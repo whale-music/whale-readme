@@ -17,14 +17,14 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-23
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("tb_rank")
 public class TbRankPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     /**
@@ -49,13 +49,18 @@ public class TbRankPojo implements Serializable {
      * 歌曲播放次数
      */
     @TableField("num")
-    private Integer num;
+    private Integer broadcastCount;
     
     /**
      * 创建时间
      */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+    
+    
+    /**
+     * 修改时间
+     */
     @TableField("update_time")
     private LocalDateTime updateTime;
-    
-    
 }

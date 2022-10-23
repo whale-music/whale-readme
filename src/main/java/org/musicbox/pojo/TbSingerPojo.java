@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -16,7 +18,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-23
  */
 @Getter
 @Setter
@@ -61,12 +63,23 @@ public class TbSingerPojo implements Serializable {
      */
     @TableField("location")
     private String location;
-
+    
     /**
      * 歌手介绍
      */
     @TableField("introduction")
     private String introduction;
-
-
+    
+    /**
+     * 创建时间
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+    
+    
+    /**
+     * 修改时间
+     */
+    @TableField("update_time")
+    private LocalDateTime updateTime;
 }

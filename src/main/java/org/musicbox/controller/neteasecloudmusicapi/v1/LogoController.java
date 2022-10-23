@@ -1,11 +1,11 @@
-package org.musicbox.controller;
+package org.musicbox.controller.neteasecloudmusicapi.v1;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 用户控制器
+ * NeteaseCloudMusicApi 登录控制器
  * </p>
  *
  * @author Sakura
@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/")
-public class UserController {
+public class LogoController {
 
 }

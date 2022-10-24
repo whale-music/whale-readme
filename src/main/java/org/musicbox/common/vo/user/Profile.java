@@ -2,6 +2,8 @@ package org.musicbox.common.vo.user;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class Profile {
     private String backgroundUrl;
@@ -27,10 +29,10 @@ public class Profile {
     private int authStatus;
     private int vipType;
     private String userName;
-    private int userId;
+    private Long userId;
     private boolean followed;
     private String lastLoginIP;
-    private long lastLoginTime;
+    private LocalDateTime lastLoginTime;
     private int authenticationTypes;
     private boolean mutual;
     private long createTime;

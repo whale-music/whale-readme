@@ -3,6 +3,7 @@ package org.musicbox.controller.neteasecloudmusicapi.v1;
 import cn.hutool.core.bean.BeanUtil;
 import org.musicbox.common.result.NeteaseResult;
 import org.musicbox.common.vo.user.Account;
+import org.musicbox.common.vo.user.Profile;
 import org.musicbox.common.vo.user.UserVo;
 import org.musicbox.compatibility.UserCompatibility;
 import org.musicbox.pojo.SysUserPojo;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -28,11 +31,33 @@ public class UserController {
     
     @GetMapping("/user/account")
     public NeteaseResult getUser() {
+        // 查找用户
         SysUserPojo account = user.getAccount(2L);
+        // 包装返回结果
         UserVo userVo = new UserVo();
+        userVo.setProfile(new Profile());
+        Profile profile = userVo.getProfile();
+        profile.setNickname(account.getNickname());
+    
+        profile.setUserId(account.getId());
+        profile.setUserName(account.getUsername());
+        profile.setShortUserName(account.getUsername());
+    
+        profile.setAvatarUrl(account.getAvatarUrl());
+        profile.setBackgroundUrl(account.getBackgroundUrl());
+    
+        profile.setLastLoginIP(account.getLastLoginIp());
+        profile.setLastLoginTime(account.getLastLoginTime());
+    
+        profile.setCreateTime(account.getCreateTime().getNano());
+    
         userVo.setAccount(new Account());
-        userVo.getAccount().setId(account.getId());
-        
+        Account userVoAccount = userVo.getAccount();
+        userVoAccount.setId(account.getId());
+        userVoAccount.setUserName(account.getUsername());
+    
+    
+        // 前端通用返回类
         NeteaseResult r = new NeteaseResult();
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
@@ -44,6 +69,7 @@ public class UserController {
         userPojo.setUsername(account);
         userPojo.setNickname(nickname);
         userPojo.setPassword(password);
+        userPojo.setCreateTime(LocalDateTime.now());
         user.createAccount(userPojo);
     }
 }

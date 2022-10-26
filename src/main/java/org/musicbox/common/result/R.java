@@ -2,7 +2,7 @@ package org.musicbox.common.result;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.musicbox.common.exception.BaseErrorInfoInterface;
-import org.musicbox.common.exception.ExceptionEnum;
+import org.musicbox.common.exception.ResultCode;
 
 public class R {
     /**
@@ -45,8 +45,8 @@ public class R {
      */
     public static R success(Object data) {
         R rb = new R();
-        rb.setCode(ExceptionEnum.SUCCESS.getResultCode());
-        rb.setMessage(ExceptionEnum.SUCCESS.getResultMsg());
+        rb.setCode(ResultCode.SUCCESS.getResultCode());
+        rb.setMessage(ResultCode.SUCCESS.getResultMsg());
         rb.setResult(data);
         return rb;
     }

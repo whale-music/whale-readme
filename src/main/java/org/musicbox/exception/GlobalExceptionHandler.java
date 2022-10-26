@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     // @ResponseBody
     // public R exceptionHandler(HttpServletRequest req, NullPointerException e){
     //     log.error("发生空指针异常！原因是:",e);
-    //     return R.error(ExceptionEnum.BODY_NOT_MATCH);
+    //     return R.error(ResultCode.BODY_NOT_MATCH);
     // }
     
     // /**
@@ -83,6 +83,6 @@ public class GlobalExceptionHandler {
     // @ResponseBody
     // public R exceptionHandler(HttpServletRequest req, Exception e){
     //     log.error("未知异常！原因是:",e);
-    //     return R.error(ExceptionEnum.INTERNAL_SERVER_ERROR);
+    //     return R.error(ResultCode.INTERNAL_SERVER_ERROR);
     // }
 }

@@ -1,9 +1,10 @@
 package org.musicbox.compatibility;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.musicbox.common.exception.ExceptionEnum;
+import org.musicbox.common.exception.ResultCode;
 import org.musicbox.exception.DuplicateUserNameException;
 import org.musicbox.exception.UserDoesNotExistException;
 import org.musicbox.pojo.SysUserPojo;
@@ -36,12 +37,12 @@ public class UserCompatibility {
         if (count == 0) {
             userService.save(user);
         } else {
-            throw new DuplicateUserNameException(ExceptionEnum.DUPLICATE_USER_NAME_ERROR.getResultCode(), ExceptionEnum.DUPLICATE_USER_NAME_ERROR.getResultMsg());
+            throw new DuplicateUserNameException(ResultCode.DUPLICATE_USER_NAME_ERROR.getResultCode(), ResultCode.DUPLICATE_USER_NAME_ERROR.getResultMsg());
         }
     }
     
     /**
-     * 获取用户信息
+     * 获取用户ID信息
      *
      * @param userId 用户ID
      * @return 用户信息
@@ -49,8 +50,20 @@ public class UserCompatibility {
     public SysUserPojo getAccount(Long userId) {
         SysUserPojo userPojo = userService.getById(userId);
         if (userPojo == null) {
-            throw new UserDoesNotExistException(ExceptionEnum.USER_DOES_NOT_EXIST.getResultCode(), ExceptionEnum.USER_DOES_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return userPojo;
+    }
+    
+    
+    public SysUserPojo loginEfficacy(String phone, String password) {
+        LambdaQueryWrapper<SysUserPojo> lambdaQuery = new LambdaQueryWrapper<>();
+        lambdaQuery.eq(SysUserPojo::getUsername, phone);
+        lambdaQuery.eq(SysUserPojo::getPassword, password);
+        SysUserPojo one = userService.getOne(lambdaQuery);
+        if (one == null) {
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+        }
+        return one;
     }
 }

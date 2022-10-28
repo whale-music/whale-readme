@@ -8,9 +8,14 @@ import org.musicbox.common.exception.ResultCode;
 import org.musicbox.exception.DuplicateUserNameException;
 import org.musicbox.exception.UserDoesNotExistException;
 import org.musicbox.pojo.SysUserPojo;
+import org.musicbox.pojo.TbCollectPojo;
 import org.musicbox.service.SysUserService;
+import org.musicbox.service.TbCollectMusicService;
+import org.musicbox.service.TbCollectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,9 +28,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class UserCompatibility {
+    // 用户服务
     @Autowired
     private SysUserService userService;
     
+    // 歌单表
+    @Autowired
+    private TbCollectService collectService;
+    
+    @Autowired
+    private TbCollectMusicService collectMusicService;
     
     /**
      * 创建用户
@@ -55,7 +67,13 @@ public class UserCompatibility {
         return userPojo;
     }
     
-    
+    /**
+     * 用户登录
+     *
+     * @param phone    账号
+     * @param password 密码
+     * @return 返回用户信息
+     */
     public SysUserPojo loginEfficacy(String phone, String password) {
         LambdaQueryWrapper<SysUserPojo> lambdaQuery = new LambdaQueryWrapper<>();
         lambdaQuery.eq(SysUserPojo::getUsername, phone);
@@ -65,5 +83,30 @@ public class UserCompatibility {
             throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return one;
+    }
+    
+    /**
+     * 跟新用户信息
+     *
+     * @param userPojo 用户信息
+     */
+    public void updateUserPojo(SysUserPojo userPojo) {
+        boolean b = userService.updateById(userPojo);
+        if (b) {
+            log.debug("用户名初始化成功");
+        } else {
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+        }
+    }
+    
+    /**
+     * 查询用户所有歌单
+     *
+     * @param uid 用户ID
+     * @return 返回用户所有歌单
+     */
+    public List<TbCollectPojo> getPlayList(String uid) {
+        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery().eq(TbCollectPojo::getUserId, Long.valueOf(uid));
+        return collectService.list(lambdaQueryWrapper);
     }
 }

@@ -2,12 +2,16 @@ package org.musicbox.controller.neteasecloudmusicapi.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.musicbox.common.exception.ResultCode;
 import org.musicbox.common.result.NeteaseResult;
 import org.musicbox.common.vo.user.UserVo;
 import org.musicbox.compatibility.UserCompatibility;
 import org.musicbox.controller.neteasecloudmusicapi.BaseController;
+import org.musicbox.exception.UserDoesNotExistException;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.utils.JwtUtil;
+import org.musicbox.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +31,14 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("/")
+@Slf4j
 public class LogoController extends BaseController {
     
     
     @Autowired
     private UserCompatibility user;
+    
+    private final String cookieName = "Cookie";
     
     /**
      * 登录接口
@@ -45,8 +52,8 @@ public class LogoController extends BaseController {
         
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
-        
-        Cookie cookie = new Cookie("Cookie", sign);
+        // 写入用户信息到cookie
+        Cookie cookie = new Cookie(cookieName, sign);
         response.addCookie(cookie);
         
         NeteaseResult r = new NeteaseResult();
@@ -59,13 +66,13 @@ public class LogoController extends BaseController {
     /**
      * 注册接口
      *
-     * @param account
-     * @param nickname
-     * @param password
-     * @return
+     * @param account  账号
+     * @param password 密码
+     * @param nickname 昵称
+     * @return 返回成功信息
      */
     @GetMapping("/register/account")
-    public NeteaseResult addUser(String account, String nickname, String password) {
+    public NeteaseResult addUser(String account, String password, String nickname) {
         SysUserPojo userPojo = new SysUserPojo();
         userPojo.setUsername(account);
         userPojo.setNickname(nickname);
@@ -75,4 +82,44 @@ public class LogoController extends BaseController {
         user.createAccount(userPojo);
         return new NeteaseResult().success();
     }
+    
+    /**
+     * 登录刷新
+     * @param response servlet response
+     * @return 返回token and Cookie
+     */
+    @GetMapping("/login/refresh")
+    public NeteaseResult refresh(HttpServletResponse response) {
+        SysUserPojo userPojo = UserUtil.getUser();
+        if (userPojo == null) {
+            log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+        }
+        String userStr = JSON.toJSONString(userPojo);
+        String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
+        // 写入用户信息到cookie
+        Cookie cookie = new Cookie(cookieName, sign);
+        response.addCookie(cookie);
+        
+        NeteaseResult r = new NeteaseResult();
+        r.put("token", sign);
+        return r;
+    }
+    
+    @GetMapping("/logout")
+    public NeteaseResult logout(HttpServletResponse response) {
+        // 删除cookie
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        
+        // 删除用户
+        UserUtil.removeUser();
+    
+        NeteaseResult r = new NeteaseResult();
+        r.success();
+        return r;
+    }
+    
 }

@@ -1,8 +1,8 @@
 package org.musicbox.mapper;
 
-import org.musicbox.pojo.SysDictDataPojo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.musicbox.pojo.SysDictDataPojo;
 
 /**
  * <p>
@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
 @Mapper
 public interface SysDictDataMapper extends BaseMapper<SysDictDataPojo> {

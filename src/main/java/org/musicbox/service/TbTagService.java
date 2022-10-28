@@ -1,7 +1,7 @@
 package org.musicbox.service;
 
-import org.musicbox.pojo.TbStylePojo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.musicbox.pojo.TbTagPojo;
 
 /**
  * <p>
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
-public interface TbStyleService extends IService<TbStylePojo> {
+public interface TbTagService extends IService<TbTagPojo> {
 
 }

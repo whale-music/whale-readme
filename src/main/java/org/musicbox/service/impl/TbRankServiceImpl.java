@@ -1,9 +1,9 @@
 package org.musicbox.service.impl;
 
-import org.musicbox.pojo.TbRankPojo;
-import org.musicbox.mapper.TbRankMapper;
-import org.musicbox.service.TbRankService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.musicbox.mapper.TbRankMapper;
+import org.musicbox.pojo.TbRankPojo;
+import org.musicbox.service.TbRankService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
 @Service
 public class TbRankServiceImpl extends ServiceImpl<TbRankMapper, TbRankPojo> implements TbRankService {

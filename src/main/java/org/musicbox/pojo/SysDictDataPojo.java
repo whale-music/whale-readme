@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -17,81 +19,60 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-23
+ * @since 2022-10-28
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("sys_dict_data")
+@ApiModel(value = "SysDictDataPojo对象", description = "字典数据表")
 public class SysDictDataPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 字典编码
-     */
+    @ApiModelProperty("字典编码")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 字典排序
-     */
+    @ApiModelProperty("字典排序")
     @TableField("dict_sort")
     private Integer dictSort;
 
-    /**
-     * 字典记录实际数据
-     */
+    @ApiModelProperty("字典记录实际数据")
     @TableField("dict_label")
     private String dictLabel;
 
-    /**
-     * 字典键值
-     */
+    @ApiModelProperty("字典键值")
     @TableField("dict_value")
     private String dictValue;
 
-    /**
-     * 字典类型
-     */
+    @ApiModelProperty("字典类型")
     @TableField("dict_type")
     private String dictType;
 
-    /**
-     * 状态（0正常 1停用）
-     */
+    @ApiModelProperty("状态（0正常 1停用）")
     @TableField("status")
     private String status;
 
-    /**
-     * 创建者
-     */
+    @ApiModelProperty("创建者")
     @TableField("create_by")
     private String createBy;
 
-    /**
-     * 创建时间
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
-
-    /**
-     * 更新者
-     */
+    @ApiModelProperty("更新者")
     @TableField("update_by")
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
-    @TableField("update_time")
-    private LocalDateTime updateTime;
-
-    /**
-     * 备注
-     */
+    @ApiModelProperty("备注")
     @TableField("remark")
     private String remark;
+
+    @ApiModelProperty("创建时间")
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    @TableField("update_time")
+    private LocalDateTime updateTime;
 
 
 }

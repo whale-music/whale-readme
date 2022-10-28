@@ -21,6 +21,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PARAM_TYPE_BIND_ERROR("10003", "参数类型错误"),
     PARAM_NOT_COMPLETE("10004", "参数缺失"),
     TOKEN_INVALID("10004", "Token 无效"),
+    COOKIE_INVALID("10005", "Cookie 无效"),
     
     
     /* 用户错误：20001-29999*/

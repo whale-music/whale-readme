@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateUserNameException.class)
     @ResponseBody
-    public R userRepetitionExceptionHandler(HttpServletRequest req, BaseException e) {
+    public R exceptionHandler1(HttpServletRequest req, BaseException e) {
         log.error("用户名不能重复：{}", e.getErrorMsg());
         return R.error(e.getErrorCode(), e.getErrorMsg());
     }
@@ -41,8 +41,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UserDoesNotExistException.class)
     @ResponseBody
-    public R userDoesNotExistExceptionHandler(HttpServletRequest req, BaseException e) {
+    public R exceptionHandler2(HttpServletRequest req, BaseException e) {
         log.warn("用户不存在{}", e.getErrorMsg());
+        return R.error(e.getErrorCode(), e.getErrorMsg());
+    }
+    
+    @ExceptionHandler(CookieInvalidException.class)
+    @ResponseBody
+    public R exceptionHandler3(HttpServletRequest req, BaseException e) {
+        log.warn("Cookie无效{}", e.getErrorMsg());
         return R.error(e.getErrorCode(), e.getErrorMsg());
     }
     

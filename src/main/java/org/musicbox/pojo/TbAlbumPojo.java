@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -17,49 +19,38 @@ import java.time.LocalDate;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-23
+ * @since 2022-10-28
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("tb_album")
+@ApiModel(value = "TbAlbumPojo对象", description = "歌曲专辑表")
 public class TbAlbumPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 专辑表ID
-     */
+    @ApiModelProperty("专辑表ID")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 专辑名
-     */
+    @ApiModelProperty("专辑名")
     @TableField("album_name")
     private String albumName;
 
-    /**
-     * 专辑封面地址
-     */
+    @ApiModelProperty("专辑封面地址")
     @TableField("pic")
     private String pic;
 
-    /**
-     * 专辑简介
-     */
+    @ApiModelProperty("专辑简介")
     @TableField("indirect")
     private String indirect;
 
-    /**
-     * 修改时间
-     */
+    @ApiModelProperty("修改时间")
     @TableField("update_time")
     private LocalDate updateTime;
 
-    /**
-     * 创建时间
-     */
+    @ApiModelProperty("创建时间")
     @TableField("create_time")
     private LocalDate createTime;
 

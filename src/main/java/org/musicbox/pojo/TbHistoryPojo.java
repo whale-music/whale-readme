@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -17,49 +19,34 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-23
+ * @since 2022-10-28
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("tb_history")
+@ApiModel(value = "TbHistoryPojo对象", description = "音乐播放历史(包括歌单，音乐，专辑）")
 public class TbHistoryPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 音乐播放历史ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-
-    /**
-     * 歌曲ID
-     */
-    @TableField("music_id")
+    @ApiModelProperty("歌曲ID")
+    @TableId(value = "music_id", type = IdType.AUTO)
     private Long musicId;
 
-    /**
-     * 听歌次数
-     */
+    @ApiModelProperty("听歌次数")
     @TableField("count")
     private Integer count;
 
-    /**
-     * 历史类型
-     */
+    @ApiModelProperty("历史类型")
     @TableField("type")
     private Integer type;
 
-    /**
-     * 创建时间
-     */
+    @ApiModelProperty("创建时间")
     @TableField("create_time")
     private LocalDateTime createTime;
 
-    /**
-     * 修改时间
-     */
+    @ApiModelProperty("修改时间")
     @TableField("update_time")
     private LocalDateTime updateTime;
 

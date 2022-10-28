@@ -1,9 +1,9 @@
 package org.musicbox.service.impl;
 
-import org.musicbox.pojo.TbAlbumPojo;
-import org.musicbox.mapper.TbAlbumMapper;
-import org.musicbox.service.TbAlbumService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.musicbox.mapper.TbAlbumMapper;
+import org.musicbox.pojo.TbAlbumPojo;
+import org.musicbox.service.TbAlbumService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
 @Service
 public class TbAlbumServiceImpl extends ServiceImpl<TbAlbumMapper, TbAlbumPojo> implements TbAlbumService {

@@ -1,18 +1,18 @@
 package org.musicbox.mapper;
 
-import org.musicbox.pojo.TbStylePojo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.musicbox.pojo.TbCollectTagPojo;
 
 /**
  * <p>
- * 标签表（风格） Mapper 接口
+ * 歌单风格中间表 Mapper 接口
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
 @Mapper
-public interface TbStyleMapper extends BaseMapper<TbStylePojo> {
+public interface TbCollectTagMapper extends BaseMapper<TbCollectTagPojo> {
 
 }

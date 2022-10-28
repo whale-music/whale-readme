@@ -4,9 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.musicbox.common.exception.ResultCode;
-import org.musicbox.exception.BaseException;
 
 import java.util.Date;
 
@@ -76,15 +73,11 @@ public class JwtUtil {
      * @param token token 数据
      */
     public static void checkSign(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(SECRET);
-            JWTVerifier verifier = JWT.require(algorithm)
-                                      //.withClaim("username, username)
-                                      .build();
-            verifier.verify(token);
-        } catch (JWTVerificationException e) {
-            throw new BaseException(ResultCode.TOKEN_INVALID.getResultCode(), ResultCode.TOKEN_INVALID.getResultMsg());
-        }
+        Algorithm algorithm = Algorithm.HMAC256(SECRET);
+        JWTVerifier verifier = JWT.require(algorithm)
+                                  //.withClaim("username, username)
+                                  .build();
+        verifier.verify(token);
     }
 }
 

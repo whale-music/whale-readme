@@ -1,264 +1,225 @@
-SET NAMES utf8mb4;
-SET
-FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for sys_dict_data
--- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_data`;
-CREATE TABLE `sys_dict_data`
+create table if not exists music_box.sys_dict_data
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '�ֵ����',
-    `dict_sort`   int(11) NULL DEFAULT 0 COMMENT '�ֵ�����',
-    `dict_label`  varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '�ֵ��¼ʵ������',
-    `dict_value`  varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '�ֵ��ֵ',
-    `dict_type`   varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '�ֵ�����',
-    `status`      char(1) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '0' COMMENT '״̬��0���� 1ͣ�ã�',
-    `create_by`   varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '������',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_by`   varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '������',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `remark`      varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '��ע',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�ֵ����ݱ�' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment comment '字典编码'
+        primary key,
+    dict_sort   int                           default 0   null comment '字典排序',
+    dict_label  varchar(100) collate utf8_bin default ''  null comment '字典记录实际数据',
+    dict_value  varchar(100) collate utf8_bin default ''  null comment '字典键值',
+    dict_type   varchar(100) collate utf8_bin default ''  null comment '字典类型',
+    status      char collate utf8_bin         default '0' null comment '状态（0正常 1停用）',
+    create_by   varchar(64) collate utf8_bin  default ''  null comment '创建者',
+    update_by   varchar(64) collate utf8_bin  default ''  null comment '更新者',
+    remark      varchar(500) collate utf8_bin             null comment '备注',
+    create_time datetime                                  null comment '创建时间',
+    update_time datetime                                  null comment '更新时间'
+)
+    comment '字典数据表';
 
--- ----------------------------
--- Table structure for sys_dict_type
--- ----------------------------
-DROP TABLE IF EXISTS `sys_dict_type`;
-CREATE TABLE `sys_dict_type`
+create table if not exists music_box.sys_dict_type
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '�ֵ�����',
-    `dict_name`   varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '�ֵ�����',
-    `dict_type`   varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '�ֵ�����',
-    `status`      char(1) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '0' COMMENT '״̬��0���� 1ͣ�ã�',
-    `create_by`   varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '������',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_by`   varchar(64) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '' COMMENT '������',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `remark`      varchar(500) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL COMMENT '��ע',
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `dict_type`(`dict_type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�ֵ����ͱ�' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment comment '字典主键'
+        primary key,
+    dict_name   varchar(100) collate utf8_bin default ''  null comment '字典名称',
+    dict_type   varchar(100) collate utf8_bin default ''  null comment '字典类型',
+    status      char collate utf8_bin         default '0' null comment '状态（0正常 1停用）',
+    remark      varchar(500) collate utf8_bin             null comment '备注',
+    create_by   varchar(64) collate utf8_bin  default ''  null comment '创建者',
+    update_by   varchar(64) collate utf8_bin  default ''  null comment '更新者',
+    update_time datetime                                  null comment '更新时间',
+    create_time datetime                                  null comment '创建时间',
+    constraint dict_type
+        unique (dict_type)
+)
+    comment '字典类型表';
 
--- ----------------------------
--- Table structure for sys_user
--- ----------------------------
-DROP TABLE IF EXISTS `sys_user`;
-CREATE TABLE `sys_user`
+create table if not exists music_box.sys_user
 (
-    `id`              bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ϵͳ�û�ID',
-    `username`        varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '��¼�û���',
-    `nickname`        varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '��¼��ʾ�ǳ�',
-    `password`        varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '�û�����',
-    `avatar_url`      varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'ͷ��URL',
-    `background_url`  varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '������ƬURL',
-    `signature`       varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '����ǩ��',
-    `account_type`    int(11) NULL DEFAULT NULL COMMENT '�˻�����',
-    `last_login_ip`   varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '����¼IP',
-    `last_login_time` datetime(0) NULL DEFAULT NULL COMMENT '����¼ʱ��',
-    `create_time`     datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time`     datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    PRIMARY KEY (`id`, `username`, `nickname`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'ϵͳ�û���' ROW_FORMAT = Dynamic;
+    id              bigint auto_increment comment '系统用户ID'
+        primary key,
+    username        varchar(128) not null comment '登录用户名',
+    nickname        varchar(128) not null comment '登录显示昵称',
+    password        varchar(20)  null comment '用户密码',
+    avatar_url      varchar(256) null comment '头像URL',
+    background_url  varchar(256) null comment '背景照片URL',
+    signature       varchar(50)  null comment '个性签名',
+    account_type    int          null comment '账户类型',
+    last_login_ip   varchar(20)  null comment '最后登录IP',
+    last_login_time datetime     null comment '最后登录时间',
+    create_time     datetime     null comment '创建时间',
+    update_time     datetime     null comment '修改时间'
+)
+    comment '系统用户表';
 
--- ----------------------------
--- Table structure for tb_album
--- ----------------------------
-DROP TABLE IF EXISTS `tb_album`;
-CREATE TABLE `tb_album`
+create index sys_user_nickname_index
+    on music_box.sys_user (nickname);
+
+create index sys_user_username_index
+    on music_box.sys_user (username);
+
+create table if not exists music_box.tb_album
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ר����ID',
-    `album_name`  varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ר����',
-    `pic`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'ר�������ַ',
-    `indirect`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'ר�����',
-    `update_time` date NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    `create_time` date NULL DEFAULT NULL COMMENT '����ʱ��',
-    PRIMARY KEY (`id`, `album_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '����ר����' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment comment '专辑表ID'
+        primary key,
+    album_name  varchar(64) charset utf8 not null comment '专辑名',
+    pic         varchar(64) charset utf8 null comment '专辑封面地址',
+    indirect    varchar(255)             null comment '专辑简介',
+    update_time date                     null comment '修改时间',
+    create_time date                     null comment '创建时间'
+)
+    comment '歌曲专辑表';
 
--- ----------------------------
--- Table structure for tb_collect
--- ----------------------------
-DROP TABLE IF EXISTS `tb_collect`;
-CREATE TABLE `tb_collect`
+create index tb_album_album_name_index
+    on music_box.tb_album (album_name);
+
+create table if not exists music_box.tb_collect
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '�赥��ID',
-    `song_name`   varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '�赥��',
-    `pic`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '�����ַ',
-    `introduce`   varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '���',
-    `style`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '�赥��ǩ����ʾ�赥��񡣱����ǩ����ǩ�����ŷָ�',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    `user_id`     bigint(20) NULL DEFAULT NULL COMMENT '������ID',
-    PRIMARY KEY (`id`, `song_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�赥�б�' ROW_FORMAT = Dynamic;
+    id             bigint auto_increment comment '歌单表ID'
+        primary key,
+    play_list_name varchar(256)              not null comment '歌单名',
+    pic            varchar(64) charset utf8  null comment '封面地址',
+    description    varchar(512) charset utf8 null comment '简介',
+    tag_id         bigint                    null comment '歌单标签，表示歌单风格。保存标签到标签表，逗号分割',
+    user_id        bigint                    null comment '创建人ID',
+    sort           bigint                    null comment '排序字段',
+    create_time    datetime                  null comment '创建时间',
+    update_time    datetime                  null comment '修改时间'
+)
+    comment '歌单列表';
 
--- ----------------------------
--- Table structure for tb_collect_music
--- ----------------------------
-DROP TABLE IF EXISTS `tb_collect_music`;
-CREATE TABLE `tb_collect_music`
+create index tb_collect_play_list_name_index
+    on music_box.tb_collect (play_list_name);
+
+create table if not exists music_box.tb_collect_music
 (
-    `id`         bigint(20) NOT NULL AUTO_INCREMENT,
-    `collect_id` bigint(20) NOT NULL COMMENT '�赥ID',
-    `music_id`   bigint(20) NOT NULL COMMENT '����ID',
-    PRIMARY KEY (`id`, `collect_id`, `music_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 99 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�赥�����ֵ��м�����ڼ�¼�赥�е�ÿһ������' ROW_FORMAT = Dynamic;
+    collect_id bigint not null comment '歌单ID',
+    music_id   bigint not null comment '音乐ID',
+    primary key (collect_id, music_id)
+)
+    comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';
 
--- ----------------------------
--- Table structure for tb_collect_style
--- ----------------------------
-DROP TABLE IF EXISTS `tb_collect_style`;
-CREATE TABLE `tb_collect_style`
+create table if not exists music_box.tb_collect_tag
 (
-    `id`         bigint(20) NOT NULL AUTO_INCREMENT,
-    `collect_id` bigint(20) NULL DEFAULT NULL,
-    `style_id`   bigint(20) NULL DEFAULT NULL,
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�赥������м����ǩ��' ROW_FORMAT = Dynamic;
+    collect_id bigint not null comment '歌单ID',
+    tag_id     bigint not null comment 'tag ID',
+    primary key (collect_id, tag_id)
+)
+    comment '歌单风格中间表';
 
--- ----------------------------
--- Table structure for tb_history
--- ----------------------------
-DROP TABLE IF EXISTS `tb_history`;
-CREATE TABLE `tb_history`
+create table if not exists music_box.tb_history
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '���ֲ�����ʷID',
-    `music_id`    bigint(20) NOT NULL COMMENT '����ID',
-    `count`       int(11) NULL DEFAULT NULL COMMENT '�������',
-    `type`        int(11) NULL DEFAULT NULL COMMENT '��ʷ����',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    PRIMARY KEY (`id`, `music_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '���ֲ�����ʷ(�����赥�����֣�ר����' ROW_FORMAT = Dynamic;
+    music_id    bigint   not null comment '歌曲ID'
+        primary key,
+    count       int      null comment '听歌次数',
+    type        int      null comment '历史类型',
+    create_time datetime null comment '创建时间',
+    update_time datetime null comment '修改时间'
+)
+    comment '音乐播放历史(包括歌单，音乐，专辑）';
 
--- ----------------------------
--- Table structure for tb_like
--- ----------------------------
-DROP TABLE IF EXISTS `tb_like`;
-CREATE TABLE `tb_like`
+create table if not exists music_box.tb_like
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ϲ���赥ID',
-    `song_name`   varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '�赥��',
-    `pic`         varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '�����ַ',
-    `introduce`   varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '���',
-    `style`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '�赥��ǩ����ʾ�赥���ʹ���ֵ��',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    `user_id`     bigint(20) NULL DEFAULT NULL COMMENT '�����û�ID',
-    PRIMARY KEY (`id`, `song_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'ϲ���赥' ROW_FORMAT = Dynamic;
+    user_id     bigint auto_increment comment '我喜欢的歌单ID和用户ID相同'
+        primary key,
+    song_name   varchar(256)              null comment '歌单名',
+    pic         varchar(64) charset utf8  null comment '封面地址',
+    description varchar(512) charset utf8 null comment '简介',
+    tag         bigint                    null comment '歌单标签，表示歌单风格。使用字典表',
+    update_time datetime                  null comment '修改时间',
+    create_time datetime                  null comment '创建时间'
+)
+    comment '喜爱歌单';
 
--- ----------------------------
--- Table structure for tb_like_music
--- ----------------------------
-DROP TABLE IF EXISTS `tb_like_music`;
-CREATE TABLE `tb_like_music`
+create table if not exists music_box.tb_like_music
 (
-    `id`       bigint(20) NOT NULL AUTO_INCREMENT,
-    `like_id`  bigint(20) NOT NULL COMMENT 'ϲ���赥ID',
-    `music_id` bigint(20) NOT NULL COMMENT '����ID',
-    PRIMARY KEY (`id`, `like_id`, `music_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 105 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'ϲ���赥�м��' ROW_FORMAT = Dynamic;
+    like_id  bigint not null comment '喜爱歌单ID',
+    music_id bigint not null comment '音乐ID',
+    primary key (like_id, music_id)
+)
+    comment '喜爱歌单中间表';
 
--- ----------------------------
--- Table structure for tb_music
--- ----------------------------
-DROP TABLE IF EXISTS `tb_music`;
-CREATE TABLE `tb_music`
+create table if not exists music_box.tb_music
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '���������б�ID',
-    `music_name`  varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '������',
-    `alia_name`   varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '����������������ʹ�ö��ŷָ�',
-    `singer_id`   bigint(20) NULL DEFAULT NULL COMMENT '������Ϣ��id�Ǹ��ֺ͸������м��',
-    `lyric`       varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '���',
-    `time_length` time(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `album_id`    bigint(20) NULL DEFAULT NULL COMMENT 'ר��ID',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1201 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '���������б�' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment comment '所有音乐列表ID'
+        primary key,
+    music_name  varchar(64) charset utf8  null comment '音乐名',
+    alia_name   varchar(64)               null comment '歌曲别名，数组则使用逗号分割',
+    singer_id   bigint                    null comment '歌手信息，id是歌手和歌曲的中间表',
+    lyric       varchar(512) charset utf8 null comment '歌词',
+    album_id    bigint                    null comment '专辑ID',
+    time_length time                      null comment '歌曲时长',
+    sort        bigint                    null comment '排序字段',
+    update_time datetime                  null comment '更新时间',
+    create_time datetime                  null comment '创建时间'
+)
+    comment '所有音乐列表';
 
--- ----------------------------
--- Table structure for tb_music_singer
--- ----------------------------
-DROP TABLE IF EXISTS `tb_music_singer`;
-CREATE TABLE `tb_music_singer`
+create index tb_music_alia_name_index
+    on music_box.tb_music (alia_name);
+
+create index tb_music_music_name_index
+    on music_box.tb_music (music_name);
+
+create table if not exists music_box.tb_music_singer
 (
-    `id`        bigint(20) NOT NULL AUTO_INCREMENT,
-    `music_id`  bigint(20) NOT NULL COMMENT '����ID',
-    `singer_id` bigint(20) NOT NULL COMMENT '����ID',
-    PRIMARY KEY (`id`, `music_id`, `singer_id`) USING BTREE,
-    UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�����͸��ֵ��м��' ROW_FORMAT = Dynamic;
+    music_id  bigint not null comment '歌曲ID',
+    singer_id bigint not null comment '歌曲ID',
+    primary key (music_id, singer_id)
+)
+    comment '歌曲和歌手的中间表';
 
--- ----------------------------
--- Table structure for tb_music_url
--- ----------------------------
-DROP TABLE IF EXISTS `tb_music_url`;
-CREATE TABLE `tb_music_url`
+create table if not exists music_box.tb_music_url
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '����',
-    `music_id`    bigint(20) NOT NULL COMMENT '����ID',
-    `url`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '���ֵ�ַ',
-    `rate`        int(11) NULL DEFAULT NULL COMMENT '�����ʣ���Ƶ�ļ�����Ϣ',
-    `quality`     char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '��������(sq: ����l����������m����������h����������a��δ֪)',
-    `md5`         bigint(20) NULL DEFAULT NULL COMMENT '�������ֱ����md5�����ϴ��µ�����ʱ���Ƚϡ������ͬ���ʾ�Ѵ���',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `encodeType`  varbinary(10) NULL DEFAULT NULL COMMENT '�ļ���ʽ����',
-    PRIMARY KEY (`id`, `music_id`) USING BTREE,
-    UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '�������ص�ַ' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment comment '主键'
+        primary key,
+    music_id    bigint        not null comment '音乐ID',
+    url         varchar(255)  null comment '音乐地址',
+    rate        int           null comment '比特率，音频文件的信息',
+    quality     char(3)       null comment '音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)',
+    md5         bigint        null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
+    update_time datetime      null comment '修改时间',
+    create_time datetime      null comment '创建时间',
+    encodeType  varbinary(10) null comment '文件格式类型'
+)
+    comment '音乐下载地址';
 
--- ----------------------------
--- Table structure for tb_rank
--- ----------------------------
-DROP TABLE IF EXISTS `tb_rank`;
-CREATE TABLE `tb_rank`
+create index tb_music_url_music_id_index
+    on music_box.tb_music_url (music_id);
+
+create table if not exists music_box.tb_rank
 (
-    `id`              bigint(20) NOT NULL AUTO_INCREMENT COMMENT '���ֲ������а�ID',
-    `music_id`        bigint(20) NOT NULL COMMENT '����ID',
-    `user_id`         bigint(20) NOT NULL COMMENT '�û�ID',
-    `broadcast_count` int(11) NULL DEFAULT NULL COMMENT '�������Ŵ���',
-    `create_time`     datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time`     datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    PRIMARY KEY (`id`, `music_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '���ֲ������а�' ROW_FORMAT = Dynamic;
+    user_id         bigint   not null comment '用户ID'
+        primary key,
+    music_id        bigint   not null comment '音乐ID',
+    broadcast_count int      null comment '歌曲播放次数',
+    create_time     datetime null comment '创建时间',
+    update_time     datetime null comment '创建时间'
+)
+    comment '音乐播放排行榜';
 
--- ----------------------------
--- Table structure for tb_singer
--- ----------------------------
-DROP TABLE IF EXISTS `tb_singer`;
-CREATE TABLE `tb_singer`
+create table if not exists music_box.tb_singer
 (
-    `id`           bigint(20) NOT NULL AUTO_INCREMENT COMMENT '����ID',
-    `singer_name`  varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '������',
-    `sex`          varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '�����Ա�',
-    `pic`          varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '����',
-    `birth`        date NULL DEFAULT NULL COMMENT '��������',
-    `location`     varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '���ڹ���',
-    `introduction` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '���ֽ���',
-    `create_time`  datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time`  datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    PRIMARY KEY (`id`, `singer_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '���ֱ�' ROW_FORMAT = Dynamic;
+    id           bigint auto_increment comment '歌手ID'
+        primary key,
+    singer_name  varchar(64) charset utf8  not null comment '歌手名',
+    sex          varchar(64) charset utf8  null comment '歌手性别',
+    pic          varchar(64) charset utf8  null comment '封面',
+    birth        date                      null comment '出生年月',
+    location     varchar(64) charset utf8  null comment '所在国家',
+    introduction varchar(128) charset utf8 null comment '歌手介绍',
+    create_time  datetime                  null comment '创建时间',
+    update_time  datetime                  null comment '修改时间'
+)
+    comment '歌手表';
 
--- ----------------------------
--- Table structure for tb_style
--- ----------------------------
-DROP TABLE IF EXISTS `tb_style`;
-CREATE TABLE `tb_style`
+create table if not exists music_box.tb_tag
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
-    `style`       varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '��񣨱�ǩ��',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '����ʱ��',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT '�޸�ʱ��',
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `id`(`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '��ǩ�����' ROW_FORMAT = Dynamic;
+    id          bigint auto_increment
+        primary key,
+    tag_name    varchar(20) null comment '风格（标签）',
+    create_time datetime    null comment '创建时间',
+    update_time datetime    null comment '修改时间',
+    constraint id
+        unique (id)
+)
+    comment '标签表（风格）';
 
-SET
-FOREIGN_KEY_CHECKS = 1;

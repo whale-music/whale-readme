@@ -1,7 +1,7 @@
 package org.musicbox.service;
 
-import org.musicbox.pojo.TbMusicUrlPojo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.musicbox.pojo.TbMusicUrlPojo;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-22
+ * @since 2022-10-28
  */
 public interface TbMusicUrlService extends IService<TbMusicUrlPojo> {
 

@@ -2,9 +2,12 @@ package org.musicbox.utils;
 
 import org.musicbox.pojo.SysUserPojo;
 
-public class ThreadUtils {
+public class UserUtil {
     
-    private static ThreadLocal<SysUserPojo> USER = new ThreadLocal<>();
+    private UserUtil() {
+    }
+    
+    private static final ThreadLocal<SysUserPojo> USER = new ThreadLocal<>();
     
     public static SysUserPojo getUser() {
         return USER.get();

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -12,28 +14,28 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 歌单个风格中间表（标签）
+ * 歌单风格中间表
  * </p>
  *
  * @author Sakura
- * @since 2022-10-23
+ * @since 2022-10-28
  */
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("tb_collect_style")
-public class TbCollectStylePojo implements Serializable {
+@TableName("tb_collect_tag")
+@ApiModel(value = "TbCollectTagPojo对象", description = "歌单风格中间表")
+public class TbCollectTagPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-
-    @TableField("collect_id")
+    @ApiModelProperty("歌单ID")
+    @TableId(value = "collect_id", type = IdType.AUTO)
     private Long collectId;
 
-    @TableField("style_id")
-    private Long styleId;
+    @ApiModelProperty("tag ID")
+    @TableField(value = "tag_id")
+    private Long tagId;
 
 
 }

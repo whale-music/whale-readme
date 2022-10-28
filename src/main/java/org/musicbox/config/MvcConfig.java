@@ -15,10 +15,8 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor())
-                // 用户信息
-                .addPathPatterns("/user/account")
-                // 用户歌单
-                .addPathPatterns("/user/playlist");
+                // 拦截所有请求
+                .addPathPatterns("/*/**");
     }
     
     /**

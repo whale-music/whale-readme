@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PlaylistItem{
+public class PlaylistItem {
 	private Object sharedUsers;
 	private boolean copied;
 	private Integer privacy;

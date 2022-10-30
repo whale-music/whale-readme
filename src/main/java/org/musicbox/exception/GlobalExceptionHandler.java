@@ -53,6 +53,26 @@ public class GlobalExceptionHandler {
         return R.error(e.getErrorCode(), e.getErrorMsg());
     }
     
+    @ExceptionHandler(SongListDoesNotExistException.class)
+    @ResponseBody
+    public R exceptionHandler4(HttpServletRequest req, BaseException e) {
+        log.warn("歌单不存在{}", e.getErrorMsg());
+        return R.error(e.getErrorCode(), e.getErrorMsg());
+    }
+    
+    @ExceptionHandler(NoAuthorityException.class)
+    @ResponseBody
+    public R exceptionHandler5(HttpServletRequest req, BaseException e) {
+        log.warn("无权限操作{}", e.getErrorMsg());
+        return R.error(e.getErrorCode(), e.getErrorMsg());
+    }
+    
+    @ExceptionHandler(SongNotExistException.class)
+    @ResponseBody
+    public R exceptionHandler6(HttpServletRequest req, BaseException e) {
+        log.warn("歌曲不存在{}", e.getErrorMsg());
+        return R.error(e.getErrorCode(), e.getErrorMsg());
+    }
     
     // /**
     //  * 处理自定义的业务异常

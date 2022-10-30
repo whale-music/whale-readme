@@ -2,7 +2,6 @@ package org.musicbox.common.result;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.musicbox.common.exception.BaseErrorInfoInterface;
-import org.musicbox.common.exception.ResultCode;
 
 public class R {
     /**

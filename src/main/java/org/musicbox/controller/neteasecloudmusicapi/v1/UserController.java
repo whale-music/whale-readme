@@ -1,10 +1,12 @@
 package org.musicbox.controller.neteasecloudmusicapi.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.musicbox.common.result.NeteaseResult;
 import org.musicbox.common.vo.playlist.Creator;
 import org.musicbox.common.vo.playlist.PlayListVo;
 import org.musicbox.common.vo.playlist.PlaylistItem;
+import org.musicbox.common.vo.subcount.Subcount;
 import org.musicbox.common.vo.user.UserVo;
 import org.musicbox.compatibility.CollectCompatibility;
 import org.musicbox.compatibility.UserCompatibility;
@@ -81,29 +83,38 @@ public class UserController extends BaseController {
      * @return 返回用户歌单
      */
     @GetMapping("/user/playlist")
-    public NeteaseResult userPlayList(@RequestParam("uid") String uid) {
+    public NeteaseResult userPlayList(@RequestParam("uid") String uid, Long pageSize, Long pageIndex) {
+        if (pageIndex == null || pageSize == null) {
+            pageIndex = 0L;
+            pageSize = 30L;
+        }
         PlayListVo playListVo = new PlayListVo();
         playListVo.setPlaylist(new ArrayList<>());
         playListVo.setVersion("0");
-        playListVo.setMore(false);
+        
         
         // 如果歌单查询没有值，直接返回
-        List<TbCollectPojo> collectPojo = user.getPlayList(uid);
-        if (collectPojo == null || collectPojo.isEmpty()) {
+        Page<TbCollectPojo> collectPojoPage = user.getPlayList(uid, pageIndex, pageSize);
+        // 是否有下一页
+        playListVo.setMore(collectPojoPage.hasNext());
+        List<TbCollectPojo> collectPojoList = collectPojoPage.getRecords();
+        if (collectPojoList == null || collectPojoList.isEmpty()) {
             NeteaseResult neteaseResult = new NeteaseResult();
             neteaseResult.putAll(BeanUtil.beanToMap(playListVo));
             return neteaseResult.success();
         }
         // 导出歌单id
-        List<Long> collectIds = collectPojo.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
+        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
         // 根据歌单和tag的中间表来获取tag id列表
         List<TbCollectTagPojo> collectIdAndTagsIdList = collect.getCollectTagIdList(collectIds);
         // 根据tag id 列表获取tag Name列表
-        List<Long> tagIdList = collectIdAndTagsIdList.stream().map(TbCollectTagPojo::getTagId).collect(Collectors.toList());
+        List<Long> tagIdList = collectIdAndTagsIdList.stream()
+                                                     .map(TbCollectTagPojo::getTagId)
+                                                     .collect(Collectors.toList());
         List<TbTagPojo> collectTagList = collect.getTagPojoList(tagIdList);
         
         
-        for (TbCollectPojo tbCollectPojo : collectPojo) {
+        for (TbCollectPojo tbCollectPojo : collectPojoList) {
             PlaylistItem item = new PlaylistItem();
             // 是否订阅
             item.setSubscribed(false);
@@ -123,7 +134,12 @@ public class UserController extends BaseController {
             if (!collectIdAndTagsIdList.isEmpty() && collectTagList != null && !collectTagList.isEmpty()) {
                 // 歌单tag
                 // 先查找歌单和tag中间表，再查找tag记录表
-                List<String> tags = collectIdAndTagsIdList.stream().filter(tbCollectTagPojo -> tbCollectTagPojo.getCollectId().equals(tbCollectPojo.getId())).map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(), collectTagList)).collect(Collectors.toList());
+                List<String> tags = collectIdAndTagsIdList.stream()
+                                                          .filter(tbCollectTagPojo -> tbCollectTagPojo.getCollectId()
+                                                                                                      .equals(tbCollectPojo.getId()))
+                                                          .map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(),
+                                                                  collectTagList))
+                                                          .collect(Collectors.toList());
                 item.setTags(tags);
             }
             // 歌单名
@@ -137,6 +153,35 @@ public class UserController extends BaseController {
         neteaseResult.putAll(BeanUtil.beanToMap(playListVo));
         return neteaseResult.success();
     }
+    
+    /**
+     * 获取用户收藏，创建
+     * 歌单，收藏，mv, dj 数量
+     *
+     * @return 计数
+     */
+    @GetMapping("/user/subcount")
+    public NeteaseResult getSubcount() {
+        SysUserPojo userPojo = UserUtil.getUser();
+        
+        NeteaseResult r = new NeteaseResult();
+        Subcount subcount = new Subcount();
+        // 收藏歌单
+        subcount.setSubPlaylistCount(user.getSubPlaylistCount(userPojo.getId()));
+        // 创建歌单
+        subcount.setCreatedPlaylistCount(user.getCreatedPlaylistCount(userPojo.getId()));
+        // 关注歌手
+        subcount.setArtistCount(user.getUserBySinger(userPojo.getId()));
+        // 首次从Dj
+        subcount.setDjRadioCount(0L);
+        // 创建DJ
+        subcount.setCreateDjRadioCount(0L);
+        // MV
+        subcount.setMvCount(0L);
+        r.putAll(BeanUtil.beanToMap(subcount));
+        return r.success();
+    }
+    
     
     /**
      * 获取歌单tag

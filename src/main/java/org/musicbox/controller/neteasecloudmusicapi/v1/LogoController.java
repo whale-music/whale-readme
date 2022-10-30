@@ -3,8 +3,8 @@ package org.musicbox.controller.neteasecloudmusicapi.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.musicbox.common.exception.ResultCode;
 import org.musicbox.common.result.NeteaseResult;
+import org.musicbox.common.result.ResultCode;
 import org.musicbox.common.vo.user.UserVo;
 import org.musicbox.compatibility.UserCompatibility;
 import org.musicbox.controller.neteasecloudmusicapi.BaseController;
@@ -35,10 +35,9 @@ import java.time.LocalDateTime;
 public class LogoController extends BaseController {
     
     
+    private final String cookieName = "Cookie";
     @Autowired
     private UserCompatibility user;
-    
-    private final String cookieName = "Cookie";
     
     /**
      * 登录接口
@@ -85,6 +84,7 @@ public class LogoController extends BaseController {
     
     /**
      * 登录刷新
+     *
      * @param response servlet response
      * @return 返回token and Cookie
      */
@@ -93,7 +93,8 @@ public class LogoController extends BaseController {
         SysUserPojo userPojo = UserUtil.getUser();
         if (userPojo == null) {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+                    ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);

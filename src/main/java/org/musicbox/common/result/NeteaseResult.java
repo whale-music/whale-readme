@@ -1,7 +1,5 @@
 package org.musicbox.common.result;
 
-import org.musicbox.common.exception.ResultCode;
-
 import java.util.HashMap;
 
 public class NeteaseResult extends HashMap<String, Object> {

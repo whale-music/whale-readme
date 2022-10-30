@@ -2,20 +2,21 @@ package org.musicbox.compatibility;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.musicbox.common.exception.ResultCode;
+import org.musicbox.common.result.ResultCode;
 import org.musicbox.exception.DuplicateUserNameException;
 import org.musicbox.exception.UserDoesNotExistException;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.pojo.TbCollectPojo;
+import org.musicbox.pojo.TbUserSingerPojo;
 import org.musicbox.service.SysUserService;
 import org.musicbox.service.TbCollectMusicService;
 import org.musicbox.service.TbCollectService;
+import org.musicbox.service.TbUserSingerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * <p>
@@ -36,8 +37,13 @@ public class UserCompatibility {
     @Autowired
     private TbCollectService collectService;
     
+    // 歌单和歌曲中间表
     @Autowired
     private TbCollectMusicService collectMusicService;
+    
+    // 用户关注歌手表
+    @Autowired
+    private TbUserSingerService userSingerService;
     
     /**
      * 创建用户
@@ -45,11 +51,15 @@ public class UserCompatibility {
      * @param user 用户信息
      */
     public void createAccount(SysUserPojo user) {
-        long count = userService.count(Wrappers.<SysUserPojo>lambdaQuery().eq(StringUtils.isNotBlank(user.getUsername()), SysUserPojo::getUsername, user.getUsername()));
+        long count = userService.count(Wrappers.<SysUserPojo>lambdaQuery()
+                                               .eq(StringUtils.isNotBlank(user.getUsername()),
+                                                       SysUserPojo::getUsername,
+                                                       user.getUsername()));
         if (count == 0) {
             userService.save(user);
         } else {
-            throw new DuplicateUserNameException(ResultCode.DUPLICATE_USER_NAME_ERROR.getResultCode(), ResultCode.DUPLICATE_USER_NAME_ERROR.getResultMsg());
+            throw new DuplicateUserNameException(ResultCode.DUPLICATE_USER_NAME_ERROR.getResultCode(),
+                    ResultCode.DUPLICATE_USER_NAME_ERROR.getResultMsg());
         }
     }
     
@@ -62,7 +72,8 @@ public class UserCompatibility {
     public SysUserPojo getAccount(Long userId) {
         SysUserPojo userPojo = userService.getById(userId);
         if (userPojo == null) {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+                    ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return userPojo;
     }
@@ -80,7 +91,8 @@ public class UserCompatibility {
         lambdaQuery.eq(SysUserPojo::getPassword, password);
         SysUserPojo one = userService.getOne(lambdaQuery);
         if (one == null) {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+                    ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return one;
     }
@@ -95,7 +107,8 @@ public class UserCompatibility {
         if (b) {
             log.debug("用户名初始化成功");
         } else {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(), ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+                    ResultCode.USER_NOT_EXIST.getResultMsg());
         }
     }
     
@@ -105,8 +118,47 @@ public class UserCompatibility {
      * @param uid 用户ID
      * @return 返回用户所有歌单
      */
-    public List<TbCollectPojo> getPlayList(String uid) {
-        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery().eq(TbCollectPojo::getUserId, Long.valueOf(uid));
-        return collectService.list(lambdaQueryWrapper);
+    public Page<TbCollectPojo> getPlayList(String uid, Long pageIndex, Long pageSize) {
+        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
+                                                                       .eq(TbCollectPojo::getUserId, Long.valueOf(uid))
+                                                                       .orderByDesc(TbCollectPojo::getSort);
+        return collectService.page(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
+    }
+    
+    /**
+     * 获取用户创建歌单数量
+     *
+     * @param userId 用户ID
+     * @return 歌单数量
+     */
+    public Long getCreatedPlaylistCount(Long userId) {
+        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
+                                                                       .eq(TbCollectPojo::getUserId, userId);
+        return collectService.count(lambdaQueryWrapper);
+    }
+    
+    
+    /**
+     * 获取订阅(收藏)歌单总数
+     *
+     * @param userId 用户ID
+     * @return 订阅歌单总数
+     */
+    public Long getSubPlaylistCount(Long userId) {
+        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
+                                                                       .eq(TbCollectPojo::getUserId, userId)
+                                                                       .eq(TbCollectPojo::getSubscribed, true);
+        return collectService.count(lambdaQueryWrapper);
+    }
+    
+    /**
+     * 获取用户关注歌曲家数量
+     *
+     * @return 关注数量
+     */
+    public Long getUserBySinger(Long userId) {
+        LambdaQueryWrapper<TbUserSingerPojo> lambdaQueryWrapper = Wrappers.<TbUserSingerPojo>lambdaQuery()
+                                                                          .eq(TbUserSingerPojo::getUserId, userId);
+        return userSingerService.count(lambdaQueryWrapper);
     }
 }

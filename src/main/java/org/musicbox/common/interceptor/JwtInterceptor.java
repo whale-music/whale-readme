@@ -3,8 +3,8 @@ package org.musicbox.common.interceptor;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
-import org.musicbox.common.exception.ResultCode;
 import org.musicbox.common.result.R;
+import org.musicbox.common.result.ResultCode;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.utils.JwtUtil;
 import org.musicbox.utils.UserUtil;
@@ -28,7 +28,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
         // 放行登录和注册,注销
-        if ("/login/cellphone".equals(request.getRequestURI()) || "/register/account".equals(request.getRequestURI()) || "/logout".equals(request.getRequestURI())) {
+        if ("/login/cellphone".equals(request.getRequestURI()) || "/register/account".equals(request.getRequestURI()) || "/logout".equals(
+                request.getRequestURI())) {
             return true;
         }
         log.debug(request.getPathInfo());
@@ -37,13 +38,17 @@ public class JwtInterceptor implements HandlerInterceptor {
         log.debug("token值：{}", token);
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
-            Optional<Cookie> first = Arrays.stream(request.getCookies()).filter(cookie -> "Cookie".equals(cookie.getName())).findFirst();
+            Optional<Cookie> first = Arrays.stream(request.getCookies())
+                                           .filter(cookie -> "Cookie".equals(cookie.getName()))
+                                           .findFirst();
             token = first.map(Cookie::getValue).orElse(null);
         }
         // 判断是否携带用户信息
         if (token == null) {
             response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter().println(R.error(ResultCode.TOKEN_INVALID.getResultCode(), ResultCode.TOKEN_INVALID.getResultMsg()));
+            response.getWriter()
+                    .println(R.error(ResultCode.TOKEN_INVALID.getResultCode(),
+                            ResultCode.TOKEN_INVALID.getResultMsg()));
             return false;
         }
         
@@ -52,7 +57,9 @@ public class JwtInterceptor implements HandlerInterceptor {
             JwtUtil.checkSign(token);
         } catch (JWTVerificationException e) {
             response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getResultCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
+            response.getWriter()
+                    .println(R.error(ResultCode.COOKIE_INVALID.getResultCode(),
+                            ResultCode.COOKIE_INVALID.getResultMsg()));
             return false;
         }
         

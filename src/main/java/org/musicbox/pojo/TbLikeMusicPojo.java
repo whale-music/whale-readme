@@ -26,16 +26,16 @@ import java.io.Serializable;
 @TableName("tb_like_music")
 @ApiModel(value = "TbLikeMusicPojo对象", description = "喜爱歌单中间表")
 public class TbLikeMusicPojo implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     @ApiModelProperty("喜爱歌单ID")
     @TableId(value = "like_id", type = IdType.AUTO)
     private Long likeId;
-
+    
     @ApiModelProperty("音乐ID")
     @TableField(value = "music_id")
     private Long musicId;
-
-
+    
+    
 }

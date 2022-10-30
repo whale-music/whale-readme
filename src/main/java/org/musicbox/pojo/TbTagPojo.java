@@ -1,9 +1,6 @@
 package org.musicbox.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -27,23 +24,23 @@ import java.time.LocalDateTime;
 @TableName("tb_tag")
 @ApiModel(value = "TbTagPojo对象", description = "标签表（风格）")
 public class TbTagPojo implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
-    @TableId(value = "id", type = IdType.AUTO)
+    
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
+    
     @ApiModelProperty("风格（标签）")
     @TableField("tag_name")
     private String tagName;
-
+    
     @ApiModelProperty("创建时间")
-    @TableField("create_time")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
+    
     @ApiModelProperty("修改时间")
-    @TableField("update_time")
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-
+    
+    
 }

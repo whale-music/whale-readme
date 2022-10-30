@@ -1,9 +1,6 @@
 package org.musicbox.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -28,44 +25,44 @@ import java.time.LocalDateTime;
 @TableName("tb_singer")
 @ApiModel(value = "TbSingerPojo对象", description = "歌手表")
 public class TbSingerPojo implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     @ApiModelProperty("歌手ID")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
+    
     @ApiModelProperty("歌手名")
     @TableField("singer_name")
     private String singerName;
-
+    
     @ApiModelProperty("歌手性别")
     @TableField("sex")
     private String sex;
-
+    
     @ApiModelProperty("封面")
     @TableField("pic")
     private String pic;
-
+    
     @ApiModelProperty("出生年月")
     @TableField("birth")
     private LocalDate birth;
-
+    
     @ApiModelProperty("所在国家")
     @TableField("location")
     private String location;
-
+    
     @ApiModelProperty("歌手介绍")
     @TableField("introduction")
     private String introduction;
-
+    
     @ApiModelProperty("创建时间")
-    @TableField("create_time")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
+    
     @ApiModelProperty("修改时间")
-    @TableField("update_time")
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-
+    
+    
 }

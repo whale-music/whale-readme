@@ -6,9 +6,9 @@ package org.musicbox.exception;
  * @date: 2021/4/19 21:44
  * @version: v1.0
  */
-public class CookieInvalidException extends BaseException {
+public class NoAuthorityException extends BaseException {
     
-    public CookieInvalidException(String errorCode, String errorMsg) {
+    public NoAuthorityException(String errorCode, String errorMsg) {
         super(errorCode, errorMsg);
     }
     

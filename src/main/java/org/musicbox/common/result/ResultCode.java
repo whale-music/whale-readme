@@ -1,4 +1,6 @@
-package org.musicbox.common.exception;
+package org.musicbox.common.result;
+
+import org.musicbox.common.exception.BaseErrorInfoInterface;
 
 /**
  * @description: 异常处理枚举类
@@ -31,6 +33,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     USER_HAS_EXISTED("20005", "用户已存在"),
     USER_NOT_EXIST("20006", "用户名不存在!"),
     DUPLICATE_USER_NAME_ERROR("20007", "用户名不能重复!"),
+    SONG_LIST_DOES_NOT_EXIST("20008", "歌单不存在!"),
+    SONG_NOT_EXIST("20009", "歌曲不存在!"),
     
     
     /* 业务错误：30001-39999 */

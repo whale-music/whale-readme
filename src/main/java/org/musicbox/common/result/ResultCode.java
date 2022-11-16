@@ -3,10 +3,7 @@ package org.musicbox.common.result;
 import org.musicbox.common.exception.BaseErrorInfoInterface;
 
 /**
- * @description: 异常处理枚举类
- * @author: DT
- * @date: 2021/4/19 21:41
- * @version: v1.0
+ * &#064;description:  异常处理枚举类
  */
 public enum ResultCode implements BaseErrorInfoInterface {
     /* 默认成功状态码 */
@@ -35,15 +32,18 @@ public enum ResultCode implements BaseErrorInfoInterface {
     DUPLICATE_USER_NAME_ERROR("20007", "用户名不能重复!"),
     SONG_LIST_DOES_NOT_EXIST("20008", "歌单不存在!"),
     SONG_NOT_EXIST("20009", "歌曲不存在!"),
+    SONG_EXIST("20010", "歌曲已存在!"),
     
     
     /* 业务错误：30001-39999 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST("30001", "业务逻辑出现问题"),
+    NULLPOINTEREXCEPTION("30002", "空指针错误"),
     
     
     /* 系统错误：40001-49999 */
     SYSTEM_INNER_ERROR("40001", "系统内部错误，请稍后重试"),
     
+    INTERNAL_SERVER_ERROR("40002", "未知异常"),
     
     /* 数据错误：50001-599999 */
     DATA_NONE("50001", "数据未找到"),
@@ -59,26 +59,27 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     
     /* 权限错误：70001-79999 */
-    PERMISSION_NO_ACCESS("70001", "无访问权限");
+    PERMISSION_NO_ACCESS("70001", "无访问权限"),
+    ;
     
     /**
      * 错误码
      */
-    private final String resultCode;
+    private final String code;
     
     /**
      * 错误描述
      */
     private final String resultMsg;
     
-    ResultCode(String resultCode, String resultMsg) {
-        this.resultCode = resultCode;
+    ResultCode(String code, String resultMsg) {
+        this.code = code;
         this.resultMsg = resultMsg;
     }
     
     @Override
-    public String getResultCode() {
-        return resultCode;
+    public String getCode() {
+        return code;
     }
     
     @Override

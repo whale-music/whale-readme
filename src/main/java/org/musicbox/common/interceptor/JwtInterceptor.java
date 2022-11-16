@@ -47,7 +47,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (token == null) {
             response.setHeader("content-type", "application/json; charset=utf-8");
             response.getWriter()
-                    .println(R.error(ResultCode.TOKEN_INVALID.getResultCode(),
+                    .println(R.error(ResultCode.TOKEN_INVALID.getCode(),
                             ResultCode.TOKEN_INVALID.getResultMsg()));
             return false;
         }
@@ -58,7 +58,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (JWTVerificationException e) {
             response.setHeader("content-type", "application/json; charset=utf-8");
             response.getWriter()
-                    .println(R.error(ResultCode.COOKIE_INVALID.getResultCode(),
+                    .println(R.error(ResultCode.COOKIE_INVALID.getCode(),
                             ResultCode.COOKIE_INVALID.getResultMsg()));
             return false;
         }

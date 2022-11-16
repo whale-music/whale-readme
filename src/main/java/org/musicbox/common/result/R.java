@@ -23,14 +23,12 @@ public class R {
     }
     
     public R(BaseErrorInfoInterface errorInfo) {
-        this.code = errorInfo.getResultCode();
+        this.code = errorInfo.getCode();
         this.message = errorInfo.getResultMsg();
     }
     
     /**
      * 成功
-     *
-     * @return
      */
     public static R success() {
         return success(null);
@@ -38,13 +36,10 @@ public class R {
     
     /**
      * 成功
-     *
-     * @param data
-     * @return
      */
     public static R success(Object data) {
         R rb = new R();
-        rb.setCode(ResultCode.SUCCESS.getResultCode());
+        rb.setCode(ResultCode.SUCCESS.getCode());
         rb.setMessage(ResultCode.SUCCESS.getResultMsg());
         rb.setResult(data);
         return rb;
@@ -55,7 +50,7 @@ public class R {
      */
     public static R error(BaseErrorInfoInterface errorInfo) {
         R rb = new R();
-        rb.setCode(errorInfo.getResultCode());
+        rb.setCode(errorInfo.getCode());
         rb.setMessage(errorInfo.getResultMsg());
         rb.setResult(null);
         return rb;

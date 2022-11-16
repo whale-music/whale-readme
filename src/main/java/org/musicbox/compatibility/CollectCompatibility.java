@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.musicbox.common.result.ResultCode;
 import org.musicbox.exception.NoAuthorityException;
+import org.musicbox.exception.SongExistException;
 import org.musicbox.exception.SongListDoesNotExistException;
 import org.musicbox.exception.SongNotExistException;
 import org.musicbox.pojo.*;
@@ -43,6 +44,12 @@ public class CollectCompatibility {
     @Autowired
     private TbMusicUrlService musicUrlService;
     
+    @Autowired
+    private TbLikeService likeService;
+    
+    @Autowired
+    private TbLikeMusicService likeMusicService;
+    
     /**
      * 是否包含tag
      *
@@ -67,13 +74,13 @@ public class CollectCompatibility {
     private static void checkUserAuth(Long userId, TbCollectPojo tbCollectPojo) {
         // 检查是否有该歌单
         if (tbCollectPojo == null || tbCollectPojo.getUserId() == null) {
-            throw new SongListDoesNotExistException(ResultCode.SONG_LIST_DOES_NOT_EXIST.getResultCode(),
+            throw new SongListDoesNotExistException(ResultCode.SONG_LIST_DOES_NOT_EXIST.getCode(),
                     ResultCode.SONG_LIST_DOES_NOT_EXIST.getResultMsg());
         }
         // 检查用户是否有权限
         if (!userId.equals(tbCollectPojo.getUserId())) {
             log.warn(ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
-            throw new NoAuthorityException(ResultCode.PERMISSION_NO_ACCESS.getResultCode(),
+            throw new NoAuthorityException(ResultCode.PERMISSION_NO_ACCESS.getCode(),
                     ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
         }
     }
@@ -271,7 +278,7 @@ public class CollectCompatibility {
                                                                  .in(TbCollectMusicPojo::getCollectId, collectId);
         Page<TbCollectMusicPojo> page = collectMusicService.page(new Page<>(pageIndex, pageSize), wrapper);
         if (page.getTotal() == 0) {
-            throw new SongNotExistException(ResultCode.SONG_NOT_EXIST.getResultCode(),
+            throw new SongNotExistException(ResultCode.SONG_NOT_EXIST.getCode(),
                     ResultCode.SONG_NOT_EXIST.getResultMsg());
         }
         List<Long> musicIds = page.getRecords()
@@ -291,8 +298,8 @@ public class CollectCompatibility {
     /**
      * 获取音乐信息
      *
-     * @param musicIds
-     * @return
+     * @param musicIds 音乐id list
+     * @return 音乐信息列表
      */
     public List<TbMusicUrlPojo> getMusicInfo(List<Long> musicIds) {
         return musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
@@ -309,7 +316,7 @@ public class CollectCompatibility {
     public void addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         checkUserAuth(userID, tbCollectPojo);
-        
+    
         if (flag) {
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
@@ -324,6 +331,62 @@ public class CollectCompatibility {
                                                .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                .in(TbCollectMusicPojo::getMusicId, songIds));
         }
+    
+    }
+    
+    /**
+     * 添加喜爱歌曲
+     *
+     * @param id              歌曲ID
+     * @param isAddAndDelLike true添加歌曲，false删除歌曲
+     */
+    public void like(Long userId, Long id, Boolean isAddAndDelLike) {
+        TbLikePojo entity = new TbLikePojo();
+        entity.setUserId(userId);
+        likeService.saveOrUpdate(entity);
+        TbMusicPojo byId = musicService.getById(id);
+        if (byId == null) {
+            log.debug("添加歌曲不存在");
+            throw new SongExistException(ResultCode.SONG_NOT_EXIST.getCode(),
+                    ResultCode.SONG_NOT_EXIST.getResultMsg());
+        }
         
+        // 效验歌单中是否有该歌曲
+        LambdaQueryWrapper<TbLikeMusicPojo> wrapper = Wrappers.<TbLikeMusicPojo>lambdaQuery()
+                                                              .eq(TbLikeMusicPojo::getLikeId, id);
+        long count = likeMusicService.count(wrapper);
+        if (Boolean.TRUE.equals(isAddAndDelLike)) {
+            // 歌曲已存在
+            if (count >= 1) {
+                throw new SongExistException(ResultCode.SONG_EXIST.getCode(),
+                        ResultCode.SONG_EXIST.getResultMsg());
+            }
+            TbLikeMusicPojo tbLikeMusicPojo = new TbLikeMusicPojo();
+            tbLikeMusicPojo.setLikeId(userId);
+            tbLikeMusicPojo.setMusicId(id);
+            likeMusicService.save(tbLikeMusicPojo);
+            log.debug("歌曲保存");
+        } else {
+            // 歌曲不存在
+            if (count == 0) {
+                throw new SongExistException(ResultCode.SONG_NOT_EXIST.getCode(),
+                        ResultCode.SONG_NOT_EXIST.getResultMsg());
+            }
+            likeMusicService.remove(wrapper);
+            log.debug("歌曲已删除");
+        }
+        
+    }
+    
+    /**
+     * 查询用户喜爱歌单
+     *
+     * @param uid 用户ID
+     * @return 返回歌曲数组
+     */
+    public List<Long> likelist(Long uid) {
+        List<TbLikeMusicPojo> list = likeMusicService.list(Wrappers.<TbLikeMusicPojo>lambdaQuery()
+                                                                   .eq(TbLikeMusicPojo::getLikeId, uid));
+        return list.stream().map(TbLikeMusicPojo::getLikeId).collect(Collectors.toList());
     }
 }

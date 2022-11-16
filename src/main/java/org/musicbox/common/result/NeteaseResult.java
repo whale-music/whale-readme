@@ -1,7 +1,14 @@
 package org.musicbox.common.result;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.HashMap;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class NeteaseResult extends HashMap<String, Object> {
     /**
      * 响应代码
@@ -13,7 +20,7 @@ public class NeteaseResult extends HashMap<String, Object> {
      * 成功
      */
     public NeteaseResult success() {
-        this.code = ResultCode.SUCCESS.getResultCode();
+        this.code = ResultCode.SUCCESS.getCode();
         this.message = ResultCode.SUCCESS.getResultMsg();
         put("code", code);
         put("message", message);

@@ -11,12 +11,15 @@ public class JwtUtil {
     /**
      * 过期5分钟
      */
-    private static final long EXPIRE_TIME = 5 * 60 * 1000;
+    private static final long EXPIRE_TIME = 5 * 60 * 1000L;
     
     /**
      * jwt密钥
      */
     private static final String SECRET = "jwt_secret";
+    
+    private JwtUtil() {
+    }
     
     /**
      * 生成jwt字符串，五分钟后过期  JWT(json web token)

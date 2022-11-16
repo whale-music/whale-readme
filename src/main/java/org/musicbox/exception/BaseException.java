@@ -3,10 +3,9 @@ package org.musicbox.exception;
 import org.musicbox.common.exception.BaseErrorInfoInterface;
 
 /**
- * @description: 自定义异常类
- * @author: DT
- * @date: 2021/4/19 21:44
- * @version: v1.0
+ * &#064;Deprecated  异常类
+ *
+ * @author Sakura
  */
 public class BaseException extends RuntimeException {
     
@@ -15,30 +14,33 @@ public class BaseException extends RuntimeException {
     /**
      * 错误码
      */
-    protected String errorCode;
+    private final String errorCode;
     /**
      * 错误信息
      */
-    protected String errorMsg;
+    private final String errorMsg;
     
     public BaseException() {
         super();
+        this.errorCode = null;
+        this.errorMsg = null;
     }
     
     public BaseException(BaseErrorInfoInterface errorInfoInterface) {
-        super(errorInfoInterface.getResultCode());
-        this.errorCode = errorInfoInterface.getResultCode();
+        super(errorInfoInterface.getCode());
+        this.errorCode = errorInfoInterface.getCode();
         this.errorMsg = errorInfoInterface.getResultMsg();
     }
     
     public BaseException(BaseErrorInfoInterface errorInfoInterface, Throwable cause) {
-        super(errorInfoInterface.getResultCode(), cause);
-        this.errorCode = errorInfoInterface.getResultCode();
+        super(errorInfoInterface.getCode(), cause);
+        this.errorCode = errorInfoInterface.getCode();
         this.errorMsg = errorInfoInterface.getResultMsg();
     }
     
     public BaseException(String errorMsg) {
         super(errorMsg);
+        this.errorCode = null;
         this.errorMsg = errorMsg;
     }
     
@@ -59,20 +61,9 @@ public class BaseException extends RuntimeException {
         return errorCode;
     }
     
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-    }
     
     public String getErrorMsg() {
         return errorMsg;
     }
     
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
-    
-    @Override
-    public Throwable fillInStackTrace() {
-        return this;
-    }
 }

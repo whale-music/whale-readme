@@ -41,6 +41,11 @@ public class PlayListController {
     @Autowired
     private CollectCompatibility collect;
     
+    /**
+     * 创建歌单
+     *
+     * @param name 歌单名
+     */
     @GetMapping("/playlist/create")
     public NeteaseResult createPlayList(@RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
@@ -143,11 +148,7 @@ public class PlayListController {
      * @param pageIndex 当前多少页
      */
     @GetMapping("/playlist/track/all")
-    public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false) Long pageSize, @RequestParam(value = "offset", required = false) Long pageIndex) {
-        if (pageSize == null && pageIndex == null) {
-            pageSize = Long.MAX_VALUE;
-            pageIndex = 0L;
-        }
+    public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false, defaultValue = "9223372036854775807") Long pageSize, @RequestParam(value = "offset", required = false, defaultValue = "0") Long pageIndex) {
         Page<TbMusicPojo> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
@@ -255,19 +256,41 @@ public class PlayListController {
      */
     @GetMapping("/playlist/tracks")
     public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") String songIds) {
-        boolean flag = false;
-        if ("add".equals(op)) {
-            flag = true;
-        } else if ("del".equals(op)) {
-            flag = false;
-        }
+        boolean flag;
+        // add 是false
+        // del 是false
+        flag = "add".equals(op);
         SysUserPojo user = UserUtil.getUser();
         collect.addSongToCollect(user.getId(),
                 collectId,
                 Arrays.stream(songIds.split(",")).map(Long::valueOf).collect(Collectors.toList()),
                 flag);
-        
+    
         NeteaseResult r = new NeteaseResult();
+        return r.success();
+    }
+    
+    /**
+     * 添加喜爱歌曲
+     *
+     * @param id   歌曲ID
+     * @param like true 添加歌曲，false 删除歌曲
+     */
+    @GetMapping("/like")
+    public NeteaseResult like(@RequestParam("id") Long id, @RequestParam("like") Boolean like) {
+        collect.like(UserUtil.getUser().getId(), id, like);
+        NeteaseResult r = new NeteaseResult();
+        r.put("songs", new ArrayList<>());
+        r.put("playlistId", UserUtil.getUser().getId());
+        return r.success();
+    }
+    
+    @GetMapping("/likelist")
+    public NeteaseResult likelist(@RequestParam("uid") Long uid) {
+        List<Long> ids = collect.likelist(uid);
+        NeteaseResult r = new NeteaseResult();
+        r.put("ids", ids);
+        r.put("checkPoint", 1668601332328L);
         return r.success();
     }
 }

@@ -58,7 +58,7 @@ public class UserCompatibility {
         if (count == 0) {
             userService.save(user);
         } else {
-            throw new DuplicateUserNameException(ResultCode.DUPLICATE_USER_NAME_ERROR.getResultCode(),
+            throw new DuplicateUserNameException(ResultCode.DUPLICATE_USER_NAME_ERROR.getCode(),
                     ResultCode.DUPLICATE_USER_NAME_ERROR.getResultMsg());
         }
     }
@@ -72,7 +72,7 @@ public class UserCompatibility {
     public SysUserPojo getAccount(Long userId) {
         SysUserPojo userPojo = userService.getById(userId);
         if (userPojo == null) {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getCode(),
                     ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return userPojo;
@@ -91,7 +91,7 @@ public class UserCompatibility {
         lambdaQuery.eq(SysUserPojo::getPassword, password);
         SysUserPojo one = userService.getOne(lambdaQuery);
         if (one == null) {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getCode(),
                     ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         return one;
@@ -107,7 +107,7 @@ public class UserCompatibility {
         if (b) {
             log.debug("用户名初始化成功");
         } else {
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getCode(),
                     ResultCode.USER_NOT_EXIST.getResultMsg());
         }
     }

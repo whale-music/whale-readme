@@ -5,9 +5,9 @@ import org.musicbox.common.vo.user.Profile;
 import org.musicbox.common.vo.user.UserVo;
 import org.musicbox.pojo.SysUserPojo;
 
-public abstract class BaseController {
+public class BaseController {
     
-    protected static UserVo getUserVo(SysUserPojo account) {
+    protected UserVo getUserVo(SysUserPojo account) {
         // 包装返回结果
         UserVo userVo = new UserVo();
         userVo.setProfile(new Profile());

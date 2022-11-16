@@ -34,8 +34,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class LogoController extends BaseController {
     
-    
-    private final String cookieName = "Cookie";
+    private static final String COOKIE = "Cookie";
     @Autowired
     private UserCompatibility user;
     
@@ -52,7 +51,7 @@ public class LogoController extends BaseController {
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(cookieName, sign);
+        Cookie cookie = new Cookie(COOKIE, sign);
         response.addCookie(cookie);
         
         NeteaseResult r = new NeteaseResult();
@@ -93,13 +92,13 @@ public class LogoController extends BaseController {
         SysUserPojo userPojo = UserUtil.getUser();
         if (userPojo == null) {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getResultCode(),
+            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getCode(),
                     ResultCode.USER_NOT_EXIST.getResultMsg());
         }
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(cookieName, sign);
+        Cookie cookie = new Cookie(COOKIE, sign);
         response.addCookie(cookie);
         
         NeteaseResult r = new NeteaseResult();
@@ -110,7 +109,7 @@ public class LogoController extends BaseController {
     @GetMapping("/logout")
     public NeteaseResult logout(HttpServletResponse response) {
         // 删除cookie
-        Cookie cookie = new Cookie(cookieName, null);
+        Cookie cookie = new Cookie(COOKIE, null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

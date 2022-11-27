@@ -10,7 +10,7 @@ server:
 ########## log ##########
 logging:
   level:
-    root: debug
+    root: info
   pattern:
     # 时间；日志级别；类；方法；行(行不能使用圆括号)
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %C.%M[%line] - %msg%n"
@@ -23,7 +23,15 @@ spring:
     url: jdbc:mysql://localhost:3306/music_box?useUnicode=true&characterEncoding=UTF-8&useSSL=false&&serverTimezone=UTC
     username: root
     password: root
-
+  servlet:
+    multipart:
+      enabled: true
+      # 设置 上传文件的大小
+      max-file-size: 100MB
+      # 设置 整个请求的大小
+      max-request-size: 100MB
+      # 设置上传文件位置
+      # location: ./
 # mybatis-plus相关配置
 mybatis-plus:
   # xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）

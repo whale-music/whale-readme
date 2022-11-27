@@ -27,9 +27,15 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        // 放行路径
+        String[] passPath = {
+                "/login/cellphone",
+                "/register/account",
+                "/logout",
+                "/add/upload"
+        };
         // 放行登录和注册,注销
-        if ("/login/cellphone".equals(request.getRequestURI()) || "/register/account".equals(request.getRequestURI()) || "/logout".equals(
-                request.getRequestURI())) {
+        if (Arrays.asList(passPath).contains(request.getRequestURI())) {
             return true;
         }
         log.debug(request.getPathInfo());

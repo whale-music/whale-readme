@@ -2,6 +2,7 @@ package org.musicbox.common.result;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class NeteaseResult extends HashMap<String, Object> {
     /**
      * 响应代码

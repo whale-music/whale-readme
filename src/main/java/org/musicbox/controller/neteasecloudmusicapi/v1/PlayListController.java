@@ -4,10 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.musicbox.common.result.NeteaseResult;
-import org.musicbox.common.vo.createplatlist.CreatePlaylistVo;
-import org.musicbox.common.vo.createplatlist.Playlist;
-import org.musicbox.common.vo.playlistallsong.*;
-import org.musicbox.compatibility.CollectCompatibility;
+import org.musicbox.common.vo.neteasecloudmusic.createplatlist.CreatePlaylistVo;
+import org.musicbox.common.vo.neteasecloudmusic.createplatlist.Playlist;
+import org.musicbox.common.vo.neteasecloudmusic.playlistallsong.*;
+import org.musicbox.compatibility.neteasecloudmusic.CollectCompatibility;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.pojo.TbCollectPojo;
 import org.musicbox.pojo.TbMusicPojo;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController
+@RestController("NeteaseCloudPlayList")
 @RequestMapping("/")
 @Slf4j
 public class PlayListController {

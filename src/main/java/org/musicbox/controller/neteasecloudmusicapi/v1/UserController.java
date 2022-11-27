@@ -2,14 +2,15 @@ package org.musicbox.controller.neteasecloudmusicapi.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.musicbox.common.result.NeteaseResult;
-import org.musicbox.common.vo.playlist.Creator;
-import org.musicbox.common.vo.playlist.PlayListVo;
-import org.musicbox.common.vo.playlist.PlaylistItem;
-import org.musicbox.common.vo.subcount.Subcount;
-import org.musicbox.common.vo.user.UserVo;
-import org.musicbox.compatibility.CollectCompatibility;
-import org.musicbox.compatibility.UserCompatibility;
+import org.musicbox.common.vo.neteasecloudmusic.playlist.Creator;
+import org.musicbox.common.vo.neteasecloudmusic.playlist.PlayListVo;
+import org.musicbox.common.vo.neteasecloudmusic.playlist.PlaylistItem;
+import org.musicbox.common.vo.neteasecloudmusic.subcount.Subcount;
+import org.musicbox.common.vo.neteasecloudmusic.user.UserVo;
+import org.musicbox.compatibility.neteasecloudmusic.CollectCompatibility;
+import org.musicbox.compatibility.neteasecloudmusic.UserCompatibility;
 import org.musicbox.controller.neteasecloudmusicapi.BaseController;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.pojo.TbCollectPojo;
@@ -35,8 +36,9 @@ import java.util.stream.Collectors;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController
+@RestController("NeteaseCloudUser")
 @RequestMapping("/")
+@Slf4j
 public class UserController extends BaseController {
     
     @Autowired
@@ -65,8 +67,6 @@ public class UserController extends BaseController {
     
     /**
      * 初始化用户昵称
-     *
-     * @return
      */
     @GetMapping("/activate/init/profile")
     public NeteaseResult initUser(@RequestParam("nickname") String nickname) {

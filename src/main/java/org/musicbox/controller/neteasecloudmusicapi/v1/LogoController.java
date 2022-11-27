@@ -5,10 +5,10 @@ import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.musicbox.common.result.NeteaseResult;
 import org.musicbox.common.result.ResultCode;
-import org.musicbox.common.vo.user.UserVo;
-import org.musicbox.compatibility.UserCompatibility;
+import org.musicbox.common.vo.neteasecloudmusic.user.UserVo;
+import org.musicbox.compatibility.neteasecloudmusic.UserCompatibility;
 import org.musicbox.controller.neteasecloudmusicapi.BaseController;
-import org.musicbox.exception.UserDoesNotExistException;
+import org.musicbox.exception.BaseException;
 import org.musicbox.pojo.SysUserPojo;
 import org.musicbox.utils.JwtUtil;
 import org.musicbox.utils.UserUtil;
@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController
+@RestController("NeteaseCloudLogin")
 @RequestMapping("/")
 @Slf4j
 public class LogoController extends BaseController {
@@ -92,8 +92,7 @@ public class LogoController extends BaseController {
         SysUserPojo userPojo = UserUtil.getUser();
         if (userPojo == null) {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
-            throw new UserDoesNotExistException(ResultCode.USER_NOT_EXIST.getCode(),
-                    ResultCode.USER_NOT_EXIST.getResultMsg());
+            throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);

@@ -1,8 +1,8 @@
 package org.musicbox.controller.neteasecloudmusicapi;
 
-import org.musicbox.common.vo.user.Account;
-import org.musicbox.common.vo.user.Profile;
-import org.musicbox.common.vo.user.UserVo;
+import org.musicbox.common.vo.neteasecloudmusic.user.Account;
+import org.musicbox.common.vo.neteasecloudmusic.user.Profile;
+import org.musicbox.common.vo.neteasecloudmusic.user.UserVo;
 import org.musicbox.pojo.SysUserPojo;
 
 public class BaseController {

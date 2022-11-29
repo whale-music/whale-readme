@@ -32,8 +32,6 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/login/cellphone",
                 "/register/account",
                 "/logout",
-                "/add/upload",
-                "/error"
         };
         // 放行登录和注册,注销
         if (Arrays.asList(passPath).contains(request.getRequestURI())) {

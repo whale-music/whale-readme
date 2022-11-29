@@ -1,6 +1,7 @@
 package org.api.admin;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -13,24 +14,29 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
 @Slf4j
-public class AddMusicCompatibility {
+public class AddMusicApi {
     
     String[] fileType = {
             "mp3",
             "ogg",
             "flac"
     };
+    
+    String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp\\";
     
     public AudioInfoVo uploadMusicFile(MultipartFile uploadFile) throws IOException, CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException {
         String filename = uploadFile.getOriginalFilename();
@@ -46,7 +52,8 @@ public class AddMusicCompatibility {
         if (!StringUtils.containsAny(split[1], fileType)) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
-        String path = FileUtil.getTmpDirPath() + "\\musicTemp\\" + LocalDateTime.now().getNano() + "." + split[1];
+        String musicFileName = UUID.fastUUID() + "." + split[1];
+        String path = pathTemp + musicFileName;
         BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
         outputStream.write(uploadFile.getBytes());
         outputStream.close();
@@ -65,7 +72,29 @@ public class AddMusicCompatibility {
         audioInfoVo.setAlbum(read.getTag().getFirst(FieldKey.ALBUM));
         audioInfoVo.setTimeLength(read.getAudioHeader().getTrackLength());
         audioInfoVo.setSize(read.getFile().length());
+        audioInfoVo.setMusicFileTemp(musicFileName);
         return audioInfoVo;
     }
     
+    /**
+     * 获取临时文件字节
+     *
+     * @param musicTempFile 临时文件名
+     * @return 字节数据
+     */
+    public ResponseEntity<FileSystemResource> getMusicFile(String musicTempFile) {
+        if (musicTempFile.contains("/") || musicTempFile.contains("\\")) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        String path = pathTemp + musicTempFile;
+        File file = new File(path);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+        return ResponseEntity.ok()
+                             .headers(headers)
+                             .contentLength(file.length())
+                             .contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                             .body(new FileSystemResource(file));
+    }
 }

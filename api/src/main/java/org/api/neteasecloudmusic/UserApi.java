@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class UserCompatibility {
+public class UserApi {
     // 用户服务
     @Autowired
     private SysUserService userService;

@@ -37,7 +37,8 @@ public class AddMusicCompatibility {
         if (StringUtils.isBlank(filename)) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
-        String[] split = filename.split("\\.");
+        int indexOf = filename.lastIndexOf('.');
+        String[] split = filename.split(String.valueOf(new char[]{'\\', filename.charAt(indexOf)}));
         if (split.length < 1) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
@@ -45,21 +46,19 @@ public class AddMusicCompatibility {
         if (!StringUtils.containsAny(split[1], fileType)) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
-        String path = FileUtil.getTmpDirPath() + "1\\" + LocalDateTime.now().getNano() + "." + split[1];
+        String path = FileUtil.getTmpDirPath() + "\\musicTemp\\" + LocalDateTime.now().getNano() + "." + split[1];
         BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
         outputStream.write(uploadFile.getBytes());
-        outputStream.flush();
         outputStream.close();
-        File f = new File(path);
-        AudioFile read = AudioFileIO.read(f);
+        AudioFile read = AudioFileIO.read(new File(path));
+        log.info(" ----- ----- ");
         log.info("标题:" + read.getTag().getFirst(FieldKey.TITLE));
         log.info("作者:" + read.getTag().getFirst(FieldKey.ARTIST));
         log.info("专辑:" + read.getTag().getFirst(FieldKey.ALBUM));
         log.info("比特率:" + read.getAudioHeader().getBitRate());
-        log.info("时长:" + read.getAudioHeader().getBitRate() + " (" + read.getAudioHeader().getTrackLength() + "s)");
+        log.info("时长:" + read.getAudioHeader().getTrackLength() + "s");
         log.info("大小:" + (read.getFile().length() / 1024F / 1024F) + "MB");
         log.info(" ----- ----- ");
-        
         AudioInfoVo audioInfoVo = new AudioInfoVo();
         audioInfoVo.setMusicName(read.getTag().getFirst(FieldKey.TITLE));
         audioInfoVo.setSinger(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));

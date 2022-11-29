@@ -1,6 +1,6 @@
 server:
   # 配置启动端口号
-  port: 10100
+  port: 8080
   servlet:
     session:
       timeout: 259200000000
@@ -27,9 +27,9 @@ spring:
     multipart:
       enabled: true
       # 设置 上传文件的大小
-      max-file-size: 100MB
+      max-file-size: 200MB
       # 设置 整个请求的大小
-      max-request-size: 100MB
+      max-request-size: 200MB
       # 设置上传文件位置
       # location: ./
 # mybatis-plus相关配置

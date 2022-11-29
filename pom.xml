@@ -124,6 +124,19 @@
                 <artifactId>api</artifactId>
                 <version>${whale.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.whale</groupId>
+                <artifactId>core</artifactId>
+                <version>${whale.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.whale</groupId>
+                <artifactId>web</artifactId>
+                <version>${whale.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

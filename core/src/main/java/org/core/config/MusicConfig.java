@@ -17,7 +17,7 @@ public class MusicConfig {
     // 默认保存模式
     private String saveMode;
     // 保存名称(文件夹)
-    private String saveName;
+    private String objectSave;
     // 地址
     private String host;
     // 访问账户

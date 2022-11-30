@@ -21,13 +21,13 @@ public class LocalOSSServiceImpl implements OSSService {
     
     @Override
     public void isExist() {
-        FileUtil.mkParentDirs("./" + config.getSaveName());
+        FileUtil.mkParentDirs("./" + config.getObjectSave());
     }
     
     @Override
     public String upload(String filePath) {
         String name = new File(filePath).getName();
-        String destPath = "./" + config.getSaveName() + name;
+        String destPath = "./" + config.getObjectSave() + name;
         FileUtil.copy(filePath, destPath, true);
         return name;
     }

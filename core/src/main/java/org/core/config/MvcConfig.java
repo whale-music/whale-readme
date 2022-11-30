@@ -1,6 +1,6 @@
 package org.core.config;
 
-import org.core.common.interceptor.JwtInterceptor;
+import org.core.interceptor.JwtInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

@@ -1,7 +1,8 @@
 package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.AddMusicApi;
+import org.api.admin.UploadMusicApi;
+import org.api.admin.dto.AudioInfoDto;
 import org.core.common.result.R;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -21,12 +22,12 @@ import java.io.IOException;
 @CrossOrigin
 public class UploadMusicController {
     @Autowired
-    private AddMusicApi addMusic;
+    private UploadMusicApi uploadMusic;
     
     
     @PostMapping("/file")
-    public R upload(@RequestParam("file") MultipartFile uploadFile) throws CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException, IOException {
-        return R.success(addMusic.uploadMusicFile(uploadFile));
+    public R uploadMusicFile(@RequestParam("file") MultipartFile uploadFile) throws CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException, IOException {
+        return R.success(uploadMusic.uploadMusicFile(uploadFile));
     }
     
     /**
@@ -37,6 +38,18 @@ public class UploadMusicController {
      */
     @GetMapping("/{music}")
     public ResponseEntity<FileSystemResource> getMusicFile(@PathVariable("music") String musicTempFile) {
-        return addMusic.getMusicFile(musicTempFile);
+        return uploadMusic.getMusicFile(musicTempFile);
+    }
+    
+    /**
+     * 上传音乐信息，包括临时文件名
+     *
+     * @param dto 音乐信息
+     * @return 返回成功信息
+     */
+    @PostMapping("/music")
+    public R uploadMusicInfo(@RequestBody AudioInfoDto dto) throws IOException {
+        uploadMusic.saveMusicInfo(dto);
+        return R.success();
     }
 }

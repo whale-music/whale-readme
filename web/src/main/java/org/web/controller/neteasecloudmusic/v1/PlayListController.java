@@ -4,10 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.CollectApi;
+import org.api.neteasecloudmusic.vo.createplatlist.CreatePlaylistVo;
+import org.api.neteasecloudmusic.vo.createplatlist.Playlist;
+import org.api.neteasecloudmusic.vo.playlistallsong.*;
 import org.core.common.result.NeteaseResult;
-import org.core.common.vo.neteasecloudmusic.createplatlist.CreatePlaylistVo;
-import org.core.common.vo.neteasecloudmusic.createplatlist.Playlist;
-import org.core.common.vo.neteasecloudmusic.playlistallsong.*;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbMusicPojo;
@@ -171,8 +171,8 @@ public class PlayListController {
                 sqPojo.setSize(sqOrElse.getSize());
                 e.setSq(sqPojo);
             }
-            
-            //l 低质量
+    
+            // l 低质量
             Optional<TbMusicUrlPojo> l = musicInfos.stream()
                                                    .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
                                                                                            .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
@@ -185,8 +185,8 @@ public class PlayListController {
                 lPojo.setSize(lOrElse.getSize());
                 e.setL(lPojo);
             }
-            
-            //m 中质量
+    
+            // m 中质量
             Optional<TbMusicUrlPojo> m = musicInfos.stream()
                                                    .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
                                                                                            .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
@@ -199,8 +199,8 @@ public class PlayListController {
                 mPojo.setSize(mOrElse.getSize());
                 e.setM(mPojo);
             }
-            
-            //h高质量
+    
+            // h高质量
             Optional<TbMusicUrlPojo> h = musicInfos.stream()
                                                    .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
                                                                                            .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
@@ -262,9 +262,9 @@ public class PlayListController {
         flag = "add".equals(op);
         SysUserPojo user = UserUtil.getUser();
         collect.addSongToCollect(user.getId(),
-                collectId,
-                Arrays.stream(songIds.split(",")).map(Long::valueOf).collect(Collectors.toList()),
-                flag);
+                                 collectId,
+                                 Arrays.stream(songIds.split(",")).map(Long::valueOf).collect(Collectors.toList()),
+                                 flag);
     
         NeteaseResult r = new NeteaseResult();
         return r.success();

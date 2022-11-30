@@ -48,7 +48,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     /* 业务错误：30001-39999 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST("30001", "业务逻辑出现问题"),
     
-    NULLPOINTEREXCEPTION("30002", "空指针错误"),
+    NULL_POINTER_EXCEPTION("30002", "空指针错误"),
     
     
     /* 系统错误：40001-49999 */
@@ -62,6 +62,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     DATA_WRONG("50002", "数据错误"),
     
     DATA_EXISTED("50003", "数据已存在"),
+    SAVE_Fail("50004", "保存错误!!请检查日志"),
     
     /* 接口错误：60001-69999 */
     INTERFACE_INNER_INVOKE_ERROR("60001", "内部系统接口调用异常"),
@@ -76,7 +77,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     
     /* 权限错误：70001-79999 */
-    PERMISSION_NO_ACCESS("70001", "无访问权限");
+    PERMISSION_NO_ACCESS("70001", "无访问权限"),
+    ;
     
     /**
      * 错误码

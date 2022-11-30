@@ -19,6 +19,7 @@
         <module>core</module>
         <module>web</module>
         <module>api</module>
+        <module>oss</module>
     </modules>
 
     <properties>
@@ -137,6 +138,11 @@
                 <version>${whale.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.whale</groupId>
+                <artifactId>oss</artifactId>
+                <version>${whale.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

@@ -51,4 +51,9 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 music-config:
-  address: https://github.com/
+  # 保存模式
+  save-mode: local
+  save-name: data
+  host: https://github.com/
+  access-key: admin
+  secret-key: c81e728d9d4c2f636f067f89cc14862c

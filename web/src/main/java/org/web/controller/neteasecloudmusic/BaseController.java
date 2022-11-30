@@ -1,8 +1,8 @@
 package org.web.controller.neteasecloudmusic;
 
-import org.core.common.vo.neteasecloudmusic.user.Account;
-import org.core.common.vo.neteasecloudmusic.user.Profile;
-import org.core.common.vo.neteasecloudmusic.user.UserVo;
+import org.api.neteasecloudmusic.vo.user.Account;
+import org.api.neteasecloudmusic.vo.user.Profile;
+import org.api.neteasecloudmusic.vo.user.UserVo;
 import org.core.pojo.SysUserPojo;
 
 public class BaseController {

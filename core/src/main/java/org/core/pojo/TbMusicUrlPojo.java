@@ -49,7 +49,7 @@ public class TbMusicUrlPojo implements Serializable {
     
     @ApiModelProperty("保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在")
     @TableField("md5")
-    private Long md5;
+    private String md5;
     
     @ApiModelProperty("文件大小")
     @TableField("size")

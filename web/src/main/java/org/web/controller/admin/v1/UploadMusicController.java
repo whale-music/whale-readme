@@ -25,7 +25,7 @@ public class UploadMusicController {
     private UploadMusicApi uploadMusic;
     
     
-    @PostMapping("/file")
+    @PostMapping("/music/file")
     public R uploadMusicFile(@RequestParam("file") MultipartFile uploadFile) throws CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile));
     }
@@ -36,9 +36,9 @@ public class UploadMusicController {
      * @param musicTempFile 临时文件
      * @return 字节数据
      */
-    @GetMapping("/{music}")
-    public ResponseEntity<FileSystemResource> getMusicFile(@PathVariable("music") String musicTempFile) {
-        return uploadMusic.getMusicFile(musicTempFile);
+    @GetMapping("/temp/{music}")
+    public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("music") String musicTempFile) {
+        return uploadMusic.getMusicTempFile(musicTempFile);
     }
     
     /**
@@ -47,9 +47,31 @@ public class UploadMusicController {
      * @param dto 音乐信息
      * @return 返回成功信息
      */
-    @PostMapping("/music")
+    @PostMapping("/music/info")
     public R uploadMusicInfo(@RequestBody AudioInfoDto dto) throws IOException {
         uploadMusic.saveMusicInfo(dto);
         return R.success();
+    }
+    
+    /**
+     * 获取音乐URL
+     *
+     * @param musicId 音乐id
+     * @return url
+     */
+    @GetMapping("/music/{musicId}")
+    public R getMusicUrl(@PathVariable("musicId") String musicId) {
+        return R.success(uploadMusic.getMusicUrl(musicId));
+    }
+    
+    /**
+     * 获取上传本地音乐字节数据
+     *
+     * @param musicId 临时文件
+     * @return 字节数据
+     */
+    @GetMapping("/download/{musicId}")
+    public ResponseEntity<FileSystemResource> downloadMusicFile(@PathVariable("musicId") String musicId) {
+        return uploadMusic.downloadMusicFile(musicId);
     }
 }

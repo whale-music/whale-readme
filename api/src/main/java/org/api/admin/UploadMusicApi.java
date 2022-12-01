@@ -2,16 +2,19 @@ package org.api.admin;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.dto.AudioInfoDto;
 import org.api.admin.vo.AudioInfoVo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.MusicConfig;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.service.TbMusicService;
 import org.core.service.TbMusicUrlService;
+import org.core.utils.LocalFileUtil;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -26,6 +29,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -34,6 +38,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -44,6 +50,9 @@ public class UploadMusicApi {
     
     @Autowired
     private TbMusicUrlService musicUrlService;
+    
+    @Autowired
+    private MusicConfig config;
     
     @Autowired
     private LocalOSSServiceImpl localOSSService;
@@ -100,15 +109,10 @@ public class UploadMusicApi {
      * @param musicTempFile 临时文件名
      * @return 字节数据
      */
-    public ResponseEntity<FileSystemResource> getMusicFile(String musicTempFile) {
-        if (musicTempFile.contains("/") || musicTempFile.contains("\\")) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
-        }
+    public ResponseEntity<FileSystemResource> getMusicTempFile(String musicTempFile) {
+        LocalFileUtil.checkFileNameLegal(musicTempFile);
         String path = pathTemp + musicTempFile;
-        // 无文件
-        if (!FileUtil.isFile(path)) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
-        }
+        LocalFileUtil.checkFilePath(path);
         File file = new File(path);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
@@ -120,41 +124,87 @@ public class UploadMusicApi {
                              .body(new FileSystemResource(file));
     }
     
+    
     /**
      * 保存音乐
      *
      * @param dto 音乐信息
      */
-    public void saveMusicInfo(AudioInfoDto dto) {
+    public void saveMusicInfo(AudioInfoDto dto) throws IOException {
         String path = pathTemp + dto.getMusicFileTemp();
         // 无文件
-        if (!FileUtil.isFile(path)) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
-        }
-        
-        // 保存音乐信息
+        LocalFileUtil.checkFilePath(path);
+        // 检测文件md5值是否一样一样的就
+        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(path));
+        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
+                                                            .eq(TbMusicUrlPojo::getMd5, md5));
+        // music Info
         TbMusicPojo entity = new TbMusicPojo();
         entity.setMusicName(dto.getMusicName());
         entity.setLyric(dto.getLyric());
         entity.setTimeLength(LocalTime.now());
-        // entity.setPic(dto.getPic());
+        entity.setPic(dto.getPic());
         entity.setAliaName(dto.getAliaName());
         entity.setSort(musicService.count());
-        boolean save = musicService.save(entity);
-        if (!save) {
-            throw new BaseException(ResultCode.SAVE_Fail);
-        }
         
-        // 上传文件
-        String uploadPath = localOSSService.upload(path);
+        // music URL
         TbMusicUrlPojo urlPojo = new TbMusicUrlPojo();
-        urlPojo.setMusicId(entity.getId());
-        // urlPojo.setSize(FileUtil.size(new File(path)));
-        urlPojo.setUrl(uploadPath);
+        urlPojo.setSize(FileUtil.size(new File(path)));
         urlPojo.setRate(dto.getRate());
         urlPojo.setQuality(dto.getQuality());
-        // urlPojo.setMd5(Long.valueOf(DigestUtils.md5DigestAsHex(FileUtil.getInputStream(path))));
+        urlPojo.setMd5(md5);
         urlPojo.setEncodeType(dto.getFileType().getBytes(StandardCharsets.UTF_8));
-        musicUrlService.save(urlPojo);
+        if (one == null) {
+            // 没有数据新增, 音乐信息
+            boolean save = musicService.save(entity);
+            if (!save) {
+                throw new BaseException(ResultCode.SAVE_Fail);
+            }
+            
+            // 上传文件
+            String uploadPath = localOSSService.upload(path);
+            urlPojo.setMusicId(entity.getId());
+            urlPojo.setUrl(uploadPath);
+            musicUrlService.save(urlPojo);
+        } else {
+            // 已有数据，对原来的数据更新，数据会直接覆盖原有数据
+            entity.setId(one.getMusicId());
+            boolean save = musicService.updateById(entity);
+            if (!save) {
+                throw new BaseException(ResultCode.SAVE_Fail);
+            }
+            
+            // 对music_url表更新
+            musicUrlService.updateById(urlPojo);
+        }
+    }
+    
+    /**
+     * 查询音乐URL表
+     *
+     * @param musicId 音乐id
+     * @return 音乐URL列表
+     */
+    public List<TbMusicUrlPojo> getMusicUrl(String musicId) {
+        List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
+                                                                 .eq(TbMusicUrlPojo::getMusicId, musicId));
+        return list.stream()
+                   .peek(tbMusicUrlPojo -> tbMusicUrlPojo.setUrl(config.getHost() + tbMusicUrlPojo.getUrl()))
+                   .collect(Collectors.toList());
+    }
+    
+    public ResponseEntity<FileSystemResource> downloadMusicFile(String musicFilePath) {
+        LocalFileUtil.checkFileNameLegal(musicFilePath);
+        String filePath = config.getObjectSave() + musicFilePath;
+        LocalFileUtil.checkFilePath(filePath);
+        File file = new File(musicFilePath);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + musicFilePath);
+        return ResponseEntity.ok()
+                             .headers(headers)
+                             .contentLength(file.length())
+                             .contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                             .body(new FileSystemResource(file));
     }
 }

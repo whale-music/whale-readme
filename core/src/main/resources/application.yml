@@ -54,6 +54,6 @@ music-config:
   # 保存模式
   save-mode: local
   object-save: data
-  host: https://localhost:8080/
+  host: http://127.0.0.1:8080/upload/download/
   access-key: admin
   secret-key: c81e728d9d4c2f636f067f89cc14862c

@@ -26,10 +26,9 @@ public class LocalOSSServiceImpl implements OSSService {
     
     @Override
     public String upload(String filePath) {
-        String name = new File(filePath).getName();
-        String destPath = "./" + config.getObjectSave() + "/" + name;
-        FileUtil.copy(filePath, destPath, true);
-        return name;
+        File srcFile = new File(filePath);
+        FileUtil.copy(srcFile, new File(config.getObjectSave(), srcFile.getName()), true);
+        return srcFile.getName();
     }
     
     @Override

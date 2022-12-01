@@ -111,9 +111,7 @@ public class UploadMusicApi {
      */
     public ResponseEntity<FileSystemResource> getMusicTempFile(String musicTempFile) {
         LocalFileUtil.checkFileNameLegal(musicTempFile);
-        String path = pathTemp + musicTempFile;
-        LocalFileUtil.checkFilePath(path);
-        File file = new File(path);
+        File file = LocalFileUtil.checkFilePath(pathTemp, musicTempFile);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
@@ -131,11 +129,10 @@ public class UploadMusicApi {
      * @param dto 音乐信息
      */
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
-        String path = pathTemp + dto.getMusicFileTemp();
         // 无文件
-        LocalFileUtil.checkFilePath(path);
+        File file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
         // 检测文件md5值是否一样一样的就
-        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(path));
+        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
         TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
                                                             .eq(TbMusicUrlPojo::getMd5, md5));
         // music Info
@@ -149,7 +146,7 @@ public class UploadMusicApi {
         
         // music URL
         TbMusicUrlPojo urlPojo = new TbMusicUrlPojo();
-        urlPojo.setSize(FileUtil.size(new File(path)));
+        urlPojo.setSize(FileUtil.size(file));
         urlPojo.setRate(dto.getRate());
         urlPojo.setQuality(dto.getQuality());
         urlPojo.setMd5(md5);
@@ -162,7 +159,7 @@ public class UploadMusicApi {
             }
             
             // 上传文件
-            String uploadPath = localOSSService.upload(path);
+            String uploadPath = localOSSService.upload(file.getPath());
             urlPojo.setMusicId(entity.getId());
             urlPojo.setUrl(uploadPath);
             musicUrlService.save(urlPojo);
@@ -188,6 +185,9 @@ public class UploadMusicApi {
     public List<TbMusicUrlPojo> getMusicUrl(String musicId) {
         List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
                                                                  .eq(TbMusicUrlPojo::getMusicId, musicId));
+        if (list == null || list.isEmpty()) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST);
+        }
         return list.stream()
                    .peek(tbMusicUrlPojo -> tbMusicUrlPojo.setUrl(config.getHost() + tbMusicUrlPojo.getUrl()))
                    .collect(Collectors.toList());
@@ -195,9 +195,7 @@ public class UploadMusicApi {
     
     public ResponseEntity<FileSystemResource> downloadMusicFile(String musicFilePath) {
         LocalFileUtil.checkFileNameLegal(musicFilePath);
-        String filePath = config.getObjectSave() + musicFilePath;
-        LocalFileUtil.checkFilePath(filePath);
-        File file = new File(musicFilePath);
+        File file = LocalFileUtil.checkFilePath(config.getObjectSave(), musicFilePath);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + musicFilePath);

@@ -1,8 +1,9 @@
 package org.core.utils;
 
-import cn.hutool.core.io.FileUtil;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+
+import java.io.File;
 
 public class LocalFileUtil {
     private LocalFileUtil() {
@@ -14,10 +15,12 @@ public class LocalFileUtil {
         }
     }
     
-    public static void checkFilePath(String path) {
+    public static File checkFilePath(String path, String filename) {
         // 无文件
-        if (!FileUtil.isFile(path)) {
+        File file = new File(path, filename);
+        if (!file.isFile()) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
+        return file;
     }
 }

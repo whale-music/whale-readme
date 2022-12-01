@@ -11,12 +11,12 @@ public class JwtUtil {
     /**
      * 过期5分钟
      */
-    private static final long EXPIRE_TIME = 5 * 60 * 1000L;
+    private static final long EXPIRE_TIME = 60 * 60 * 1000L;
     
     /**
      * jwt密钥
      */
-    private static final String SECRET = "jwt_secret";
+    private static final String SECRET = "0a8be4854d487b1fbd1d7d1c5d6dea07";
     
     private JwtUtil() {
     }

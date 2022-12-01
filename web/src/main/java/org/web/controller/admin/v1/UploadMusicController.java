@@ -67,11 +67,11 @@ public class UploadMusicController {
     /**
      * 获取上传本地音乐字节数据
      *
-     * @param musicId 临时文件
+     * @param musicFilePath 临时文件
      * @return 字节数据
      */
-    @GetMapping("/download/{musicId}")
-    public ResponseEntity<FileSystemResource> downloadMusicFile(@PathVariable("musicId") String musicId) {
-        return uploadMusic.downloadMusicFile(musicId);
+    @GetMapping("/download/{music}")
+    public ResponseEntity<FileSystemResource> downloadMusicFile(@PathVariable("music") String musicFilePath) {
+        return uploadMusic.downloadMusicFile(musicFilePath);
     }
 }

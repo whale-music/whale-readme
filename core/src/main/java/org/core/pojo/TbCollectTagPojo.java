@@ -18,7 +18,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -26,11 +26,11 @@ import java.io.Serializable;
 @TableName("tb_collect_tag")
 @ApiModel(value = "TbCollectTagPojo对象", description = "歌单风格中间表")
 public class TbCollectTagPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌单ID")
-    @TableId(value = "collect_id", type = IdType.AUTO)
+    @TableId(value = "collect_id", type = IdType.NONE)
     private Long collectId;
     
     @ApiModelProperty("tag ID")

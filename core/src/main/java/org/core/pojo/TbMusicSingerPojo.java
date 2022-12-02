@@ -18,7 +18,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -26,11 +26,11 @@ import java.io.Serializable;
 @TableName("tb_music_singer")
 @ApiModel(value = "TbMusicSingerPojo对象", description = "歌曲和歌手的中间表")
 public class TbMusicSingerPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌曲ID")
-    @TableId(value = "music_id", type = IdType.AUTO)
+    @TableId(value = "music_id", type = IdType.NONE)
     private Long musicId;
     
     @ApiModelProperty("歌曲ID")

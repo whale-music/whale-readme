@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @TableName("tb_history")
 @ApiModel(value = "TbHistoryPojo对象", description = "音乐播放历史(包括歌单，音乐，专辑）")
 public class TbHistoryPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌曲ID")

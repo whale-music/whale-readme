@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @TableName("tb_collect")
 @ApiModel(value = "TbCollectPojo对象", description = "歌单列表")
 public class TbCollectPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌单表ID")
@@ -51,7 +51,7 @@ public class TbCollectPojo implements Serializable {
     @TableField("sort")
     private Long sort;
     
-    @ApiModelProperty("该歌单是否订阅(收藏)")
+    @ApiModelProperty("该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)")
     @TableField("subscribed")
     private Boolean subscribed;
     
@@ -62,4 +62,6 @@ public class TbCollectPojo implements Serializable {
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+
 }

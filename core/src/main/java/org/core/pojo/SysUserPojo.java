@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @TableName("sys_user")
 @ApiModel(value = "SysUserPojo对象", description = "系统用户表")
 public class SysUserPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("系统用户ID")

@@ -17,7 +17,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-29
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -28,7 +28,7 @@ public class TbUserSingerPojo implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    @TableId(value = "user_id", type = IdType.ASSIGN_ID)
+    @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
     
     @TableField(value = "singer_id")

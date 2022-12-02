@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @TableName("sys_dict_type")
 @ApiModel(value = "SysDictTypePojo对象", description = "字典类型表")
 public class SysDictTypePojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("字典主键")

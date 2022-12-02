@@ -19,7 +19,7 @@ import java.time.LocalDate;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @TableName("tb_album")
 @ApiModel(value = "TbAlbumPojo对象", description = "歌曲专辑表")
 public class TbAlbumPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("专辑表ID")

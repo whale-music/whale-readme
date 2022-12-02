@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Getter
 @Setter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @TableName("tb_rank")
 @ApiModel(value = "TbRankPojo对象", description = "音乐播放排行榜")
 public class TbRankPojo implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("用户ID")
@@ -43,7 +43,7 @@ public class TbRankPojo implements Serializable {
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     

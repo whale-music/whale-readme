@@ -35,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +149,7 @@ public class UploadMusicApi {
         urlPojo.setRate(dto.getRate());
         urlPojo.setQuality(dto.getQuality());
         urlPojo.setMd5(md5);
-        urlPojo.setEncodeType(dto.getFileType().getBytes(StandardCharsets.UTF_8));
+        urlPojo.setEncodeType(dto.getFileType());
         if (one == null) {
             // 没有数据新增, 音乐信息
             boolean save = musicService.save(entity);

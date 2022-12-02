@@ -9,7 +9,7 @@ import org.core.pojo.TbUserSingerPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-29
+ * @since 2022-12-02
  */
 public interface TbUserSingerService extends IService<TbUserSingerPojo> {
 

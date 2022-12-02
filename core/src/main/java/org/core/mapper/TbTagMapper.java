@@ -10,7 +10,7 @@ import org.core.pojo.TbTagPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Mapper
 public interface TbTagMapper extends BaseMapper<TbTagPojo> {

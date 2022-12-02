@@ -10,7 +10,7 @@ import org.core.pojo.TbRankPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Mapper
 public interface TbRankMapper extends BaseMapper<TbRankPojo> {

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Service
 public class TbLikeServiceImpl extends ServiceImpl<TbLikeMapper, TbLikePojo> implements TbLikeService {

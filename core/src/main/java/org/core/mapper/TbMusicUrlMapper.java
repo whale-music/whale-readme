@@ -10,7 +10,7 @@ import org.core.pojo.TbMusicUrlPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-10-28
+ * @since 2022-12-02
  */
 @Mapper
 public interface TbMusicUrlMapper extends BaseMapper<TbMusicUrlPojo> {

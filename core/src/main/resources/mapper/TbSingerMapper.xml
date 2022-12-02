@@ -2,4 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.core.mapper.TbSingerMapper">
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="org.core.pojo.TbSingerPojo">
+        <id column="id" property="id" />
+        <result column="singer_name" property="singerName" />
+        <result column="sex" property="sex" />
+        <result column="pic" property="pic" />
+        <result column="birth" property="birth" />
+        <result column="location" property="location" />
+        <result column="introduction" property="introduction" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, singer_name, sex, pic, birth, location, introduction, create_time, update_time
+    </sql>
+
 </mapper>

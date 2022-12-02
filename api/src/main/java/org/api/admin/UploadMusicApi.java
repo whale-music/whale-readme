@@ -183,7 +183,7 @@ public class UploadMusicApi {
      */
     public List<TbMusicUrlPojo> getMusicUrl(String musicId) {
         List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                 .eq(TbMusicUrlPojo::getMusicId, musicId));
+                                                                 .eq(TbMusicUrlPojo::getId, musicId));
         if (list == null || list.isEmpty()) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
@@ -192,6 +192,12 @@ public class UploadMusicApi {
                    .collect(Collectors.toList());
     }
     
+    /**
+     * 下载音乐接口
+     *
+     * @param musicFilePath 音乐地址
+     * @return 音乐数据
+     */
     public ResponseEntity<FileSystemResource> downloadMusicFile(String musicFilePath) {
         LocalFileUtil.checkFileNameLegal(musicFilePath);
         File file = LocalFileUtil.checkFilePath(config.getObjectSave(), musicFilePath);

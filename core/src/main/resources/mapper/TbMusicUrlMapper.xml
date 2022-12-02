@@ -5,20 +5,21 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="org.core.pojo.TbMusicUrlPojo">
         <id column="id" property="id" />
-        <result column="rate" property="rate" />
         <result column="music_id" property="musicId" />
+        <result column="rate" property="rate" />
         <result column="url" property="url" />
         <result column="quality" property="quality" />
         <result column="md5" property="md5" />
-        <result column="size" property="size" />
         <result column="encodeType" property="encodeType" />
+        <result column="size" property="size" />
+        <result column="user_id" property="userId" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, rate, music_id, url, quality, md5, size, encodeType, create_time, update_time
+        id, music_id, rate, url, quality, md5, encodeType, size, user_id, create_time, update_time
     </sql>
 
 </mapper>

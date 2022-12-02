@@ -24,7 +24,12 @@ public class UploadMusicController {
     @Autowired
     private UploadMusicApi uploadMusic;
     
-    
+    /**
+     * 上传临时文件
+     *
+     * @param uploadFile 临时文件
+     * @return 返回音乐数据
+     */
     @PostMapping("/music/file")
     public R uploadMusicFile(@RequestParam("file") MultipartFile uploadFile) throws CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile));

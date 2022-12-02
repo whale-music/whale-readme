@@ -32,12 +32,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +88,13 @@ public class UploadMusicApi {
     
     String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp\\";
     
+    /**
+     * 上传文件到临时目录
+     *
+     * @param uploadFile 临时文件
+     * @return 音乐信息
+     */
+    @Transactional(rollbackFor = Exception.class)
     public AudioInfoVo uploadMusicFile(MultipartFile uploadFile) throws IOException, CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException {
         String filename = uploadFile.getOriginalFilename();
         if (StringUtils.isBlank(filename)) {
@@ -116,6 +125,7 @@ public class UploadMusicApi {
         log.info(" ----- ----- ");
         AudioInfoVo audioInfoVo = new AudioInfoVo();
         audioInfoVo.setMusicName(read.getTag().getFirst(FieldKey.TITLE));
+        audioInfoVo.setOriginFileName(split[0]);
         audioInfoVo.setSinger(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));
         audioInfoVo.setAlbum(read.getTag().getFirst(FieldKey.ALBUM));
         audioInfoVo.setTimeLength(read.getAudioHeader().getTrackLength());
@@ -149,6 +159,7 @@ public class UploadMusicApi {
      *
      * @param dto 音乐信息
      */
+    @Transactional(rollbackFor = Exception.class)
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
         // 检查文件目录是否合法
         File file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
@@ -232,9 +243,7 @@ public class UploadMusicApi {
     
         // 上传文件
         String uploadPath = localOSSService.upload(file.getPath());
-        if (!file.delete()) {
-            log.warn("文件删除失败,请检查路径: {}", file.getAbsolutePath());
-        }
+        Files.delete(file.toPath());
         // music URL 地址表
         TbMusicUrlPojo urlPojo = new TbMusicUrlPojo();
         urlPojo.setId(IdWorker.getId());
@@ -262,9 +271,10 @@ public class UploadMusicApi {
         if (list == null || list.isEmpty()) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
-        return list.stream()
-                   .peek(tbMusicUrlPojo -> tbMusicUrlPojo.setUrl(config.getHost() + tbMusicUrlPojo.getUrl()))
-                   .collect(Collectors.toList());
+        for (TbMusicUrlPojo tbMusicUrlPojo : list) {
+            tbMusicUrlPojo.setUrl(config.getHost() + tbMusicUrlPojo.getUrl());
+        }
+        return list;
     }
     
     /**

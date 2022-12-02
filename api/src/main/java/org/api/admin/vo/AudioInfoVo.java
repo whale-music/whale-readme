@@ -17,6 +17,9 @@ public class AudioInfoVo {
     @ApiModelProperty("音乐别名")
     private String aliaName;
     
+    @ApiModelProperty("源文件音乐名")
+    private String originFileName;
+    
     @ApiModelProperty("音乐类型")
     private String type;
     

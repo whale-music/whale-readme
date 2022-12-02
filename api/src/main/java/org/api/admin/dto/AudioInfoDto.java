@@ -24,10 +24,10 @@ public class AudioInfoDto {
     private String type;
     
     @ApiModelProperty("歌手")
-    private List<String> singer;
+    private List<SingerDto> singer;
     
     @ApiModelProperty("专辑")
-    private String album;
+    private AlbumDto album;
     
     @ApiModelProperty("音乐歌词")
     private String lyric;
@@ -43,9 +43,6 @@ public class AudioInfoDto {
     
     @ApiModelProperty("大小")
     private Long size;
-    
-    @ApiModelProperty("文件格式")
-    private String fileType;
     
     @ApiModelProperty("临时文件名")
     private String musicFileTemp;

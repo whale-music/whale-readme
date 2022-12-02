@@ -1,5 +1,6 @@
 package org.api.admin.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,33 +11,33 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AudioInfoVo {
-    // 音乐名
-    String musicName;
+    @ApiModelProperty("音乐名")
+    private String musicName;
     
-    // 音乐别名
-    String aliaName;
+    @ApiModelProperty("音乐别名")
+    private String aliaName;
     
-    // 音乐类型
-    String type;
+    @ApiModelProperty("音乐类型")
+    private String type;
     
-    // 歌手
-    List<String> singer;
+    @ApiModelProperty("歌手")
+    private List<String> singer;
     
-    // 专辑
-    String album;
+    @ApiModelProperty("专辑")
+    private String album;
     
-    // 音乐歌词
-    String lyric;
+    @ApiModelProperty("音乐歌词")
+    private String lyric;
     
-    // 音乐时长
-    Integer timeLength;
+    @ApiModelProperty("音乐时长")
+    private Integer timeLength;
     
-    // 音乐质量
-    String quality;
+    @ApiModelProperty("音乐质量")
+    private String quality;
     
-    // 大小
-    Long size;
+    @ApiModelProperty("大小")
+    private Long size;
     
-    // 临时文件名
-    String musicFileTemp;
+    @ApiModelProperty("临时文件名")
+    private String musicFileTemp;
 }

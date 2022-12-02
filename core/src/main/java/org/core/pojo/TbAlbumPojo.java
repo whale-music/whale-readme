@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -31,7 +31,7 @@ public class TbAlbumPojo implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("专辑表ID")
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
     @ApiModelProperty("专辑名")
@@ -48,11 +48,11 @@ public class TbAlbumPojo implements Serializable {
     
     @ApiModelProperty("修改时间")
     @TableField("update_time")
-    private LocalDate updateTime;
+    private LocalDateTime updateTime;
     
     @ApiModelProperty("创建时间")
     @TableField("create_time")
-    private LocalDate createTime;
+    private LocalDateTime createTime;
     
     
 }

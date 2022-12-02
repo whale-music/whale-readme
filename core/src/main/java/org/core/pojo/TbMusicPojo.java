@@ -9,7 +9,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 /**
  * <p>
@@ -29,7 +28,7 @@ public class TbMusicPojo implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("所有音乐列表ID")
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
     @ApiModelProperty("音乐名")
@@ -43,10 +42,6 @@ public class TbMusicPojo implements Serializable {
     @ApiModelProperty("歌曲封面地址")
     @TableField("pic")
     private String pic;
-    
-    @ApiModelProperty("歌手信息，id是歌手和歌曲的中间表")
-    @TableField("singer_id")
-    private Long singerId;
     
     @ApiModelProperty("歌词")
     @TableField("lyric")
@@ -62,7 +57,7 @@ public class TbMusicPojo implements Serializable {
     
     @ApiModelProperty("歌曲时长")
     @TableField("time_length")
-    private LocalTime timeLength;
+    private Integer timeLength;
     
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)

@@ -62,7 +62,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     DATA_WRONG("50002", "数据错误"),
     
     DATA_EXISTED("50003", "数据已存在"),
-    SAVE_Fail("50004", "保存错误!!请检查日志"),
+    SAVE_FAIL("50004", "保存错误!!请检查日志"),
     
     /* 接口错误：60001-69999 */
     INTERFACE_INNER_INVOKE_ERROR("60001", "内部系统接口调用异常"),

@@ -28,7 +28,7 @@ public class SysUserPojo implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("系统用户ID")
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
     @ApiModelProperty("登录用户名")

@@ -12,5 +12,7 @@ import org.core.pojo.SysUserPojo;
  * @since 2022-12-02
  */
 public interface SysUserService extends IService<SysUserPojo> {
-
+    void createAccount(SysUserPojo user);
+    
+    SysUserPojo login(String phone, String password);
 }

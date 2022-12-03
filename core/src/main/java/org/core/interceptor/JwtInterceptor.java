@@ -1,5 +1,6 @@
 package org.core.interceptor;
 
+import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,8 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/login/cellphone",
                 "/register/account",
                 "/logout",
+                "/admin/login/register",
+                "/admin/login/account",
         };
         // 放行登录和注册,注销
         if (Arrays.asList(passPath).contains(request.getRequestURI())) {
@@ -44,7 +47,9 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
             Optional<Cookie> first = Arrays.stream(request.getCookies())
-                                           .filter(cookie -> "Cookie".equals(cookie.getName()))
+                                           .filter(cookie -> !"undefined".equalsIgnoreCase(cookie.getValue()))
+                                           .filter(cookie -> Header.COOKIE.getValue()
+                                                                          .equalsIgnoreCase(cookie.getName()))
                                            .findFirst();
             token = first.map(Cookie::getValue).orElse(null);
         }

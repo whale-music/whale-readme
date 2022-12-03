@@ -1,4 +1,4 @@
-create table music_box.sys_dict_data
+create table sys_dict_data
 (
     id          bigint                                    not null comment '字典编码'
         primary key,
@@ -15,7 +15,7 @@ create table music_box.sys_dict_data
 )
     comment '字典数据表';
 
-create table music_box.sys_dict_type
+create table sys_dict_type
 (
     id          bigint                                    not null comment '字典主键'
         primary key,
@@ -32,7 +32,7 @@ create table music_box.sys_dict_type
 )
     comment '字典类型表';
 
-create table music_box.sys_user
+create table sys_user
 (
     id              bigint       not null comment '系统用户ID'
         primary key,
@@ -51,12 +51,12 @@ create table music_box.sys_user
     comment '系统用户表';
 
 create index sys_user_nickname_index
-    on music_box.sys_user (nickname);
+    on sys_user (nickname);
 
 create index sys_user_username_index
-    on music_box.sys_user (username);
+    on sys_user (username);
 
-create table music_box.tb_album
+create table tb_album
 (
     id          bigint       not null comment '专辑表ID'
         primary key,
@@ -69,9 +69,9 @@ create table music_box.tb_album
     comment '歌曲专辑表';
 
 create index tb_album_album_name_index
-    on music_box.tb_album (album_name);
+    on tb_album (album_name);
 
-create table music_box.tb_collect
+create table tb_collect
 (
     id             bigint       not null comment '歌单表ID'
         primary key,
@@ -89,9 +89,9 @@ create table music_box.tb_collect
     comment '歌单列表';
 
 create index tb_collect_play_list_name_index
-    on music_box.tb_collect (play_list_name);
+    on tb_collect (play_list_name);
 
-create table music_box.tb_collect_music
+create table tb_collect_music
 (
     collect_id bigint not null comment '歌单ID',
     music_id   bigint not null comment '音乐ID',
@@ -99,7 +99,7 @@ create table music_box.tb_collect_music
 )
     comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';
 
-create table music_box.tb_collect_tag
+create table tb_collect_tag
 (
     collect_id bigint not null comment '歌单ID',
     tag_id     bigint not null comment 'tag ID',
@@ -107,7 +107,7 @@ create table music_box.tb_collect_tag
 )
     comment '歌单风格中间表';
 
-create table music_box.tb_history
+create table tb_history
 (
     music_id    bigint   not null comment '歌曲ID'
         primary key,
@@ -118,7 +118,7 @@ create table music_box.tb_history
 )
     comment '音乐播放历史(包括歌单，音乐，专辑）';
 
-create table music_box.tb_like
+create table tb_like
 (
     user_id     bigint       not null comment '我喜欢的歌单ID和用户ID相同'
         primary key,
@@ -131,7 +131,7 @@ create table music_box.tb_like
 )
     comment '喜爱歌单';
 
-create table music_box.tb_like_music
+create table tb_like_music
 (
     like_id  bigint not null comment '喜爱歌单ID',
     music_id bigint not null comment '音乐ID',
@@ -139,7 +139,7 @@ create table music_box.tb_like_music
 )
     comment '喜爱歌单中间表';
 
-create table music_box.tb_music
+create table tb_music
 (
     id          bigint       not null comment '所有音乐列表ID'
         primary key,
@@ -156,12 +156,12 @@ create table music_box.tb_music
     comment '所有音乐列表';
 
 create index tb_music_alia_name_index
-    on music_box.tb_music (alia_name);
+    on tb_music (alia_name);
 
 create index tb_music_music_name_index
-    on music_box.tb_music (music_name);
+    on tb_music (music_name);
 
-create table music_box.tb_music_singer
+create table tb_music_singer
 (
     music_id  bigint not null comment '歌曲ID',
     singer_id bigint not null comment '歌手ID',
@@ -169,7 +169,7 @@ create table music_box.tb_music_singer
 )
     comment '歌曲和歌手的中间表';
 
-create table music_box.tb_music_url
+create table tb_music_url
 (
     id          bigint       not null comment '主键'
         primary key,
@@ -189,15 +189,15 @@ create table music_box.tb_music_url
     comment '音乐下载地址';
 
 create index tb_music_url_md5_index
-    on music_box.tb_music_url (md5);
+    on tb_music_url (md5);
 
 create index tb_music_url_music_id_index
-    on music_box.tb_music_url (music_id);
+    on tb_music_url (music_id);
 
 create index tb_music_url_size_index
-    on music_box.tb_music_url (size);
+    on tb_music_url (size);
 
-create table music_box.tb_rank
+create table tb_rank
 (
     user_id         bigint   not null comment '用户ID'
         primary key,
@@ -208,7 +208,7 @@ create table music_box.tb_rank
 )
     comment '音乐播放排行榜';
 
-create table music_box.tb_singer
+create table tb_singer
 (
     id           bigint       not null comment '歌手ID'
         primary key,
@@ -223,7 +223,7 @@ create table music_box.tb_singer
 )
     comment '歌手表';
 
-create table music_box.tb_tag
+create table tb_tag
 (
     id          bigint      not null
         primary key,
@@ -235,7 +235,7 @@ create table music_box.tb_tag
 )
     comment '标签表（风格）';
 
-create table music_box.tb_user_singer
+create table tb_user_singer
 (
     user_id   bigint not null,
     singer_id bigint not null,
@@ -244,8 +244,8 @@ create table music_box.tb_user_singer
     comment '用户关注歌曲家';
 
 create index tb_user_singer_user_id_index
-    on music_box.tb_user_singer (user_id);
+    on tb_user_singer (user_id);
 
 create index tb_user_singer_user_id_index_2
-    on music_box.tb_user_singer (user_id);
+    on tb_user_singer (user_id);
 

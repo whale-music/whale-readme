@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.pojo.SysUserPojo;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-10-22
  */
 @Slf4j
-@Service
+@Service("neteasecloudUser")
 public class UserApi {
     // 用户服务
     @Autowired
@@ -46,15 +45,7 @@ public class UserApi {
      * @param user 用户信息
      */
     public void createAccount(SysUserPojo user) {
-        long count = userService.count(Wrappers.<SysUserPojo>lambdaQuery()
-                                               .eq(StringUtils.isNotBlank(user.getUsername()),
-                                                       SysUserPojo::getUsername,
-                                                       user.getUsername()));
-        if (count == 0) {
-            userService.save(user);
-        } else {
-            throw new BaseException(ResultCode.DUPLICATE_USER_NAME_ERROR);
-        }
+        userService.createAccount(user);
     }
     
     /**
@@ -78,15 +69,8 @@ public class UserApi {
      * @param password 密码
      * @return 返回用户信息
      */
-    public SysUserPojo loginEfficacy(String phone, String password) {
-        LambdaQueryWrapper<SysUserPojo> lambdaQuery = new LambdaQueryWrapper<>();
-        lambdaQuery.eq(SysUserPojo::getUsername, phone);
-        lambdaQuery.eq(SysUserPojo::getPassword, password);
-        SysUserPojo one = userService.getOne(lambdaQuery);
-        if (one == null) {
-            throw new BaseException(ResultCode.USER_NOT_EXIST);
-        }
-        return one;
+    public SysUserPojo login(String phone, String password) {
+        return userService.login(phone, password);
     }
     
     /**

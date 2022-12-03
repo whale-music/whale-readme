@@ -1,6 +1,7 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.UserApi;
@@ -15,11 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.web.controller.neteasecloudmusic.BaseController;
+import org.web.controller.BaseController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -32,9 +32,8 @@ import java.time.LocalDateTime;
 @RestController("NeteaseCloudLogin")
 @RequestMapping("/")
 @Slf4j
-public class LogoController extends BaseController {
+public class LoginController extends BaseController {
     
-    private static final String COOKIE = "Cookie";
     @Autowired
     private UserApi user;
     
@@ -45,13 +44,13 @@ public class LogoController extends BaseController {
      */
     @GetMapping("/login/cellphone")
     public NeteaseResult login(HttpServletResponse response, String phone, String password) {
-        SysUserPojo userPojo = user.loginEfficacy(phone, password);
+        SysUserPojo userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
-        
+        // 生成sign
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(COOKIE, sign);
+        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
         response.addCookie(cookie);
         
         NeteaseResult r = new NeteaseResult();
@@ -75,8 +74,6 @@ public class LogoController extends BaseController {
         userPojo.setUsername(account);
         userPojo.setNickname(nickname);
         userPojo.setPassword(password);
-        userPojo.setCreateTime(LocalDateTime.now());
-        userPojo.setUpdateTime(LocalDateTime.now());
         user.createAccount(userPojo);
         return new NeteaseResult().success();
     }
@@ -97,28 +94,20 @@ public class LogoController extends BaseController {
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(COOKIE, sign);
+        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
         response.addCookie(cookie);
-        
+    
         NeteaseResult r = new NeteaseResult();
         r.put("token", sign);
         return r;
     }
     
+    /**
+     * 登出接口
+     */
     @GetMapping("/logout")
-    public NeteaseResult logout(HttpServletResponse response) {
-        // 删除cookie
-        Cookie cookie = new Cookie(COOKIE, null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-        
-        // 删除用户
-        UserUtil.removeUser();
-    
-        NeteaseResult r = new NeteaseResult();
-        r.success();
-        return r;
+    public NeteaseResult userLogout(HttpServletResponse response) {
+        return super.logout(response);
     }
     
 }

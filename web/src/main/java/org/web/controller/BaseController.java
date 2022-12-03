@@ -1,9 +1,15 @@
-package org.web.controller.neteasecloudmusic;
+package org.web.controller;
 
+import cn.hutool.http.Header;
 import org.api.neteasecloudmusic.vo.user.Account;
 import org.api.neteasecloudmusic.vo.user.Profile;
 import org.api.neteasecloudmusic.vo.user.UserVo;
+import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
+import org.core.utils.UserUtil;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 public class BaseController {
     
@@ -23,13 +29,26 @@ public class BaseController {
         
         profile.setLastLoginIP(account.getLastLoginIp());
         profile.setLastLoginTime(account.getLastLoginTime());
-        
+    
         profile.setCreateTime(account.getCreateTime().getNano());
-        
+    
         userVo.setAccount(new Account());
         Account userVoAccount = userVo.getAccount();
         userVoAccount.setId(account.getId());
         userVoAccount.setUserName(account.getUsername());
         return userVo;
+    }
+    
+    protected NeteaseResult logout(HttpServletResponse response) {
+        // 删除cookie
+        Cookie cookie = new Cookie(Header.COOKIE.getValue(), null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        // 删除用户
+        UserUtil.removeUser();
+        NeteaseResult r = new NeteaseResult();
+        r.success();
+        return r;
     }
 }

@@ -149,7 +149,7 @@ create table tb_music
     lyric       varchar(512) null comment '歌词',
     album_id    bigint       null comment '专辑ID',
     sort        bigint       null comment '排序字段',
-    time_length time         null comment '歌曲时长',
+    time_length int         null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
     create_time datetime     null comment '创建时间'
 )

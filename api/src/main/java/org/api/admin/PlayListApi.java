@@ -62,15 +62,20 @@ public class PlayListApi {
     private TbCollectMusicService collectMusicService;
     
     public Page<MusicVo> getAllMusicPage(MusicDto req) {
+        if (req.getPageNum() == null || Objects.equals(req.getPageNum(), 0)) {
+            req.setPageNum(200);
+        }
         Page<TbMusicPojo> page = new Page<>(req.getPageIndex(), req.getPageNum());
         
         // 查询歌手表
         List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
-        List<TbSingerPojo> singerList = new ArrayList<>();
+        List<TbSingerPojo> singerList;
         if (StringUtils.isNotBlank(req.getSingerName())) {
             singerList = singerService.list(Wrappers.<TbSingerPojo>lambdaQuery().like(TbSingerPojo::getSingerName, req.getSingerName()));
             List<Long> singerIdsList = singerList.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
-            musicSingerList = musicSingerService.listByIds(singerIdsList);
+            if (!singerIdsList.isEmpty()) {
+                musicSingerList = musicSingerService.listByIds(singerIdsList);
+            }
         }
         List<Long> musicSingerIds = musicSingerList.stream().map(TbMusicSingerPojo::getMusicId).collect(Collectors.toList());
         // 查询专辑表
@@ -108,26 +113,50 @@ public class PlayListApi {
         
         musicService.page(page, musicWrapper);
         
-        List<Long> musicUrl = page.getRecords().stream().map(TbMusicPojo::getId).collect(Collectors.toList());
-        List<TbMusicUrlPojo> musicUrlList = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicUrl));
+        List<Long> musicIds = page.getRecords().stream().map(TbMusicPojo::getId).collect(Collectors.toList());
+        List<TbMusicUrlPojo> musicUrlList = new ArrayList<>();
+        
+        
+        List<TbMusicSingerPojo> tbMusicSingerPojoList = new ArrayList<>();
+        List<TbSingerPojo> tbSingerPojos = new ArrayList<>();
+        if (!musicIds.isEmpty()) {
+            // 获取歌曲地址
+            musicUrlList = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
+            // 获取歌手信息
+            tbMusicSingerPojoList = musicSingerService.listByIds(musicIds);
+            
+            if (!tbMusicSingerPojoList.isEmpty()) {
+                tbSingerPojos = singerService.listByIds(tbMusicSingerPojoList.stream()
+                                                                             .map(TbMusicSingerPojo::getSingerId)
+                                                                             .collect(Collectors.toList()));
+            }
+        }
+        // 获取专辑
+        List<Long> albumIds = page.getRecords().stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toList());
+        List<TbAlbumPojo> tbAlbumPojos = new ArrayList<>();
+        if (!albumIds.isEmpty()) {
+            tbAlbumPojos = albumService.listByIds(albumIds);
+        }
         List<MusicVo> musicVoList = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
             MusicVo m = new MusicVo();
-            // 替换歌手表
-            Optional<TbMusicSingerPojo> musicSinger = musicSingerList.stream()
-                                                                     .filter(tbMusicSingerPojo -> Objects.equals(musicPojo.getId(),
-                                                                             tbMusicSingerPojo.getMusicId()))
-                                                                     .findFirst();
+            BeanUtils.copyProperties(musicPojo, m);
+            // 在返回音乐数据添加歌手信息
+            Optional<TbMusicSingerPojo> musicSinger = tbMusicSingerPojoList.stream()
+                                                                           .filter(tbMusicSingerPojo -> Objects.equals(musicPojo.getId(),
+                                                                                   tbMusicSingerPojo.getMusicId()))
+                                                                           .findFirst();
             TbMusicSingerPojo tbMusicSingerPojo = musicSinger.orElse(new TbMusicSingerPojo());
-            List<TbSingerPojo> tbSingerPojoList = singerList.stream()
-                                                            .filter(singerPojo -> Objects.equals(tbMusicSingerPojo.getSingerId(), singerPojo.getId()))
-                                                            .collect(Collectors.toList());
-            
-            // 替换专辑表
-            Optional<TbAlbumPojo> first = albumList.stream()
-                                                   .filter(tbAlbumPojo -> Objects.equals(tbAlbumPojo.getId(), musicPojo.getAlbumId()))
-                                                   .findFirst();
+            // 歌手信息
+            List<TbSingerPojo> tbSingerPojoList = tbSingerPojos.stream()
+                                                               .filter(singerPojo -> Objects.equals(tbMusicSingerPojo.getSingerId(),
+                                                                       singerPojo.getId()))
+                                                               .collect(Collectors.toList());
             m.setSingerList(tbSingerPojoList);
+            // 在返回音乐数据添加专辑表信息
+            Optional<TbAlbumPojo> first = tbAlbumPojos.stream()
+                                                      .filter(tbAlbumPojo -> Objects.equals(tbAlbumPojo.getId(), musicPojo.getAlbumId()))
+                                                      .findFirst();
             m.setAlbum(first.orElse(new TbAlbumPojo()));
             
             // 查询当前歌曲是否可播放

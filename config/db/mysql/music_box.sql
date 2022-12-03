@@ -141,7 +141,7 @@ create table tb_like_music
 
 create table tb_music
 (
-    id          bigint       not null comment '所有音乐列表ID'
+    id          bigint       not null comment '音乐ID'
         primary key,
     music_name  varchar(64)  null comment '音乐名',
     alia_name   varchar(64)  null comment '歌曲别名，数组则使用逗号分割',

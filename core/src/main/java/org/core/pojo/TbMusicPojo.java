@@ -27,7 +27,7 @@ public class TbMusicPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    @ApiModelProperty("所有音乐列表ID")
+    @ApiModelProperty("音乐ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     

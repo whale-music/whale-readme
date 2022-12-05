@@ -163,20 +163,19 @@ public class UploadMusicApi {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
-        File file = null;
-        String md5 = null;
         // 上传文件则检测是否合法
-        if (StringUtils.isNotBlank(dto.getMusicFileTemp())) {
-            // 检查文件目录是否合法
-            file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
-            // 检测文件md5值是否一样，一样则不上传
-            md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
-            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                .eq(TbMusicUrlPojo::getMd5, md5));
-            // 如果有该数据则表示数据库中已经有该数据了
-            if (one != null) {
-                throw new BaseException(ResultCode.SONG_EXIST);
-            }
+        if (StringUtils.isBlank(dto.getMusicFileTemp())) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        // 检查文件目录是否合法
+        File file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
+        // 检测文件md5值是否一样，一样则不上传
+        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
+                                                            .eq(TbMusicUrlPojo::getMd5, md5));
+        // 如果有该数据则表示数据库中已经有该数据了
+        if (one != null) {
+            throw new BaseException(ResultCode.SONG_EXIST);
         }
     
         /* 歌手表 */
@@ -248,7 +247,7 @@ public class UploadMusicApi {
         }
     
         // 上传文件
-        if (StringUtils.isNotBlank(dto.getMusicFileTemp()) && file != null && file.isFile()) {
+        if (StringUtils.isNotBlank(dto.getMusicFileTemp()) && file.isFile()) {
             String uploadPath = localOSSService.upload(file.getPath());
             Files.delete(file.toPath());
             // music URL 地址表

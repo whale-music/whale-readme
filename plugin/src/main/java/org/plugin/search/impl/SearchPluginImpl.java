@@ -9,8 +9,8 @@ public class SearchPluginImpl implements SearchPlugin {
     }
     
     @Override
-    public void start() {
-    
+    public String start(String json) {
+        return null;
     }
     
     @Override
@@ -19,7 +19,7 @@ public class SearchPluginImpl implements SearchPlugin {
     }
     
     @Override
-    public void search(String name, String singer, String album) {
-    
+    public String search(String id, String name, String singer, String album) {
+        return null;
     }
 }

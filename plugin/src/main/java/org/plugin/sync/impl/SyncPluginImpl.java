@@ -1,9 +1,12 @@
 package org.plugin.sync.impl;
 
+import cn.hutool.http.HttpUtil;
 import org.plugin.sync.SyncPlugin;
 
+import java.util.List;
+
 public class SyncPluginImpl implements SyncPlugin {
-    
+    String host = "localhost";
     
     @Override
     public void before() {
@@ -11,8 +14,8 @@ public class SyncPluginImpl implements SyncPlugin {
     }
     
     @Override
-    public void start() {
-    
+    public String start(String json) {
+        return null;
     }
     
     @Override
@@ -21,7 +24,8 @@ public class SyncPluginImpl implements SyncPlugin {
     }
     
     @Override
-    public void sync() {
-    
+    public List<String> sync(String playId, String targetPlayId) {
+        String playList = HttpUtil.get(host + "?uid=" + playId);
+        return null;
     }
 }

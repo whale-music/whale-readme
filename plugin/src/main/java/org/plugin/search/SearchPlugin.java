@@ -4,5 +4,5 @@ import org.plugin.Plugin;
 
 public interface SearchPlugin extends Plugin {
     
-    void search(String name, String singer, String album);
+    String search(String id, String name, String singer, String album);
 }

@@ -10,7 +10,7 @@ public interface Plugin {
     /**
      * 方法执行
      */
-    void start();
+    String start(String json);
     
     /**
      * 方法执行后

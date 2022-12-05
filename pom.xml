@@ -20,6 +20,7 @@
         <module>web</module>
         <module>api</module>
         <module>oss</module>
+        <module>plugin</module>
     </modules>
 
     <properties>

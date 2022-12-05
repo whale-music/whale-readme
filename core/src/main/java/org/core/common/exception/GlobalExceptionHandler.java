@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * 全局异常处理
  *
@@ -25,7 +23,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = BaseException.class)
     @ResponseBody
-    public R bizExceptionHandler(HttpServletRequest req, BaseException e) {
+    public R bizExceptionHandler(BaseException e) {
         log.error("发生业务异常！原因是：{}", e.getErrorMsg());
         return R.error(e.getErrorCode(), e.getErrorMsg());
     }
@@ -35,7 +33,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     @ResponseBody
-    public R exceptionHandler8(HttpServletRequest req, NullPointerException e) {
+    public R exceptionHandler8(NullPointerException e) {
         log.error("上传文件太大:", e);
         return R.error(e.getMessage());
     }
@@ -46,7 +44,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NullPointerException.class)
     @ResponseBody
-    public R exceptionHandler(HttpServletRequest req, NullPointerException e) {
+    public R exceptionHandler(NullPointerException e) {
         log.error("发生空指针异常！原因是:", e);
         return R.error(ResultCode.NULL_POINTER_EXCEPTION);
     }
@@ -56,8 +54,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public R exceptionHandler(HttpServletRequest req, Exception e) {
+    public R exceptionHandler(Exception e) {
         log.error("未知异常！原因是:", e);
-        return R.error(ResultCode.INTERNAL_SERVER_ERROR);
+        R error = R.error(ResultCode.INTERNAL_SERVER_ERROR);
+        error.setMessage(error.getMessage() + ": " + e);
+        return error;
     }
 }

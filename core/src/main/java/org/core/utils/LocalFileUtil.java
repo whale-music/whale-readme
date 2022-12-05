@@ -4,6 +4,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 
 import java.io.File;
+import java.util.List;
 
 public class LocalFileUtil {
     private LocalFileUtil() {
@@ -22,5 +23,19 @@ public class LocalFileUtil {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
         return file;
+    }
+    
+    public static String getFileSuffix(String URL, List<String> fileType) {
+        String[] split;
+        int indexOf = URL.lastIndexOf('.');
+        split = URL.split(String.valueOf(new char[]{'\\', URL.charAt(indexOf)}));
+        if (split.length < 1) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        // 检测文件类型是否有效
+        if (!fileType.contains(split[split.length - 1])) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        return split[split.length - 1];
     }
 }

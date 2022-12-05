@@ -2,7 +2,7 @@ package org.api.admin;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -40,17 +40,14 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UploadMusicApi {
     
-    String[] fileType = {"mp3", "ogg", "flac"};
+    List<String> fileType = Arrays.asList("mp3", "ogg", "flac");
     /**
      * 音乐信息服务
      */
@@ -87,35 +84,62 @@ public class UploadMusicApi {
     @Autowired
     private LocalOSSServiceImpl localOSSService;
     
-    String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp\\";
+    String pathTemp = FileUtil.getTmpDirPath() + "/musicTemp";
     
     /**
-     * 上传文件到临时目录
+     * 上传文件或音乐URL下载到临时目录
      *
      * @param uploadFile 临时文件
+     * @param url        上传音乐地址
      * @return 音乐信息
      */
-    @Transactional(rollbackFor = Exception.class)
-    public AudioInfoVo uploadMusicFile(MultipartFile uploadFile) throws IOException, CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException {
-        String filename = uploadFile.getOriginalFilename();
-        if (StringUtils.isBlank(filename)) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
+    public AudioInfoVo uploadMusicFile(MultipartFile uploadFile, String url) throws IOException, CannotReadException, TagException, ReadOnlyFileException {
+        File path;
+        String fileSuffix;
+        AudioInfoVo audioInfoVo = new AudioInfoVo();
+        if (StringUtils.isBlank(url)) {
+            String md5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
+            // 上传文件
+            String filename = uploadFile.getOriginalFilename();
+            if (StringUtils.isBlank(filename)) {
+                throw new BaseException(ResultCode.FILENAME_INVALID);
+            }
+            fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType);
+            path = checkFileMd5(md5, new File(pathTemp, md5 + "." + fileSuffix));
+            // 本地没有则保存
+            if (path == null) {
+                String musicFileName = md5 + "." + fileSuffix;
+                path = new File(pathTemp, musicFileName);
+                BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
+                outputStream.write(uploadFile.getBytes());
+                outputStream.close();
+                audioInfoVo.setIsExist(false);
+            }
+            audioInfoVo.setIsExist(true);
+        } else {
+            // 下载文件
+            fileSuffix = LocalFileUtil.getFileSuffix(url, fileType);
+            byte[] bytes = HttpUtil.downloadBytes(url);
+            String md5 = DigestUtils.md5DigestAsHex(bytes);
+            File dest = new File(pathTemp, md5 + "." + fileSuffix);
+            path = checkFileMd5(md5, dest);
+            // 本地没有则保存
+            if (path == null) {
+                path = FileUtil.writeBytes(bytes, dest);
+                audioInfoVo.setIsExist(false);
+            }
+            audioInfoVo.setIsExist(true);
         }
-        int indexOf = filename.lastIndexOf('.');
-        String[] split = filename.split(String.valueOf(new char[]{'\\', filename.charAt(indexOf)}));
-        if (split.length < 1) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
+        AudioFile read;
+        try {
+            read = AudioFileIO.read(path);
+        } catch (InvalidAudioFrameException e) {
+            log.warn("该音频文件没有包含音乐信息!!");
+            audioInfoVo.setType(fileSuffix);
+            audioInfoVo.setSize(path.length());
+            audioInfoVo.setMusicFileTemp(path.getName());
+            return audioInfoVo;
         }
-        // 检测文件类型是否有效
-        if (!StringUtils.containsAny(split[1], fileType)) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
-        }
-        String musicFileName = UUID.fastUUID() + "." + split[1];
-        String path = pathTemp + musicFileName;
-        BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
-        outputStream.write(uploadFile.getBytes());
-        outputStream.close();
-        AudioFile read = AudioFileIO.read(new File(path));
         log.info(" ----- ----- ");
         log.info("标题:" + read.getTag().getFirst(FieldKey.TITLE));
         log.info("作者:" + read.getTag().getFirst(FieldKey.ARTIST));
@@ -124,16 +148,27 @@ public class UploadMusicApi {
         log.info("时长:" + read.getAudioHeader().getTrackLength() + "s");
         log.info("大小:" + (read.getFile().length() / 1024F / 1024F) + "MB");
         log.info(" ----- ----- ");
-        AudioInfoVo audioInfoVo = new AudioInfoVo();
         audioInfoVo.setMusicName(read.getTag().getFirst(FieldKey.TITLE));
-        audioInfoVo.setOriginFileName(split[0]);
+        audioInfoVo.setOriginFileName(uploadFile == null || uploadFile.getOriginalFilename() == null ? "" : uploadFile.getOriginalFilename());
         audioInfoVo.setSinger(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));
         audioInfoVo.setAlbum(read.getTag().getFirst(FieldKey.ALBUM));
         audioInfoVo.setTimeLength(read.getAudioHeader().getTrackLength());
         audioInfoVo.setSize(read.getFile().length());
-        audioInfoVo.setMusicFileTemp(musicFileName);
+        audioInfoVo.setMusicFileTemp(path.getName());
         return audioInfoVo;
     }
+    
+    private File checkFileMd5(String md5, File file) {
+        if (FileUtil.isFile(file)) {
+            return file;
+        }
+        long count = musicUrlService.count(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, md5));
+        if (count > 0) {
+            throw new BaseException(ResultCode.SONG_EXIST);
+        }
+        return null;
+    }
+    
     
     /**
      * 获取临时文件字节
@@ -208,7 +243,7 @@ public class UploadMusicApi {
         /* 专辑表 */
         TbAlbumPojo albumPojo = albumService.getOne(Wrappers.<TbAlbumPojo>lambdaQuery()
                                                             .eq(TbAlbumPojo::getAlbumName,
-                                                                    dto.getAlbum().getAlbumName()));
+                                                                dto.getAlbum().getAlbumName()));
         // 如果没有数据则新增专辑表
         if (albumPojo == null) {
             albumPojo = new TbAlbumPojo();

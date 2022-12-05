@@ -41,6 +41,9 @@ public class AudioInfoVo {
     @ApiModelProperty("大小")
     private Long size;
     
+    @ApiModelProperty("歌曲是否存在")
+    private Boolean isExist;
+    
     @ApiModelProperty("临时文件名")
     private String musicFileTemp;
 }

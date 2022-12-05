@@ -5,7 +5,6 @@ import org.api.admin.UploadMusicApi;
 import org.api.admin.dto.AudioInfoDto;
 import org.core.common.result.R;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,8 @@ public class UploadMusicController {
      * @return 返回音乐数据
      */
     @PostMapping("/music/file")
-    public R uploadMusicFile(@RequestParam("file") MultipartFile uploadFile) throws CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException, IOException {
-        return R.success(uploadMusic.uploadMusicFile(uploadFile));
+    public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
+        return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
     }
     
     /**

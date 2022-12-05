@@ -42,7 +42,9 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     SONG_NOT_EXIST("20009", "歌曲不存在!"),
     
-    SONG_EXIST("20010", "歌曲已存在!"),
+    SONG_EXIST("20010", "数据库中歌曲已存在!"),
+    
+    SONG_UPLOADED("20011", "歌曲已上传!"),
     
     
     /* 业务错误：30001-39999 */

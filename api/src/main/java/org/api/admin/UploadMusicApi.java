@@ -206,10 +206,10 @@ public class UploadMusicApi {
             file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
             // 检测文件md5值是否一样，一样则不上传
             md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
-            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                .eq(TbMusicUrlPojo::getMd5, md5));
+            long count = musicUrlService.count(Wrappers.<TbMusicUrlPojo>lambdaQuery()
+                                                       .eq(TbMusicUrlPojo::getMd5, md5));
             // 如果有该数据则表示数据库中已经有该数据了
-            if (one != null) {
+            if (count > 0) {
                 throw new BaseException(ResultCode.SONG_EXIST);
             }
         }

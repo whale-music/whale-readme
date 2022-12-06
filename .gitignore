@@ -34,6 +34,7 @@ build/
 ### Mac OS ###
 .DS_Store
 
+!**/target/
 /api/target/
 /web/target/
 /oss/target/

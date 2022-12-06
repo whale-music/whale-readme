@@ -61,7 +61,7 @@ create table tb_album
     id          bigint       not null comment '专辑表ID'
         primary key,
     album_name  varchar(64)  not null comment '专辑名',
-    pic         varchar(64)  null comment '专辑封面地址',
+    pic         varchar(512) null comment '专辑封面地址',
     indirect    varchar(255) null comment '专辑简介',
     update_time datetime     null comment '修改时间',
     create_time datetime     null comment '创建时间'
@@ -144,12 +144,12 @@ create table tb_music
     id          bigint       not null comment '音乐ID'
         primary key,
     music_name  varchar(64)  null comment '音乐名',
-    alia_name   varchar(64)  null comment '歌曲别名，数组则使用逗号分割',
+    alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
     lyric       varchar(512) null comment '歌词',
     album_id    bigint       null comment '专辑ID',
     sort        bigint       null comment '排序字段',
-    time_length int         null comment '歌曲时长',
+    time_length int          null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
     create_time datetime     null comment '创建时间'
 )

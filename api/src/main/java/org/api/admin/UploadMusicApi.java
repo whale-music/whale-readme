@@ -214,31 +214,47 @@ public class UploadMusicApi {
             }
         }
         /* 歌手表 */
-        // 查询该音乐在歌手表中是否有数据, 没有数据则新增歌手
-        LambdaQueryWrapper<TbSingerPojo> singerWrapper = Wrappers.<TbSingerPojo>lambdaQuery()
-                                                                 .in(TbSingerPojo::getSingerName, dto.getSinger());
-        List<TbSingerPojo> singList = singerService.list(singerWrapper);
-        // 获取数据库中没有该歌手数据
-        List<String> singNameList = singList.stream().map(TbSingerPojo::getSingerName).collect(Collectors.toList());
-        List<String> singNameListDto = dto.getSinger()
-                                          .stream()
-                                          .map(TbSingerPojo::getSingerName)
-                                          .filter(StringUtils::isNotBlank)
-                                          .collect(Collectors.toList());
-        Collection<String> intersection = CollUtil.disjunction(singNameListDto, singNameList);
-        // 数据库中没有该歌手，更新歌手表
-        if (intersection != null && !intersection.isEmpty()) {
-            singList = dto.getSinger()
-                          .stream()
-                          .filter(singerDto -> intersection.contains(singerDto.getSingerName()))
-                          .map(singerDto -> {
-                              TbSingerPojo tbSingerPojo = new TbSingerPojo();
-                              BeanUtils.copyProperties(singerDto, tbSingerPojo);
-                              tbSingerPojo.setId(IdWorker.getId());
-                              return tbSingerPojo;
-                          })
-                          .collect(Collectors.toList());
-            singerService.saveBatch(singList);
+        long musicId = IdWorker.getId();
+        if (dto.getSinger() != null && !dto.getSinger().isEmpty()) {
+            // 查询该音乐在歌手表中是否有数据, 没有数据则新增歌手
+            LambdaQueryWrapper<TbSingerPojo> singerWrapper = Wrappers.<TbSingerPojo>lambdaQuery()
+                                                                     .in(TbSingerPojo::getSingerName, dto.getSinger());
+            List<TbSingerPojo> singList = singerService.list(singerWrapper);
+            // 获取数据库中没有该歌手数据
+            List<String> singNameList = singList.stream().map(TbSingerPojo::getSingerName).collect(Collectors.toList());
+            List<String> singNameListDto = dto.getSinger()
+                                              .stream()
+                                              .map(TbSingerPojo::getSingerName)
+                                              .filter(StringUtils::isNotBlank)
+                                              .collect(Collectors.toList());
+            Collection<String> intersection = CollUtil.disjunction(singNameListDto, singNameList);
+            // 数据库中没有该歌手，更新歌手表
+            if (intersection != null && !intersection.isEmpty()) {
+                singList = dto.getSinger()
+                              .stream()
+                              .filter(singerDto -> intersection.contains(singerDto.getSingerName()))
+                              .map(singerDto -> {
+                                  TbSingerPojo tbSingerPojo = new TbSingerPojo();
+                                  BeanUtils.copyProperties(singerDto, tbSingerPojo);
+                                  tbSingerPojo.setId(IdWorker.getId());
+                                  return tbSingerPojo;
+                              })
+                              .collect(Collectors.toList());
+                singerService.saveBatch(singList);
+            
+                /* music 和 歌手中间表 */
+                // 在有新歌手没有录入数据库中的情况下，新增music和歌手中间表
+                if (!intersection.isEmpty()) {
+                    List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
+                    for (TbSingerPojo tbSingerPojo : singList) {
+                        TbMusicSingerPojo tbMusicSingerPojo = new TbMusicSingerPojo();
+                        tbMusicSingerPojo.setMusicId(musicId);
+                        tbMusicSingerPojo.setSingerId(tbSingerPojo.getId());
+                        musicSingerList.add(tbMusicSingerPojo);
+                    }
+                    musicSingerService.saveBatch(musicSingerList);
+                }
+            }
         }
     
         /* 专辑表 */
@@ -248,26 +264,14 @@ public class UploadMusicApi {
         // 如果没有数据则新增专辑表
         if (albumPojo == null) {
             albumPojo = new TbAlbumPojo();
-            albumPojo.setId(IdWorker.getId());
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
+            albumPojo.setId(IdWorker.getId());
         } else {
-            BeanUtils.copyProperties(dto.getAlbum(), "id");
+            BeanUtils.copyProperties(dto.getAlbum(), albumPojo, "id");
         }
         albumService.saveOrUpdate(albumPojo);
     
-        /* music 和 歌手中间表 */
-        long musicId = IdWorker.getId();
-        // 在有新歌手没有录入数据库中的情况下，新增music和歌手中间表
-        if (intersection != null && !intersection.isEmpty()) {
-            List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
-            for (TbSingerPojo tbSingerPojo : singList) {
-                TbMusicSingerPojo tbMusicSingerPojo = new TbMusicSingerPojo();
-                tbMusicSingerPojo.setMusicId(musicId);
-                tbMusicSingerPojo.setSingerId(tbSingerPojo.getId());
-                musicSingerList.add(tbMusicSingerPojo);
-            }
-            musicSingerService.saveBatch(musicSingerList);
-        }
+    
         // 查询音乐表
         TbMusicPojo musicById = null;
         if (dto.getId() == null) {
@@ -277,7 +281,7 @@ public class UploadMusicApi {
         if (musicById != null) {
             // music 信息表
             musicById.setMusicName(dto.getMusicName());
-            musicById.setAliaName(dto.getAliaName());
+            musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
             musicById.setPic(dto.getPic());
             musicById.setLyric(dto.getLyric());
             musicById.setAlbumId(albumPojo.getId());
@@ -289,7 +293,7 @@ public class UploadMusicApi {
             musicById = new TbMusicPojo();
             musicById.setId(musicId);
             musicById.setMusicName(dto.getMusicName());
-            musicById.setAliaName(dto.getAliaName());
+            musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
             musicById.setPic(dto.getPic());
             musicById.setLyric(dto.getLyric());
             musicById.setAlbumId(albumPojo.getId());

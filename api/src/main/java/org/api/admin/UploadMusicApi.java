@@ -241,19 +241,16 @@ public class UploadMusicApi {
                               })
                               .collect(Collectors.toList());
                 singerService.saveBatch(singList);
-            
                 /* music 和 歌手中间表 */
                 // 在有新歌手没有录入数据库中的情况下，新增music和歌手中间表
-                if (!intersection.isEmpty()) {
-                    List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
-                    for (TbSingerPojo tbSingerPojo : singList) {
-                        TbMusicSingerPojo tbMusicSingerPojo = new TbMusicSingerPojo();
-                        tbMusicSingerPojo.setMusicId(musicId);
-                        tbMusicSingerPojo.setSingerId(tbSingerPojo.getId());
-                        musicSingerList.add(tbMusicSingerPojo);
-                    }
-                    musicSingerService.saveBatch(musicSingerList);
+                List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
+                for (TbSingerPojo tbSingerPojo : singList) {
+                    TbMusicSingerPojo tbMusicSingerPojo = new TbMusicSingerPojo();
+                    tbMusicSingerPojo.setMusicId(musicId);
+                    tbMusicSingerPojo.setSingerId(tbSingerPojo.getId());
+                    musicSingerList.add(tbMusicSingerPojo);
                 }
+                musicSingerService.saveBatch(musicSingerList);
             }
         }
     
@@ -275,10 +272,10 @@ public class UploadMusicApi {
         }
     
         // 查询音乐表
-        TbMusicPojo musicById;
+        TbMusicPojo musicPojo;
         String aliaNames = CollUtil.join(dto.getAliaName(), ",");
         if (dto.getId() != null) {
-            musicById = musicService.getById(dto.getId());
+            musicPojo = musicService.getById(dto.getId());
         } else {
             // 查询数据库是否有相同数据
             boolean condition = albumPojo == null || albumPojo.getId() == null;
@@ -288,25 +285,31 @@ public class UploadMusicApi {
                                                          .eq(dto.getTimeLength() != null, TbMusicPojo::getTimeLength, dto.getTimeLength())
                                                          .eq(TbMusicPojo::getLyric, dto.getLyric())
                                                          .eq(TbMusicPojo::getPic, dto.getPic())
+                                                         // 如果为空-1其实不会执行
                                                          .eq(condition, TbMusicPojo::getAlbumId, condition ? -1 : albumPojo.getId());
-            musicById = musicService.getOne(eq);
+            List<TbMusicPojo> list = musicService.list(eq);
+            if (list.size() > 1) {
+                log.warn(ResultCode.MULTIPLE_SONGS.getResultMsg());
+                throw new BaseException(ResultCode.MULTIPLE_SONGS);
+            }
+            musicPojo = list.get(0);
         }
         boolean save;
-        if (musicById == null) {
-            musicById = new TbMusicPojo();
+        if (musicPojo == null) {
+            musicPojo = new TbMusicPojo();
             // 新生成音乐ID
-            musicById.setId(musicId);
+            musicPojo.setId(musicId);
         }
         // music 信息表
-        musicById.setMusicName(dto.getMusicName());
-        musicById.setAliaName(aliaNames);
-        musicById.setPic(dto.getPic());
-        musicById.setLyric(dto.getLyric());
-        musicById.setAlbumId(albumPojo == null || albumPojo.getId() == null ? null : albumPojo.getId());
-        musicById.setSort(musicService.count());
-        musicById.setTimeLength(dto.getTimeLength());
+        musicPojo.setMusicName(dto.getMusicName());
+        musicPojo.setAliaName(aliaNames);
+        musicPojo.setPic(dto.getPic());
+        musicPojo.setLyric(dto.getLyric());
+        musicPojo.setAlbumId(albumPojo == null || albumPojo.getId() == null ? null : albumPojo.getId());
+        musicPojo.setSort(musicService.count());
+        musicPojo.setTimeLength(dto.getTimeLength());
         // 保存音乐表
-        save = musicService.saveOrUpdate(musicById);
+        save = musicService.saveOrUpdate(musicPojo);
         if (!save) {
             throw new BaseException(ResultCode.SAVE_FAIL);
         }
@@ -323,7 +326,7 @@ public class UploadMusicApi {
             urlPojo.setQuality(dto.getQuality());
             urlPojo.setMd5(md5);
             urlPojo.setEncodeType(FileUtil.extName(file));
-            urlPojo.setMusicId(musicById.getId());
+            urlPojo.setMusicId(musicPojo.getId());
             urlPojo.setUrl(uploadPath);
             urlPojo.setUserId(UserUtil.getUser().getId());
             musicUrlService.save(urlPojo);

@@ -46,6 +46,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     SONG_UPLOADED("20011", "歌曲已上传!"),
     
+    MULTIPLE_SONGS("20012", "数据库中有多个相似歌曲请手动添加!"),
+    
     
     /* 业务错误：30001-39999 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST("30001", "业务逻辑出现问题"),

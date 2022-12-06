@@ -276,9 +276,21 @@ public class UploadMusicApi {
     
     
         // 查询音乐表
-        TbMusicPojo musicById = null;
-        if (dto.getId() == null) {
+        TbMusicPojo musicById;
+        String aliaNames = CollUtil.join(dto.getAliaName(), ",");
+        if (dto.getId() != null) {
             musicById = musicService.getById(dto.getId());
+        } else {
+            // 查询数据库是否有相同数据
+            boolean condition = albumPojo == null || albumPojo.getId() == null;
+            LambdaQueryWrapper<TbMusicPojo> eq = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                         .eq(StringUtils.isNotBlank(dto.getMusicName()), TbMusicPojo::getMusicName, dto.getMusicName())
+                                                         .eq(StringUtils.isNotBlank(aliaNames), TbMusicPojo::getAliaName, aliaNames)
+                                                         .eq(dto.getTimeLength() != null, TbMusicPojo::getTimeLength, dto.getTimeLength())
+                                                         .eq(StringUtils.isNotBlank(dto.getLyric()), TbMusicPojo::getLyric, dto.getLyric())
+                                                         .eq(StringUtils.isNotBlank(dto.getPic()), TbMusicPojo::getPic, dto.getPic())
+                                                         .eq(condition, TbMusicPojo::getAlbumId, condition ? -1 : albumPojo.getId());
+            musicById = musicService.getOne(eq);
         }
         boolean save;
         if (musicById == null) {
@@ -288,14 +300,14 @@ public class UploadMusicApi {
         }
         // music 信息表
         musicById.setMusicName(dto.getMusicName());
-        musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
+        musicById.setAliaName(aliaNames);
         musicById.setPic(dto.getPic());
         musicById.setLyric(dto.getLyric());
         musicById.setAlbumId(albumPojo == null || albumPojo.getId() == null ? null : albumPojo.getId());
         musicById.setSort(musicService.count());
         musicById.setTimeLength(dto.getTimeLength());
         // 保存音乐表
-        save = musicService.updateById(musicById);
+        save = musicService.saveOrUpdate(musicById);
         if (!save) {
             throw new BaseException(ResultCode.SAVE_FAIL);
         }

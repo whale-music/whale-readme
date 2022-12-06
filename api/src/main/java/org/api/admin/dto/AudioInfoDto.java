@@ -11,6 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AudioInfoDto {
+    @ApiModelProperty("音乐ID")
+    private Integer id;
+    
     @ApiModelProperty("音乐名")
     private String musicName;
     

@@ -198,21 +198,21 @@ public class UploadMusicApi {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
+        File file = null;
+        String md5 = null;
         // 上传文件则检测是否合法
-        if (StringUtils.isBlank(dto.getMusicFileTemp())) {
-            throw new BaseException(ResultCode.FILENAME_INVALID);
+        if (StringUtils.isNotBlank(dto.getMusicFileTemp())) {
+            // 检查文件目录是否合法
+            file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
+            // 检测文件md5值是否一样，一样则不上传
+            md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
+                                                                .eq(TbMusicUrlPojo::getMd5, md5));
+            // 如果有该数据则表示数据库中已经有该数据了
+            if (one != null) {
+                throw new BaseException(ResultCode.SONG_EXIST);
+            }
         }
-        // 检查文件目录是否合法
-        File file = LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
-        // 检测文件md5值是否一样，一样则不上传
-        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
-        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                            .eq(TbMusicUrlPojo::getMd5, md5));
-        // 如果有该数据则表示数据库中已经有该数据了
-        if (one != null) {
-            throw new BaseException(ResultCode.SONG_EXIST);
-        }
-    
         /* 歌手表 */
         // 查询该音乐在歌手表中是否有数据, 没有数据则新增歌手
         LambdaQueryWrapper<TbSingerPojo> singerWrapper = Wrappers.<TbSingerPojo>lambdaQuery()
@@ -234,6 +234,7 @@ public class UploadMusicApi {
                           .map(singerDto -> {
                               TbSingerPojo tbSingerPojo = new TbSingerPojo();
                               BeanUtils.copyProperties(singerDto, tbSingerPojo);
+                              tbSingerPojo.setId(IdWorker.getId());
                               return tbSingerPojo;
                           })
                           .collect(Collectors.toList());
@@ -249,8 +250,10 @@ public class UploadMusicApi {
             albumPojo = new TbAlbumPojo();
             albumPojo.setId(IdWorker.getId());
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
+        } else {
+            BeanUtils.copyProperties(dto.getAlbum(), "id");
         }
-        albumService.save(albumPojo);
+        albumService.saveOrUpdate(albumPojo);
     
         /* music 和 歌手中间表 */
         long musicId = IdWorker.getId();
@@ -265,24 +268,42 @@ public class UploadMusicApi {
             }
             musicSingerService.saveBatch(musicSingerList);
         }
-        // music 信息表
-        TbMusicPojo musicPojo = new TbMusicPojo();
-        musicPojo.setId(musicId);
-        musicPojo.setMusicName(dto.getMusicName());
-        musicPojo.setAliaName(dto.getAliaName());
-        musicPojo.setPic(dto.getPic());
-        musicPojo.setLyric(dto.getLyric());
-        musicPojo.setAlbumId(albumPojo.getId());
-        musicPojo.setSort(musicService.count());
-        musicPojo.setTimeLength(dto.getTimeLength());
-        // 保存音乐表
-        boolean save = musicService.save(musicPojo);
+        // 查询音乐表
+        TbMusicPojo musicById = null;
+        if (dto.getId() == null) {
+            musicById = musicService.getById(dto.getId());
+        }
+        boolean save;
+        if (musicById != null) {
+            // music 信息表
+            musicById.setMusicName(dto.getMusicName());
+            musicById.setAliaName(dto.getAliaName());
+            musicById.setPic(dto.getPic());
+            musicById.setLyric(dto.getLyric());
+            musicById.setAlbumId(albumPojo.getId());
+            musicById.setTimeLength(dto.getTimeLength());
+            // 保存音乐表
+            save = musicService.updateById(musicById);
+        } else {
+            // music 信息表
+            musicById = new TbMusicPojo();
+            musicById.setId(musicId);
+            musicById.setMusicName(dto.getMusicName());
+            musicById.setAliaName(dto.getAliaName());
+            musicById.setPic(dto.getPic());
+            musicById.setLyric(dto.getLyric());
+            musicById.setAlbumId(albumPojo.getId());
+            musicById.setSort(musicService.count());
+            musicById.setTimeLength(dto.getTimeLength());
+            // 保存音乐表
+            save = musicService.save(musicById);
+        }
         if (!save) {
             throw new BaseException(ResultCode.SAVE_FAIL);
         }
     
         // 上传文件
-        if (StringUtils.isNotBlank(dto.getMusicFileTemp()) && file.isFile()) {
+        if (StringUtils.isNotBlank(dto.getMusicFileTemp()) && file != null && file.isFile()) {
             String uploadPath = localOSSService.upload(file.getPath());
             Files.delete(file.toPath());
             // music URL 地址表
@@ -293,7 +314,7 @@ public class UploadMusicApi {
             urlPojo.setQuality(dto.getQuality());
             urlPojo.setMd5(md5);
             urlPojo.setEncodeType(FileUtil.extName(file));
-            urlPojo.setMusicId(musicPojo.getId());
+            urlPojo.setMusicId(musicById.getId());
             urlPojo.setUrl(uploadPath);
             urlPojo.setUserId(UserUtil.getUser().getId());
             musicUrlService.save(urlPojo);

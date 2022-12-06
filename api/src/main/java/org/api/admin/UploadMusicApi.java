@@ -274,7 +274,6 @@ public class UploadMusicApi {
             albumService.saveOrUpdate(albumPojo);
         }
     
-    
         // 查询音乐表
         TbMusicPojo musicById;
         String aliaNames = CollUtil.join(dto.getAliaName(), ",");
@@ -285,10 +284,10 @@ public class UploadMusicApi {
             boolean condition = albumPojo == null || albumPojo.getId() == null;
             LambdaQueryWrapper<TbMusicPojo> eq = Wrappers.<TbMusicPojo>lambdaQuery()
                                                          .eq(StringUtils.isNotBlank(dto.getMusicName()), TbMusicPojo::getMusicName, dto.getMusicName())
-                                                         .eq(StringUtils.isNotBlank(aliaNames), TbMusicPojo::getAliaName, aliaNames)
+                                                         .eq(TbMusicPojo::getAliaName, aliaNames)
                                                          .eq(dto.getTimeLength() != null, TbMusicPojo::getTimeLength, dto.getTimeLength())
-                                                         .eq(StringUtils.isNotBlank(dto.getLyric()), TbMusicPojo::getLyric, dto.getLyric())
-                                                         .eq(StringUtils.isNotBlank(dto.getPic()), TbMusicPojo::getPic, dto.getPic())
+                                                         .eq(TbMusicPojo::getLyric, dto.getLyric())
+                                                         .eq(TbMusicPojo::getPic, dto.getPic())
                                                          .eq(condition, TbMusicPojo::getAlbumId, condition ? -1 : albumPojo.getId());
             musicById = musicService.getOne(eq);
         }

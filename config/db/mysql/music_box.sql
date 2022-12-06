@@ -143,7 +143,7 @@ create table tb_music
 (
     id          bigint       not null comment '音乐ID'
         primary key,
-    music_name  varchar(64)  null comment '音乐名',
+    music_name  varchar(512) null comment '音乐名',
     alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
     lyric       varchar(512) null comment '歌词',

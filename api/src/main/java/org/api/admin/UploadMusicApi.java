@@ -262,14 +262,17 @@ public class UploadMusicApi {
                                                             .eq(TbAlbumPojo::getAlbumName,
                                                                 dto.getAlbum().getAlbumName()));
         // 如果没有数据则新增专辑表
-        if (albumPojo == null) {
+        if (albumPojo == null && dto.getAlbum() != null && StringUtils.isNotBlank(dto.getAlbum().getAlbumName())) {
             albumPojo = new TbAlbumPojo();
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
             albumPojo.setId(IdWorker.getId());
-        } else {
-            BeanUtils.copyProperties(dto.getAlbum(), albumPojo, "id");
+            albumService.saveOrUpdate(albumPojo);
         }
-        albumService.saveOrUpdate(albumPojo);
+        // 有则更新表
+        if (albumPojo != null) {
+            BeanUtils.copyProperties(dto.getAlbum(), albumPojo, "id");
+            albumService.saveOrUpdate(albumPojo);
+        }
     
     
         // 查询音乐表
@@ -278,30 +281,21 @@ public class UploadMusicApi {
             musicById = musicService.getById(dto.getId());
         }
         boolean save;
-        if (musicById != null) {
-            // music 信息表
-            musicById.setMusicName(dto.getMusicName());
-            musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
-            musicById.setPic(dto.getPic());
-            musicById.setLyric(dto.getLyric());
-            musicById.setAlbumId(albumPojo.getId());
-            musicById.setTimeLength(dto.getTimeLength());
-            // 保存音乐表
-            save = musicService.updateById(musicById);
-        } else {
-            // music 信息表
+        if (musicById == null) {
             musicById = new TbMusicPojo();
+            // 新生成音乐ID
             musicById.setId(musicId);
-            musicById.setMusicName(dto.getMusicName());
-            musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
-            musicById.setPic(dto.getPic());
-            musicById.setLyric(dto.getLyric());
-            musicById.setAlbumId(albumPojo.getId());
-            musicById.setSort(musicService.count());
-            musicById.setTimeLength(dto.getTimeLength());
-            // 保存音乐表
-            save = musicService.save(musicById);
         }
+        // music 信息表
+        musicById.setMusicName(dto.getMusicName());
+        musicById.setAliaName(CollUtil.join(dto.getAliaName(), ","));
+        musicById.setPic(dto.getPic());
+        musicById.setLyric(dto.getLyric());
+        musicById.setAlbumId(albumPojo == null || albumPojo.getId() == null ? null : albumPojo.getId());
+        musicById.setSort(musicService.count());
+        musicById.setTimeLength(dto.getTimeLength());
+        // 保存音乐表
+        save = musicService.updateById(musicById);
         if (!save) {
             throw new BaseException(ResultCode.SAVE_FAIL);
         }

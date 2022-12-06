@@ -18,7 +18,7 @@ public class AudioInfoDto {
     private String musicName;
     
     @ApiModelProperty("音乐别名")
-    private String aliaName;
+    private List<String> aliaName;
     
     @ApiModelProperty("音乐封面")
     private String pic;

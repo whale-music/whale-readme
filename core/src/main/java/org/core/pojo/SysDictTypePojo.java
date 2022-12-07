@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2022-12-07
  */
 @Getter
 @Setter
@@ -26,42 +26,42 @@ import java.time.LocalDateTime;
 public class SysDictTypePojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @ApiModelProperty("字典主键")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-    
+
     @ApiModelProperty("字典名称")
     @TableField("dict_name")
     private String dictName;
-    
+
     @ApiModelProperty("字典类型")
     @TableField("dict_type")
     private String dictType;
-    
+
     @ApiModelProperty("状态（0正常 1停用）")
     @TableField("status")
     private String status;
-    
+
     @ApiModelProperty("备注")
     @TableField("remark")
     private String remark;
-    
+
     @ApiModelProperty("创建者")
     @TableField("create_by")
     private String createBy;
-    
+
     @ApiModelProperty("更新者")
     @TableField("update_by")
     private String updateBy;
-    
+
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    
-    
+
+
 }

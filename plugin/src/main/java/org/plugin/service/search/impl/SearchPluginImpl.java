@@ -1,12 +1,8 @@
-package org.plugin.search.impl;
+package org.plugin.service.search.impl;
 
-import org.plugin.search.SearchPlugin;
+import org.plugin.service.search.SearchPlugin;
 
 public class SearchPluginImpl implements SearchPlugin {
-    @Override
-    public void before() {
-    
-    }
     
     @Override
     public String start(String json) {
@@ -14,7 +10,7 @@ public class SearchPluginImpl implements SearchPlugin {
     }
     
     @Override
-    public void after() {
+    public void check() {
     
     }
     

@@ -1,6 +1,6 @@
-package org.plugin.search;
+package org.plugin.service.search;
 
-import org.plugin.Plugin;
+import org.plugin.service.Plugin;
 
 public interface SearchPlugin extends Plugin {
     

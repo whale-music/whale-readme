@@ -269,7 +269,7 @@ public class UploadMusicApi {
         }
     
         // 查询音乐表
-        Optional<TbMusicPojo> musicOptional;
+        TbMusicPojo musicPojo = null;
         String aliaNames = CollUtil.join(dto.getAliaName(), ",");
         boolean condition = albumPojo == null || albumPojo.getId() == null;
         if (dto.getId() == null) {
@@ -283,15 +283,21 @@ public class UploadMusicApi {
                                                          // 如果为空-1其实不会执行
                                                          .eq(condition, TbMusicPojo::getAlbumId, condition ? -1 : albumPojo.getId());
             List<TbMusicPojo> list = musicService.list(eq);
-            // 如果小于1，抛出异常
+            // 如果大于1，说明数据库中有两个以上的相同的数据，抛出异常。让用户手动添加
             ExceptionUtil.isNull(list.size() > 1, ResultCode.MULTIPLE_SONGS);
-            musicOptional = Optional.of(list.get(0));
+            if (list.size() != 0) {
+                musicPojo = list.get(0);
+            }
         } else {
-            musicOptional = Optional.of(musicService.getById(dto.getId()));
+            musicPojo = musicService.getById(dto.getId());
         }
         
         boolean save;
-        TbMusicPojo musicPojo = musicOptional.orElse(new TbMusicPojo());
+        if (musicPojo == null) {
+            musicPojo = new TbMusicPojo();
+            // 新生成音乐ID
+            musicPojo.setId(musicId);
+        }
         // music 信息表
         musicPojo.setMusicName(dto.getMusicName());
         musicPojo.setAliaName(aliaNames);

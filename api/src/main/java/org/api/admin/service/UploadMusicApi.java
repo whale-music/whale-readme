@@ -208,7 +208,7 @@ public class UploadMusicApi {
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
         checkTempFile(dto);
         // 通过歌手表查询歌曲ID，有则返回，没有返回null
-        List<TbMusicSingerPojo> musicSingerPojoList = getMusicId(dto);
+        List<TbMusicSingerPojo> musicSingerPojoList = getMusicAndSingList(dto);
         
         // 查询专辑表，如果没有则新建。
         TbAlbumPojo albumPojo = getTbAlbumPojo(dto, musicSingerPojoList);
@@ -344,20 +344,21 @@ public class UploadMusicApi {
      * @param dto 前端请求数据
      * @return 返回音乐和歌手ID
      */
-    private List<TbMusicSingerPojo> getMusicId(AudioInfoDto dto) {
+    private List<TbMusicSingerPojo> getMusicAndSingList(AudioInfoDto dto) {
         List<TbMusicSingerPojo> musicSingerList = new ArrayList<>();
         if (IterUtil.isNotEmpty(dto.getSinger())) {
-            // 查询该音乐在歌手表中是否有数据, 没有数据则新增歌手
+            // 查询该音乐在歌手表中是否有数据
             LambdaQueryWrapper<TbSingerPojo> singerWrapper = Wrappers.<TbSingerPojo>lambdaQuery()
                                                                      .in(TbSingerPojo::getSingerName, dto.getSinger());
+            // 获取所有歌手数据，取前端参数和数据库数据差集
             List<TbSingerPojo> singList = singerService.list(singerWrapper);
-            // 获取数据库中没有该歌手数据
             List<String> singNameList = singList.stream().map(TbSingerPojo::getSingerName).collect(Collectors.toList());
             List<String> singNameListDto = dto.getSinger()
                                               .stream()
                                               .map(TbSingerPojo::getSingerName)
                                               .filter(StringUtils::isNotBlank)
                                               .collect(Collectors.toList());
+            // 获取数据库中没有该歌手数据
             Collection<String> intersection = CollUtil.disjunction(singNameListDto, singNameList);
             // 数据库中没有该歌手，更新歌手表
             if (IterUtil.isNotEmpty(intersection)) {

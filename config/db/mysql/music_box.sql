@@ -60,9 +60,9 @@ create table tb_album
 (
     id          bigint       not null comment '专辑表ID'
         primary key,
-    album_name  varchar(64)  not null comment '专辑名',
+    album_name  varchar(512) not null comment '专辑名',
     pic         varchar(512) null comment '专辑封面地址',
-    indirect    varchar(255) null comment '专辑简介',
+    indirect    varchar(512) null comment '专辑简介',
     update_time datetime     null comment '修改时间',
     create_time datetime     null comment '创建时间'
 )

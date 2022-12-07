@@ -39,10 +39,6 @@ public class TbAlbumPojo implements Serializable {
     @TableField("album_name")
     private String albumName;
 
-    @ApiModelProperty("歌手中间表ID")
-    @TableField("singer_id")
-    private Long singerId;
-
     @ApiModelProperty("专辑封面地址")
     @TableField("pic")
     private String pic;

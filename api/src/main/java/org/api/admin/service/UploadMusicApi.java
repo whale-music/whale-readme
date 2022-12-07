@@ -89,6 +89,9 @@ public class UploadMusicApi {
     @Autowired
     private LocalOSSServiceImpl localOSSService;
     
+    @Autowired
+    private TbAlbumSingerService albumSingerService;
+    
     String pathTemp = FileUtil.getTmpDirPath() + "/musicTemp";
     
     /**
@@ -206,9 +209,9 @@ public class UploadMusicApi {
         checkTempFile(dto);
         // 通过歌手表查询歌曲ID，有则返回，没有返回null
         List<TbMusicSingerPojo> musicSingerPojoList = getMusicId(dto);
-    
+        
         // 查询专辑表，如果没有则新建。
-        TbAlbumPojo albumPojo = getTbAlbumPojo(dto,musicSingerPojoList);
+        TbAlbumPojo albumPojo = getTbAlbumPojo(dto, musicSingerPojoList);
         
         // 查询音乐表
         TbMusicPojo musicPojo = getTbMusicPojo(dto, musicSingerPojoList, albumPojo);
@@ -219,7 +222,8 @@ public class UploadMusicApi {
     
     /**
      * 上传文件
-     * @param dto 前端请求数据
+     *
+     * @param dto       前端请求数据
      * @param musicPojo 音乐表数据
      * @throws IOException 文件读取异常
      */
@@ -245,9 +249,10 @@ public class UploadMusicApi {
     
     /**
      * 获取音乐数据
-     * @param dto 前端请求数据
+     *
+     * @param dto                 前端请求数据
      * @param musicSingerPojoList 音乐ID
-     * @param albumPojo 专辑数据
+     * @param albumPojo           专辑数据
      * @return 音乐信息
      */
     @NotNull
@@ -296,22 +301,38 @@ public class UploadMusicApi {
      * 查询表中专辑信息，没有则新建
      *
      * @param dto                 前端请求
-     * @param musicSingerPojoList
+     * @param musicSingerPojoList 音乐和歌手列表
      * @return 专辑表
      */
     @Nullable
     private TbAlbumPojo getTbAlbumPojo(AudioInfoDto dto, List<TbMusicSingerPojo> musicSingerPojoList) {
-        TbAlbumPojo albumPojo = albumService.getOne(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, dto.getAlbum().getAlbumName()));
-        // 如果没有数据则新增专辑表
-        if (albumPojo == null && dto.getAlbum() != null && StringUtils.isNotBlank(dto.getAlbum().getAlbumName())) {
-            albumPojo = new TbAlbumPojo();
+        // 如果是数据库中已有数据
+        Long albumId = dto.getAlbum().getId();
+        if (albumId != null) {
+            return albumService.getById(albumId);
+        }
+        // 查询该歌曲在数据中是否存在专辑
+        List<TbAlbumPojo> list = albumService.list(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, dto.getAlbum().getAlbumName()));
+        // 获取该歌曲所有歌手ID
+        List<Long> singerList = musicSingerPojoList.stream().map(TbMusicSingerPojo::getSingerId).collect(Collectors.toList());
+        // 专辑表找到后，在中间表同时满足专辑ID和歌手ID两个列表，只找到同一个专辑ID
+        List<TbAlbumSingerPojo> tbAlbumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
+                                                                                        .in(TbAlbumSingerPojo::getSingerId, singerList)
+                                                                                        .in(TbAlbumSingerPojo::getSingerId, singerList));
+        List<Long> albumIds = tbAlbumSingerPojoList.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toList());
+        ArrayList<Long> distinct = CollUtil.distinct(albumIds);
+        // 数据库中有数据
+        TbAlbumPojo albumPojo = null;
+        if (distinct.size() == 1) {
+            Optional<TbAlbumPojo> first = list.stream().filter(tbAlbumPojo -> Objects.equals(tbAlbumPojo.getId(), distinct.get(0))).findFirst();
+            albumPojo = first.orElse(new TbAlbumPojo());
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
-            albumPojo.setId(IdWorker.getId());
             albumService.saveOrUpdate(albumPojo);
         }
-        // 有则更新表
-        if (albumPojo != null) {
-            BeanUtils.copyProperties(dto.getAlbum(), albumPojo, "id");
+        // 如果没有数据则新增专辑表
+        if (distinct.isEmpty() && dto.getAlbum() != null && StringUtils.isNotBlank(dto.getAlbum().getAlbumName())) {
+            albumPojo = new TbAlbumPojo();
+            BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
             albumService.saveOrUpdate(albumPojo);
         }
         return albumPojo;
@@ -319,6 +340,7 @@ public class UploadMusicApi {
     
     /**
      * 获取音乐和歌手中间表信息
+     *
      * @param dto 前端请求数据
      * @return 返回音乐和歌手ID
      */
@@ -363,7 +385,7 @@ public class UploadMusicApi {
         return musicSingerList;
     }
     
-    private AudioInfoDto checkTempFile(AudioInfoDto dto) throws IOException {
+    private void checkTempFile(AudioInfoDto dto) throws IOException {
         // 上传文件则检测是否合法
         if (StringUtils.isNotBlank(dto.getMusicFileTemp()) && StringUtils.isBlank(dto.getMd5())) {
             // 检查文件目录是否合法
@@ -375,7 +397,6 @@ public class UploadMusicApi {
                                                    .eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
         // 如果大于0则表示数据库中已经有该数据了
         ExceptionUtil.isNull(count > 0, ResultCode.SONG_EXIST);
-        return dto;
     }
     
     /**

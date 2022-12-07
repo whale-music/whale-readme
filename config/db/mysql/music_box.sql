@@ -60,9 +60,9 @@ create table tb_album
 (
     id          bigint       not null comment '专辑表ID'
         primary key,
-    album_name  varchar(512) not null comment '专辑名',
-    pic         varchar(512) null comment '专辑封面地址',
-    indirect    varchar(512) null comment '专辑简介',
+    indirect    varchar(255) null comment '专辑简介',
+    album_name  varchar(64)  not null comment '专辑名',
+    pic         varchar(64)  null comment '专辑封面地址',
     update_time datetime     null comment '修改时间',
     create_time datetime     null comment '创建时间'
 )
@@ -70,6 +70,14 @@ create table tb_album
 
 create index tb_album_album_name_index
     on tb_album (album_name);
+
+create table tb_album_singer
+(
+    album_id  bigint not null comment '专辑ID',
+    singer_id bigint not null comment '歌手ID',
+    primary key (album_id, singer_id)
+)
+    comment '歌手和专辑中间表';
 
 create table tb_collect
 (
@@ -143,8 +151,8 @@ create table tb_music
 (
     id          bigint       not null comment '音乐ID'
         primary key,
-    music_name  varchar(512) null comment '音乐名',
-    alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
+    music_name  varchar(64)  null comment '音乐名',
+    alia_name   varchar(64)  null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
     lyric       varchar(512) null comment '歌词',
     album_id    bigint       null comment '专辑ID',
@@ -237,8 +245,8 @@ create table tb_tag
 
 create table tb_user_singer
 (
-    user_id   bigint not null,
-    singer_id bigint not null,
+    user_id   bigint not null comment '用户ID',
+    singer_id bigint not null comment '歌手ID',
     primary key (user_id, singer_id)
 )
     comment '用户关注歌曲家';

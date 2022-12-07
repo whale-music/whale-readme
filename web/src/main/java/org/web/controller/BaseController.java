@@ -1,9 +1,9 @@
 package org.web.controller;
 
 import cn.hutool.http.Header;
-import org.api.neteasecloudmusic.vo.user.Account;
-import org.api.neteasecloudmusic.vo.user.Profile;
-import org.api.neteasecloudmusic.vo.user.UserVo;
+import org.api.neteasecloudmusic.model.vo.user.Account;
+import org.api.neteasecloudmusic.model.vo.user.Profile;
+import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.UserUtil;

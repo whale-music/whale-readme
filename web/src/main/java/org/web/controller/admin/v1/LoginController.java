@@ -1,9 +1,9 @@
 package org.web.controller.admin.v1;
 
 import cn.hutool.http.Header;
-import org.api.admin.UserApi;
-import org.api.admin.dto.UserDto;
-import org.api.admin.vo.UserVo;
+import org.api.admin.model.dto.UserDto;
+import org.api.admin.model.vo.UserVo;
+import org.api.admin.service.UserApi;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;

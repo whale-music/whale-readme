@@ -18,7 +18,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2022-12-07
  */
 @Getter
 @Setter
@@ -28,14 +28,14 @@ import java.io.Serializable;
 public class TbMusicSingerPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @ApiModelProperty("歌曲ID")
-    @TableId(value = "music_id", type = IdType.NONE)
+    @TableId(value = "music_id", type = IdType.ASSIGN_ID)
     private Long musicId;
-    
+
     @ApiModelProperty("歌曲ID")
-    @TableField(value = "singer_id")
+    @TableField("singer_id")
     private Long singerId;
-    
-    
+
+
 }

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2022-12-07
  */
 @Getter
 @Setter
@@ -26,43 +26,43 @@ import java.time.LocalDateTime;
 public class TbMusicPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @ApiModelProperty("音乐ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-    
+
     @ApiModelProperty("音乐名")
     @TableField("music_name")
     private String musicName;
-    
+
     @ApiModelProperty("歌曲别名，数组则使用逗号分割")
     @TableField("alia_name")
     private String aliaName;
-    
+
     @ApiModelProperty("歌曲封面地址")
     @TableField("pic")
     private String pic;
-    
+
     @ApiModelProperty("歌词")
     @TableField("lyric")
     private String lyric;
-    
+
     @ApiModelProperty("专辑ID")
     @TableField("album_id")
     private Long albumId;
-    
+
     @ApiModelProperty("排序字段")
     @TableField("sort")
     private Long sort;
-    
+
     @ApiModelProperty("歌曲时长")
     @TableField("time_length")
     private Integer timeLength;
-    
+
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

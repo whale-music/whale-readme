@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2022-12-07
  */
 @Getter
 @Setter
@@ -26,34 +26,34 @@ import java.time.LocalDateTime;
 public class TbLikePojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @ApiModelProperty("我喜欢的歌单ID和用户ID相同")
-    @TableId(value = "user_id", type = IdType.AUTO)
+    @TableId(value = "user_id", type = IdType.ASSIGN_ID)
     private Long userId;
-    
+
     @ApiModelProperty("歌单名")
     @TableField("song_name")
     private String songName;
-    
+
     @ApiModelProperty("封面地址")
     @TableField("pic")
     private String pic;
-    
+
     @ApiModelProperty("简介")
     @TableField("description")
     private String description;
-    
+
     @ApiModelProperty("歌单标签，表示歌单风格。使用字典表")
     @TableField("tag")
     private Long tag;
-    
+
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    
-    
+
+
 }

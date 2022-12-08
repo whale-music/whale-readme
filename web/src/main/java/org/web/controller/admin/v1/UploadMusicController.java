@@ -1,8 +1,8 @@
 package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.UploadMusicApi;
-import org.api.admin.dto.AudioInfoDto;
+import org.api.admin.model.dto.AudioInfoDto;
+import org.api.admin.service.UploadMusicApi;
 import org.core.common.result.R;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;

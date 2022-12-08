@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2022-12-07
  */
 @Getter
 @Setter
@@ -26,26 +26,26 @@ import java.time.LocalDateTime;
 public class TbHistoryPojo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @ApiModelProperty("歌曲ID")
-    @TableId(value = "music_id", type = IdType.AUTO)
+    @TableId(value = "music_id", type = IdType.ASSIGN_ID)
     private Long musicId;
-    
+
     @ApiModelProperty("听歌次数")
     @TableField("count")
     private Integer count;
-    
+
     @ApiModelProperty("历史类型")
     @TableField("type")
     private Integer type;
-    
+
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    
+
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    
-    
+
+
 }

@@ -1,8 +1,8 @@
 package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.PlayListApi;
-import org.api.admin.dto.MusicDto;
+import org.api.admin.model.dto.MusicDto;
+import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

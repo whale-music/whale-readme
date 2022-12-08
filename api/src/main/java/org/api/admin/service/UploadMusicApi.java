@@ -258,6 +258,7 @@ public class UploadMusicApi {
     @NotNull
     private TbMusicPojo getTbMusicPojo(AudioInfoDto dto, List<TbMusicSingerPojo> musicSingerPojoList, TbAlbumPojo albumPojo) {
         Long musicId = 0L;
+        // 获取音乐ID
         if (!musicSingerPojoList.isEmpty()) {
             musicId = musicSingerPojoList.get(0).getMusicId();
         }
@@ -309,7 +310,9 @@ public class UploadMusicApi {
         // 如果是数据库中已有数据
         Long albumId = dto.getAlbum().getId();
         if (albumId != null) {
-            return albumService.getById(albumId);
+            TbAlbumPojo byId = albumService.getById(albumId);
+            ExceptionUtil.isNull(byId == null, ResultCode.ALBUM_NOT_EXIST);
+            return byId;
         }
         // 查询该歌曲在数据中是否存在专辑
         List<TbAlbumPojo> list = albumService.list(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, dto.getAlbum().getAlbumName()));
@@ -330,6 +333,7 @@ public class UploadMusicApi {
             albumService.saveOrUpdate(albumPojo);
         }
         // 如果没有数据则新增专辑表
+        // 默认新增歌手为歌曲歌手
         if (distinct.isEmpty() && dto.getAlbum() != null && StringUtils.isNotBlank(dto.getAlbum().getAlbumName())) {
             albumPojo = new TbAlbumPojo();
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);

@@ -2,10 +2,10 @@ package org.plugin.service.sync.impl.music163;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.PageUtil;
-import org.api.admin.UploadMusicApi;
-import org.api.admin.dto.AlbumDto;
-import org.api.admin.dto.AudioInfoDto;
-import org.api.admin.dto.SingerDto;
+import org.api.admin.model.dto.AlbumDto;
+import org.api.admin.model.dto.AudioInfoDto;
+import org.api.admin.model.dto.SingerDto;
+import org.api.admin.service.UploadMusicApi;
 import org.plugin.service.sync.SyncPlugin;
 import org.plugin.service.sync.impl.music163.model.LikePlay;
 import org.plugin.service.sync.impl.music163.model.song.ArItem;

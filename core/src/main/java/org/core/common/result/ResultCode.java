@@ -47,8 +47,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     SONG_UPLOADED("20011", "歌曲已上传!"),
     
     MULTIPLE_SONGS("20012", "数据库中有多个相似歌曲请手动添加!"),
-    
-    ALBUM_NOT_EXIST("20013", "专辑!"),
+    ALBUM_NOT_EXIST("20013", "专辑已存在!"),
+    ALBUM_ERROR("20014", "专辑专辑错误!"),
     
     
     /* 业务错误：30001-39999 */

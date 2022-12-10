@@ -23,17 +23,17 @@ import java.util.List;
 
 @SpringBootTest(classes = MusicBoxSpringBoot.class)
 @Slf4j
-public class TestUploadMusicApiTest {
+class TestUploadMusicApiTest {
     @Autowired
     private UploadMusicApi uploadMusicApi;
     
     @Test
-    public void testUploadMusic() throws Exception {
+    void testUploadMusic() {
         String playId = "290155277";
         String cookie = "MUSIC_U=afceb1d1edc22023fb24b900e2d84b1a3356f40b4c95cdc3332c107e08cf9238993166e004087dd3beb58a6aba726f0f3ce603cf8cd7f4cb6a1b92b9f0e5594e079514a26eb961c1a0d2166338885bd7;Cookie=afceb1d1edc22023fb24b900e2d84b1a333548a2160f671af20326e301054352993166e004087dd3be7a66a39c9296f7340dcce28358eb276a1b92b9f0e5594e079514a26eb961c1a89fe7c55eac81f3; MUSIC_U=afceb1d1edc22023fb24b900e2d84b1a333548a2160f671af20326e301054352993166e004087dd3be7a66a39c9296f7340dcce28358eb276a1b92b9f0e5594e079514a26eb961c1a89fe7c55eac81f3; __csrf=44f2af698fda832550f8933f7323e62f; __remember_me=true";
         LikePlay like = RequestMusic163.like(playId, cookie);
         int allPageIndex = PageUtil.totalPage(like.getIds().size(), 20);
-    
+        
         for (int i = 0; i < allPageIndex; i++) {
             List<Integer> page = ListUtil.page(i, 20, like.getIds());
             SongDetail songDetail = RequestMusic163.getSongDetail(page, cookie);

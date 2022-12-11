@@ -3,6 +3,7 @@ package org.web.controller.neteasecloudmusic.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.neteasecloudmusic.model.vo.createplatlist.CreatePlaylistVo;
 import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -153,7 +153,7 @@ public class PlayListController {
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
                                              .map(TbMusicPojo::getId)
-                                             .collect(Collectors.toList());
+                                             .toList();
         List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
         for (TbMusicPojo musicPojo : playListAllSong.getRecords()) {
@@ -262,9 +262,9 @@ public class PlayListController {
         flag = "add".equals(op);
         SysUserPojo user = UserUtil.getUser();
         collect.addSongToCollect(user.getId(),
-                                 collectId,
-                                 Arrays.stream(songIds.split(",")).map(Long::valueOf).collect(Collectors.toList()),
-                                 flag);
+                collectId,
+                Arrays.stream(StringUtils.split(songIds, ',')).map(Long::valueOf).toList(),
+                flag);
     
         NeteaseResult r = new NeteaseResult();
         return r.success();

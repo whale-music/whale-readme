@@ -61,8 +61,8 @@ create table tb_album
     id          bigint       not null comment '专辑表ID'
         primary key,
     indirect    varchar(255) null comment '专辑简介',
-    album_name  varchar(64)  not null comment '专辑名',
-    pic         varchar(64)  null comment '专辑封面地址',
+    album_name  varchar(512) not null comment '专辑名',
+    pic         varchar(512) null comment '专辑封面地址',
     update_time datetime     null comment '修改时间',
     create_time datetime     null comment '创建时间'
 )
@@ -151,8 +151,8 @@ create table tb_music
 (
     id          bigint       not null comment '音乐ID'
         primary key,
-    music_name  varchar(64)  null comment '音乐名',
-    alia_name   varchar(64)  null comment '歌曲别名，数组则使用逗号分割',
+    music_name  varchar(128) null comment '音乐名',
+    alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
     lyric       varchar(512) null comment '歌词',
     album_id    bigint       null comment '专辑ID',
@@ -183,7 +183,7 @@ create table tb_music_url
         primary key,
     music_id    bigint       not null comment '音乐ID',
     rate        int          not null comment '比特率，音频文件的信息',
-    url         varchar(255) null comment '音乐地址',
+    url         varchar(512) null comment '音乐地址',
     quality     char(3)      not null comment '音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)',
     md5         char(32)     null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
     encodeType  char(10)     null comment '文件格式类型',
@@ -220,7 +220,7 @@ create table tb_singer
 (
     id           bigint       not null comment '歌手ID'
         primary key,
-    singer_name  varchar(64)  not null comment '歌手名',
+    singer_name  varchar(128) not null comment '歌手名',
     sex          varchar(64)  null comment '歌手性别',
     pic          varchar(64)  null comment '封面',
     birth        date         null comment '出生年月',

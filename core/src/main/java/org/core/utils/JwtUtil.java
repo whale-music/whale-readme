@@ -16,7 +16,7 @@ public class JwtUtil {
     /**
      * jwt密钥
      */
-    private static final String SECRET = "0a8be4854d487b1fbd1d7d1c5d6dea07";
+    private static final String SECRET = "62bb8X8qx2rAosQumEKB&ce8f193d08c914";
     
     private JwtUtil() {
     }

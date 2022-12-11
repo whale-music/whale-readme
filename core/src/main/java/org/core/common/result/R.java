@@ -17,7 +17,7 @@ public class R {
     /**
      * 响应结果
      */
-    private Object result;
+    private Object data;
     
     public R() {
     }
@@ -41,7 +41,7 @@ public class R {
         R rb = new R();
         rb.setCode(ResultCode.SUCCESS.getCode());
         rb.setMessage(ResultCode.SUCCESS.getResultMsg());
-        rb.setResult(data);
+        rb.setData(data);
         return rb;
     }
     
@@ -52,7 +52,7 @@ public class R {
         R rb = new R();
         rb.setCode(errorInfo.getCode());
         rb.setMessage(errorInfo.getResultMsg());
-        rb.setResult(null);
+        rb.setData(null);
         return rb;
     }
     
@@ -63,7 +63,7 @@ public class R {
         R rb = new R();
         rb.setCode(code);
         rb.setMessage(message);
-        rb.setResult(null);
+        rb.setData(null);
         return rb;
     }
     
@@ -74,7 +74,7 @@ public class R {
         R rb = new R();
         rb.setCode("-1");
         rb.setMessage(message);
-        rb.setResult(null);
+        rb.setData(null);
         return rb;
     }
     
@@ -94,12 +94,12 @@ public class R {
         this.message = message;
     }
     
-    public Object getResult() {
-        return result;
+    public Object getData() {
+        return data;
     }
     
-    public void setResult(Object result) {
-        this.result = result;
+    public void setData(Object data) {
+        this.data = data;
     }
     
     @Override

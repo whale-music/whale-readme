@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -24,7 +25,8 @@ import java.time.LocalDateTime;
 @TableName("tb_music_url")
 @ApiModel(value = "TbMusicUrlPojo对象", description = "音乐下载地址")
 public class TbMusicUrlPojo implements Serializable {
-
+    
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
@@ -54,22 +56,26 @@ public class TbMusicUrlPojo implements Serializable {
     @ApiModelProperty("文件格式类型")
     @TableField("encodeType")
     private String encodeType;
-
+    
     @ApiModelProperty("文件大小")
     @TableField("size")
     private Long size;
-
+    
     @ApiModelProperty("上传用户ID")
     @TableField("user_id")
     private Long userId;
-
+    
+    @ApiModelProperty("音乐来源")
+    @TableField("origin")
+    private Long origin;
+    
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
+    
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-
+    
+    
 }

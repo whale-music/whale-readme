@@ -21,7 +21,7 @@ public class PlayListController {
      * @param req 条件参数
      * @return 返回数据
      */
-    @GetMapping("/all")
+    @PostMapping("/all")
     public R getAllMusicPage(@RequestBody MusicDto req) {
         return R.success(playList.getAllMusicPage(req));
     }
@@ -33,7 +33,7 @@ public class PlayListController {
      * @param req    条件参数
      * @return 返回数据
      */
-    @GetMapping("/{playId}")
+    @PostMapping("/{playId}")
     public R getPlaylist(@PathVariable("playId") String playId, @RequestBody MusicDto req) {
         return R.success(playList.getPlaylist(playId, req));
     }

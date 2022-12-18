@@ -6,6 +6,7 @@ import org.api.admin.model.vo.UserVo;
 import org.api.admin.service.UserApi;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.R;
+import org.core.config.JwtConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.web.controller.BaseController;
@@ -18,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController extends BaseController {
     
     @Autowired
+    private JwtConfig jwtConfig;
+    
+    @Autowired
     private UserApi user;
     
     /**
@@ -26,6 +30,7 @@ public class LoginController extends BaseController {
     @GetMapping("/account")
     public R login(HttpServletResponse response, String phone, String password) {
         UserVo userPojo = user.login(phone, password);
+        userPojo.setExpiryTime(System.currentTimeMillis() + jwtConfig.getExpireTime());
         // 写入用户信息到cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), userPojo.getToken());
         response.addCookie(cookie);

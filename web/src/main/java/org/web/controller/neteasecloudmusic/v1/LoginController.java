@@ -1,16 +1,14 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.http.Header;
-import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
+import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
-import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.web.controller.BaseController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -35,6 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController extends BaseController {
     
     @Autowired
+    private JwtConfig jwtConfig;
+    
+    @Autowired
     private UserApi user;
     
     /**
@@ -47,16 +47,8 @@ public class LoginController extends BaseController {
         SysUserPojo userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        String userStr = JSON.toJSONString(userPojo);
-        String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
-        // 写入用户信息到cookie
-        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
-        response.addCookie(cookie);
-        
-        NeteaseResult r = new NeteaseResult();
+        NeteaseResult r = getNeteaseResult(jwtConfig, response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
-        r.put("token", sign);
-        
         return r;
     }
     
@@ -91,16 +83,9 @@ public class LoginController extends BaseController {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
-        String userStr = JSON.toJSONString(userPojo);
-        String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
-        // 写入用户信息到cookie
-        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
-        response.addCookie(cookie);
-    
-        NeteaseResult r = new NeteaseResult();
-        r.put("token", sign);
-        return r;
+        return getNeteaseResult(jwtConfig, response, userPojo);
     }
+    
     
     /**
      * 登出接口

@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @NoArgsConstructor
 @Configuration
 @ConfigurationProperties(
-        prefix = "music-config"
+        prefix = "save-config"
 )
-public class MusicConfig {
+public class SaveConfig {
     // 默认保存模式
     private String saveMode;
     // 保存名称(文件夹)

@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -26,7 +25,6 @@ import java.time.LocalDateTime;
 @ApiModel(value = "TbMusicUrlPojo对象", description = "音乐下载地址")
 public class TbMusicUrlPojo implements Serializable {
     
-    @Serial
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")

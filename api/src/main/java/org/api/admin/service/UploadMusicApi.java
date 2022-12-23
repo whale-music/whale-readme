@@ -384,14 +384,14 @@ public class UploadMusicApi {
                                                            .eq(TbAlbumPojo::getAlbumName, dto.getAlbum()
                                                                                              .getAlbumName()));
         // 获取所有专辑ID
-        List<Long> albumList = list.stream().map(TbAlbumPojo::getId).toList();
+        List<Long> albumList = list.stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
         List<Long> albumIds = new ArrayList<>();
         if (IterUtil.isNotEmpty(albumList) && IterUtil.isNotEmpty(singerIds)) {
             // 专辑表找到后，在中间表同时满足专辑ID和歌手ID两个列表，只找到同一个专辑ID
             List<TbAlbumSingerPojo> tbAlbumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
                                                                                             .in(TbAlbumSingerPojo::getSingerId, singerIds)
                                                                                             .in(TbAlbumSingerPojo::getAlbumId, albumList));
-            albumIds = tbAlbumSingerPojoList.stream().map(TbAlbumSingerPojo::getAlbumId).toList();
+            albumIds = tbAlbumSingerPojoList.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toList());
         }
         List<Long> distinct = CollUtil.distinct(albumIds);
         ExceptionUtil.isNull(distinct.size() > 1, ResultCode.ALBUM_NOT_EXIST);
@@ -450,7 +450,7 @@ public class UploadMusicApi {
         List<String> singerNameList = dto.getSinger()
                                          .stream()
                                          .map(TbSingerPojo::getSingerName)
-                                         .toList();
+                                         .collect(Collectors.toList());
         
         // 查询数据库中歌手
         List<TbSingerPojo> singList = singerService.list(Wrappers.<TbSingerPojo>lambdaQuery()
@@ -468,7 +468,7 @@ public class UploadMusicApi {
             saveBatch.add(pojo);
         }
         singerService.saveOrUpdateBatch(saveBatch);
-        return saveBatch.stream().map(TbSingerPojo::getId).toList();
+        return saveBatch.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
     }
     
     private void checkTempFile(AudioInfoDto dto) throws IOException {

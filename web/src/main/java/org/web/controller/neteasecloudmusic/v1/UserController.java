@@ -26,6 +26,7 @@ import org.web.controller.BaseController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -103,13 +104,13 @@ public class UserController extends BaseController {
             return neteaseResult.success();
         }
         // 导出歌单id
-        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).toList();
+        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
         // 根据歌单和tag的中间表来获取tag id列表
         List<TbCollectTagPojo> collectIdAndTagsIdList = collect.getCollectTagIdList(collectIds);
         // 根据tag id 列表获取tag Name列表
         List<Long> tagIdList = collectIdAndTagsIdList.stream()
                                                      .map(TbCollectTagPojo::getTagId)
-                                                     .toList();
+                                                     .collect(Collectors.toList());
         List<TbTagPojo> collectTagList = collect.getTagPojoList(tagIdList);
         
         
@@ -137,7 +138,7 @@ public class UserController extends BaseController {
                                                           .filter(tbCollectTagPojo -> tbCollectTagPojo.getCollectId()
                                                                                                       .equals(tbCollectPojo.getId()))
                                                           .map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(), collectTagList))
-                                                          .toList();
+                                                          .collect(Collectors.toList());
                 item.setTags(tags);
             }
             // 歌单名

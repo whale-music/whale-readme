@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 歌单中间层
@@ -277,7 +278,7 @@ public class CollectApi {
         List<Long> musicIds = page.getRecords()
                                   .stream()
                                   .map(TbCollectMusicPojo::getMusicId)
-                                  .toList();
+                                  .collect(Collectors.toList());
         List<TbMusicPojo> tbMusicPojoList = musicService.listByIds(musicIds);
     
         Page<TbMusicPojo> musicPojoPage = new Page<>();
@@ -316,7 +317,7 @@ public class CollectApi {
             List<TbCollectMusicPojo> collect = tbMusicPojo.stream()
                                                           .map(tbMusicPojo1 -> new TbCollectMusicPojo().setCollectId(
                                                                   collectId).setMusicId(tbMusicPojo1.getId()))
-                                                          .toList();
+                                                          .collect(Collectors.toList());
             collectMusicService.saveBatch(collect);
         } else {
             // 删除歌曲
@@ -377,6 +378,6 @@ public class CollectApi {
     public List<Long> likelist(Long uid) {
         List<TbLikeMusicPojo> list = likeMusicService.list(Wrappers.<TbLikeMusicPojo>lambdaQuery()
                                                                    .eq(TbLikeMusicPojo::getLikeId, uid));
-        return list.stream().map(TbLikeMusicPojo::getLikeId).toList();
+        return list.stream().map(TbLikeMusicPojo::getLikeId).collect(Collectors.toList());
     }
 }

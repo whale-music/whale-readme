@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -153,7 +154,7 @@ public class PlayListController {
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
                                              .map(TbMusicPojo::getId)
-                                             .toList();
+                                             .collect(Collectors.toList());
         List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
         for (TbMusicPojo musicPojo : playListAllSong.getRecords()) {
@@ -263,7 +264,7 @@ public class PlayListController {
         SysUserPojo user = UserUtil.getUser();
         collect.addSongToCollect(user.getId(),
                 collectId,
-                Arrays.stream(StringUtils.split(songIds, ',')).map(Long::valueOf).toList(),
+                Arrays.stream(StringUtils.split(songIds, ',')).map(Long::valueOf).collect(Collectors.toList()),
                 flag);
     
         NeteaseResult r = new NeteaseResult();

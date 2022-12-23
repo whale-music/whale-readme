@@ -13,7 +13,7 @@ import org.api.admin.model.dto.SingerDto;
 import org.api.admin.model.vo.AudioInfoVo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.MusicConfig;
+import org.core.config.SaveConfig;
 import org.core.pojo.*;
 import org.core.service.*;
 import org.core.utils.ExceptionUtil;
@@ -80,7 +80,7 @@ public class UploadMusicApi {
      * 上传配置
      */
     @Autowired
-    private MusicConfig config;
+    private SaveConfig config;
     /**
      * 文件上传服务
      */

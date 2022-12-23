@@ -50,10 +50,14 @@ mybatis-plus:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-music-config:
+save-config:
   # 保存模式
   save-mode: local
   object-save: data
   host: http://127.0.0.1:8080/upload/download/
   access-key: admin
   secret-key: c81e728d9d4c2f636f067f89cc14862c
+
+jwt-config:
+  seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c
+  expire-time: 3600000

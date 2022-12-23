@@ -63,11 +63,11 @@ public class PlayListApi {
     private TbCollectMusicService collectMusicService;
     
     public Page<MusicVo> getAllMusicPage(MusicDto req) {
-        if (req.getPageNum() == null || Objects.equals(req.getPageNum(), 0)) {
-            req.setPageNum(200);
-        }
+        req.setPageIndex(Optional.ofNullable(req.getPageIndex()).orElse(0));
+        req.setPageNum(Optional.ofNullable(req.getPageNum()).orElse(200));
+    
         Page<TbMusicPojo> page = new Page<>(req.getPageIndex(), req.getPageNum());
-        
+    
         // 查询歌手表
         List<TbSingerPojo> singerList;
         List<Long> musicSingerIds = null;
@@ -97,7 +97,8 @@ public class PlayListApi {
         musicWrapper.in(StringUtils.isNotBlank(req.getAlbumName()) && IterUtil.isNotEmpty(albumList), TbMusicPojo::getAlbumId, albumList);
         // 排序
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
-        switch (req.getOrderBy()) {
+        req.setOrder(Optional.ofNullable(req.getOrder()).orElse(false));
+        switch (Optional.ofNullable(req.getOrderBy()).orElse("")) {
             case "id":
                 musicWrapper.orderBy(req.getOrder() != null, req.getOrder(), TbMusicPojo::getId);
                 break;

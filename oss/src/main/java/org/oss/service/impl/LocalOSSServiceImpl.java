@@ -1,7 +1,7 @@
 package org.oss.service.impl;
 
 import cn.hutool.core.io.FileUtil;
-import org.core.config.MusicConfig;
+import org.core.config.SaveConfig;
 import org.oss.service.OSSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.io.File;
 public class LocalOSSServiceImpl implements OSSService {
     
     @Autowired
-    private MusicConfig config;
+    private SaveConfig config;
     
     @Override
     public boolean isConnected(String host, String accessKey, String secretKey) {

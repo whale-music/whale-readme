@@ -9,28 +9,24 @@ import java.util.Date;
 
 public class JwtUtil {
     /**
-     * 过期5分钟
-     */
-    private static final long EXPIRE_TIME = 60 * 60 * 1000L;
-    
-    /**
      * jwt密钥
      */
-    private static final String SECRET = "62bb8X8qx2rAosQumEKB&ce8f193d08c914";
+    private static String secret = "";
     
     private JwtUtil() {
     }
     
     /**
-     * 生成jwt字符串，五分钟后过期  JWT(json web token)
+     * 生成jwt字符串，根据设置时间过期  JWT(json web token)
      *
      * @param userId                                                              根据用户ID生成token
      * @param info,Map的value只能存放值的类型为：Map，List，Boolean，Integer，Long，Double，String and Date
      * @return 返回token
      */
-    public static String sign(String userId, String info) {
-        Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
-        Algorithm algorithm = Algorithm.HMAC256(SECRET);
+    public static String sign(String seedKey, Long expireTime, String userId, String info) {
+        JwtUtil.secret = seedKey;
+        Date date = new Date(System.currentTimeMillis() + expireTime);
+        Algorithm algorithm = Algorithm.HMAC256(seedKey);
         return JWT.create()
                   // 将userId保存到token里面
                   .withAudience(userId)
@@ -76,7 +72,7 @@ public class JwtUtil {
      * @param token token 数据
      */
     public static void checkSign(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(SECRET);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm)
                                   //.withClaim("username, username)
                                   .build();

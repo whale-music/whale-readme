@@ -27,7 +27,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jetbrains.annotations.NotNull;
-import org.oss.service.impl.LocalOSSServiceImpl;
+import org.oss.service.impl.local.LocalOSSServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -240,7 +240,7 @@ public class UploadMusicApi {
     private void uploadFile(AudioInfoDto dto, TbMusicPojo musicPojo) throws IOException {
         if (StringUtils.isNotBlank(dto.getMusicFileTemp())) {
             File file = new File(pathTemp, dto.getMusicFileTemp());
-            String uploadPath = localOSSService.upload(file.getPath());
+            String uploadPath = localOSSService.upload(config.getObjectSave(), file.getPath());
             Files.delete(file.toPath());
             // music URL 地址表
             TbMusicUrlPojo urlPojo = new TbMusicUrlPojo();

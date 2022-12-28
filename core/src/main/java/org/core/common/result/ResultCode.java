@@ -27,25 +27,15 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 用户错误：20001-29999*/
     USER_NOT_LOGIN("20001", "用户未登录"),
-    
     USER_LOGIN_ERROR("20002", "账号不存在或密码错误"),
-    
     USER_ACCOUNT_FORBIDDEN("20003", "账号已被禁用"),
-    
     USER_HAS_EXISTED("20005", "用户已存在"),
-    
     USER_NOT_EXIST("20006", "用户名不存在!"),
-    
     DUPLICATE_USER_NAME_ERROR("20007", "用户名不能重复!"),
-    
     SONG_LIST_DOES_NOT_EXIST("20008", "歌单不存在!"),
-    
     SONG_NOT_EXIST("20009", "歌曲不存在!"),
-    
     SONG_EXIST("20010", "数据库中歌曲已存在!"),
-    
     SONG_UPLOADED("20011", "歌曲已上传!"),
-    
     MULTIPLE_SONGS("20012", "数据库中有多个相似歌曲请手动添加!"),
     ALBUM_NOT_EXIST("20013", "专辑已存在!"),
     ALBUM_ERROR("20014", "专辑专辑错误!"),
@@ -59,8 +49,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 系统错误：40001-49999 */
     SYSTEM_INNER_ERROR("40001", "系统内部错误，请稍后重试"),
-    
     INTERNAL_SERVER_ERROR("40002", "未知异常"),
+    LOCAL_FILE("40003", "本地文件"),
     
     /* 数据错误：50001-599999 */
     DATA_NONE("50001", "数据未找到"),

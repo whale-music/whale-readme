@@ -4,7 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -13,6 +15,10 @@ import java.util.List;
 public class AudioInfoDto {
     @ApiModelProperty("音乐ID")
     private Integer id;
+    
+    @ApiModelProperty("音乐来源")
+    @NotBlank
+    private String origin;
     
     @ApiModelProperty("音乐名")
     private String musicName;
@@ -48,6 +54,8 @@ public class AudioInfoDto {
     private Long size;
     
     @ApiModelProperty("文件md5")
+    @NotBlank
+    @Length(min = 32, max = 32,message = "MD5长度错误，请重新生成")
     private String md5;
     
     @ApiModelProperty("临时文件名")

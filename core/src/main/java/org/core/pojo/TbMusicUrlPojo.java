@@ -65,7 +65,7 @@ public class TbMusicUrlPojo implements Serializable {
     
     @ApiModelProperty("音乐来源")
     @TableField("origin")
-    private Long origin;
+    private String origin;
     
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)

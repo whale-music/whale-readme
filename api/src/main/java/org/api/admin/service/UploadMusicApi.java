@@ -27,7 +27,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jetbrains.annotations.NotNull;
-import org.oss.service.impl.local.LocalOSSServiceImpl;
+import org.oss.factory.OSSFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -81,11 +81,6 @@ public class UploadMusicApi {
      */
     @Autowired
     private SaveConfig config;
-    /**
-     * 文件上传服务
-     */
-    @Autowired
-    private LocalOSSServiceImpl localOSSService;
     
     @Autowired
     private TbAlbumSingerService albumSingerService;
@@ -212,12 +207,17 @@ public class UploadMusicApi {
         // 保存音乐表
         TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, singIds, albumPojo);
         // 保存音乐和歌手中间表
-        saveMusicAndSinger(singIds, musicPojo);
+        saveSinger(singIds, musicPojo);
         // 上传文件
         uploadFile(dto, musicPojo);
     }
     
-    private void saveMusicAndSinger(List<Long> singIds, TbMusicPojo musicPojo) {
+    /**
+     * 保存歌手
+     * @param singIds 歌手ID
+     * @param musicPojo 音乐信息
+     */
+    private void saveSinger(List<Long> singIds, TbMusicPojo musicPojo) {
         if (IterUtil.isNotEmpty(singIds)) {
             List<TbMusicSingerPojo> entityList = new ArrayList<>();
             for (Long singId : singIds) {
@@ -240,7 +240,7 @@ public class UploadMusicApi {
     private void uploadFile(AudioInfoDto dto, TbMusicPojo musicPojo) throws IOException {
         if (StringUtils.isNotBlank(dto.getMusicFileTemp())) {
             File file = new File(pathTemp, dto.getMusicFileTemp());
-            String uploadPath = localOSSService.upload(config.getObjectSave(), file.getPath());
+            String uploadPath = OSSFactory.OssFactory(config.getSaveMode()).upload(config.getObjectSave(), file.getPath());
             Files.delete(file.toPath());
             // music URL 地址表
             TbMusicUrlPojo urlPojo = new TbMusicUrlPojo();

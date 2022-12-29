@@ -20,6 +20,11 @@ public class LocalOSSServiceImpl implements OSSService {
     }
     
     @Override
+    public String getMode() {
+        return SERVICE_NAME;
+    }
+    
+    @Override
     public boolean isConnected(String host, String accessKey, String secretKey) {
         throw new BaseException(ResultCode.LOCAL_FILE);
     }

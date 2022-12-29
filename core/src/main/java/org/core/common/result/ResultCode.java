@@ -21,8 +21,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PARAM_NOT_COMPLETE("10004", "参数缺失"),
     TOKEN_INVALID("10004", "Token 无效"),
     COOKIE_INVALID("10005", "Cookie 无效"),
-    // 文件名无效
     FILENAME_INVALID("10006", "文件名无效"),
+    SAVE_NAME_INVALID("10007", "存储名称无效"),
     
     
     /* 用户错误：20001-29999*/

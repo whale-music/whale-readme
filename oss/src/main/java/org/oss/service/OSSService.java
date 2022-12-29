@@ -5,6 +5,8 @@ public interface OSSService {
     // 检测是否是当前存储地址
     boolean isCurrentOSS(String serviceName);
     
+    String getMode();
+    
     // 检查访问存储地址
     boolean isConnected(String host, String accessKey, String secretKey);
     

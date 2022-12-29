@@ -18,6 +18,11 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     @Override
+    public String getMode() {
+        return SERVICE_NAME;
+    }
+    
+    @Override
     public boolean isConnected(String host, String accessKey, String secretKey) {
         return false;
     }

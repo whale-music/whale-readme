@@ -1,4 +1,4 @@
-create table sys_dict_data
+create table if not exists sys_dict_data
 (
     id          bigint                                    not null comment '字典编码'
         primary key,
@@ -15,7 +15,7 @@ create table sys_dict_data
 )
     comment '字典数据表';
 
-create table sys_dict_type
+create table if not exists sys_dict_type
 (
     id          bigint                                    not null comment '字典主键'
         primary key,
@@ -32,7 +32,7 @@ create table sys_dict_type
 )
     comment '字典类型表';
 
-create table sys_user
+create table if not exists sys_user
 (
     id              bigint       not null comment '系统用户ID'
         primary key,
@@ -56,7 +56,7 @@ create index sys_user_nickname_index
 create index sys_user_username_index
     on sys_user (username);
 
-create table tb_album
+create table if not exists tb_album
 (
     id          bigint       not null comment '专辑表ID'
         primary key,
@@ -71,7 +71,7 @@ create table tb_album
 create index tb_album_album_name_index
     on tb_album (album_name);
 
-create table tb_album_singer
+create table if not exists tb_album_singer
 (
     album_id  bigint not null comment '专辑ID',
     singer_id bigint not null comment '歌手ID',
@@ -79,7 +79,7 @@ create table tb_album_singer
 )
     comment '歌手和专辑中间表';
 
-create table tb_collect
+create table if not exists tb_collect
 (
     id             bigint       not null comment '歌单表ID'
         primary key,
@@ -99,7 +99,7 @@ create table tb_collect
 create index tb_collect_play_list_name_index
     on tb_collect (play_list_name);
 
-create table tb_collect_music
+create table if not exists tb_collect_music
 (
     collect_id bigint not null comment '歌单ID',
     music_id   bigint not null comment '音乐ID',
@@ -107,7 +107,7 @@ create table tb_collect_music
 )
     comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';
 
-create table tb_collect_tag
+create table if not exists tb_collect_tag
 (
     collect_id bigint not null comment '歌单ID',
     tag_id     bigint not null comment 'tag ID',
@@ -115,7 +115,7 @@ create table tb_collect_tag
 )
     comment '歌单风格中间表';
 
-create table tb_history
+create table if not exists tb_history
 (
     music_id    bigint   not null comment '歌曲ID'
         primary key,
@@ -126,7 +126,7 @@ create table tb_history
 )
     comment '音乐播放历史(包括歌单，音乐，专辑）';
 
-create table tb_like
+create table if not exists tb_like
 (
     user_id     bigint       not null comment '我喜欢的歌单ID和用户ID相同'
         primary key,
@@ -139,7 +139,7 @@ create table tb_like
 )
     comment '喜爱歌单';
 
-create table tb_like_music
+create table if not exists tb_like_music
 (
     like_id  bigint not null comment '喜爱歌单ID',
     music_id bigint not null comment '音乐ID',
@@ -147,7 +147,7 @@ create table tb_like_music
 )
     comment '喜爱歌单中间表';
 
-create table tb_music
+create table if not exists tb_music
 (
     id          bigint       not null comment '音乐ID'
         primary key,
@@ -169,7 +169,7 @@ create index tb_music_alia_name_index
 create index tb_music_music_name_index
     on tb_music (music_name);
 
-create table tb_music_singer
+create table if not exists tb_music_singer
 (
     music_id  bigint not null comment '歌曲ID',
     singer_id bigint not null comment '歌手ID',
@@ -177,20 +177,21 @@ create table tb_music_singer
 )
     comment '歌曲和歌手的中间表';
 
-create table tb_music_url
+create table if not exists tb_music_url
 (
-    id          bigint       not null comment '主键'
+    id          bigint        not null comment '主键'
         primary key,
-    music_id    bigint       not null comment '音乐ID',
-    rate        int          not null comment '比特率，音频文件的信息',
-    url         varchar(512) null comment '音乐地址',
-    quality     char(3)      not null comment '音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)',
-    md5         char(32)     null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
-    encodeType  char(10)     null comment '文件格式类型',
-    size        bigint       null comment '文件大小',
-    user_id     bigint       not null comment '上传用户ID',
-    create_time datetime     null comment '创建时间',
-    update_time datetime     null comment '修改时间',
+    music_id    bigint        not null comment '音乐ID',
+    rate        int           not null comment '比特率，音频文件的信息',
+    url         varchar(512)  null comment '音乐地址',
+    quality     char(3)       not null comment '音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)',
+    md5         char(32)      null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
+    encodeType  char(10)      null comment '文件格式类型',
+    size        bigint        null comment '文件大小',
+    user_id     bigint        not null comment '上传用户ID',
+    origin      varbinary(64) null comment '音乐来源',
+    create_time datetime      null comment '创建时间',
+    update_time datetime      null comment '修改时间',
     constraint id
         unique (id)
 )
@@ -205,7 +206,7 @@ create index tb_music_url_music_id_index
 create index tb_music_url_size_index
     on tb_music_url (size);
 
-create table tb_rank
+create table if not exists tb_rank
 (
     user_id         bigint   not null comment '用户ID'
         primary key,
@@ -216,7 +217,7 @@ create table tb_rank
 )
     comment '音乐播放排行榜';
 
-create table tb_singer
+create table if not exists tb_singer
 (
     id           bigint       not null comment '歌手ID'
         primary key,
@@ -231,7 +232,7 @@ create table tb_singer
 )
     comment '歌手表';
 
-create table tb_tag
+create table if not exists tb_tag
 (
     id          bigint      not null
         primary key,
@@ -243,7 +244,7 @@ create table tb_tag
 )
     comment '标签表（风格）';
 
-create table tb_user_singer
+create table if not exists tb_user_singer
 (
     user_id   bigint not null comment '用户ID',
     singer_id bigint not null comment '歌手ID',

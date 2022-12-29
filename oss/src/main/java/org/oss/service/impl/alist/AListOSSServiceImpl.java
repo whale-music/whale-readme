@@ -49,7 +49,7 @@ public class AListOSSServiceImpl implements OSSService {
     
     @Override
     public String upload(String objectSaveConfig, String filePath) {
-        return null;
+        throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
     }
     
     @Override

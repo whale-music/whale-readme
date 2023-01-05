@@ -243,13 +243,22 @@ public class UploadMusicApi {
         
         urlPojo.setMusicId(musicPojo.getId());
         urlPojo.setOrigin(dto.getOrigin());
+        urlPojo.setUserId(UserUtil.getUser().getId());
         // 上传到本地时读取本地文件数据，否则使用前端传入的数据
-        if (StringUtils.isNotBlank(dto.getMusicFileTemp())) {
-            File file = new File(pathTemp, dto.getMusicFileTemp());
+        if (dto.getUploadFlag()) {
+            // 只保存到数据库，不上传文件
+            urlPojo.setSize(dto.getSize());
+            urlPojo.setRate(dto.getRate());
+            urlPojo.setQuality(dto.getQuality());
+            urlPojo.setMd5(dto.getMd5());
+            urlPojo.setEncodeType(dto.getType());
+            urlPojo.setUrl(dto.getMusicTemp());
+        } else {
+            // 读取本地文件
+            File file = new File(pathTemp, dto.getMusicTemp());
             String uploadPath = OSSFactory.OssFactory(config.getSaveMode())
                                           .upload(config.getObjectSave(), file.getPath());
             Files.delete(file.toPath());
-            
             // music URL 地址表
             urlPojo.setSize(FileUtil.size(file));
             urlPojo.setRate(dto.getRate());
@@ -257,16 +266,6 @@ public class UploadMusicApi {
             urlPojo.setMd5(dto.getMd5());
             urlPojo.setEncodeType(FileUtil.extName(file));
             urlPojo.setUrl(uploadPath);
-            urlPojo.setUserId(UserUtil.getUser().getId());
-        } else {
-            // music URL 地址表
-            urlPojo.setSize(dto.getSize());
-            urlPojo.setRate(dto.getRate());
-            urlPojo.setQuality(dto.getQuality());
-            urlPojo.setMd5(dto.getMd5());
-            urlPojo.setEncodeType(dto.getType());
-            urlPojo.setUrl(dto.getMd5() + "." + dto.getType());
-            urlPojo.setUserId(UserUtil.getUser().getId());
         }
         musicUrlService.saveOrUpdate(urlPojo);
     }
@@ -488,7 +487,7 @@ public class UploadMusicApi {
     
     private void checkTempFile(AudioInfoDto dto) {
         // 检查文件目录是否合法
-        LocalFileUtil.checkFilePath(pathTemp, dto.getMusicFileTemp());
+        LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
         List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
                                                                  .eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
         if (list.size() > 0) {

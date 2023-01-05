@@ -55,9 +55,13 @@ public class AudioInfoDto {
     
     @ApiModelProperty("文件md5")
     @NotBlank
-    @Length(min = 32, max = 32,message = "MD5长度错误，请重新生成")
+    @Length(min = 32, max = 32, message = "MD5长度错误，请重新生成")
     private String md5;
     
-    @ApiModelProperty("临时文件名")
-    private String musicFileTemp;
+    @ApiModelProperty("临时音乐，可以是本地地址，也可以是网络地址")
+    @NotBlank
+    private String musicTemp;
+    
+    @ApiModelProperty("只存储到数据库，不上传")
+    private Boolean uploadFlag;
 }

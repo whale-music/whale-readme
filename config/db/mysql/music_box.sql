@@ -60,8 +60,8 @@ create table if not exists tb_album
 (
     id          bigint       not null comment '专辑表ID'
         primary key,
-    indirect    varchar(255) null comment '专辑简介',
     album_name  varchar(512) not null comment '专辑名',
+    description text         null comment '专辑简介',
     pic         varchar(512) null comment '专辑封面地址',
     update_time datetime     null comment '修改时间',
     create_time datetime     null comment '创建时间'
@@ -154,7 +154,8 @@ create table if not exists tb_music
     music_name  varchar(128) null comment '音乐名',
     alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
-    lyric       varchar(512) null comment '歌词',
+    lyric       longtext     null comment '歌词',
+    k_lyric     longtext     null comment '逐字歌词',
     album_id    bigint       null comment '专辑ID',
     sort        bigint       null comment '排序字段',
     time_length int          null comment '歌曲时长',
@@ -182,11 +183,11 @@ create table if not exists tb_music_url
     id          bigint        not null comment '主键'
         primary key,
     music_id    bigint        not null comment '音乐ID',
-    rate        int           not null comment '比特率，音频文件的信息',
+    rate        int           null comment '比特率，音频文件的信息',
     url         varchar(512)  null comment '音乐地址',
-    quality     char(3)       not null comment '音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)',
     md5         char(32)      null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
-    encodeType  char(10)      null comment '文件格式类型',
+    level       char(8)       null comment '音乐质量',
+    encode_type char(10)      null comment '文件格式类型',
     size        bigint        null comment '文件大小',
     user_id     bigint        not null comment '上传用户ID',
     origin      varbinary(64) null comment '音乐来源',
@@ -222,11 +223,12 @@ create table if not exists tb_singer
     id           bigint       not null comment '歌手ID'
         primary key,
     singer_name  varchar(128) not null comment '歌手名',
+    alias        varchar(255) null comment '歌手别名',
     sex          varchar(64)  null comment '歌手性别',
-    pic          varchar(64)  null comment '封面',
+    pic          varchar(512) null comment '封面',
     birth        date         null comment '出生年月',
     location     varchar(64)  null comment '所在国家',
-    introduction varchar(128) null comment '歌手介绍',
+    introduction longtext     null comment '歌手介绍',
     create_time  datetime     null comment '创建时间',
     update_time  datetime     null comment '修改时间'
 )

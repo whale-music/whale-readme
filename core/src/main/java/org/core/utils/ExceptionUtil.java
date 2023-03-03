@@ -8,7 +8,7 @@ public class ExceptionUtil {
     
     public static void isNull(boolean flag, ResultCode code) {
         if (flag) {
-            throw new BaseException(code);
+            throw new BaseException(code.getResultMsg());
         }
     }
     

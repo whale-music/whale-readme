@@ -35,6 +35,10 @@ public class TbSingerPojo implements Serializable {
     @ApiModelProperty("歌手名")
     @TableField("singer_name")
     private String singerName;
+    
+    @ApiModelProperty("歌手名")
+    @TableField("alias")
+    private String alias;
 
     @ApiModelProperty("歌手性别")
     @TableField("sex")

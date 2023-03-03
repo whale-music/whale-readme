@@ -14,15 +14,15 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestDownloadMusic {
-    String dest = "D:\\music";
+class TestDownloadMusic {
+    String dest = "D:\\temp\\music";
     
     @Test
-    public void testDownloadMusic() {
+    void testDownloadMusic() {
         Log log = Log.get();
         
         String playId = "6389917304";
-        String cookie = "MUSIC_U=afceb1d1edc22023fb24b900e2d84b1a3356f40b4c95cdc3332c107e08cf9238993166e004087dd3beb58a6aba726f0f3ce603cf8cd7f4cb6a1b92b9f0e5594e079514a26eb961c1a0d2166338885bd7;Cookie=d33658da9213990dece8c775a34a34c5c2fb33260a1fb19bada0beb8f6faacc5519e07624a9f005385583814e33238d94932d1745580b0f93726809422c6334bdebf8de6ed45b6347a561ba977ae766d; NMTID=00OHnqUmllyTs4zBEXZg4F6NoDnMkkAAAGFLvTgXQ; __csrf=b1656f1145c34b42866e27f19fc81f0c; __remember_me=true; MUSIC_U=d33658da9213990dece8c775a34a34c5c2fb33260a1fb19bada0beb8f6faacc5519e07624a9f005385583814e33238d94932d1745580b0f93726809422c6334bdebf8de6ed45b6347a561ba977ae766d";
+        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c50a72fdf0cc97532e1e2f6d7efc8affd3519e07624a9f00535f3dd833cb266a5025ff223deb3065a43726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
         LikePlay like = RequestMusic163.like(playId, cookie);
         
         List<Integer> ids = like.getIds();
@@ -34,15 +34,15 @@ public class TestDownloadMusic {
         
         for (int i = 0; i < allPageIndex; i++) {
             List<Integer> page = ListUtil.page(i, 20, ids);
-            SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie);
+            SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
             songUrl.getData().parallelStream().forEach(datum -> {
                 if (fileMd5s.contains(datum.getMd5())) {
-                    log.info("已下载文件: {}", datum.getMd5());
+                    log.info("\033[0;33m已下载文件: {}\033[0m", datum.getMd5());
                 } else {
                     try {
                         // log.info("正在下载歌曲ID: {}, md5: {}", datum.getId(), datum.getMd5());
                         if (StringUtils.isBlank(datum.getUrl())) {
-                            log.error("该歌曲没有地址id:{} md5: {}", datum.getUrl(), datum.getMd5());
+                            log.error("\033[0;31m该歌曲没有地址id:{} md5: {}\033[0m", datum.getUrl(), datum.getMd5());
                             return;
                         }
                         String[] split = datum.getUrl().split("/");
@@ -52,7 +52,7 @@ public class TestDownloadMusic {
                         log.error(e.getMessage(), e);
                         return;
                     }
-                    log.info("下载成功: {} 比特率: {} 时常: {} 大小{}", datum.getMd5(), datum.getBr(), datum.getTime(), datum.getSize());
+                    log.info("\033[0;32m下载成功: {} 比特率: {} 时常: {} 大小{}\033[0m", datum.getMd5(), datum.getBr(), datum.getTime(), datum.getSize());
                 }
             });
         }

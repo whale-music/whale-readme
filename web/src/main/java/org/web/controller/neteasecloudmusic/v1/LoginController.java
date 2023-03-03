@@ -13,6 +13,7 @@ import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.web.controller.BaseController;
 
@@ -42,14 +43,14 @@ public class LoginController extends BaseController {
      *
      * @return 返回登录结果
      */
-    @GetMapping("/login/cellphone")
+    @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult login(HttpServletResponse response, String phone, String password) {
         SysUserPojo userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(jwtConfig, response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
-        return r;
+        return r.success();
     }
     
     /**

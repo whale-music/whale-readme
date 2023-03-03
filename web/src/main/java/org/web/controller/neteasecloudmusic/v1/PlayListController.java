@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -158,76 +155,57 @@ public class PlayListController {
         List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
         for (TbMusicPojo musicPojo : playListAllSong.getRecords()) {
+            Map<Integer, TbMusicUrlPojo> musicInfoMaps = musicInfos.stream()
+                                                                   .collect(Collectors.toMap(TbMusicUrlPojo::getRate,
+                                                                           tbMusicUrlPojo -> tbMusicUrlPojo));
             SongsItem e = new SongsItem();
             // Sq 无损
-            Optional<TbMusicUrlPojo> sq = musicInfos.stream()
-                                                    .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
-                                                                                            .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
-                                                                                                                                        .equals("sq"))
-                                                    .findFirst();
-            if (sq.isPresent()) {
-                Sq sqPojo = new Sq();
-                TbMusicUrlPojo sqOrElse = sq.orElse(new TbMusicUrlPojo());
-                sqPojo.setBr(sqOrElse.getRate());
-                sqPojo.setSize(sqOrElse.getSize());
-                e.setSq(sqPojo);
-            }
+            Optional<TbMusicUrlPojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
+            musicInfoMaps.remove(320000);
+            Sq sqPojo = new Sq();
+            TbMusicUrlPojo sqOrElse = sq.orElse(new TbMusicUrlPojo());
+            sqPojo.setBr(sqOrElse.getRate());
+            sqPojo.setSize(sqOrElse.getSize());
+            e.setSq(sqPojo);
+            musicInfoMaps.remove(320000);
     
             // l 低质量
-            Optional<TbMusicUrlPojo> l = musicInfos.stream()
-                                                   .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
-                                                                                           .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
-                                                                                                                                       .equals("l"))
-                                                   .findFirst();
-            if (l.isPresent()) {
-                L lPojo = new L();
-                TbMusicUrlPojo lOrElse = l.orElse(new TbMusicUrlPojo());
-                lPojo.setBr(lOrElse.getRate());
-                lPojo.setSize(lOrElse.getSize());
-                e.setL(lPojo);
-            }
+            Optional<TbMusicUrlPojo> l = Optional.ofNullable(musicInfoMaps.get(128000));
+            musicInfoMaps.remove(128000);
+            L lPojo = new L();
+            TbMusicUrlPojo lOrElse = l.orElse(new TbMusicUrlPojo());
+            lPojo.setBr(lOrElse.getRate());
+            lPojo.setSize(lOrElse.getSize());
+            e.setL(lPojo);
     
             // m 中质量
-            Optional<TbMusicUrlPojo> m = musicInfos.stream()
-                                                   .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
-                                                                                           .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
-                                                                                                                                       .equals("m"))
-                                                   .findFirst();
-            if (m.isPresent()) {
-                M mPojo = new M();
-                TbMusicUrlPojo mOrElse = m.orElse(new TbMusicUrlPojo());
-                mPojo.setBr(mOrElse.getRate());
-                mPojo.setSize(mOrElse.getSize());
-                e.setM(mPojo);
-            }
+            Optional<TbMusicUrlPojo> m = Optional.ofNullable(musicInfoMaps.get(192000));
+            musicInfoMaps.remove(192000);
+            M mPojo = new M();
+            TbMusicUrlPojo mOrElse = m.orElse(new TbMusicUrlPojo());
+            mPojo.setBr(mOrElse.getRate());
+            mPojo.setSize(mOrElse.getSize());
+            e.setM(mPojo);
     
             // h高质量
-            Optional<TbMusicUrlPojo> h = musicInfos.stream()
-                                                   .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
-                                                                                           .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
-                                                                                                                                       .equals("h"))
-                                                   .findFirst();
-            if (h.isPresent()) {
-                H hPojo = new H();
-                TbMusicUrlPojo hOrElse = h.orElse(new TbMusicUrlPojo());
-                hPojo.setBr(hOrElse.getRate());
-                hPojo.setSize(hOrElse.getSize());
-                e.setH(hPojo);
-            }
+            Optional<TbMusicUrlPojo> h = Optional.ofNullable(musicInfoMaps.get(320000));
+            musicInfoMaps.remove(320000);
+            H hPojo = new H();
+            TbMusicUrlPojo hOrElse = h.orElse(new TbMusicUrlPojo());
+            hPojo.setBr(hOrElse.getRate());
+            hPojo.setSize(hOrElse.getSize());
+            e.setH(hPojo);
             
             // a 未知
-            Optional<TbMusicUrlPojo> a = musicInfos.stream()
-                                                   .filter(tbMusicUrlPojo -> tbMusicUrlPojo.getMusicId()
-                                                                                           .equals(musicPojo.getId()) && tbMusicUrlPojo.getQuality()
-                                                                                                                                       .equals("a"))
-                                                   .findFirst();
-            if (a.isPresent()) {
-                A aPojo = new A();
-                TbMusicUrlPojo aOrElse = a.orElse(new TbMusicUrlPojo());
-                aPojo.setBr(aOrElse.getRate());
-                aPojo.setSize(aOrElse.getSize());
-                e.setA(aPojo);
-            }
+            musicInfoMaps.forEach(
+                    (integer, tbMusicUrlPojo) -> {
+                        A aPojo = new A();
+                        TbMusicUrlPojo aOrElse = Optional.ofNullable(tbMusicUrlPojo).orElse(new TbMusicUrlPojo());
+                        aPojo.setBr(aOrElse.getRate());
+                        aPojo.setSize(aOrElse.getSize());
+                        e.setA(aPojo);
+                    }
+            );
             
             
             e.setName(musicPojo.getMusicName());

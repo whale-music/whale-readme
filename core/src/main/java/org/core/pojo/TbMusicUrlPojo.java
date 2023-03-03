@@ -38,21 +38,21 @@ public class TbMusicUrlPojo implements Serializable {
     @ApiModelProperty("比特率，音频文件的信息")
     @TableField("rate")
     private Integer rate;
+    
+    @ApiModelProperty("音乐质量")
+    @TableField("level")
+    private String level;
 
     @ApiModelProperty("音乐地址")
     @TableField("url")
     private String url;
-
-    @ApiModelProperty("音乐质量(sq: 无损，l：低质量，m：中质量，h：高质量，a：未知)")
-    @TableField("quality")
-    private String quality;
 
     @ApiModelProperty("保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在")
     @TableField("md5")
     private String md5;
 
     @ApiModelProperty("文件格式类型")
-    @TableField("encodeType")
+    @TableField("encode_type")
     private String encodeType;
     
     @ApiModelProperty("文件大小")

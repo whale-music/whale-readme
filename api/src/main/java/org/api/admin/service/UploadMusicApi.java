@@ -12,6 +12,7 @@ import org.api.admin.model.dto.SingerDto;
 import org.api.admin.model.vo.AudioInfoVo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.FileTypeConfig;
 import org.core.config.SaveConfig;
 import org.core.pojo.*;
 import org.core.service.*;
@@ -49,7 +50,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UploadMusicApi {
     
-    List<String> fileType = Arrays.asList("mp3", "ogg", "flac");
+    /**
+     * 音乐文件导入后缀名
+     */
+    @Autowired
+    private FileTypeConfig fileType;
     /**
      * 音乐信息服务
      */
@@ -104,7 +109,7 @@ public class UploadMusicApi {
             if (StringUtils.isBlank(filename)) {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
-            fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType);
+            fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType.getFileTypes());
             path = checkFileMd5(md5, new File(pathTemp, md5 + "." + fileSuffix));
             // 本地没有则保存
             if (path == null) {
@@ -118,7 +123,7 @@ public class UploadMusicApi {
             audioInfoVo.setIsExist(true);
         } else {
             // 下载文件
-            fileSuffix = LocalFileUtil.getFileSuffix(url, fileType);
+            fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getFileTypes());
             byte[] bytes = HttpUtil.downloadBytes(url);
             String md5 = DigestUtils.md5DigestAsHex(bytes);
             File dest = new File(pathTemp, md5 + "." + fileSuffix);
@@ -198,7 +203,11 @@ public class UploadMusicApi {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveMusicInfo(AudioInfoDto dto) throws IOException {
-        checkTempFile(dto);
+        // 检测是读取本地缓存文件
+        if (Boolean.FALSE.equals(dto.getUploadFlag())) {
+            // 检查文件目录是否合法
+            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+        }
         // 保存歌手和音乐中间表
         List<Long> singIds = saveAndReturnMusicAndSingList(dto);
         // 保存专辑表，如果没有则新建。
@@ -238,18 +247,17 @@ public class UploadMusicApi {
      * @throws IOException 文件读取异常
      */
     private void uploadFile(AudioInfoDto dto, TbMusicPojo musicPojo) throws IOException {
-        TbMusicUrlPojo urlPojo = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                .eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
-        
+        TbMusicUrlPojo urlPojo = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
+        urlPojo = urlPojo == null ? new TbMusicUrlPojo() : urlPojo;
         urlPojo.setMusicId(musicPojo.getId());
         urlPojo.setOrigin(dto.getOrigin());
         urlPojo.setUserId(UserUtil.getUser().getId());
         // 上传到本地时读取本地文件数据，否则使用前端传入的数据
-        if (dto.getUploadFlag()) {
+        if (Boolean.TRUE.equals(dto.getUploadFlag())) {
             // 只保存到数据库，不上传文件
             urlPojo.setSize(dto.getSize());
             urlPojo.setRate(dto.getRate());
-            urlPojo.setQuality(dto.getQuality());
+            urlPojo.setLevel(dto.getLevel());
             urlPojo.setMd5(dto.getMd5());
             urlPojo.setEncodeType(dto.getType());
             urlPojo.setUrl(dto.getMusicTemp());
@@ -262,7 +270,7 @@ public class UploadMusicApi {
             // music URL 地址表
             urlPojo.setSize(FileUtil.size(file));
             urlPojo.setRate(dto.getRate());
-            urlPojo.setQuality(dto.getQuality());
+            urlPojo.setLevel(dto.getLevel());
             urlPojo.setMd5(dto.getMd5());
             urlPojo.setEncodeType(FileUtil.extName(file));
             urlPojo.setUrl(uploadPath);
@@ -361,8 +369,9 @@ public class UploadMusicApi {
         tbMusicPojo.setAliaName(aliaNames);
         tbMusicPojo.setPic(dto.getPic());
         tbMusicPojo.setLyric(dto.getLyric());
+        tbMusicPojo.setKLyric(dto.getKLyric());
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
-        tbMusicPojo.setSort(musicService.count());
+        tbMusicPojo.setSort(musicService.count()+1);
         tbMusicPojo.setTimeLength(dto.getTimeLength());
         // 保存音乐表
         boolean save = musicService.saveOrUpdate(tbMusicPojo);
@@ -485,18 +494,6 @@ public class UploadMusicApi {
         return saveBatch.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
     }
     
-    private void checkTempFile(AudioInfoDto dto) {
-        // 检查文件目录是否合法
-        LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
-        List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                 .eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
-        if (list.size() > 0) {
-            long count = list.stream().filter(tbMusicUrlPojo -> Objects.isNull(tbMusicUrlPojo.getMusicId())).count();
-            // 如果数据库种有值，并且有音乐ID(有音乐ID会等于0)，则直接抛异常
-            ExceptionUtil.isNull(count == 0, ResultCode.SONG_EXIST);
-            // 数据库中有值，但是没有音乐ID，(没有音乐ID会大于0)继续下一步
-        }
-    }
     
     /**
      * 查询音乐URL表

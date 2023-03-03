@@ -1,6 +1,6 @@
 server:
   # 配置启动端口号
-  port: 8080
+  port: 3000
   servlet:
     session:
       timeout: 259200000000
@@ -10,7 +10,7 @@ server:
 ########## log ##########
 logging:
   level:
-    root: info
+    root: debug
   pattern:
     # 时间；日志级别；类；方法；行(行不能使用圆括号)
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %C.%M[%line] - %msg%n"
@@ -61,3 +61,8 @@ save-config:
 jwt-config:
   seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c
   expire-time: 3600000
+
+file-type:
+  - mp3
+  - ogg
+  - flac

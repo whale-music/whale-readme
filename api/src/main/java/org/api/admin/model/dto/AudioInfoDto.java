@@ -41,14 +41,17 @@ public class AudioInfoDto {
     @ApiModelProperty("音乐歌词")
     private String lyric;
     
+    @ApiModelProperty("音乐歌词")
+    private String kLyric;
+    
     @ApiModelProperty("音乐时长")
     private Integer timeLength;
     
-    @ApiModelProperty("音乐质量")
-    private String quality;
-    
     @ApiModelProperty("比特率")
     private Integer rate;
+    
+    @ApiModelProperty("音乐质量")
+    private String level;
     
     @ApiModelProperty("大小")
     private Long size;
@@ -62,6 +65,6 @@ public class AudioInfoDto {
     @NotBlank
     private String musicTemp;
     
-    @ApiModelProperty("只存储到数据库，不上传")
+    @ApiModelProperty("true: 只存储到数据库，不上传, false: 读取本地数据上传到数据库")
     private Boolean uploadFlag;
 }

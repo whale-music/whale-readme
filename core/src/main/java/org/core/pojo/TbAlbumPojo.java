@@ -31,13 +31,13 @@ public class TbAlbumPojo implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    @ApiModelProperty("专辑简介")
-    @TableField("indirect")
-    private String indirect;
-
     @ApiModelProperty("专辑名")
     @TableField("album_name")
     private String albumName;
+    
+    @ApiModelProperty("专辑简介")
+    @TableField("description")
+    private String description;
 
     @ApiModelProperty("专辑封面地址")
     @TableField("pic")

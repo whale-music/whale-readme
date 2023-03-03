@@ -7,6 +7,9 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.log.Log;
 import com.alibaba.fastjson2.JSON;
 import org.api.model.LikePlay;
+import org.api.model.album.AlbumRes;
+import org.api.model.lyric.Lyric;
+import org.api.model.singer.SingerRes;
 import org.api.model.song.SongDetail;
 import org.api.model.url.SongUrl;
 import org.jetbrains.annotations.NotNull;
@@ -43,10 +46,28 @@ public class RequestMusic163 {
         return JSON.parseObject(request, LikePlay.class);
     }
     
-    
+    /**
+     * 获取歌单信息
+     *
+     * @param musicIds
+     * @param cookie
+     * @return
+     */
     public static SongDetail getSongDetail(List<Integer> musicIds, String cookie) {
         String request = req(host + "/song/detail?ids=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
         return JSON.parseObject(request, SongDetail.class);
+    }
+    
+    /**
+     * 获取专辑信息
+     *
+     * @param albumId
+     * @param cookie
+     * @return
+     */
+    public static AlbumRes getAlbumDto(Integer albumId, String cookie) {
+        String request = req(host + "/album?id=" + albumId, cookie);
+        return JSON.parseObject(request, AlbumRes.class);
     }
     
     public static SongUrl getNewSongUrl(List<Integer> musicIds, String cookie) {
@@ -54,10 +75,71 @@ public class RequestMusic163 {
         return JSON.parseObject(request, SongUrl.class);
     }
     
-    public static SongUrl getSongUrl(List<Integer> musicIds, String cookie) {
+    /**
+     * 获取歌曲下载地址
+     *
+     * @param musicIds
+     * @param cookie
+     * @return
+     */
+    public static SongUrl getSongUrl(List<Integer> musicIds, String cookie, int flag) {
+        if (flag == 0) {
+            return getSongUrlV1(musicIds, cookie);
+        }
+        if (flag == 1) {
+            return getSongUrlV2(musicIds, cookie);
+        }
+        throw new RuntimeException();
+    }
+    
+    /**
+     * 获取歌曲下载地址
+     *
+     * @param musicIds
+     * @param cookie
+     * @return
+     */
+    public static SongUrl getSongUrlV1(List<Integer> musicIds, String cookie) {
         String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
         return JSON.parseObject(request, SongUrl.class);
     }
+    
+    /**
+     * 获取歌曲下载地址
+     *
+     * @param musicIds
+     * @param cookie
+     * @return
+     */
+    public static SongUrl getSongUrlV2(List<Integer> musicIds, String cookie) {
+        String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=hires", cookie);
+        return JSON.parseObject(request, SongUrl.class);
+    }
+    
+    /**
+     * 获取歌词
+     *
+     * @param musicId
+     * @param cookie
+     * @return
+     */
+    public static Lyric getLyric(Integer musicId, String cookie) {
+        String request = req(host + "/lyric/url?id=" + musicId, cookie);
+        return JSON.parseObject(request, Lyric.class);
+    }
+    
+    /**
+     * 获取歌曲作者信息
+     *
+     * @param singerId
+     * @param cookie
+     * @return
+     */
+    public static SingerRes getSingerInfo(int singerId, String cookie) {
+        String request = req(host + "/artist/detail?id=" + singerId, cookie);
+        return JSON.parseObject(request, SingerRes.class);
+    }
+    
     
     public static void download(String url, File saveFile) {
         try {

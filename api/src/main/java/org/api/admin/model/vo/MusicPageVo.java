@@ -17,7 +17,7 @@ import java.util.List;
 public class MusicPageVo implements Serializable {
     
     @ApiModelProperty("音乐ID")
-    private Long id;
+    private String id;
     
     @ApiModelProperty("音乐名")
     private String musicName;

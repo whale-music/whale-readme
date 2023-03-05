@@ -265,7 +265,7 @@ public class PlayListApi {
         List<MusicPageVo> musicPageVos = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
             MusicPageVo e = new MusicPageVo();
-            e.setId(musicPojo.getId());
+            e.setId(String.valueOf(musicPojo.getId()));
             e.setMusicName(musicPojo.getMusicName());
             e.setMusicNameAlias(musicPojo.getAliaName());
             
@@ -287,7 +287,7 @@ public class PlayListApi {
                 e.getSingerIds().add(tbSingerPojo.getId());
                 e.getSingerName().add(tbSingerPojo.getSingerName());
             }
-            
+            e.setTimeLength(musicPojo.getTimeLength());
             e.setCreateTime(musicPojo.getCreateTime());
             e.setOrder(req.getOrder());
             musicPageVos.add(e);

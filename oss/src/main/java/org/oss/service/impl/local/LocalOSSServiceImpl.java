@@ -30,12 +30,12 @@ public class LocalOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public void isExist(String objectSaveConfig, String file) {
+    public void isExist(String host, String objectSaveConfig, String file) {
         FileUtil.mkParentDirs("./" + objectSaveConfig);
     }
     
     @Override
-    public String getMusicAddresses(String objectSaveConfig, String file) {
+    public String getMusicAddresses(String host, String objectSave, String path) {
         return null;
     }
     

@@ -6,7 +6,10 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.log.Log;
 import com.alibaba.fastjson2.JSON;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.jetbrains.annotations.NotNull;
+import org.oss.service.impl.alist.model.address.Data;
 import org.oss.service.impl.alist.model.address.MusicAddressReq;
 import org.oss.service.impl.alist.model.address.MusicAddressRes;
 import org.oss.service.impl.alist.model.list.ContentItem;
@@ -14,6 +17,7 @@ import org.oss.service.impl.alist.model.list.MusicListReq;
 import org.oss.service.impl.alist.model.list.MusicListRes;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Request {
@@ -28,7 +32,7 @@ public class Request {
      */
     @NotNull
     private static String req(String host, String body) {
-        try (HttpResponse execute = HttpUtil.createGet(host).body(body).header("Cookie", null).execute()) {
+        try (HttpResponse execute = HttpUtil.createPost(host).body(body).header("Cookie", null).execute()) {
             return execute.body();
         } catch (HttpException e) {
             throw new HttpException("http请求失败" + e);
@@ -36,16 +40,16 @@ public class Request {
     }
     
     
-    public static String getMusicAddress(String host, String path) {
+    public static String getMusicAddress(String host, String objectSave, String path) {
         MusicAddressReq musicAddressReq = new MusicAddressReq();
-        musicAddressReq.setPath(path);
+        musicAddressReq.setPath('/' + objectSave + '/' + path);
         try {
             String resStr = req(host + "/api/fs/get", JSON.toJSONString(musicAddressReq));
             MusicAddressRes res = JSON.parseObject(resStr, MusicAddressRes.class);
-            return res.getData().getRawUrl();
+            return Optional.ofNullable(res.getData()).orElse(new Data()).getRawUrl();
         } catch (Exception e) {
             log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
-            return "";
+            throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
     }
     

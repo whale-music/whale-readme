@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 public class OSSFactory {
     private static final Log log = LogFactory.get(OSSFactory.class);
     
-    private static OSSService OSS = null;
     
     private static final HashMap<String, OSSService> map = new HashMap<>();
     
@@ -45,11 +44,16 @@ public class OSSFactory {
         }
     }
     
-    public static OSSService OssFactory(String serviceName) {
-        OSS = map.get(serviceName);
-        if (OSSFactory.OSS == null) {
+    /**
+     * 获取音乐处理工厂
+     *
+     * @param serviceName 音乐地址处理
+     */
+    public static OSSService ossFactory(String serviceName) {
+        OSSService oss = map.get(serviceName);
+        if (oss == null) {
             throw new BaseException(ResultCode.SAVE_NAME_INVALID);
         }
-        return OSSFactory.OSS;
+        return oss;
     }
 }

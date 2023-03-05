@@ -264,7 +264,7 @@ public class UploadMusicApi {
         } else {
             // 读取本地文件
             File file = new File(pathTemp, dto.getMusicTemp());
-            String uploadPath = OSSFactory.OssFactory(config.getSaveMode())
+            String uploadPath = OSSFactory.ossFactory(config.getSaveMode())
                                           .upload(config.getObjectSave(), file.getPath());
             Files.delete(file.toPath());
             // music URL 地址表

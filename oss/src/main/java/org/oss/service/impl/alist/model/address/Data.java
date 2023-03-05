@@ -11,7 +11,7 @@ public class Data {
 	private String modified;
 	private String readme;
 	private Integer type;
-	private String rawUrl;
+	private String raw_url;
 	
 	public Integer getSize() {
 		return size;
@@ -94,10 +94,10 @@ public class Data {
 	}
 	
 	public String getRawUrl() {
-		return rawUrl;
+		return raw_url;
 	}
 	
-	public void setRawUrl(String rawUrl) {
-		this.rawUrl = rawUrl;
+	public void setRaw_url(String raw_url) {
+		this.raw_url = raw_url;
 	}
 }

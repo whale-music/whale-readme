@@ -11,9 +11,9 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class MusicDto extends TbMusicPojo {
+public class MusicAllDto extends TbMusicPojo {
     @ApiModelProperty("歌曲ID列表")
-    private List<Long> ids;
+    private List<Long> musicIds;
     
     @ApiModelProperty("歌手")
     private String singerName;
@@ -24,7 +24,7 @@ public class MusicDto extends TbMusicPojo {
     @ApiModelProperty(value = "排序", example = "sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序")
     private String orderBy;
     
-    @ApiModelProperty("数据顺序")
+    @ApiModelProperty(value = "数据排序", example = "true: ASC, false: DESC")
     private Boolean order;
     
     @ApiModelProperty("当前页数")

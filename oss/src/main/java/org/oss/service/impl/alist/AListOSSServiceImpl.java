@@ -6,8 +6,6 @@ import org.core.common.result.ResultCode;
 import org.oss.service.OSSService;
 import org.oss.service.impl.alist.util.Request;
 
-import java.net.URL;
-
 public class AListOSSServiceImpl implements OSSService {
     
     private static final String SERVICE_NAME = "AList";
@@ -28,15 +26,14 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public void isExist(String objectSaveConfig, String file) {
-        getMusicAddresses(objectSaveConfig, file);
+    public void isExist(String host, String objectSaveConfig, String file) {
+        getMusicAddresses(host, objectSaveConfig, file);
     }
     
     @Override
-    public String getMusicAddresses(String objectSaveConfig, String file) {
+    public String getMusicAddresses(String host, String objectSave, String path) {
         try {
-            String host = new URL(objectSaveConfig).getHost();
-            String musicAddress = Request.getMusicAddress(host, file);
+            String musicAddress = Request.getMusicAddress(host, objectSave, path);
             if (StringUtils.isBlank(musicAddress)) {
                 throw new BaseException();
             } else {

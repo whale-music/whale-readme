@@ -46,7 +46,7 @@ public class Request {
         try {
             String resStr = req(host + "/api/fs/get", JSON.toJSONString(musicAddressReq));
             MusicAddressRes res = JSON.parseObject(resStr, MusicAddressRes.class);
-            return Optional.ofNullable(res.getData()).orElse(new Data()).getRawUrl();
+            return Optional.ofNullable(res.getData()).orElse(new Data()).getSign();
         } catch (Exception e) {
             log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
             throw new BaseException(ResultCode.SONG_NOT_EXIST);

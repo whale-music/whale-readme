@@ -30,7 +30,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     USER_LOGIN_ERROR("20002", "账号不存在或密码错误"),
     USER_ACCOUNT_FORBIDDEN("20003", "账号已被禁用"),
     USER_HAS_EXISTED("20005", "用户已存在"),
-    USER_NOT_EXIST("20006", "用户名不存在!"),
+    USER_NOT_EXIST("20006", "用户不存在!"),
     DUPLICATE_USER_NAME_ERROR("20007", "用户名不能重复!"),
     SONG_LIST_DOES_NOT_EXIST("20008", "歌单不存在!"),
     SONG_NOT_EXIST("20009", "歌曲不存在!"),

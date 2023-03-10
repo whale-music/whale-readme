@@ -1,12 +1,12 @@
-package org.api.admin.model.dto;
+package org.api.admin.model.res;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.SysUserPojo;
+import org.core.pojo.TbCollectPojo;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UserDto extends SysUserPojo {
+public class PlayListRes extends TbCollectPojo {
 }

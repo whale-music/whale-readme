@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.dto.MusicAllDto;
-import org.api.admin.model.dto.MusicPageDto;
-import org.api.admin.model.vo.MusicPageVo;
-import org.api.admin.model.vo.MusicVo;
+import org.api.admin.model.req.MusicAllReq;
+import org.api.admin.model.req.MusicPageReq;
+import org.api.admin.model.res.MusicPageRes;
+import org.api.admin.model.res.MusicRes;
 import org.core.config.SaveConfig;
 import org.core.pojo.*;
 import org.core.service.*;
@@ -88,16 +88,16 @@ public class PlayListApi {
         }
     }
     
-    private static void checkPage(MusicPageDto req) {
-        req.setPageIndex(Optional.ofNullable(req.getPageIndex()).orElse(0));
-        req.setPageNum(Optional.ofNullable(req.getPageNum()).orElse(20));
+    private static void checkPage(MusicPageReq req) {
+        req.getPage().setPageIndex(Optional.ofNullable(req.getPage().getPageIndex()).orElse(0));
+        req.getPage().setPageNum(Optional.ofNullable(req.getPage().getPageNum()).orElse(20));
     }
     
-    public Page<MusicVo> getAllMusic(MusicAllDto req) {
-        req.setPageIndex(Optional.ofNullable(req.getPageIndex()).orElse(0));
-        req.setPageNum(Optional.ofNullable(req.getPageNum()).orElse(200));
+    public Page<MusicRes> getAllMusic(MusicAllReq req) {
+        req.getPage().setPageIndex(Optional.ofNullable(req.getPage().getPageIndex()).orElse(0));
+        req.getPage().setPageNum(Optional.ofNullable(req.getPage().getPageNum()).orElse(200));
         
-        Page<TbMusicPojo> page = new Page<>(req.getPageIndex(), req.getPageNum());
+        Page<TbMusicPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         
         // 查询歌手表
         List<TbSingerPojo> singerList;
@@ -141,9 +141,9 @@ public class PlayListApi {
         if (!albumIds.isEmpty()) {
             tbAlbumPojos = albumService.listByIds(albumIds);
         }
-        List<MusicVo> musicVoList = new ArrayList<>();
+        List<MusicRes> musicResList = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
-            MusicVo m = new MusicVo();
+            MusicRes m = new MusicRes();
             BeanUtils.copyProperties(musicPojo, m);
     
             List<TbMusicSingerPojo> tbMusicSingerPojoList = new ArrayList<>();
@@ -199,16 +199,16 @@ public class PlayListApi {
                                                       .filter(tbAlbumPojo -> Objects.equals(tbAlbumPojo.getId(), musicPojo.getAlbumId()))
                                                       .findFirst();
             m.setAlbum(first.orElse(new TbAlbumPojo()));
-            
-            musicVoList.add(m);
+    
+            musicResList.add(m);
         }
-        Page<MusicVo> voPage = new Page<>();
+        Page<MusicRes> voPage = new Page<>();
         BeanUtils.copyProperties(page, voPage);
-        voPage.setRecords(musicVoList);
+        voPage.setRecords(musicResList);
         return voPage;
     }
     
-    public Page<MusicVo> getPlaylist(String playId, MusicAllDto req) {
+    public Page<MusicRes> getPlaylist(String playId, MusicAllReq req) {
         List<TbCollectMusicPojo> collectMusicList = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                                                      .eq(TbCollectMusicPojo::getCollectId, playId));
         List<Long> musicIds = collectMusicList.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
@@ -219,7 +219,7 @@ public class PlayListApi {
     /**
      * 获取音乐基本信息
      */
-    public Page<MusicPageVo> getMusicPage(MusicPageDto req) {
+    public Page<MusicPageRes> getMusicPage(MusicPageReq req) {
         checkPage(req);
         List<Long> musicIdList = new LinkedList<>();
         
@@ -230,7 +230,7 @@ public class PlayListApi {
         // 查询歌曲名
         musicIdList.addAll(getMusicIdByMusicName(req));
         
-        Page<TbMusicPojo> page = new Page<>(req.getPageIndex(), req.getPageNum());
+        Page<TbMusicPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
                                                           .in(CollUtil.isNotEmpty(musicIdList), TbMusicPojo::getId, musicIdList);
         pageOrderBy(req.getOrder(), req.getOrderBy(), wrapper);
@@ -262,18 +262,18 @@ public class PlayListApi {
         }
         
         // 填充信息
-        List<MusicPageVo> musicPageVos = new ArrayList<>();
+        List<MusicPageRes> musicPageRes = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
-            MusicPageVo e = new MusicPageVo();
-            e.setId(String.valueOf(musicPojo.getId()));
+            MusicPageRes e = new MusicPageRes();
+            e.setId(musicPojo.getId());
             e.setMusicName(musicPojo.getMusicName());
             e.setMusicNameAlias(musicPojo.getAliaName());
-            
+    
             // 专辑
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumMap.get(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             e.setAlbumId(tbAlbumPojo.getId());
             e.setAlbumName(tbAlbumPojo.getAlbumName());
-            
+    
             // 歌手
             // 获取歌手ID
             List<Long> collect = singerIds.stream()
@@ -290,11 +290,11 @@ public class PlayListApi {
             e.setTimeLength(musicPojo.getTimeLength());
             e.setCreateTime(musicPojo.getCreateTime());
             e.setOrder(req.getOrder());
-            musicPageVos.add(e);
+            musicPageRes.add(e);
         }
-        Page<MusicPageVo> pageVo = new Page<>();
+        Page<MusicPageRes> pageVo = new Page<>();
         BeanUtils.copyProperties(page, pageVo);
-        pageVo.setRecords(musicPageVos);
+        pageVo.setRecords(musicPageRes);
         return pageVo;
     }
     
@@ -303,7 +303,7 @@ public class PlayListApi {
      *
      * @return 歌曲ID
      */
-    private List<Long> getMusicIdByMusicName(MusicPageDto req) {
+    private List<Long> getMusicIdByMusicName(MusicPageReq req) {
         if (StringUtils.isNotBlank(req.getMusicName())) {
             List<TbMusicPojo> list = new ArrayList<>();
             // 音乐名
@@ -315,7 +315,7 @@ public class PlayListApi {
         return Collections.emptyList();
     }
     
-    private List<Long> getMusicIDByAlbumName(MusicPageDto req) {
+    private List<Long> getMusicIDByAlbumName(MusicPageReq req) {
         if (StringUtils.isNotBlank(req.getAlbumName())) {
             // 获取专辑ID
             LambdaQueryWrapper<TbAlbumPojo> like = Wrappers.<TbAlbumPojo>lambdaQuery()
@@ -337,7 +337,7 @@ public class PlayListApi {
      *
      * @return 歌曲ID
      */
-    private List<Long> getMusicIDBySingerName(MusicPageDto req) {
+    private List<Long> getMusicIDBySingerName(MusicPageReq req) {
         if (StringUtils.isNotBlank(req.getSingerName())) {
             LambdaQueryWrapper<TbSingerPojo> wrapper = Wrappers.lambdaQuery();
             List<TbSingerPojo> singerList = singerService.list(wrapper.like(TbSingerPojo::getSingerName, req.getSingerName()));

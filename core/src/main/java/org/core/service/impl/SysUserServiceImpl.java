@@ -57,6 +57,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUserPojo> 
         if (one == null) {
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
+        one.setPassword(null);
         return one;
     }
 }

@@ -1,9 +1,10 @@
-package org.api.admin.model.dto;
+package org.api.admin.model.req;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.api.admin.model.common.PageCommon;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class MusicPageDto implements Serializable {
+public class MusicPageReq implements Serializable {
     
     @ApiModelProperty("音乐名")
     private String musicName;
@@ -34,9 +35,6 @@ public class MusicPageDto implements Serializable {
     @ApiModelProperty(value = "结束时间")
     private LocalDateTime afterDate;
     
-    @ApiModelProperty("当前页数")
-    private Integer pageIndex;
-    
-    @ApiModelProperty("每页展示行数")
-    private Integer pageNum;
+    @ApiModelProperty("分页数据")
+    PageCommon page;
 }

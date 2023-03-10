@@ -1,7 +1,7 @@
 package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.model.dto.AudioInfoDto;
+import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.UploadMusicApi;
 import org.core.common.result.R;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -53,7 +53,7 @@ public class UploadMusicController {
      * @return 返回成功信息
      */
     @PostMapping("/music/info")
-    public R uploadMusicInfo(@Validated @RequestBody AudioInfoDto dto) throws IOException {
+    public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) throws IOException {
         uploadMusic.saveMusicInfo(dto);
         return R.success();
     }

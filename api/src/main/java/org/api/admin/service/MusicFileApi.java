@@ -1,7 +1,7 @@
 package org.api.admin.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import org.api.admin.model.vo.MusicFileVo;
+import org.api.admin.model.res.MusicFileRes;
 import org.core.config.SaveConfig;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.service.TbMusicUrlService;
@@ -29,29 +29,29 @@ public class MusicFileApi {
     private SaveConfig config;
     
     
-    public List<MusicFileVo> getMusic(Set<String> musicIds) {
-        List<MusicFileVo> files = new ArrayList<>();
+    public List<MusicFileRes> getMusic(Set<String> musicIds) {
+        List<MusicFileRes> files = new ArrayList<>();
         List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
-            MusicFileVo musicFileVo = new MusicFileVo();
+            MusicFileRes musicFileRes = new MusicFileRes();
             try {
                 OSSService aList = OSSFactory.ossFactory("AList");
                 String musicAddresses = aList.getMusicAddresses(
                         config.getHost(),
                         config.getObjectSave(),
                         tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType());
-                musicFileVo.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
-                musicFileVo.setSize(tbMusicUrlPojo.getSize());
-                musicFileVo.setLevel(tbMusicUrlPojo.getLevel());
-                musicFileVo.setMd5(tbMusicUrlPojo.getMd5());
-                musicFileVo.setRawUrl(musicAddresses);
-                musicFileVo.setExists(true);
+                musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
+                musicFileRes.setSize(tbMusicUrlPojo.getSize());
+                musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
+                musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
+                musicFileRes.setRawUrl(musicAddresses);
+                musicFileRes.setExists(true);
             } catch (Exception e) {
-                musicFileVo.setRawUrl("");
-                musicFileVo.setExists(false);
+                musicFileRes.setRawUrl("");
+                musicFileRes.setExists(false);
                 continue;
             }
-            files.add(musicFileVo);
+            files.add(musicFileRes);
         }
         return files;
     }

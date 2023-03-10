@@ -1,4 +1,4 @@
-package org.api.admin.model.vo;
+package org.api.admin.model.res;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class MusicVo extends TbMusicPojo {
+public class MusicRes extends TbMusicPojo {
     @ApiModelProperty("歌手")
     private List<TbSingerPojo> singerList;
     

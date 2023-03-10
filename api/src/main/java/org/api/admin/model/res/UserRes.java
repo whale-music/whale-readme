@@ -1,4 +1,4 @@
-package org.api.admin.model.vo;
+package org.api.admin.model.res;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,7 +9,7 @@ import org.core.pojo.SysUserPojo;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UserVo extends SysUserPojo {
+public class UserRes extends SysUserPojo {
     @ApiModelProperty("token")
     private String token;
     

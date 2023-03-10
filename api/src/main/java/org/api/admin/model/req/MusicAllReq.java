@@ -1,9 +1,10 @@
-package org.api.admin.model.dto;
+package org.api.admin.model.req;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.api.admin.model.common.PageCommon;
 import org.core.pojo.TbMusicPojo;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class MusicAllDto extends TbMusicPojo {
+public class MusicAllReq extends TbMusicPojo {
     @ApiModelProperty("歌曲ID列表")
     private List<Long> musicIds;
     
@@ -27,9 +28,5 @@ public class MusicAllDto extends TbMusicPojo {
     @ApiModelProperty(value = "数据排序", example = "true: ASC, false: DESC")
     private Boolean order;
     
-    @ApiModelProperty("当前页数")
-    private Integer pageIndex;
-    
-    @ApiModelProperty("每页展示行数")
-    private Integer pageNum;
+    PageCommon page;
 }

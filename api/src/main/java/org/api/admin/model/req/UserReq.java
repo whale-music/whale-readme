@@ -1,12 +1,12 @@
-package org.api.admin.model.vo;
+package org.api.admin.model.req;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbCollectPojo;
+import org.core.pojo.SysUserPojo;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class PlayListVo extends TbCollectPojo {
+public class UserReq extends SysUserPojo {
 }

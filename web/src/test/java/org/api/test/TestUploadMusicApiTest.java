@@ -4,9 +4,9 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.dto.AlbumDto;
-import org.api.admin.model.dto.AudioInfoDto;
-import org.api.admin.model.dto.SingerDto;
+import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.SingerReq;
 import org.api.admin.service.UploadMusicApi;
 import org.api.model.LikePlay;
 import org.api.model.album.Album;
@@ -53,15 +53,15 @@ class TestUploadMusicApiTest {
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
             Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
             for (SongsItem song : songDetail.getSongs()) {
-                AudioInfoDto dto = new AudioInfoDto();
-                AlbumDto album = new AlbumDto();
+                AudioInfoReq dto = new AudioInfoReq();
+                AlbumReq album = new AlbumReq();
                 album.setAlbumName(song.getAl().getName());
                 album.setPic(song.getAl().getPicUrl());
                 AlbumRes albumDto = RequestMusic163.getAlbumDto(song.getAl().getId(), cookie);
                 Optional<Album> dtoAlbumOpt = Optional.ofNullable(albumDto.getAlbum());
                 Album dtoAlbum = dtoAlbumOpt.orElse(new Album());
                 album.setDescription(StringUtils.isNotBlank(dtoAlbum.getDescription()) ? dtoAlbum.getDescription() : null);
-                
+    
                 dto.setAlbum(album);
                 dto.setMusicName(song.getName());
                 dto.setAliaName(song.getAlia());
@@ -69,22 +69,22 @@ class TestUploadMusicApiTest {
                 dto.setPic(dtoAlbum.getPicUrl());
                 
                 // 歌手
-                ArrayList<SingerDto> singer = new ArrayList<>();
+                ArrayList<SingerReq> singer = new ArrayList<>();
                 for (ArItem arItem : song.getAr()) {
-                    SingerDto singerDto = new SingerDto();
+                    SingerReq singerReq = new SingerReq();
                     SingerRes singerInfo = RequestMusic163.getSingerInfo(arItem.getId(), cookie);
                     // 歌手名
-                    singerDto.setSingerName(arItem.getName());
+                    singerReq.setSingerName(arItem.getName());
                     // 歌手别名
                     Data data = Optional.ofNullable(singerInfo.getData()).orElse(new Data());
                     // 歌手别名
                     Artist artist = Optional.ofNullable(data.getArtist()).orElse(new Artist());
-                    singerDto.setAlias(StringUtils.join(artist.getAlias(), ","));
+                    singerReq.setAlias(StringUtils.join(artist.getAlias(), ","));
                     // 歌手封面
-                    singerDto.setPic(artist.getCover());
+                    singerReq.setPic(artist.getCover());
                     // 歌手描述
-                    singerDto.setIntroduction(artist.getBriefDesc());
-                    singer.add(singerDto);
+                    singerReq.setIntroduction(artist.getBriefDesc());
+                    singer.add(singerReq);
                 }
                 // 歌词
                 try {

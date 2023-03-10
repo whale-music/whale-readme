@@ -2,8 +2,8 @@ package org.api.admin.service;
 
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.model.dto.UserDto;
-import org.api.admin.model.vo.UserVo;
+import org.api.admin.model.req.UserReq;
+import org.api.admin.model.res.UserRes;
 import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.service.SysUserService;
@@ -22,16 +22,16 @@ public class UserApi {
     @Autowired
     private SysUserService userService;
     
-    public void createAccount(UserDto req) {
+    public void createAccount(UserReq req) {
         userService.createAccount(req);
     }
     
-    public UserVo login(String phone, String password) {
+    public UserRes login(String phone, String password) {
         SysUserPojo userPojo = userService.login(phone, password);
         String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), JSON.toJSONString(userPojo));
-        UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(userPojo, userVo);
-        userVo.setToken(sign);
-        return userVo;
+        UserRes userRes = new UserRes();
+        BeanUtils.copyProperties(userPojo, userRes);
+        userRes.setToken(sign);
+        return userRes;
     }
 }

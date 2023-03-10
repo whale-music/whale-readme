@@ -1,4 +1,4 @@
-package org.api.admin.model.vo;
+package org.api.admin.model.res;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MusicFileVo {
+public class MusicFileRes {
     
     @ApiModelProperty("音乐ID")
     private String id;

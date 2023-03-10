@@ -1,4 +1,4 @@
-package org.api.admin.model.dto;
+package org.api.admin.model.req;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AudioInfoDto {
+public class AudioInfoReq {
     @ApiModelProperty("音乐ID")
     private Integer id;
     
@@ -33,10 +33,10 @@ public class AudioInfoDto {
     private String type;
     
     @ApiModelProperty("歌手")
-    private List<SingerDto> singer;
+    private List<SingerReq> singer;
     
     @ApiModelProperty("专辑")
-    private AlbumDto album;
+    private AlbumReq album;
     
     @ApiModelProperty("音乐歌词")
     private String lyric;

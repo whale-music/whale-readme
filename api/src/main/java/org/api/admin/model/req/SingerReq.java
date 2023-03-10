@@ -1,4 +1,4 @@
-package org.api.admin.model.dto;
+package org.api.admin.model.req;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,5 +8,5 @@ import org.core.pojo.TbSingerPojo;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class SingerDto extends TbSingerPojo {
+public class SingerReq extends TbSingerPojo {
 }

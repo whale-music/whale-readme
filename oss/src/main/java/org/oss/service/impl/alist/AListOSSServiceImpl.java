@@ -33,7 +33,8 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public String getMusicAddresses(String host, String objectSave, String path) {
         try {
-            String musicAddress = Request.getMusicAddress(host, objectSave, path);
+            String sign = Request.getMusicAddress(host, objectSave, path);
+            String musicAddress = String.format("%s/d/%s/%s?sign=%s", host, objectSave, path, sign);
             if (StringUtils.isBlank(musicAddress)) {
                 throw new BaseException();
             } else {

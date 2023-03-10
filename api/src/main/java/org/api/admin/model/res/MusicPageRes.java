@@ -1,4 +1,4 @@
-package org.api.admin.model.vo;
+package org.api.admin.model.res;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -14,10 +14,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class MusicPageVo implements Serializable {
+public class MusicPageRes implements Serializable {
     
     @ApiModelProperty("音乐ID")
-    private String id;
+    private Long id;
     
     @ApiModelProperty("音乐名")
     private String musicName;

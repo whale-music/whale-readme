@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicAllReq;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.model.res.MusicRes;
+import org.api.admin.utils.MyPageUtil;
 import org.core.config.SaveConfig;
 import org.core.pojo.*;
 import org.core.service.*;
@@ -74,24 +76,20 @@ public class PlayListApi {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
         switch (Optional.ofNullable(orderBy).orElse("")) {
             case "id":
-                musicWrapper.orderBy(order, order, TbMusicPojo::getId);
+                musicWrapper.orderBy(true, order, TbMusicPojo::getId);
                 break;
             case "updateTime":
-                musicWrapper.orderBy(order, order, TbMusicPojo::getUpdateTime);
+                musicWrapper.orderBy(true, order, TbMusicPojo::getUpdateTime);
                 break;
             case "createTime":
-                musicWrapper.orderBy(order, order, TbMusicPojo::getCreateTime);
+                musicWrapper.orderBy(true, order, TbMusicPojo::getCreateTime);
                 break;
             case "sort":
             default:
-                musicWrapper.orderBy(order, order, TbMusicPojo::getSort);
+                musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
         }
     }
     
-    private static void checkPage(MusicPageReq req) {
-        req.getPage().setPageIndex(Optional.ofNullable(req.getPage().getPageIndex()).orElse(0));
-        req.getPage().setPageNum(Optional.ofNullable(req.getPage().getPageNum()).orElse(20));
-    }
     
     public Page<MusicRes> getAllMusic(MusicAllReq req) {
         req.getPage().setPageIndex(Optional.ofNullable(req.getPage().getPageIndex()).orElse(0));
@@ -220,7 +218,7 @@ public class PlayListApi {
      * 获取音乐基本信息
      */
     public Page<MusicPageRes> getMusicPage(MusicPageReq req) {
-        checkPage(req);
+        req.setPage(MyPageUtil.checkPage(Optional.ofNullable(req.getPage()).orElse(new PageCommon())));
         List<Long> musicIdList = new LinkedList<>();
         
         // 查询歌手表

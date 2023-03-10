@@ -13,6 +13,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AlbumRes extends TbAlbumPojo {
+    @ApiModelProperty("专辑歌曲数量")
+    private Long albumSize;
+    
     @ApiModelProperty("歌手信息")
     private List<TbSingerPojo> singer;
     

@@ -8,11 +8,14 @@ import org.api.admin.model.common.PageCommon;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
 public class MusicPageReq implements Serializable {
+    @ApiModelProperty("歌曲ID列表")
+    private List<Long> musicIds;
     
     @ApiModelProperty("音乐名")
     private String musicName;

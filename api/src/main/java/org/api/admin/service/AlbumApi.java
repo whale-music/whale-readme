@@ -11,9 +11,11 @@ import org.api.admin.model.res.AlbumRes;
 import org.api.admin.utils.MyPageUtil;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbAlbumSingerPojo;
+import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbSingerPojo;
 import org.core.service.TbAlbumService;
 import org.core.service.TbAlbumSingerService;
+import org.core.service.TbMusicService;
 import org.core.service.TbSingerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,9 @@ public class AlbumApi {
     @Autowired
     private TbSingerService singerService;
     
+    @Autowired
+    private TbMusicService musicService;
+    
     
     public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
@@ -72,28 +77,14 @@ public class AlbumApi {
         LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         pageOrderBy(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
         lambdaQueryWrapper.in(CollUtil.isNotEmpty(albumListId), TbAlbumPojo::getId, albumListId);
-        // TODO 时间范围选择，Mybatis plus 不能完成
-        // boolean flag = req.getTimeBy() != null;
-        // if (flag && Boolean.TRUE.equals(req.getTimeBy())) {
-        //     lambdaQueryWrapper.between(req.getCreateTime() != null && req.getUpdateTime() != null,
-        //             TbAlbumPojo::getUpdateTime,
-        //             req.getBeforeTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-        //             req.getLaterTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        // } else if (flag) {
-        //     boolean condition = req.getCreateTime() != null && req.getUpdateTime() != null;
-        //     lambdaQueryWrapper.ge(condition,
-        //             TbAlbumPojo::getCreateTime,
-        //             req.getBeforeTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        //     lambdaQueryWrapper.le(condition,
-        //             TbAlbumPojo::getCreateTime,
-        //             req.getLaterTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        // }
+        
         // 查询全部专辑数据
         Page<TbAlbumPojo> albumPojoPage = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         albumService.page(albumPojoPage, lambdaQueryWrapper);
         
         // 获取专辑ID，以供查询歌手信息
         List<TbAlbumSingerPojo> albumSingerPojos = new ArrayList<>();
+        List<TbMusicPojo> musicPojoList = new ArrayList<>();
         Map<Long, TbSingerPojo> tbSingerPojoMap = new HashMap<>();
         if (CollUtil.isNotEmpty(albumPojoPage.getRecords())) {
             List<Long> collect = albumPojoPage.getRecords().stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
@@ -103,6 +94,11 @@ public class AlbumApi {
                                                                                        .map(TbAlbumSingerPojo::getSingerId)
                                                                                        .collect(Collectors.toList()));
             tbSingerPojoMap = tbSingerPojos.stream().collect(Collectors.toMap(TbSingerPojo::getId, tbSingerPojo -> tbSingerPojo));
+            
+            // 查询专辑中歌曲数量
+            if (CollUtil.isNotEmpty(collect)) {
+                musicPojoList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, collect));
+            }
         }
         
         
@@ -114,7 +110,7 @@ public class AlbumApi {
             albumRes.setSinger(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
             
-            // 获取专辑中所以歌手
+            // 获取专辑中所有歌手
             int[] singerIds = CollUtil.indexOfAll(albumSingerPojos,
                     tbAlbumSingerPojo -> ObjectUtil.equals(tbAlbumPojo.getId(), tbAlbumSingerPojo.getAlbumId()));
             for (int singerId : singerIds) {
@@ -122,11 +118,14 @@ public class AlbumApi {
                 TbSingerPojo tbSingerPojo = tbSingerPojoMap.get(singerId1);
                 albumRes.getSinger().add(tbSingerPojo);
             }
-    
-    
+            
+            // 获取专辑下歌曲数量
+            long count = musicPojoList.stream().filter(tbMusicPojo -> ObjectUtil.equals(tbAlbumPojo.getId(), tbMusicPojo.getAlbumId())).count();
+            albumRes.setAlbumSize(count);
+            
             albumRes.setOrderBy(req.getOrderBy());
             albumRes.setOrder(req.getOrder());
-    
+            
             page.getRecords().add(albumRes);
         }
     

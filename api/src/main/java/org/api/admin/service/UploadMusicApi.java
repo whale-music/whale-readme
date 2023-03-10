@@ -479,9 +479,11 @@ public class UploadMusicApi {
         List<TbSingerPojo> singList = singerService.list(Wrappers.<TbSingerPojo>lambdaQuery()
                                                                  .in(TbSingerPojo::getSingerName, singerNameList));
     
+        // 遍历前端传入的所有歌手信息
         for (SingerReq singerReq : singerReqList) {
             TbSingerPojo pojo = new TbSingerPojo();
             BeanUtils.copyProperties(singerReq, pojo);
+            // 覆盖数据中的数据，防止出现脏数据(多个相同的歌手)
             for (TbSingerPojo tbSingerPojo : singList) {
                 if (StringUtils.equalsIgnoreCase(singerReq.getSingerName(), tbSingerPojo.getSingerName())) {
                     // 歌曲家名字相同，就把数据库中的ID拷贝到前端传入的数据中，直接更新数据库

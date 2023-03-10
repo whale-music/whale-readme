@@ -44,24 +44,6 @@ public class AlbumApi {
     @Autowired
     private TbSingerService singerService;
     
-    /**
-     * 设置分页查询排序
-     */
-    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbAlbumPojo> musicWrapper) {
-        // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
-        switch (Optional.ofNullable(orderBy).orElse("")) {
-            case "id":
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getId);
-                break;
-            case "updateTime":
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getUpdateTime);
-                break;
-            case "createTime":
-            default:
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getCreateTime);
-                break;
-        }
-    }
     
     public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
@@ -140,14 +122,33 @@ public class AlbumApi {
                 TbSingerPojo tbSingerPojo = tbSingerPojoMap.get(singerId1);
                 albumRes.getSinger().add(tbSingerPojo);
             }
-            
-            
+    
+    
             albumRes.setOrderBy(req.getOrderBy());
             albumRes.setOrder(req.getOrder());
-            
+    
             page.getRecords().add(albumRes);
         }
-        
+    
         return page;
+    }
+    
+    /**
+     * 设置分页查询排序
+     */
+    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbAlbumPojo> musicWrapper) {
+        // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
+        switch (Optional.ofNullable(orderBy).orElse("")) {
+            case "id":
+                musicWrapper.orderBy(true, order, TbAlbumPojo::getId);
+                break;
+            case "updateTime":
+                musicWrapper.orderBy(true, order, TbAlbumPojo::getUpdateTime);
+                break;
+            case "createTime":
+            default:
+                musicWrapper.orderBy(true, order, TbAlbumPojo::getCreateTime);
+                break;
+        }
     }
 }

@@ -48,10 +48,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌单信息
-     *
-     * @param musicIds
-     * @param cookie
-     * @return
      */
     public static SongDetail getSongDetail(List<Integer> musicIds, String cookie) {
         String request = req(host + "/song/detail?ids=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
@@ -60,10 +56,6 @@ public class RequestMusic163 {
     
     /**
      * 获取专辑信息
-     *
-     * @param albumId
-     * @param cookie
-     * @return
      */
     public static AlbumRes getAlbumDto(Integer albumId, String cookie) {
         String request = req(host + "/album?id=" + albumId, cookie);
@@ -77,10 +69,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌曲下载地址
-     *
-     * @param musicIds
-     * @param cookie
-     * @return
      */
     public static SongUrl getSongUrl(List<Integer> musicIds, String cookie, int flag) {
         if (flag == 0) {
@@ -94,10 +82,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌曲下载地址
-     *
-     * @param musicIds
-     * @param cookie
-     * @return
      */
     public static SongUrl getSongUrlV1(List<Integer> musicIds, String cookie) {
         String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
@@ -106,10 +90,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌曲下载地址
-     *
-     * @param musicIds
-     * @param cookie
-     * @return
      */
     public static SongUrl getSongUrlV2(List<Integer> musicIds, String cookie) {
         String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=hires", cookie);
@@ -118,10 +98,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌词
-     *
-     * @param musicId
-     * @param cookie
-     * @return
      */
     public static Lyric getLyric(Integer musicId, String cookie) {
         String request = req(host + "/lyric/url?id=" + musicId, cookie);
@@ -130,10 +106,6 @@ public class RequestMusic163 {
     
     /**
      * 获取歌曲作者信息
-     *
-     * @param singerId
-     * @param cookie
-     * @return
      */
     public static SingerRes getSingerInfo(int singerId, String cookie) {
         String request = req(host + "/artist/detail?id=" + singerId, cookie);
@@ -143,10 +115,10 @@ public class RequestMusic163 {
     
     public static void download(String url, File saveFile) {
         try {
-            HttpUtil.downloadFile(url, saveFile, 600);
+            HttpUtil.downloadFile(url, saveFile, 60000);
         } catch (Exception e) {
             log.info("重试一次{}", url);
-            HttpUtil.downloadFile(url, saveFile, 600);
+            HttpUtil.downloadFile(url, saveFile, 60000);
         }
     }
 }

@@ -3,6 +3,7 @@ package org.api.test;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.PageUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.log.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.api.model.LikePlay;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class TestDownloadMusic {
@@ -20,18 +22,20 @@ class TestDownloadMusic {
     @Test
     void testDownloadMusic() {
         Log log = Log.get();
-        
+    
         String playId = "6389917304";
-        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c50a72fdf0cc97532e1e2f6d7efc8affd3519e07624a9f00535f3dd833cb266a5025ff223deb3065a43726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
+        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c5a61c09bbb039cd86abedcdb3013fda14519e07624a9f0053212155e70d424b8dfb6cda0c285e97283726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
         LikePlay like = RequestMusic163.like(playId, cookie);
-        
+    
         List<Integer> ids = like.getIds();
         int allPageIndex = PageUtil.totalPage(ids.size(), 20);
-        
+    
         File saveFile = FileUtil.mkdir(dest);
         List<String> fileNames = FileUtil.listFileNames(dest);
         List<String> fileMd5s = fileNames.stream().map(s -> StringUtils.split(s, '.')[0]).collect(Collectors.toList());
-        
+        // 获取所有文件名
+        Map<String, String> collect = fileNames.stream().collect(Collectors.toMap(s -> StringUtils.split(s, '.')[0], String::new));
+    
         for (int i = 0; i < allPageIndex; i++) {
             List<Integer> page = ListUtil.page(i, 20, ids);
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
@@ -54,6 +58,20 @@ class TestDownloadMusic {
                     }
                     log.info("\033[0;32m下载成功: {} 比特率: {} 时常: {} 大小{}\033[0m", datum.getMd5(), datum.getBr(), datum.getTime(), datum.getSize());
                 }
+                // 检测所有下载文件MD5值是否相同，不相同则删除
+                File dataFile = new File(dest + "\\" + collect.get(datum.getMd5()));
+                if (collect.get(datum.getMd5()) != null) {
+                    String md5 = SecureUtil.md5(dataFile);
+                    if (StringUtils.equals(datum.getMd5(), md5)) {
+                        log.info("Md5值一样");
+                    } else {
+                        log.error("\033[0;31mMd5值不一样!!!!!!!\033[0m" + datum.getMd5() + "\n" + md5);
+                        FileUtil.del(dataFile);
+                        log.error("\n\033[0;31m已删除不一样数据\033[0m");
+                    }
+                    System.out.println(md5);
+                }
+            
             });
         }
     }

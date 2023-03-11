@@ -54,7 +54,7 @@ save-config:
   # 保存模式
   save-mode: AList
   # 请求对象地址 (必须)
-  object-save: fenmiaozhen/music
+  object-save: tianyiyun/music
   # 请求地址(必须)
   host: http://43.139.22.243:5244
   # 账户(可选)

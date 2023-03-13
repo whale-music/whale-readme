@@ -9,7 +9,7 @@ import org.core.common.result.ResultCode;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbUserSingerPojo;
-import org.core.service.SysUserService;
+import org.core.service.AccountService;
 import org.core.service.TbCollectService;
 import org.core.service.TbUserSingerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class UserApi {
     // 用户服务
     @Autowired
-    private SysUserService userService;
+    private AccountService accountService;
     
     // 歌单表
     @Autowired
@@ -45,7 +45,7 @@ public class UserApi {
      * @param user 用户信息
      */
     public void createAccount(SysUserPojo user) {
-        userService.createAccount(user);
+        accountService.createAccount(user);
     }
     
     /**
@@ -55,7 +55,7 @@ public class UserApi {
      * @return 用户信息
      */
     public SysUserPojo getAccount(Long userId) {
-        SysUserPojo userPojo = userService.getById(userId);
+        SysUserPojo userPojo = accountService.getById(userId);
         if (userPojo == null) {
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
@@ -70,7 +70,7 @@ public class UserApi {
      * @return 返回用户信息
      */
     public SysUserPojo login(String phone, String password) {
-        return userService.login(phone, password);
+        return accountService.login(phone, password);
     }
     
     /**
@@ -79,7 +79,7 @@ public class UserApi {
      * @param userPojo 用户信息
      */
     public void updateUserPojo(SysUserPojo userPojo) {
-        boolean b = userService.updateById(userPojo);
+        boolean b = accountService.updateById(userPojo);
         if (b) {
             log.debug("用户名初始化成功");
         } else {

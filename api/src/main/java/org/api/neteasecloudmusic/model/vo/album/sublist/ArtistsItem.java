@@ -16,8 +16,8 @@ public class ArtistsItem {
     private Integer topicPerson;
     private String briefDesc;
     private String name;
-    private List<Object> alias;
-    private Integer id;
+    private List<String> alias;
+    private Long id;
     private Integer picId;
     private String trans;
 }

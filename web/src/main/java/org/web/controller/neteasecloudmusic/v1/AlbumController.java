@@ -1,5 +1,6 @@
 package org.web.controller.neteasecloudmusic.v1;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.model.vo.album.sublist.AlbumSubListRes;
 import org.api.neteasecloudmusic.service.AlbumApi;
@@ -26,6 +27,7 @@ public class AlbumController {
         SysUserPojo user = UserUtil.getUser();
         AlbumSubListRes res = albumApi.albumSubList(user, limit, offset);
         NeteaseResult r = new NeteaseResult();
-        return r;
+        r.putAll(BeanUtil.beanToMap(res));
+        return r.success();
     }
 }

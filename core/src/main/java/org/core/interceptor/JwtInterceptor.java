@@ -1,5 +1,6 @@
 package org.core.interceptor;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -45,6 +46,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/playlist/delete",
                 "/playlist/subscribe",
                 "/playlist/tracks",
+                "/album/sublist",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
@@ -74,7 +76,9 @@ public class JwtInterceptor implements HandlerInterceptor {
                             ResultCode.TOKEN_INVALID.getResultMsg()));
             return false;
         }
-        
+    
+        // 取出Cookie的前缀，如果有的话
+        token = CharSequenceUtil.removePrefix(token, "Cookie=");
         // 验证 token
         try {
             JwtUtil.checkSign(token);

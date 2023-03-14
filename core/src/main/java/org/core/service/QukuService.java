@@ -1,9 +1,6 @@
 package org.core.service;
 
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
-import org.core.pojo.TbSingerPojo;
+import org.core.pojo.*;
 
 import java.util.List;
 import java.util.Set;
@@ -67,4 +64,18 @@ public interface QukuService {
      * 查询专辑下音乐数量
      */
     Integer getAlbumMusicSizeByMusicId(Long musicId);
+    
+    /**
+     * 获取专辑歌手列表
+     */
+    List<TbSingerPojo> getSingerListByAlbumIds(Long albumIds);
+    
+    /**
+     * 获取专辑歌手列表
+     */
+    List<TbSingerPojo> getSingerListByAlbumIds(List<Long> albumIds);
+    
+    
+    List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo userPojo, Long current, Long size);
+    
 }

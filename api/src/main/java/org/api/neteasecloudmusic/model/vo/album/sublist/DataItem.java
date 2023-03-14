@@ -12,8 +12,8 @@ public class DataItem {
     private List<ArtistsItem> artists;
     private List<Object> transNames;
     private String name;
-    private List<Object> alias;
-    private Integer id;
+    private List<String> alias;
+    private Long id;
     private Long subTime;
     private Long picId;
 }

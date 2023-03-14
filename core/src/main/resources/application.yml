@@ -1,6 +1,6 @@
 server:
   # 配置启动端口号
-  port: 3000
+  port: 8000
   servlet:
     session:
       timeout: 259200000000

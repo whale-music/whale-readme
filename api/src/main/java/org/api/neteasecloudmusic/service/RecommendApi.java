@@ -7,10 +7,10 @@ import org.api.neteasecloudmusic.model.vo.personalfm.Album;
 import org.api.neteasecloudmusic.model.vo.personalfm.ArtistsItem;
 import org.api.neteasecloudmusic.model.vo.personalfm.DataItem;
 import org.api.neteasecloudmusic.model.vo.personalfm.PersonalFMRes;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
-import org.core.pojo.TbSingerPojo;
+import org.api.neteasecloudmusic.model.vo.personalized.PersonalizedRes;
+import org.api.neteasecloudmusic.model.vo.personalized.ResultItem;
+import org.core.pojo.*;
+import org.core.service.PlayListService;
 import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,10 @@ public class RecommendApi {
      */
     @Autowired
     private MusicCommonApi musicCommonApi;
+    
+    
+    @Autowired
+    private PlayListService playListService;
     
     public PersonalFMRes personalFM() {
         PersonalFMRes res = new PersonalFMRes();
@@ -85,4 +89,20 @@ public class RecommendApi {
     }
     
     
+    public PersonalizedRes personalized(Long limit) {
+        List<TbCollectPojo> tbCollectPojos = playListService.randomPlayList(limit);
+        PersonalizedRes personalizedRes = new PersonalizedRes();
+        List<ResultItem> result = new ArrayList<>();
+        for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
+            ResultItem e = new ResultItem();
+            e.setId(tbCollectPojo.getId());
+            e.setName(tbCollectPojo.getPlayListName());
+            e.setPicUrl(tbCollectPojo.getPic());
+            e.setCanDislike(true);
+            e.setTrackNumberUpdateTime(tbCollectPojo.getUpdateTime().getNano());
+            result.add(e);
+        }
+        personalizedRes.setResult(result);
+        return personalizedRes;
+    }
 }

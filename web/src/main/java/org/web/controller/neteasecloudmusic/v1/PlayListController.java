@@ -7,12 +7,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.neteasecloudmusic.model.vo.createplatlist.CreatePlaylistVo;
 import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
+import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
+import org.core.service.PlayListService;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +40,9 @@ public class PlayListController {
     
     @Autowired
     private CollectApi collect;
+    
+    @Autowired
+    private PlayListService playListService;
     
     /**
      * 创建歌单
@@ -272,4 +277,19 @@ public class PlayListController {
         r.put("checkPoint", 1668601332328L);
         return r.success();
     }
+    
+    /**
+     * 获取歌单详情（包括歌曲ID）
+     *
+     * @return ID
+     */
+    @GetMapping("/playlist/detail")
+    public NeteaseResult playlistDetail(@RequestParam("id") Long id) {
+        PlayListDetailRes res = collect.playlistDetail(id);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(res));
+        return r.success();
+    }
+    
+    
 }

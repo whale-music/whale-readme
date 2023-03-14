@@ -27,10 +27,10 @@ public class MusicCommonApi {
     private SaveConfig config;
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId) {
-        return getMusicUrlListByMusicIds(Set.of(musicId));
+        return getMusicUrlByMusicId(Set.of(musicId));
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlListByMusicIds(Set<Long> musicIds) {
+    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds) {
         List<TbMusicUrlPojo> list = qukuService.getMusicUrl(musicIds);
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
             try {

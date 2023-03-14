@@ -30,19 +30,32 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
         // 放行路径
         String[] passPath = {
-                "/login/cellphone",
-                "/register/account",
+                "/music/info",
+                "/login/refresh",
                 "/logout",
-                "/admin/user/register",
-                "/admin/user/login",
+                "/refreshToken",
+                "/user/subcount",
+                "/user/account",
+                "/like",
+                "/activate/init/profile",
+                "/playlist/create",
+                "/playlist/name/update",
+                "/playlist/desc/update",
+                "/playlist/tags/update",
+                "/playlist/delete",
+                "/playlist/subscribe",
+                "/playlist/tracks",
         };
         // 放行登录和注册,注销
-        if (Arrays.asList(passPath).contains(request.getRequestURI())) {
+        if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
             return true;
         }
         log.debug(request.getPathInfo());
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
+        if (token == null) {
+            token = request.getHeader("cookie");
+        }
         log.debug("token值：{}", token);
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {

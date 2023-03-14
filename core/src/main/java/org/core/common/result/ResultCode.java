@@ -12,7 +12,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 默认失败状态码 */
     ERROR("100", "操作失败，未知指定错误信息"),
-    
+    QR_ERROR("800", "二维码不存在或已过期"),
     
     /* 参数错误：10001-19999 */
     PARAM_IS_INVALID("10001", "参数无效"),

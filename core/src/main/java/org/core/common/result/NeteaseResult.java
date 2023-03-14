@@ -30,6 +30,18 @@ public class NeteaseResult extends HashMap<String, Object> {
     }
     
     /**
+     * 成功
+     */
+    public NeteaseResult success(Object o) {
+        this.code = ResultCode.SUCCESS.getCode();
+        this.message = ResultCode.SUCCESS.getResultMsg();
+        put("data", o);
+        put("code", code);
+        put("message", message);
+        return this;
+    }
+    
+    /**
      * 失败
      */
     public NeteaseResult error(String code) {
@@ -47,5 +59,12 @@ public class NeteaseResult extends HashMap<String, Object> {
         put("code", code);
         put("message ", message);
         return this;
+    }
+    
+    /**
+     * 失败
+     */
+    public NeteaseResult error(ResultCode resultCode) {
+        return error(resultCode.getCode(), resultCode.getResultMsg());
     }
 }

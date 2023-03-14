@@ -1,7 +1,10 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.http.Header;
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.exception.BaseException;
@@ -9,15 +12,18 @@ import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
+import org.core.utils.GlobeDataUtil;
+import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.web.controller.BaseController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * <p>
@@ -38,6 +44,8 @@ public class LoginController extends BaseController {
     @Autowired
     private UserApi user;
     
+    private final String COOKIE = "cookie";
+    
     /**
      * 登录接口
      *
@@ -51,6 +59,72 @@ public class LoginController extends BaseController {
         NeteaseResult r = getNeteaseResult(jwtConfig, response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
+    }
+    
+    @GetMapping("/login/qr/key")
+    public NeteaseResult qrKey() {
+        UUID uuid = UUID.randomUUID();
+        GlobeDataUtil.setData(uuid.toString(), uuid.toString());
+        
+        NeteaseResult r = new NeteaseResult();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("code", 200);
+        map.put("unikey", uuid.toString());
+        return r.success(map);
+    }
+    
+    @GetMapping("/login/qr/create")
+    public NeteaseResult qrCreate(@RequestParam("key") String key) {
+        String data = GlobeDataUtil.getData(key);
+        NeteaseResult r = new NeteaseResult();
+        if (data == null) {
+            r.put(COOKIE, "");
+            return r.error(ResultCode.QR_ERROR);
+        }
+        String value = "/login/sure?" + data;
+        r.put("qrurl", value);
+        r.put("qrimg", Base64Util.encode(value));
+        return r;
+    }
+    
+    @GetMapping("/login/sure")
+    public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) {
+        String data = GlobeDataUtil.getData(codekey);
+        NeteaseResult r = new NeteaseResult();
+        if (data == null) {
+            r.put(COOKIE, "");
+            return r.error("800", "二维码不存在或已过期");
+        }
+        SysUserPojo userPojo = user.login(phone, password);
+        GlobeDataUtil.setData(codekey, JSON.toJSONString(userPojo));
+        return r.success();
+    }
+    
+    @GetMapping("/login/qr/check")
+    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
+        String data = GlobeDataUtil.getData(key);
+        if (data == null) {
+            NeteaseResult r = new NeteaseResult();
+            r.put(COOKIE, "");
+            return r.error("800", "二维码不存在或已过期");
+        }
+        if (Objects.equals(key, data)) {
+            NeteaseResult r = new NeteaseResult();
+            r.put(COOKIE, "");
+            return r.error("801", "等待扫码");
+        }
+        SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
+        String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), data);
+        GlobeDataUtil.remove(key);
+        
+        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
+        response.addCookie(cookie);
+        
+        NeteaseResult r = new NeteaseResult();
+        r.put("code", 803);
+        r.put("message", "授权登陆成功");
+        r.put(COOKIE, sign);
+        return r;
     }
     
     /**

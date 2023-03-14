@@ -442,6 +442,7 @@ public class CollectApi {
             tracks.add(e);
         }
         playlist.setTracks(tracks);
+    
         playListRes.setPlaylist(playlist);
         return playListRes;
     }

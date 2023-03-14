@@ -26,6 +26,7 @@ import org.web.controller.BaseController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -83,7 +84,8 @@ public class UserController extends BaseController {
      * @return 返回用户歌单
      */
     @GetMapping("/user/playlist")
-    public NeteaseResult userPlayList(@RequestParam("uid") String uid, Long pageSize, Long pageIndex) {
+    public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, Long pageSize, Long pageIndex) {
+        uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         if (pageIndex == null || pageSize == null) {
             pageIndex = 0L;
             pageSize = 30L;

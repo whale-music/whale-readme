@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
+import org.core.config.CookieConfig;
 import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
@@ -44,7 +45,6 @@ public class LoginController extends BaseController {
     @Autowired
     private UserApi user;
     
-    private final String COOKIE = "cookie";
     
     /**
      * 登录接口
@@ -78,7 +78,7 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(key);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
-            r.put(COOKIE, "");
+            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
             return r.error(ResultCode.QR_ERROR);
         }
         String value = "/login/sure?" + data;
@@ -92,7 +92,7 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(codekey);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
-            r.put(COOKIE, "");
+            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
             return r.error("800", "二维码不存在或已过期");
         }
         SysUserPojo userPojo = user.login(phone, password);
@@ -105,12 +105,12 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
-            r.put(COOKIE, "");
+            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
             return r.error("800", "二维码不存在或已过期");
         }
         if (Objects.equals(key, data)) {
             NeteaseResult r = new NeteaseResult();
-            r.put(COOKIE, "");
+            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
@@ -123,7 +123,7 @@ public class LoginController extends BaseController {
         NeteaseResult r = new NeteaseResult();
         r.put("code", 803);
         r.put("message", "授权登陆成功");
-        r.put(COOKIE, sign);
+        r.put(CookieConfig.COOKIE_NAME_COOKIE, CookieConfig.COOKIE_NAME_MUSIC_U + "=" + sign);
         return r;
     }
     

@@ -6,6 +6,7 @@ import org.api.neteasecloudmusic.model.vo.user.Account;
 import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.core.common.result.NeteaseResult;
+import org.core.config.CookieConfig;
 import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
@@ -61,9 +62,11 @@ public class BaseController {
         String userStr = JSON.toJSONString(userPojo);
         String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
-        response.addCookie(cookie);
-        
+        Cookie cookie1 = new Cookie(CookieConfig.COOKIE_NAME_COOKIE, sign);
+        Cookie cookie2 = new Cookie(CookieConfig.COOKIE_NAME_MUSIC_U, sign);
+        response.addCookie(cookie1);
+        response.addCookie(cookie2);
+    
         NeteaseResult r = new NeteaseResult();
         r.put("token", sign);
         return r;

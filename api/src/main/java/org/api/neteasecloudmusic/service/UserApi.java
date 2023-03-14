@@ -93,9 +93,9 @@ public class UserApi {
      * @param uid 用户ID
      * @return 返回用户所有歌单
      */
-    public Page<TbCollectPojo> getPlayList(String uid, Long pageIndex, Long pageSize) {
+    public Page<TbCollectPojo> getPlayList(Long uid, Long pageIndex, Long pageSize) {
         LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getUserId, Long.valueOf(uid))
+                                                                       .eq(TbCollectPojo::getUserId, uid)
                                                                        .orderByDesc(TbCollectPojo::getSort);
         return collectService.page(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
     }

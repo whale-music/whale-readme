@@ -1,13 +1,12 @@
 package org.core.interceptor;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
+import org.core.config.CookieConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
@@ -18,7 +17,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
@@ -49,6 +47,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/playlist/tracks",
                 "/album/sublist",
                 "/artist/sublist",
+                "/user/playlist",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
@@ -57,49 +56,33 @@ public class JwtInterceptor implements HandlerInterceptor {
         log.debug(request.getPathInfo());
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
-        if (token == null) {
-            token = request.getHeader("cookie");
-        }
         log.debug("token值：{}", token);
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
-            Optional<Cookie> first = Arrays.stream(request.getCookies())
-                                           .filter(cookie -> !"undefined".equalsIgnoreCase(cookie.getValue()))
-                                           .filter(cookie -> Header.COOKIE.getValue()
-                                                                          .equalsIgnoreCase(cookie.getName()))
-                                           .findFirst();
-            token = first.map(Cookie::getValue).orElse(null);
-        }
-        // 判断是否携带用户信息
-        if (token == null) {
-            response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter()
-                    .println(R.error(ResultCode.TOKEN_INVALID.getCode(),
-                            ResultCode.TOKEN_INVALID.getResultMsg()));
-            return false;
-        }
-    
-        // 多个Cookie下，获取需要Cookie
-        String[] split = StringUtils.split(token, ";");
-        if (split.length > 0) {
-            for (String s : split) {
-                if (CharSequenceUtil.contains(s, Header.COOKIE.getValue())) {
-                    token = s;
+            for (Cookie cookie : request.getCookies()) {
+                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE)) {
+                    token = cookie.getValue();
+                    break;
+                }
+                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_MUSIC_U)) {
+                    token = cookie.getValue();
                     break;
                 }
             }
         }
+        // 判断是否携带用户信息
+        if (token == null) {
+            response.setHeader("content-type", "application/json; charset=utf-8");
+            response.getWriter().println(R.error(ResultCode.TOKEN_INVALID.getCode(), ResultCode.TOKEN_INVALID.getResultMsg()));
+            return false;
+        }
     
-        // 取出Cookie的前缀，如果有的话
-        token = CharSequenceUtil.removePrefix(token, "Cookie=");
         // 验证 token
         try {
             JwtUtil.checkSign(token);
         } catch (JWTVerificationException e) {
             response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter()
-                    .println(R.error(ResultCode.COOKIE_INVALID.getCode(),
-                            ResultCode.COOKIE_INVALID.getResultMsg()));
+            response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
             return false;
         }
         

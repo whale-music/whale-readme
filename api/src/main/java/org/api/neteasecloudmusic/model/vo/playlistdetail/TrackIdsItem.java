@@ -11,7 +11,7 @@ public class TrackIdsItem {
     private Integer v;
     private Object f;
     private String rcmdReason;
-    private Integer id;
+    private Long id;
     private Object alg;
     private Object sr;
 }

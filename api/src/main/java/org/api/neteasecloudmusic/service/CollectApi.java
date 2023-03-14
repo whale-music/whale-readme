@@ -412,6 +412,7 @@ public class CollectApi {
         playlist.setCreator(creator);
         
         ArrayList<TracksItem> tracks = new ArrayList<>();
+        ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
         for (TbMusicPojo tbMusicPojo : playListAllMusic) {
             TracksItem e = new TracksItem();
             e.setId(tbMusicPojo.getId());
@@ -430,7 +431,7 @@ public class CollectApi {
                 ar.add(e1);
             }
             e.setAr(ar);
-            
+    
             // 专辑数据
             TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
             Al al = new Al();
@@ -438,11 +439,16 @@ public class CollectApi {
             al.setName(albumByAlbumId.getAlbumName());
             al.setPicUrl(albumByAlbumId.getPic());
             e.setAl(al);
-            
+    
             tracks.add(e);
+    
+    
+            TrackIdsItem trackIdsItem = new TrackIdsItem();
+            trackIdsItem.setId(tbMusicPojo.getId());
+            trackIds.add(trackIdsItem);
         }
         playlist.setTracks(tracks);
-    
+        playlist.setTrackIds(trackIds);
         playListRes.setPlaylist(playlist);
         return playListRes;
     }

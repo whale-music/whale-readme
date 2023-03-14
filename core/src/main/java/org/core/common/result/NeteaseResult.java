@@ -24,7 +24,7 @@ public class NeteaseResult extends HashMap<String, Object> {
     public NeteaseResult success() {
         this.code = ResultCode.SUCCESS.getCode();
         this.message = ResultCode.SUCCESS.getResultMsg();
-        put("code", code);
+        put("code", Integer.valueOf(code));
         put("message", message);
         return this;
     }

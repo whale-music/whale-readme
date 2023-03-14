@@ -76,6 +76,26 @@ public interface QukuService {
     List<TbSingerPojo> getSingerListByAlbumIds(List<Long> albumIds);
     
     
-    List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo userPojo, Long current, Long size);
+    /**
+     * 获取用户收藏专辑
+     *
+     * @param user    用户信息
+     * @param current 当前页数
+     * @param size    每页数量
+     */
+    List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo user, Long current, Long size);
     
+    /**
+     * 获取用户关注歌手
+     *
+     * @param user 用户信息
+     */
+    List<TbSingerPojo> getUserLikeSingerList(SysUserPojo user);
+    
+    /**
+     * 获取歌手所有专辑数量
+     *
+     * @param id 歌手ID
+     */
+    Integer getAlbumCountBySingerId(Long id);
 }

@@ -5,6 +5,7 @@ import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
 import org.core.pojo.SysUserPojo;
@@ -47,6 +48,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/playlist/subscribe",
                 "/playlist/tracks",
                 "/album/sublist",
+                "/artist/sublist",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
@@ -75,6 +77,17 @@ public class JwtInterceptor implements HandlerInterceptor {
                     .println(R.error(ResultCode.TOKEN_INVALID.getCode(),
                             ResultCode.TOKEN_INVALID.getResultMsg()));
             return false;
+        }
+    
+        // 多个Cookie下，获取需要Cookie
+        String[] split = StringUtils.split(token, ";");
+        if (split.length > 0) {
+            for (String s : split) {
+                if (CharSequenceUtil.contains(s, Header.COOKIE.getValue())) {
+                    token = s;
+                    break;
+                }
+            }
         }
     
         // 取出Cookie的前缀，如果有的话

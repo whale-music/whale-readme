@@ -43,6 +43,8 @@ public class QukuServiceImpl implements QukuService {
     @Autowired
     private TbAlbumSingerService albumSingerService;
     
+    @Autowired
+    private TbUserSingerService userSingerService;
     
     /**
      * 获取专辑信息
@@ -190,18 +192,45 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 查询用户收藏专辑
      *
-     * @param userPojo 用户数据
-     * @param current  当前页数
-     * @param size     每页多少数据
+     * @param user    用户数据
+     * @param current 当前页数
+     * @param size    每页多少数据
      */
     @Override
-    public List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo userPojo, Long current, Long size) {
+    public List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo user, Long current, Long size) {
         List<TbUserAlbumPojo> userAlbumPojoList = userAlbumService.list(Wrappers.<TbUserAlbumPojo>lambdaQuery()
-                                                                                .eq(TbUserAlbumPojo::getUserId, userPojo.getId()));
+                                                                                .eq(TbUserAlbumPojo::getUserId, user.getId()));
         if (CollUtil.isEmpty(userAlbumPojoList)) {
             return Collections.emptyList();
         }
         List<Long> albumIds = userAlbumPojoList.stream().map(TbUserAlbumPojo::getAlbumId).collect(Collectors.toList());
         return getAlbumListByAlbumId(albumIds);
+    }
+    
+    
+    /**
+     * 获取用户关注歌手
+     *
+     * @param user 用户信息
+     */
+    @Override
+    public List<TbSingerPojo> getUserLikeSingerList(SysUserPojo user) {
+        List<TbUserSingerPojo> userLikeSinger = userSingerService.list(Wrappers.<TbUserSingerPojo>lambdaQuery()
+                                                                               .eq(TbUserSingerPojo::getUserId, user.getId()));
+        if (CollUtil.isEmpty(userLikeSinger)) {
+            return Collections.emptyList();
+        }
+        List<Long> singerIds = userLikeSinger.stream().map(TbUserSingerPojo::getSingerId).collect(Collectors.toList());
+        return singerService.listByIds(singerIds);
+    }
+    
+    /**
+     * 获取歌手所有专辑数量
+     *
+     * @param id 歌手ID
+     */
+    @Override
+    public Integer getAlbumCountBySingerId(Long id) {
+        return Math.toIntExact(albumSingerService.count(Wrappers.<TbAlbumSingerPojo>lambdaQuery().eq(TbAlbumSingerPojo::getSingerId, id)));
     }
 }

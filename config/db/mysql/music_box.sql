@@ -246,6 +246,14 @@ create table if not exists tb_tag
 )
     comment '标签表（风格）';
 
+create table if not exists tb_user_album
+(
+    user_id  bigint not null comment '用户ID',
+    album_id bigint not null comment '专辑ID',
+    primary key (user_id, album_id)
+)
+    comment '用户收藏专辑表';
+
 create table if not exists tb_user_singer
 (
     user_id   bigint not null comment '用户ID',
@@ -253,10 +261,4 @@ create table if not exists tb_user_singer
     primary key (user_id, singer_id)
 )
     comment '用户关注歌曲家';
-
-create index tb_user_singer_user_id_index
-    on tb_user_singer (user_id);
-
-create index tb_user_singer_user_id_index_2
-    on tb_user_singer (user_id);
 

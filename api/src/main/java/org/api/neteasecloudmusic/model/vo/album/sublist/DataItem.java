@@ -1,0 +1,19 @@
+package org.api.neteasecloudmusic.model.vo.album.sublist;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class DataItem {
+    private List<Object> msg;
+    private String picUrl;
+    private Integer size;
+    private List<ArtistsItem> artists;
+    private List<Object> transNames;
+    private String name;
+    private List<Object> alias;
+    private Integer id;
+    private Long subTime;
+    private Long picId;
+}

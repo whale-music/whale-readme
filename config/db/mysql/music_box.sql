@@ -58,13 +58,16 @@ create index sys_user_username_index
 
 create table if not exists tb_album
 (
-    id          bigint       not null comment '专辑表ID'
+    id           bigint       not null comment '专辑表ID'
         primary key,
-    album_name  varchar(512) not null comment '专辑名',
-    description text         null comment '专辑简介',
-    pic         varchar(512) null comment '专辑封面地址',
-    update_time datetime     null comment '修改时间',
-    create_time datetime     null comment '创建时间'
+    album_name   varchar(512) not null comment '专辑名',
+    alias_name   varchar(512) null comment '专辑别名',
+    description  text         null comment '专辑简介',
+    company      varchar(256) null comment '发行公司',
+    pic          varchar(512) null comment '专辑封面地址',
+    publish_time datetime     null comment '专辑发布时间',
+    create_time  datetime     null comment '创建时间',
+    update_time  datetime     null comment '修改时间'
 )
     comment '歌曲专辑表';
 

@@ -14,7 +14,6 @@ import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
-import org.core.service.PlayListService;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,8 +40,6 @@ public class PlayListController {
     @Autowired
     private CollectApi collect;
     
-    @Autowired
-    private PlayListService playListService;
     
     /**
      * 创建歌单
@@ -270,7 +267,8 @@ public class PlayListController {
     }
     
     @GetMapping("/likelist")
-    public NeteaseResult likelist(@RequestParam("uid") Long uid) {
+    public NeteaseResult likelist(@RequestParam(value = "uid", required = false) Long uid) {
+        uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         List<Long> ids = collect.likelist(uid);
         NeteaseResult r = new NeteaseResult();
         r.put("ids", ids);

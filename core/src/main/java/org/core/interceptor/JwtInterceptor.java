@@ -48,6 +48,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/album/sublist",
                 "/artist/sublist",
                 "/user/playlist",
+                "/likelist",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
@@ -60,11 +61,8 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
             for (Cookie cookie : request.getCookies()) {
-                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE)) {
-                    token = cookie.getValue();
-                    break;
-                }
-                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_MUSIC_U)) {
+                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
+                        CookieConfig.COOKIE_NAME_MUSIC_U)) {
                     token = cookie.getValue();
                     break;
                 }

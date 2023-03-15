@@ -209,7 +209,7 @@ public class UploadMusicApi {
             LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
         }
         // 保存歌手和音乐中间表
-        List<Long> singIds = saveAndReturnMusicAndSingList(dto);
+        Set<Long> singIds = saveAndReturnMusicAndSingList(dto);
         // 保存专辑表，如果没有则新建。
         TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, singIds);
         // 保存音乐表
@@ -226,16 +226,21 @@ public class UploadMusicApi {
      * @param singIds   歌手ID
      * @param musicPojo 音乐信息
      */
-    private void saveSinger(List<Long> singIds, TbMusicPojo musicPojo) {
+    private void saveSinger(Set<Long> singIds, TbMusicPojo musicPojo) {
         if (IterUtil.isNotEmpty(singIds)) {
-            List<TbMusicSingerPojo> entityList = new ArrayList<>();
+            // 删除关联的音乐与歌手关联的ID
+            musicSingerService.remove(Wrappers.<TbMusicSingerPojo>lambdaQuery()
+                                              .eq(TbMusicSingerPojo::getMusicId, musicPojo.getId())
+                                              .in(TbMusicSingerPojo::getSingerId, singIds));
+            // 保存音乐关联歌手数据
+            Set<TbMusicSingerPojo> entityList = new HashSet<>();
             for (Long singId : singIds) {
                 TbMusicSingerPojo entity = new TbMusicSingerPojo();
                 entity.setMusicId(musicPojo.getId());
                 entity.setSingerId(singId);
                 entityList.add(entity);
             }
-            musicSingerService.saveOrUpdateBatch(entityList);
+            musicSingerService.saveBatch(entityList, entityList.size());
         }
     }
     
@@ -292,7 +297,7 @@ public class UploadMusicApi {
      * @return 音乐信息
      */
     @NotNull
-    private TbMusicPojo saveAndReturnMusicPojo(AudioInfoReq dto, List<Long> singerIds, TbAlbumPojo albumPojo) {
+    private TbMusicPojo saveAndReturnMusicPojo(AudioInfoReq dto, Set<Long> singerIds, TbAlbumPojo albumPojo) {
         String aliaNames = CollUtil.join(dto.getAliaName(), ",");
         // 如果有ID则直接更新
         if (dto.getId() != null) {
@@ -390,7 +395,7 @@ public class UploadMusicApi {
      * @param singerIds 音乐和歌手列表
      * @return 专辑表
      */
-    private TbAlbumPojo saveAndReturnAlbumPojo(AudioInfoReq dto, List<Long> singerIds) {
+    private TbAlbumPojo saveAndReturnAlbumPojo(AudioInfoReq dto, Set<Long> singerIds) {
         // 专辑没有值直接返回
         if (dto.getAlbum() == null || StringUtils.isBlank(dto.getAlbum().getAlbumName())) {
             return new TbAlbumPojo();
@@ -461,10 +466,10 @@ public class UploadMusicApi {
      * @param dto 前端请求数据
      * @return 返回音乐和歌手ID
      */
-    private List<Long> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
+    private Set<Long> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
         if (IterUtil.isEmpty(dto.getSinger()) || StringUtils.isBlank(dto.getSinger().get(0).getSingerName())) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
         List<SingerReq> singerReqList = dto.getSinger();
         List<TbSingerPojo> saveBatch = new ArrayList<>();
@@ -493,7 +498,7 @@ public class UploadMusicApi {
             saveBatch.add(pojo);
         }
         singerService.saveOrUpdateBatch(saveBatch);
-        return saveBatch.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
+        return saveBatch.stream().map(TbSingerPojo::getId).collect(Collectors.toSet());
     }
     
     

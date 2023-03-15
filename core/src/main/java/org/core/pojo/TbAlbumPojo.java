@@ -53,7 +53,7 @@ public class TbAlbumPojo implements Serializable {
     
     @ApiModelProperty("专辑发布时间")
     @TableField("publish_time")
-    private String publishTime;
+    private LocalDateTime publishTime;
     
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)

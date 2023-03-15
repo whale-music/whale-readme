@@ -61,7 +61,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
             for (Cookie cookie : request.getCookies()) {
-                if (StringUtils.equals(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
+                if (StringUtils.equalsIgnoreCase(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
                         CookieConfig.COOKIE_NAME_MUSIC_U)) {
                     token = cookie.getValue();
                     break;

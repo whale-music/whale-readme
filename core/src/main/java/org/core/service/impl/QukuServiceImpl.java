@@ -138,6 +138,12 @@ public class QukuServiceImpl implements QukuService {
         return Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>()).get(0);
     }
     
+    @Override
+    public Page<TbAlbumPojo> getAlbumPage(String area, Long offset, Long limit) {
+        Page<TbAlbumPojo> page = new Page<>(offset, limit);
+        albumService.page(page);
+        return page;
+    }
     
     /**
      * 查询专辑下音乐数量

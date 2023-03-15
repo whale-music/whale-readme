@@ -1,5 +1,6 @@
 package org.core.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.pojo.*;
 
 import java.util.List;
@@ -56,6 +57,11 @@ public interface QukuService {
     TbMusicPojo randomMusic();
     
     /**
+     * 随机获取一条专辑
+     */
+    Page<TbAlbumPojo> getAlbumPage(String area, Long offset, Long limit);
+    
+    /**
      * 查询专辑下音乐数量
      */
     Integer getAlbumMusicSizeByAlbumId(Long albumId);
@@ -98,4 +104,5 @@ public interface QukuService {
      * @param id 歌手ID
      */
     Integer getAlbumCountBySingerId(Long id);
+    
 }

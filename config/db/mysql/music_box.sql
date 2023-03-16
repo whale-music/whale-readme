@@ -212,12 +212,13 @@ create index tb_music_url_size_index
 
 create table if not exists tb_rank
 (
-    user_id         bigint   not null comment '用户ID'
-        primary key,
-    music_id        bigint   not null comment '音乐ID',
-    broadcast_count int      null comment '歌曲播放次数',
-    create_time     datetime null comment '创建时间',
-    update_time     datetime null comment '更新时间'
+    user_id         bigint        not null comment '用户ID',
+    id              bigint        not null comment '播放ID，可能是歌曲，专辑，歌单',
+    broadcast_type  int default 0 null comment '播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑',
+    broadcast_count int           null comment '歌曲播放次数',
+    create_time     datetime      null comment '创建时间',
+    update_time     datetime      null comment '更新时间',
+    primary key (user_id, id)
 )
     comment '音乐播放排行榜';
 

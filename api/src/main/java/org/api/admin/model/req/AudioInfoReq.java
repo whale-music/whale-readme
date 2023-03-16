@@ -67,4 +67,7 @@ public class AudioInfoReq {
     
     @ApiModelProperty("true: 只存储到数据库，不上传, false: 读取本地数据上传到数据库")
     private Boolean uploadFlag;
+    
+    @ApiModelProperty("隐藏字段，测试时使用")
+    private Long userId;
 }

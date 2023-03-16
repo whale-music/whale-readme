@@ -9,6 +9,7 @@ import com.alibaba.fastjson2.JSON;
 import org.api.model.LikePlay;
 import org.api.model.album.AlbumRes;
 import org.api.model.lyric.Lyric;
+import org.api.model.playlist.PlayList;
 import org.api.model.singer.SingerRes;
 import org.api.model.song.SongDetail;
 import org.api.model.url.SongUrl;
@@ -41,9 +42,9 @@ public class RequestMusic163 {
         return JSON.parseObject(request, LikePlay.class);
     }
     
-    public static LikePlay getPlayList(String playId, String cookie) {
+    public static PlayList getPlayList(String playId, String cookie) {
         String request = req(host + "/playlist/track/all?id=" + playId, cookie);
-        return JSON.parseObject(request, LikePlay.class);
+        return JSON.parseObject(request, PlayList.class);
     }
     
     /**

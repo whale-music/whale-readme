@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.UploadMusicApi;
 import org.core.common.result.R;
+import org.core.pojo.MusicDetails;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
@@ -54,8 +55,8 @@ public class UploadMusicController {
      */
     @PostMapping("/music/info")
     public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) throws IOException {
-        uploadMusic.saveMusicInfo(dto);
-        return R.success();
+        MusicDetails musicDetails = uploadMusic.saveMusicInfo(dto);
+        return R.success(musicDetails);
     }
     
     /**

@@ -236,13 +236,13 @@ public class PlayListController {
      * @param songIds   歌曲ID
      */
     @GetMapping("/playlist/tracks")
-    public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") String songIds) {
+    public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") String songIds, @RequestParam(value = "userId", required = false) Long userId) {
         boolean flag;
         // add 是false
         // del 是false
         flag = "add".equals(op);
-        SysUserPojo user = UserUtil.getUser();
-        collect.addSongToCollect(user.getId(),
+        userId = userId == null ? UserUtil.getUser().getId() : userId;
+        collect.addSongToCollect(userId,
                 collectId,
                 Arrays.stream(StringUtils.split(songIds, ',')).map(Long::valueOf).collect(Collectors.toList()),
                 flag);
@@ -258,8 +258,9 @@ public class PlayListController {
      * @param like true 添加歌曲，false 删除歌曲
      */
     @GetMapping("/like")
-    public NeteaseResult like(@RequestParam("id") Long id, @RequestParam("like") Boolean like) {
-        collect.like(UserUtil.getUser().getId(), id, like);
+    public NeteaseResult like(@RequestParam("id") Long id, @RequestParam("like") Boolean like, @RequestParam(value = "userId", required = false) Long userId) {
+        userId = Optional.ofNullable(userId).orElse(UserUtil.getUser().getId());
+        collect.like(userId, id, like);
         NeteaseResult r = new NeteaseResult();
         r.put("songs", new ArrayList<>());
         r.put("playlistId", UserUtil.getUser().getId());

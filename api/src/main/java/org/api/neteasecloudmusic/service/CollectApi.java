@@ -346,7 +346,9 @@ public class CollectApi {
         }
         
         // 效验歌单中是否有该歌曲
-        LambdaQueryWrapper<TbLikeMusicPojo> wrapper = Wrappers.<TbLikeMusicPojo>lambdaQuery().eq(TbLikeMusicPojo::getLikeId, id);
+        LambdaQueryWrapper<TbLikeMusicPojo> wrapper = Wrappers.<TbLikeMusicPojo>lambdaQuery()
+                                                              .eq(TbLikeMusicPojo::getLikeId, userId)
+                                                              .eq(TbLikeMusicPojo::getMusicId, id);
         long count = likeMusicService.count(wrapper);
         if (Boolean.TRUE.equals(isAddAndDelLike)) {
             // 歌曲已存在

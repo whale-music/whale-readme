@@ -1,19 +1,25 @@
 package org.api.neteasecloudmusic.service;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.model.vo.user.record.Al;
+import org.api.neteasecloudmusic.model.vo.user.record.ArItem;
+import org.api.neteasecloudmusic.model.vo.user.record.Song;
+import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.pojo.SysUserPojo;
-import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbUserSingerPojo;
-import org.core.service.AccountService;
-import org.core.service.TbCollectService;
-import org.core.service.TbUserSingerService;
+import org.core.pojo.*;
+import org.core.service.*;
+import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -38,6 +44,15 @@ public class UserApi {
     // 用户关注歌手表
     @Autowired
     private TbUserSingerService userSingerService;
+    
+    @Autowired
+    private TbRankService rankService;
+    
+    @Autowired
+    private TbMusicService musicService;
+    
+    @Autowired
+    private QukuService qukuService;
     
     /**
      * 创建用户
@@ -135,5 +150,50 @@ public class UserApi {
         LambdaQueryWrapper<TbUserSingerPojo> lambdaQueryWrapper = Wrappers.<TbUserSingerPojo>lambdaQuery()
                                                                           .eq(TbUserSingerPojo::getUserId, userId);
         return userSingerService.count(lambdaQueryWrapper);
+    }
+    
+    public List<UserRecordRes> userRecord(Long uid, Long type) {
+        ArrayList<UserRecordRes> res = new ArrayList<>();
+        List<TbRankPojo> list = rankService.list(Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, uid));
+        
+        List<TbMusicPojo> musicPojoList;
+        if (CollUtil.isEmpty(list)) {
+            Page<TbMusicPojo> page = musicService.page(new Page<>(0, 100L));
+            musicPojoList = page.getRecords();
+        } else {
+            List<Long> musicIds = list.stream().map(TbRankPojo::getId).collect(Collectors.toList());
+            musicPojoList = musicService.listByIds(musicIds);
+        }
+        
+        for (TbMusicPojo tbMusicPojo : musicPojoList) {
+            UserRecordRes userRecordRes = new UserRecordRes();
+            Song song = new Song();
+            song.setName(tbMusicPojo.getMusicName());
+            song.setId(tbMusicPojo.getId());
+            song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliaName()));
+            
+            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            ArrayList<ArItem> ar = new ArrayList<>();
+            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+                ArItem e = new ArItem();
+                e.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                e.setName(tbSingerPojo.getSingerName());
+                e.setId(tbSingerPojo.getId());
+                ar.add(e);
+            }
+            song.setAr(ar);
+            
+            TbAlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
+            Al al = new Al();
+            al.setId(albumByMusicId.getId());
+            al.setPicUrl(albumByMusicId.getPic());
+            al.setName(albumByMusicId.getAlbumName());
+            song.setAl(al);
+            userRecordRes.setSong(song);
+            
+            res.add(userRecordRes);
+        }
+        
+        return res;
     }
 }

@@ -151,7 +151,7 @@ public class QukuServiceImpl implements QukuService {
      * @param albumId 专辑ID
      */
     @Override
-    public Integer getAlbumMusicSizeByAlbumId(Long albumId) {
+    public Integer getAlbumMusicCountByAlbumId(Long albumId) {
         long count = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getId, albumId));
         return Integer.valueOf(count + "");
     }
@@ -162,12 +162,22 @@ public class QukuServiceImpl implements QukuService {
      * @param musicId 歌曲ID
      */
     @Override
-    public Integer getAlbumMusicSizeByMusicId(Long musicId) {
+    public Integer getAlbumMusicCountByMusicId(Long musicId) {
         TbMusicPojo tbMusicPojo = musicService.getOne(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, musicId));
         if (tbMusicPojo == null) {
             return null;
         }
-        return getAlbumMusicSizeByAlbumId(tbMusicPojo.getAlbumId());
+        return getAlbumMusicCountByAlbumId(tbMusicPojo.getAlbumId());
+    }
+    
+    /**
+     * 获取歌手音乐数量
+     *
+     * @param id 歌手ID
+     */
+    @Override
+    public Long getMusicCountBySingerId(Long id) {
+        return musicSingerService.count(Wrappers.<TbMusicSingerPojo>lambdaQuery().eq(TbMusicSingerPojo::getSingerId, id));
     }
     
     /**
@@ -238,5 +248,15 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public Integer getAlbumCountBySingerId(Long id) {
         return Math.toIntExact(albumSingerService.count(Wrappers.<TbAlbumSingerPojo>lambdaQuery().eq(TbAlbumSingerPojo::getSingerId, id)));
+    }
+    
+    /**
+     * 根据专辑ID查找音乐
+     *
+     * @param id 专辑ID
+     */
+    @Override
+    public List<TbMusicPojo> getMusicListByAlbumId(Long id) {
+        return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, id));
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -155,7 +156,8 @@ public class UserApi {
     public List<UserRecordRes> userRecord(Long uid, Long type) {
         ArrayList<UserRecordRes> res = new ArrayList<>();
         List<TbRankPojo> list = rankService.list(Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, uid));
-        
+        Map<Long, TbRankPojo> rankPojoMap = list.stream().collect(Collectors.toMap(TbRankPojo::getId, tbRankPojo -> tbRankPojo));
+    
         List<TbMusicPojo> musicPojoList;
         if (CollUtil.isEmpty(list)) {
             Page<TbMusicPojo> page = musicService.page(new Page<>(0, 100L));
@@ -167,6 +169,8 @@ public class UserApi {
         
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             UserRecordRes userRecordRes = new UserRecordRes();
+            int count = rankPojoMap.get(tbMusicPojo.getId()) == null ? 0 : rankPojoMap.get(tbMusicPojo.getId()).getBroadcastCount();
+            userRecordRes.setPlayCount(count);
             Song song = new Song();
             song.setName(tbMusicPojo.getMusicName());
             song.setId(tbMusicPojo.getId());

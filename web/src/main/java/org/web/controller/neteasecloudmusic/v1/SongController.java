@@ -2,6 +2,7 @@ package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.model.vo.song.lyric.SongLyricRes;
 import org.api.neteasecloudmusic.model.vo.songdetail.SongDetailRes;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.api.neteasecloudmusic.service.MusicApi;
@@ -53,4 +54,18 @@ public class SongController {
         return r.success();
     }
     
+    @GetMapping("/lyric")
+    public NeteaseResult lyric(@RequestParam("id") Long id) {
+        SongLyricRes res = musicApi.lyric(id);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(res));
+        return r.success();
+    }
+    
+    @GetMapping("/scrobble")
+    public NeteaseResult scrobble(@RequestParam("id") Long id, @RequestParam("sourceid") Long sourceid, @RequestParam(value = "time", required = false) Integer time) {
+        musicApi.scrobble(id,sourceid,time);
+        NeteaseResult r = new NeteaseResult();
+        return r.success();
+    }
 }

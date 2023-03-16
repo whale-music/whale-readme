@@ -64,12 +64,19 @@ public interface QukuService {
     /**
      * 查询专辑下音乐数量
      */
-    Integer getAlbumMusicSizeByAlbumId(Long albumId);
+    Integer getAlbumMusicCountByAlbumId(Long albumId);
     
     /**
      * 查询专辑下音乐数量
      */
-    Integer getAlbumMusicSizeByMusicId(Long musicId);
+    Integer getAlbumMusicCountByMusicId(Long musicId);
+    
+    /**
+     * 获取歌手音乐数量
+     *
+     * @param id 歌手ID
+     */
+    Long getMusicCountBySingerId(Long id);
     
     /**
      * 获取专辑歌手列表
@@ -104,5 +111,12 @@ public interface QukuService {
      * @param id 歌手ID
      */
     Integer getAlbumCountBySingerId(Long id);
+    
+    /**
+     * 根据专辑ID查找音乐
+     *
+     * @param id 专辑ID
+     */
+    List<TbMusicPojo> getMusicListByAlbumId(Long id);
     
 }

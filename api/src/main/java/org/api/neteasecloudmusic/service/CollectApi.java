@@ -379,7 +379,7 @@ public class CollectApi {
      */
     public List<Long> likelist(Long uid) {
         List<TbLikeMusicPojo> list = likeMusicService.list(Wrappers.<TbLikeMusicPojo>lambdaQuery().eq(TbLikeMusicPojo::getLikeId, uid));
-        return list.stream().map(TbLikeMusicPojo::getLikeId).collect(Collectors.toList());
+        return list.stream().map(TbLikeMusicPojo::getMusicId).collect(Collectors.toList());
     }
     
     

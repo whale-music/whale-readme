@@ -21,6 +21,7 @@ import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +66,7 @@ public class RecommendApi {
             // 填充数据
             DataItem e = new DataItem();
             // 歌曲信息
+            e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
             e.setAlias(List.of(tbMusicPojo.getAliaName().split(",")));
             // 歌曲下载地址
@@ -85,7 +87,7 @@ public class RecommendApi {
             // 歌手信息
             ArrayList<ArtistsItem> artists = new ArrayList<>();
             List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
-            int albumSize = qukuService.getAlbumMusicSizeByAlbumId(tbMusicPojo.getAlbumId());
+            int albumSize = qukuService.getAlbumMusicCountByAlbumId(tbMusicPojo.getAlbumId());
             for (TbSingerPojo tbSingerPojo : singerByMusicId) {
                 ArtistsItem artistsItem = new ArtistsItem();
                 artistsItem.setName(tbSingerPojo.getSingerName());
@@ -125,7 +127,7 @@ public class RecommendApi {
         List<DailyRecommendResourceRes> res = new ArrayList<>();
         for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
             DailyRecommendResourceRes e = new DailyRecommendResourceRes();
-            e.setId(e.getId());
+            e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
             e.setPicUrl(tbCollectPojo.getPic());
             e.setPlaycount(3000L);
@@ -233,6 +235,7 @@ public class RecommendApi {
             }
             recommendAlbumNewResPage.getRecords().add(recommendAlbumNewRes);
         }
+        BeanUtils.copyProperties(albumPojoList,recommendAlbumNewResPage,"records");
         return recommendAlbumNewResPage;
     }
     

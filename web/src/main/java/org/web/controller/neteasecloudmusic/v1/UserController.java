@@ -8,6 +8,7 @@ import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
 import org.api.neteasecloudmusic.model.vo.playlist.PlaylistItem;
 import org.api.neteasecloudmusic.model.vo.subcount.Subcount;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
+import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.result.NeteaseResult;
@@ -198,5 +199,17 @@ public class UserController extends BaseController {
             }
         }
         return "";
+    }
+    
+    @GetMapping("/user/record")
+    public NeteaseResult userRecord(@RequestParam("uid") Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
+        List<UserRecordRes> res =  user.userRecord(uid,type);
+        NeteaseResult r = new NeteaseResult();
+        if (type == 1) {
+            r.put("weekData", res);
+        } else if (type == 0) {
+            r.put("allData", res);
+        }
+        return r.success();
     }
 }

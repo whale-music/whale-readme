@@ -27,7 +27,7 @@ public class DataItem {
     private int hearTime;
     private List<String> alias;
     private int starredNum;
-    private int id;
+    private Long id;
     private String mp3Url;
     private String alg;
     private Object audition;

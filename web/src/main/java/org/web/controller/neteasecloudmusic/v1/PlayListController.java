@@ -16,10 +16,7 @@ import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +43,7 @@ public class PlayListController {
      *
      * @param name 歌单名
      */
-    @GetMapping("/playlist/create")
+    @RequestMapping(value = "/playlist/create", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult createPlayList(@RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
         

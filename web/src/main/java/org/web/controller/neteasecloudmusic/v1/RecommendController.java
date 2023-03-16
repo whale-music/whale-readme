@@ -87,10 +87,12 @@ public class RecommendController {
      * 全部新碟
      */
     @GetMapping("/album/new")
-    public NeteaseResult albumNew(String area, Long offset, Long limit) {
+    public NeteaseResult albumNew(String area,@RequestParam(value = "offset",required = false,defaultValue = "0") Long offset, @RequestParam(value = "limit",required = false,defaultValue = "30") Long limit) {
         Page<RecommendAlbumNewRes> res = recommendApi.albumNew(area, offset, limit);
         NeteaseResult r = new NeteaseResult();
-        return r.success(res);
+        r.putAll(BeanUtil.beanToMap(res,"records"));
+        r.put("albums", res.getRecords());
+        return r.success();
     }
     
 }

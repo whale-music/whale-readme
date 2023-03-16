@@ -1,17 +1,19 @@
 package org.api.neteasecloudmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.api.common.service.MusicCommonApi;
+import org.api.neteasecloudmusic.model.vo.song.lyric.Klyric;
+import org.api.neteasecloudmusic.model.vo.song.lyric.Lrc;
+import org.api.neteasecloudmusic.model.vo.song.lyric.SongLyricRes;
 import org.api.neteasecloudmusic.model.vo.songdetail.*;
 import org.api.neteasecloudmusic.model.vo.songurl.DataItem;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
-import org.core.pojo.TbSingerPojo;
-import org.core.service.QukuService;
-import org.core.service.TbMusicService;
+import org.core.pojo.*;
+import org.core.service.*;
+import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,14 @@ public class MusicApi {
     @Autowired
     private QukuService qukuService;
     
+    @Autowired
+    private TbRankService rankService;
+    
+    @Autowired
+    private TbAlbumService albumService;
+    
+    @Autowired
+    private TbCollectService collectService;
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
         List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(Set.copyOf(id));
@@ -110,5 +120,76 @@ public class MusicApi {
         songDetailRes.setPrivileges(privileges);
         
         return songDetailRes;
+    }
+    
+    public SongLyricRes lyric(Long id) {
+        SongLyricRes songLyricRes = new SongLyricRes();
+        TbMusicPojo musicPojo = musicService.getById(id);
+        Lrc lrc = new Lrc();
+        lrc.setLyric(musicPojo.getLyric());
+        songLyricRes.setLrc(lrc);
+        Klyric klyric = new Klyric();
+        klyric.setLyric(musicPojo.getKLyric());
+        songLyricRes.setKlyric(klyric);
+        return songLyricRes;
+    }
+    
+    /**
+     * 听歌打卡
+     *
+     * @param id       歌曲ID
+     * @param sourceid 歌单或者专辑ID
+     * @param time     歌曲播放时间
+     */
+    public void scrobble(Long id, Long sourceid, Integer time) {
+        Long userId = UserUtil.getUser().getId();
+        
+        LambdaQueryWrapper<TbRankPojo> musicWrapper = Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, userId).eq(TbRankPojo::getId, id);
+        TbRankPojo musicRank = rankService.getOne(musicWrapper);
+        ArrayList<TbRankPojo> entityList = new ArrayList<>();
+        // 没有数据则添加数据到表中
+        if (musicRank == null) {
+            TbRankPojo musicRankPojo = new TbRankPojo();
+            musicRankPojo.setId(id);
+            musicRankPojo.setUserId(userId);
+            musicRankPojo.setBroadcastCount(1);
+            musicRankPojo.setBroadcastType(0);
+            entityList.add(musicRankPojo);
+        } else {
+            Integer broadcastCount = musicRank.getBroadcastCount();
+            broadcastCount = broadcastCount + 1;
+            musicRank.setBroadcastCount(broadcastCount);
+            rankService.update(musicRank, musicWrapper);
+        }
+        
+        // 专辑或歌单
+        LambdaQueryWrapper<TbRankPojo> sourceWrapper = Wrappers.<TbRankPojo>lambdaQuery()
+                                                               .eq(TbRankPojo::getUserId, userId)
+                                                               .eq(TbRankPojo::getId, sourceid);
+        TbRankPojo sourcePojo = rankService.getOne(sourceWrapper);
+        if (sourcePojo == null) {
+            // 专辑或歌单ID
+            TbRankPojo rankPojo = new TbRankPojo();
+            rankPojo.setUserId(userId);
+            rankPojo.setId(sourceid);
+            rankPojo.setBroadcastCount(1);
+    
+            TbCollectPojo collectPojo = collectService.getById(sourceid);
+            if (collectPojo != null) {
+                rankPojo.setBroadcastType(1);
+            }else {
+                TbAlbumPojo albumPojo = albumService.getById(sourceid);
+                if (albumPojo != null) {
+                    rankPojo.setBroadcastType(2);
+                }
+            }
+            entityList.add(rankPojo);
+        }else{
+            Integer broadcastCount = sourcePojo.getBroadcastCount();
+            broadcastCount = broadcastCount + 1;
+            sourcePojo.setBroadcastCount(broadcastCount);
+            rankService.update(sourcePojo, sourceWrapper);
+        }
+        rankService.saveBatch(entityList);
     }
 }

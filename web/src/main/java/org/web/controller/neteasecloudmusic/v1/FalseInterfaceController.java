@@ -2,10 +2,7 @@ package org.web.controller.neteasecloudmusic.v1;
 
 import lombok.extern.slf4j.Slf4j;
 import org.core.common.result.NeteaseResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
@@ -35,10 +32,22 @@ public class FalseInterfaceController {
         return r.success();
     }
     
-    @GetMapping("/user/record")
-    public NeteaseResult userRecord() {
+    @GetMapping("/album/detail/dynamic")
+    public NeteaseResult albumDetailDynamic(@RequestParam("id") Long id) {
         NeteaseResult r = new NeteaseResult();
-        r.put("weekData", Collections.emptyList());
+        r.put("onSale", false);
+        r.put("albumGameInfo", null);
+        // 评论
+        r.put("commentCount", 402);
+        // 喜欢计数
+        r.put("likedCount", 0);
+        // 分享
+        r.put("shareCount", 134);
+        r.put("isSub", false);
+        r.put("subTime", 0);
+        // 提交次数
+        r.put("subCount", 2913);
+        r.put("code", 200);
         return r.success();
     }
     

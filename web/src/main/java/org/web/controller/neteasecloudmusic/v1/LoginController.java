@@ -61,7 +61,29 @@ public class LoginController extends BaseController {
         return r.success();
     }
     
-    @GetMapping("/login/qr/key")
+    /**
+     * 登录接口
+     *
+     * @return 返回登录结果
+     */
+    @RequestMapping(value = "/cellphone/existence/check", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult cellphoneCheck(@RequestParam("phone") Long phone, @RequestParam(value = "countrycode", required = false, defaultValue = "86") String countrycode) {
+        SysUserPojo userPojo = user.checkPhone(phone, countrycode);
+        
+        boolean b = userPojo == null;
+        userPojo = b ? new SysUserPojo() : userPojo;
+        NeteaseResult r = new NeteaseResult();
+        r.put("exist", b ? -1 : 1);
+        r.put("nickname", userPojo.getNickname());
+        r.put("hasPassword", b);
+        r.put("avatarUrl", userPojo.getAvatarUrl());
+        r.put("hasSnsBinded", !b);
+        r.put("countryCode", "86");
+        r.put("cellphone", userPojo.getId());
+        return r.success();
+    }
+    
+    @RequestMapping(value = "/login/qr/key", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult qrKey() {
         UUID uuid = UUID.randomUUID();
         GlobeDataUtil.setData(uuid.toString(), uuid.toString());

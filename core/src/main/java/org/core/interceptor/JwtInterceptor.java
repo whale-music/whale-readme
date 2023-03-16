@@ -49,6 +49,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/artist/sublist",
                 "/user/playlist",
                 "/likelist",
+                "/scrobble",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {

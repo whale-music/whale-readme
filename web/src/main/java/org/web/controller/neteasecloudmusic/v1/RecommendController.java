@@ -11,10 +11,7 @@ import org.api.neteasecloudmusic.model.vo.recommend.songs.RecommendSongerRes;
 import org.api.neteasecloudmusic.service.RecommendApi;
 import org.core.common.result.NeteaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,7 +35,7 @@ public class RecommendController {
     /**
      * 推荐FM
      */
-    @GetMapping("/personal_fm")
+    @RequestMapping(value = "/personal_fm", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult personalFM() {
         PersonalFMRes personalFM = recommendApi.personalFM();
         NeteaseResult r = new NeteaseResult();
@@ -52,7 +49,7 @@ public class RecommendController {
      *
      * @param limit 取出数量 , 默认为 30 (不支持 offset)
      */
-    @GetMapping("/personalized")
+    @RequestMapping(value = "/personalized", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult personalized(@RequestParam(value = "limit", required = false, defaultValue = "30") Long limit) {
         PersonalizedRes res = recommendApi.personalized(limit);
         NeteaseResult r = new NeteaseResult();

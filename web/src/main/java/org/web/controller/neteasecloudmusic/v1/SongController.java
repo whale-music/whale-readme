@@ -8,10 +8,7 @@ import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.api.neteasecloudmusic.service.MusicApi;
 import org.core.common.result.NeteaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class SongController {
     /**
      * 获取歌曲详情
      */
-    @GetMapping("/song/detail")
+    @RequestMapping(value = "/song/detail", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult songDetail(@RequestParam("ids") List<Long> ids) {
         SongDetailRes res = musicApi.songDetail(ids);
         NeteaseResult r = new NeteaseResult();
@@ -46,7 +43,7 @@ public class SongController {
     /**
      * 获取歌曲下载地址
      */
-    @GetMapping("/song/url")
+    @RequestMapping(value = "/song/url", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult songUrl(@RequestParam("id") List<Long> id, @RequestParam(value = "br", required = false, defaultValue = "999000") Integer br) {
         SongUrlRes songUrlRes = musicApi.songUrl(id, br);
         NeteaseResult r = new NeteaseResult();
@@ -54,7 +51,7 @@ public class SongController {
         return r.success();
     }
     
-    @GetMapping("/lyric")
+    @RequestMapping(value = "/lyric", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult lyric(@RequestParam("id") Long id) {
         SongLyricRes res = musicApi.lyric(id);
         NeteaseResult r = new NeteaseResult();

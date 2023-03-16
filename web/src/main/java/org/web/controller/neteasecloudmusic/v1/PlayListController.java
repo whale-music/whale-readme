@@ -279,7 +279,7 @@ public class PlayListController {
      *
      * @return ID
      */
-    @GetMapping("/playlist/detail")
+    @RequestMapping(value = "/playlist/detail", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult playlistDetail(@RequestParam("id") Long id) {
         PlayListDetailRes res = collect.playlistDetail(id);
         NeteaseResult r = new NeteaseResult();

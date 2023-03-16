@@ -194,10 +194,20 @@ public class UserApi {
             al.setName(albumByMusicId.getAlbumName());
             song.setAl(al);
             userRecordRes.setSong(song);
-            
+    
             res.add(userRecordRes);
         }
-        
+    
         return res;
+    }
+    
+    /**
+     * 检查账户是否存在
+     *
+     * @param phone       账户
+     * @param countrycode 手机号默认86
+     */
+    public SysUserPojo checkPhone(Long phone, String countrycode) {
+        return accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
     }
 }

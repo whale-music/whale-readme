@@ -124,7 +124,7 @@ public class MusicApi {
     
     public SongLyricRes lyric(Long id) {
         SongLyricRes songLyricRes = new SongLyricRes();
-        TbMusicPojo musicPojo = musicService.getById(id);
+        TbMusicPojo musicPojo = Optional.ofNullable(musicService.getById(id)).orElse(new TbMusicPojo());
         Lrc lrc = new Lrc();
         lrc.setLyric(musicPojo.getLyric());
         songLyricRes.setLrc(lrc);

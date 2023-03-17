@@ -12,7 +12,7 @@ public class PlaylistItem {
 	private String description;
 	private Long trackNumberUpdateTime;
 	private boolean subscribed;
-	private Integer trackCount;
+	private Long trackCount;
 	private Integer adType;
 	private String coverImgIdStr;
 	private Integer specialType;

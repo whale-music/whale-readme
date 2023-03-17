@@ -25,7 +25,7 @@ public class Creator {
     private int authStatus;
     private int vipType;
     private boolean followed;
-    private int userId;
+    private Long userId;
     private int authenticationTypes;
     private boolean mutual;
     private int authority;

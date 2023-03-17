@@ -259,4 +259,34 @@ public class QukuServiceImpl implements QukuService {
     public List<TbMusicPojo> getMusicListByAlbumId(Long id) {
         return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, id));
     }
+    
+    /**
+     * 获取歌手下音乐信息
+     *
+     * @param id 歌手ID
+     */
+    @Override
+    public List<TbMusicPojo> getMusicListBySingerId(Long id) {
+        List<TbMusicSingerPojo> tbMusicSingerPojos = musicSingerService.list(Wrappers.<TbMusicSingerPojo>lambdaQuery()
+                                                                                     .eq(TbMusicSingerPojo::getSingerId, id));
+        Set<Long> collect = tbMusicSingerPojos.stream().map(TbMusicSingerPojo::getMusicId).collect(Collectors.toSet());
+        return musicService.listByIds(collect);
+    }
+    
+    /**
+     * 随机获取歌手
+     *
+     * @param count 获取数量
+     */
+    @Override
+    public List<TbSingerPojo> randomSinger(int count) {
+        long sum = singerService.count();
+        ArrayList<TbSingerPojo> res = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            long randomNum = RandomUtil.randomLong(sum);
+            Page<TbSingerPojo> page = singerService.page(new Page<>(randomNum, 1));
+            res.addAll(page.getRecords());
+        }
+        return res;
+    }
 }

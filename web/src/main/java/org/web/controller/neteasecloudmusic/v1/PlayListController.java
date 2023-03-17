@@ -3,7 +3,6 @@ package org.web.controller.neteasecloudmusic.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.api.neteasecloudmusic.model.vo.createplatlist.CreatePlaylistVo;
 import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
@@ -232,19 +231,21 @@ public class PlayListController {
      * @param collectId 歌单ID
      * @param songIds   歌曲ID
      */
-    @GetMapping("/playlist/tracks")
-    public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") String songIds, @RequestParam(value = "userId", required = false) Long userId) {
+    @RequestMapping(value = "/playlist/tracks", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") List<Long> songIds, @RequestParam(value = "userId", required = false) Long userId) {
         boolean flag;
         // add 是false
         // del 是false
         flag = "add".equals(op);
         userId = userId == null ? UserUtil.getUser().getId() : userId;
-        collect.addSongToCollect(userId,
+        NeteaseResult map = collect.addSongToCollect(userId,
                 collectId,
-                Arrays.stream(StringUtils.split(songIds, ',')).map(Long::valueOf).collect(Collectors.toList()),
+                songIds,
                 flag);
     
         NeteaseResult r = new NeteaseResult();
+        r.put("body", map);
+        r.put("status", 200);
         return r.success();
     }
     

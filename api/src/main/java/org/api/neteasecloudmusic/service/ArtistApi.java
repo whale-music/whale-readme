@@ -7,12 +7,13 @@ import org.api.neteasecloudmusic.model.vo.artist.album.Artist;
 import org.api.neteasecloudmusic.model.vo.artist.album.ArtistAlbumRes;
 import org.api.neteasecloudmusic.model.vo.artist.album.ArtistsItem;
 import org.api.neteasecloudmusic.model.vo.artist.album.HotAlbumsItem;
+import org.api.neteasecloudmusic.model.vo.artist.artist.Al;
+import org.api.neteasecloudmusic.model.vo.artist.artist.ArItem;
+import org.api.neteasecloudmusic.model.vo.artist.artist.ArtistRes;
+import org.api.neteasecloudmusic.model.vo.artist.artist.HotSongsItem;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.ArtistSubListRes;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.DataItem;
-import org.core.pojo.SysUserPojo;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbAlbumSingerPojo;
-import org.core.pojo.TbSingerPojo;
+import org.core.pojo.*;
 import org.core.service.QukuService;
 import org.core.service.TbAlbumService;
 import org.core.service.TbAlbumSingerService;
@@ -105,5 +106,59 @@ public class ArtistApi {
         res.setArtist(artist);
         res.setHotAlbums(hotAlbums);
         return res;
+    }
+    
+    /**
+     * 获取歌手(信息)单曲
+     *
+     * @param id 歌手ID
+     */
+    public ArtistRes artists(Long id) {
+        ArtistRes artistRes = new ArtistRes();
+        TbSingerPojo singerPojo = singerService.getById(id);
+        List<TbMusicPojo> musicPojoList = qukuService.getMusicListBySingerId(id);
+        org.api.neteasecloudmusic.model.vo.artist.artist.Artist artist = new org.api.neteasecloudmusic.model.vo.artist.artist.Artist();
+        artist.setName(singerPojo.getSingerName());
+        artist.setId(singerPojo.getId());
+        artist.setPicUrl(singerPojo.getPic());
+        artist.setAlias(AliasUtil.getAliasList(singerPojo.getAlias()));
+        artist.setImg1v1IdStr(singerPojo.getPic());
+        artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
+        artist.setBriefDesc(singerPojo.getIntroduction());
+        artist.setImg1v1Url(singerPojo.getPic());
+        artistRes.setArtist(artist);
+        
+        ArrayList<HotSongsItem> hotSongs = new ArrayList<>();
+        for (TbMusicPojo tbMusicPojo : musicPojoList) {
+            HotSongsItem hotSongsItem = new HotSongsItem();
+            hotSongsItem.setName(tbMusicPojo.getMusicName());
+            hotSongsItem.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliaName()));
+            hotSongsItem.setId(tbMusicPojo.getId());
+            
+            TbAlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
+            Al al = new Al();
+            al.setId(albumByMusicId.getId());
+            al.setName(albumByMusicId.getAlbumName());
+            al.setPicUrl(albumByMusicId.getPic());
+            al.setAlia(AliasUtil.getAliasList(albumByMusicId.getAliasName()));
+            hotSongsItem.setAl(al);
+            hotSongs.add(hotSongsItem);
+            
+            ArrayList<ArItem> ar = new ArrayList<>();
+            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+                ArItem arItem = new ArItem();
+                arItem.setId(tbSingerPojo.getId());
+                arItem.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                arItem.setName(tbSingerPojo.getSingerName());
+                ar.add(arItem);
+            }
+            hotSongsItem.setAr(ar);
+        }
+        artistRes.setHotSongs(hotSongs);
+        
+        
+        artistRes.setMore(true);
+        return artistRes;
     }
 }

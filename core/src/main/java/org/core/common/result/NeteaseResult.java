@@ -46,7 +46,7 @@ public class NeteaseResult extends HashMap<String, Object> {
      */
     public NeteaseResult error(String code) {
         this.code = code;
-        put("code", code);
+        put("code", Integer.valueOf(code));
         return this;
     }
     
@@ -56,7 +56,7 @@ public class NeteaseResult extends HashMap<String, Object> {
     public NeteaseResult error(String code, String message) {
         this.code = code;
         this.message = message;
-        put("code", code);
+        put("code", Integer.valueOf(code));
         put("message ", message);
         return this;
     }

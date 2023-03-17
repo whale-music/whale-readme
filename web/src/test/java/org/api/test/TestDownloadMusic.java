@@ -64,6 +64,7 @@ class TestDownloadMusic {
                     String md5 = SecureUtil.md5(dataFile);
                     if (StringUtils.equals(datum.getMd5(), md5)) {
                         log.info("Md5值一样");
+                        collect.remove(md5);
                     } else {
                         log.error("\033[0;31mMd5值不一样!!!!!!!\033[0m" + datum.getMd5() + "\n" + md5);
                         FileUtil.del(dataFile);
@@ -71,8 +72,11 @@ class TestDownloadMusic {
                     }
                     System.out.println(md5);
                 }
-            
+    
             });
+        }
+        for (String s : collect.keySet()) {
+            System.out.println("collect.get(s) = " + collect.get(s));
         }
     }
 }

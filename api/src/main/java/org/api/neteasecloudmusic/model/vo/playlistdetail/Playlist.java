@@ -50,7 +50,7 @@ public class Playlist {
     private boolean opRecommend;
     private boolean highQuality;
     private Long updateTime;
-    private Integer userId;
+    private Long userId;
     private List<TracksItem> tracks;
     private Integer titleImage;
     private Long createTime;

@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
 import org.core.common.exception.BaseException;
+import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
 import org.core.pojo.*;
 import org.core.service.*;
+import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -314,12 +316,22 @@ public class CollectApi {
      * @param collectId 歌单ID
      * @param songIds   歌曲ID
      * @param flag      添加还是删除
+     * @return 返回添加歌单后歌单数量
      */
-    public void addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
+    public NeteaseResult addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         checkUserAuth(userID, tbCollectPojo);
-    
+        
         if (flag) {
+            // 查询歌单内歌曲是否存在
+            long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                           .eq(TbCollectMusicPojo::getCollectId, collectId)
+                                                           .in(TbCollectMusicPojo::getMusicId, songIds));
+            if (count > 0) {
+                NeteaseResult r = new NeteaseResult();
+                return r.error("502", "歌单内歌曲重复");
+            }
+            
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
             List<TbCollectMusicPojo> collect = tbMusicPojo.stream()
@@ -327,13 +339,24 @@ public class CollectApi {
                                                                                                        .setMusicId(tbMusicPojo1.getId()))
                                                           .collect(Collectors.toList());
             collectMusicService.saveBatch(collect);
+            Long songId = songIds.get(songIds.size() - 1);
+            TbMusicPojo musicPojo = musicService.getById(songId);
+            if (musicPojo != null) {
+                tbCollectPojo.setPic(musicPojo.getPic());
+            }
+            collectService.updateById(tbCollectPojo);
         } else {
             // 删除歌曲
             collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                .in(TbCollectMusicPojo::getMusicId, songIds));
         }
-    
+        long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, collectId));
+        NeteaseResult map = new NeteaseResult();
+        map.put("trackIds", songIds.toArray());
+        map.put("count", count);
+        map.put("cloudCount", 0);
+        return map.success();
     }
     
     /**
@@ -352,6 +375,7 @@ public class CollectApi {
             SysUserPojo userPojo = accountService.getById(userId);
             entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
             entity.setPic(userPojo.getAvatarUrl());
+            entity.setSort(collectService.count());
             entity.setUserId(userId);
             entity.setType(Short.valueOf("1"));
             collectService.save(entity);
@@ -421,7 +445,6 @@ public class CollectApi {
         playlist.setDescription(byId.getDescription());
         
         // 歌单创建者
-        
         Creator creator = new Creator();
         SysUserPojo userPojo = accountService.getById(byId.getUserId());
         userPojo = Optional.ofNullable(userPojo).orElse(new SysUserPojo());
@@ -430,6 +453,7 @@ public class CollectApi {
         creator.setAvatarUrl(userPojo.getAvatarUrl());
         creator.setUserId(userPojo.getId());
         playlist.setCreator(creator);
+        playlist.setUserId(userPojo.getId());
         
         ArrayList<TracksItem> tracks = new ArrayList<>();
         ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
@@ -437,7 +461,7 @@ public class CollectApi {
             TracksItem e = new TracksItem();
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
-            e.setAlia(Arrays.asList(Optional.ofNullable(tbMusicPojo.getAliaName()).orElse("").split(",")));
+            e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliaName()));
             e.setPublishTime((long) tbMusicPojo.getCreateTime().getNano());
             ArrayList<ArItem> ar = new ArrayList<>();
             
@@ -469,6 +493,7 @@ public class CollectApi {
         }
         playlist.setTracks(tracks);
         playlist.setTrackIds(trackIds);
+        playlist.setTrackCount(playListAllMusic.size());
         playListRes.setPlaylist(playlist);
         return playListRes;
     }

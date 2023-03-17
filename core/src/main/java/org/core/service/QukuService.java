@@ -119,4 +119,17 @@ public interface QukuService {
      */
     List<TbMusicPojo> getMusicListByAlbumId(Long id);
     
+    /**
+     * 获取歌手下音乐信息
+     *
+     * @param id 歌手ID
+     */
+    List<TbMusicPojo> getMusicListBySingerId(Long id);
+    
+    /**
+     * 随机获取歌手
+     *
+     * @param count 获取数量
+     */
+    List<TbSingerPojo> randomSinger(int count);
 }

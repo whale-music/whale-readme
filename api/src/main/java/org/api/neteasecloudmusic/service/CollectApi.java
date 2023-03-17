@@ -344,13 +344,16 @@ public class CollectApi {
      * @param isAddAndDelLike true添加歌曲，false删除歌曲
      */
     public void like(Long userId, Long id, Boolean isAddAndDelLike) {
-        // 添加或用户喜爱歌单
-        TbCollectPojo entity = new TbCollectPojo();
-        entity.setId(userId);
-        entity.setPic(accountService.getById(userId).getAvatarUrl());
-        entity.setUserId(userId);
-        entity.setType(Short.valueOf("1"));
-        collectService.saveOrUpdate(entity);
+        TbCollectPojo collectServiceById = collectService.getById(userId);
+        if (collectServiceById == null) {
+            // 添加或用户喜爱歌单
+            TbCollectPojo entity = new TbCollectPojo();
+            entity.setId(userId);
+            entity.setPic(accountService.getById(userId).getAvatarUrl());
+            entity.setUserId(userId);
+            entity.setType(Short.valueOf("1"));
+            collectService.save(entity);
+        }
         TbMusicPojo byId = musicService.getById(id);
         if (byId == null) {
             log.debug("添加歌曲不存在");

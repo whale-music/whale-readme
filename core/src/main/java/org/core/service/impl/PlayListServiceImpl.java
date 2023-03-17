@@ -37,6 +37,8 @@ public class PlayListServiceImpl implements PlayListService {
         LambdaQueryWrapper<TbCollectPojo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(collectPojo.getId() != null, TbCollectPojo::getId, collectPojo.getId());
         queryWrapper.like(StringUtils.isNotBlank(collectPojo.getPlayListName()), TbCollectPojo::getPlayListName, collectPojo.getPlayListName());
+        // 只查询普通歌单
+        queryWrapper.eq(TbCollectPojo::getType, Short.valueOf("0"));
         collectService.page(page, queryWrapper);
         return page;
     }

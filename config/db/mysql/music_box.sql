@@ -84,16 +84,17 @@ create table if not exists tb_album_singer
 
 create table if not exists tb_collect
 (
-    id             bigint       not null comment '歌单表ID'
+    id             bigint               not null comment '歌单表ID'
         primary key,
-    play_list_name varchar(256) not null comment '歌单名',
-    pic            varchar(512) null comment '封面地址',
-    description    varchar(512) null comment '简介',
-    user_id        bigint       null comment '创建人ID',
-    sort           bigint       null comment '排序字段',
-    subscribed     tinyint(1)   null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
-    create_time    datetime     null comment '创建时间',
-    update_time    datetime     null comment '修改时间',
+    play_list_name varchar(256)         not null comment '歌单名（包括用户喜爱歌单）',
+    pic            varchar(512)         null comment '封面地址',
+    type           tinyint              not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，',
+    subscribed     tinyint(1) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
+    description    varchar(512)         null comment '简介',
+    user_id        bigint               null comment '创建人ID',
+    sort           bigint               null comment '排序字段',
+    create_time    datetime             null comment '创建时间',
+    update_time    datetime             null comment '修改时间',
     constraint sort
         unique (sort)
 )
@@ -128,27 +129,6 @@ create table if not exists tb_history
     update_time datetime null comment '修改时间'
 )
     comment '音乐播放历史(包括歌单，音乐，专辑）';
-
-create table if not exists tb_like
-(
-    user_id     bigint       not null comment '我喜欢的歌单ID和用户ID相同'
-        primary key,
-    song_name   varchar(256) null comment '歌单名',
-    pic         varchar(64)  null comment '封面地址',
-    description varchar(512) null comment '简介',
-    tag         bigint       null comment '歌单标签，表示歌单风格。使用字典表',
-    update_time datetime     null comment '修改时间',
-    create_time datetime     null comment '创建时间'
-)
-    comment '喜爱歌单';
-
-create table if not exists tb_like_music
-(
-    like_id  bigint not null comment '喜爱歌单ID',
-    music_id bigint not null comment '音乐ID',
-    primary key (like_id, music_id)
-)
-    comment '喜爱歌单中间表';
 
 create table if not exists tb_music
 (
@@ -212,13 +192,16 @@ create index tb_music_url_size_index
 
 create table if not exists tb_rank
 (
+    id              bigint        not null
+        primary key,
     user_id         bigint        not null comment '用户ID',
-    id              bigint        not null comment '播放ID，可能是歌曲，专辑，歌单',
+    broadcast_id    int           null comment '播放ID，可能是歌曲，专辑，歌单',
     broadcast_type  int default 0 null comment '播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑',
     broadcast_count int           null comment '歌曲播放次数',
     create_time     datetime      null comment '创建时间',
     update_time     datetime      null comment '更新时间',
-    primary key (user_id, id)
+    constraint id
+        unique (id)
 )
     comment '音乐播放排行榜';
 

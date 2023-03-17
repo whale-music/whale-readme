@@ -42,12 +42,6 @@ public class CollectApi {
     @Autowired
     private TbMusicUrlService musicUrlService;
     
-    @Autowired
-    private TbLikeService likeService;
-    
-    @Autowired
-    private TbLikeMusicService likeMusicService;
-    
     
     @Autowired
     private PlayListService playListService;
@@ -134,6 +128,7 @@ public class CollectApi {
         collectPojo.setSort(collectService.count() + 1);
         collectPojo.setPic("https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg");
         collectPojo.setSubscribed(false);
+        collectPojo.setType(Short.valueOf("0"));
         collectService.save(collectPojo);
         return collectPojo;
     }
@@ -258,6 +253,18 @@ public class CollectApi {
             // 增加排序值
             tbCollectPojo.setSort(collectService.count() + 1);
             collectService.save(tbCollectPojo);
+    
+            // 保存歌单
+            List<TbCollectMusicPojo> tbCollectMusicPojos = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                                            .eq(TbCollectMusicPojo::getCollectId, collectId));
+            Set<TbCollectMusicPojo> batch = tbCollectMusicPojos.stream().map(tbCollectMusicPojo -> {
+                TbCollectMusicPojo tbCollectMusicPojo1 = new TbCollectMusicPojo();
+                tbCollectMusicPojo1.setCollectId(Long.valueOf(collectId));
+                tbCollectMusicPojo1.setMusicId(tbCollectMusicPojo.getMusicId());
+                return tbCollectMusicPojo1;
+            }).collect(Collectors.toSet());
+    
+            collectMusicService.saveBatch(batch);
         } else if (Boolean.TRUE.equals(tbCollectPojo != null && tbCollectPojo.getSubscribed()) && flag == 2) {
             // 歌单存在并且是收藏状态
             // 删除歌单
@@ -332,41 +339,47 @@ public class CollectApi {
     /**
      * 添加喜爱歌曲
      *
+     * @param userId          用户ID
      * @param id              歌曲ID
      * @param isAddAndDelLike true添加歌曲，false删除歌曲
      */
     public void like(Long userId, Long id, Boolean isAddAndDelLike) {
-        TbLikePojo entity = new TbLikePojo();
+        // 添加或用户喜爱歌单
+        TbCollectPojo entity = new TbCollectPojo();
+        entity.setId(userId);
+        entity.setPic(accountService.getById(userId).getAvatarUrl());
         entity.setUserId(userId);
-        likeService.saveOrUpdate(entity);
+        entity.setType(Short.valueOf("1"));
+        collectService.saveOrUpdate(entity);
         TbMusicPojo byId = musicService.getById(id);
         if (byId == null) {
             log.debug("添加歌曲不存在");
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
-        
+    
         // 效验歌单中是否有该歌曲
-        LambdaQueryWrapper<TbLikeMusicPojo> wrapper = Wrappers.<TbLikeMusicPojo>lambdaQuery()
-                                                              .eq(TbLikeMusicPojo::getLikeId, userId)
-                                                              .eq(TbLikeMusicPojo::getMusicId, id);
-        long count = likeMusicService.count(wrapper);
+        LambdaQueryWrapper<TbCollectMusicPojo> wrapper = Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                 .eq(TbCollectMusicPojo::getCollectId, userId)
+                                                                 .eq(TbCollectMusicPojo::getMusicId, id);
+        long count = collectMusicService.count(wrapper);
+        // 删除还是添加歌曲
         if (Boolean.TRUE.equals(isAddAndDelLike)) {
             // 歌曲已存在
             if (count >= 1) {
                 throw new BaseException(ResultCode.SONG_EXIST);
             }
-            TbLikeMusicPojo tbLikeMusicPojo = new TbLikeMusicPojo();
-            tbLikeMusicPojo.setLikeId(userId);
+            TbCollectMusicPojo tbLikeMusicPojo = new TbCollectMusicPojo();
+            tbLikeMusicPojo.setCollectId(userId);
             tbLikeMusicPojo.setMusicId(id);
-            likeMusicService.save(tbLikeMusicPojo);
-            log.debug("歌曲保存");
+            collectMusicService.save(tbLikeMusicPojo);
+            log.debug("歌单ID: {} 歌曲ID: {}  歌曲保存", tbLikeMusicPojo.getCollectId(), tbLikeMusicPojo.getMusicId());
         } else {
             // 歌曲不存在
             if (count == 0) {
                 throw new BaseException(ResultCode.SONG_NOT_EXIST);
             }
-            likeMusicService.remove(wrapper);
-            log.debug("歌曲已删除");
+            collectMusicService.remove(wrapper);
+            log.debug("歌单ID: {} 歌曲ID: {}  歌曲已删除", userId, id);
         }
         
     }
@@ -378,8 +391,8 @@ public class CollectApi {
      * @return 返回歌曲数组
      */
     public List<Long> likelist(Long uid) {
-        List<TbLikeMusicPojo> list = likeMusicService.list(Wrappers.<TbLikeMusicPojo>lambdaQuery().eq(TbLikeMusicPojo::getLikeId, uid));
-        return list.stream().map(TbLikeMusicPojo::getMusicId).collect(Collectors.toList());
+        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, uid));
+        return list.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
     }
     
     

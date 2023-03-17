@@ -349,7 +349,9 @@ public class CollectApi {
             // 添加或用户喜爱歌单
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(userId);
-            entity.setPic(accountService.getById(userId).getAvatarUrl());
+            SysUserPojo userPojo = accountService.getById(userId);
+            entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
+            entity.setPic(userPojo.getAvatarUrl());
             entity.setUserId(userId);
             entity.setType(Short.valueOf("1"));
             collectService.save(entity);
@@ -451,7 +453,7 @@ public class CollectApi {
             e.setAr(ar);
     
             // 专辑数据
-            TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
+            TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             Al al = new Al();
             al.setId(albumByAlbumId.getId());
             al.setName(albumByAlbumId.getAlbumName());

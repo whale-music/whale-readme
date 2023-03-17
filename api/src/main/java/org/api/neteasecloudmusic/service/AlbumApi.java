@@ -141,6 +141,7 @@ public class AlbumApi {
         album.setId(tbAlbumPojo.getId());
         album.setDescription(tbAlbumPojo.getDescription());
         album.setCompany(tbAlbumPojo.getCompany());
+        album.setSubType(tbAlbumPojo.getSubType());
         album.setPublishTime(tbAlbumPojo.getPublishTime().getNano());
         album.setSize(albumMusicCountByAlbumId);
     

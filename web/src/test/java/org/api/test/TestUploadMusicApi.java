@@ -74,6 +74,7 @@ class TestUploadMusicApi {
         AlbumRes albumDto = RequestMusic163.getAlbumDto(song.getAl().getId(), cookie);
         Optional<Album> dtoAlbumOpt = Optional.ofNullable(albumDto.getAlbum());
         Album dtoAlbum = dtoAlbumOpt.orElse(new Album());
+        album.setSubType(dtoAlbum.getSubType());
         album.setCompany(dtoAlbum.getCompany());
         if (dtoAlbum.getPublishTime() != null && dtoAlbum.getPublishTime() != 0) {
             album.setPublishTime(LocalDateTimeUtil.of(dtoAlbum.getPublishTime()));

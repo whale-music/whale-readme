@@ -57,7 +57,7 @@ public class LoginController extends BaseController {
         SysUserPojo userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        NeteaseResult r = getNeteaseResult(jwtConfig, response, userPojo);
+        NeteaseResult r = getNeteaseResult(response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
     }
@@ -137,7 +137,7 @@ public class LoginController extends BaseController {
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
-        String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), data);
+        String sign = JwtUtil.sign(userPojo.getUsername(), data);
         GlobeDataUtil.remove(key);
         
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
@@ -181,7 +181,7 @@ public class LoginController extends BaseController {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
-        return getNeteaseResult(jwtConfig, response, userPojo);
+        return getNeteaseResult(response, userPojo);
     }
     
     

@@ -39,7 +39,7 @@ public class LoginController extends BaseController {
     @PostMapping("/login")
     public R login(HttpServletResponse response, @RequestBody UserReq dto) {
         UserRes userPojo = user.login(dto.getUsername(), dto.getPassword());
-        userPojo.setExpiryTime(System.currentTimeMillis() + jwtConfig.getExpireTime());
+        userPojo.setExpiryTime(System.currentTimeMillis() + JwtConfig.EXPIRE_TIME);
         // 写入用户信息到cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), userPojo.getToken());
         response.addCookie(cookie);
@@ -67,7 +67,7 @@ public class LoginController extends BaseController {
     public R refreshUserToken(HttpServletResponse response, String id) {
         SysUserPojo userPojo = UserUtil.getUser();
         if (StringUtils.equals(String.valueOf(userPojo.getId()), id)) {
-            String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), JSON.toJSONString(userPojo));
+            String sign = JwtUtil.sign(userPojo.getUsername(), JSON.toJSONString(userPojo));
             UserRes userRes = new UserRes();
             BeanUtils.copyProperties(userPojo, userRes);
             userRes.setToken(sign);

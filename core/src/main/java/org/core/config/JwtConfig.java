@@ -1,22 +1,32 @@
 package org.core.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Configuration
-@ConfigurationProperties(
-        prefix = "jwt-config"
-)
+@Component
 public class JwtConfig {
     
-    private String seedKey;
+    public static String SEED_KEY;
     
-    private Long expireTime;
+    public static Long EXPIRE_TIME;
     
+    
+    private JwtConfig() {
+    }
+    
+    /**
+     * 设置
+     */
+    @Value("${jwt-config.seed-key}")
+    public void setSeedKey(String seedKey) {
+        JwtConfig.SEED_KEY = seedKey;
+    }
+    
+    /**
+     * 设置
+     */
+    @Value("${jwt-config.expire-time}")
+    public void setExpireTime(Long expireTime) {
+        JwtConfig.EXPIRE_TIME = expireTime;
+    }
 }

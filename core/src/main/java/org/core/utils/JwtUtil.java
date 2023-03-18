@@ -4,14 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import org.core.config.JwtConfig;
 
 import java.util.Date;
 
 public class JwtUtil {
-    /**
-     * jwt密钥
-     */
-    private static String secret = "";
     
     private JwtUtil() {
     }
@@ -23,16 +20,15 @@ public class JwtUtil {
      * @param info,Map的value只能存放值的类型为：Map，List，Boolean，Integer，Long，Double，String and Date
      * @return 返回token
      */
-    public static String sign(String seedKey, Long expireTime, String userId, String info) {
-        JwtUtil.secret = seedKey;
-        Date date = new Date(System.currentTimeMillis() + expireTime);
-        Algorithm algorithm = Algorithm.HMAC256(seedKey);
+    public static String sign(String userId, String info) {
+        Date date = new Date(System.currentTimeMillis() + JwtConfig.EXPIRE_TIME);
+        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.SEED_KEY);
         return JWT.create()
                   // 将userId保存到token里面
                   .withAudience(userId)
                   // 存放自定义数据
                   .withClaim("info", info)
-                  // 五分钟后token过期
+                  // 根据设定的时间过期
                   .withExpiresAt(date)
                   // token的密钥
                   .sign(algorithm);
@@ -72,7 +68,7 @@ public class JwtUtil {
      * @param token token 数据
      */
     public static void checkSign(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
+        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.SEED_KEY);
         JWTVerifier verifier = JWT.require(algorithm)
                                   //.withClaim("username, username)
                                   .build();

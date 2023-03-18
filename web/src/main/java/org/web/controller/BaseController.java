@@ -7,7 +7,6 @@ import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.core.common.result.NeteaseResult;
 import org.core.config.CookieConfig;
-import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
@@ -58,9 +57,9 @@ public class BaseController {
     }
     
     @NotNull
-    protected NeteaseResult getNeteaseResult(JwtConfig jwtConfig, HttpServletResponse response, SysUserPojo userPojo) {
+    protected NeteaseResult getNeteaseResult(HttpServletResponse response, SysUserPojo userPojo) {
         String userStr = JSON.toJSONString(userPojo);
-        String sign = JwtUtil.sign(jwtConfig.getSeedKey(), jwtConfig.getExpireTime(), userPojo.getUsername(), userStr);
+        String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
         // 写入用户信息到cookie
         Cookie cookie1 = new Cookie(CookieConfig.COOKIE_NAME_COOKIE, sign);
         Cookie cookie2 = new Cookie(CookieConfig.COOKIE_NAME_MUSIC_U, sign);

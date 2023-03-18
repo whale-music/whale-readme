@@ -2,11 +2,11 @@ package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
 import org.api.neteasecloudmusic.model.vo.subcount.Subcount;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
-import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
@@ -29,7 +29,7 @@ import java.util.Optional;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController("NeteaseCloudUser")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "UserController")
 @RequestMapping("/")
 @Slf4j
 public class UserController extends BaseController {
@@ -37,8 +37,6 @@ public class UserController extends BaseController {
     @Autowired
     private UserApi user;
     
-    @Autowired
-    private CollectApi collect;
     
     /**
      * 获取用户信息

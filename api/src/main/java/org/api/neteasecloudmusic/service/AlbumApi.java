@@ -2,6 +2,7 @@ package org.api.neteasecloudmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.album.album.*;
 import org.api.neteasecloudmusic.model.vo.album.detail.Album;
 import org.api.neteasecloudmusic.model.vo.album.detail.AlbumDetailRes;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Service("NeteaseCloudAlbumApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "AlbumApi")
 public class AlbumApi {
     
     @Autowired

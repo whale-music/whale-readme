@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.common.service.MusicCommonApi;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.personalfm.Album;
 import org.api.neteasecloudmusic.model.vo.personalfm.ArtistsItem;
 import org.api.neteasecloudmusic.model.vo.personalfm.DataItem;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Service("RecommendApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "RecommendApi")
 public class RecommendApi {
     
     /**

@@ -3,6 +3,7 @@ package org.web.controller.neteasecloudmusic.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.createplatlist.CreatePlaylistVo;
 import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController("NeteaseCloudPlayList")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "PlayListController")
 @RequestMapping("/")
 @Slf4j
 public class PlayListController {

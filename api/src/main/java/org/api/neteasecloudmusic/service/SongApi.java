@@ -1,29 +1,17 @@
 package org.api.neteasecloudmusic.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.core.pojo.TbSingerPojo;
-import org.core.service.*;
+import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Slf4j
-@Service("SongApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "SongApi")
 public class SongApi {
-    
-    @Autowired
-    private TbMusicService musicService;
-    
-    @Autowired
-    private TbAlbumService albumService;
-    
-    @Autowired
-    private TbMusicSingerService musicSingerService;
-    
-    @Autowired
-    private TbSingerService singerService;
-    
     /**
      * 曲库服务
      */

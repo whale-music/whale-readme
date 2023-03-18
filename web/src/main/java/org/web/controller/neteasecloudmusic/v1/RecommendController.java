@@ -3,6 +3,7 @@ package org.web.controller.neteasecloudmusic.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.personalfm.PersonalFMRes;
 import org.api.neteasecloudmusic.model.vo.personalized.PersonalizedRes;
 import org.api.neteasecloudmusic.model.vo.recommend.albumnew.RecommendAlbumNewRes;
@@ -24,7 +25,7 @@ import java.util.List;
  * @author Sakura
  * @since 2023-03-13
  */
-@RestController("NeteaseCloudRecommend")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "RecommendController")
 @RequestMapping("/")
 @Slf4j
 public class RecommendController {

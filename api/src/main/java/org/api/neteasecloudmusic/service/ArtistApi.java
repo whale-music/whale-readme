@@ -3,6 +3,7 @@ package org.api.neteasecloudmusic.service;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.artist.album.Artist;
 import org.api.neteasecloudmusic.model.vo.artist.album.ArtistAlbumRes;
 import org.api.neteasecloudmusic.model.vo.artist.album.ArtistsItem;
@@ -29,7 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service("NeteaseCloudArtistApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "ArtistApi")
 public class ArtistApi {
     @Autowired
     private QukuService qukuService;

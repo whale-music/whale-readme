@@ -1,12 +1,13 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.core.common.result.NeteaseResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
-@RestController("NeteaseCloud" + "FalseInterfaceController")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "FalseInterfaceController")
 @RequestMapping("/")
 @Slf4j
 public class FalseInterfaceController {

@@ -2,6 +2,7 @@ package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.song.lyric.SongLyricRes;
 import org.api.neteasecloudmusic.model.vo.songdetail.SongDetailRes;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController("NeteaseCloudSong")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "SongController")
 @RequestMapping("/")
 @Slf4j
 public class SongController {

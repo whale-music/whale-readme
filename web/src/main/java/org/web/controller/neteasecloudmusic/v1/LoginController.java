@@ -5,6 +5,7 @@ import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Base64Util;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.exception.BaseException;
@@ -34,7 +35,7 @@ import java.util.UUID;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController("NeteaseCloudLogin")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "LoginController")
 @RequestMapping("/")
 @Slf4j
 public class LoginController extends BaseController {

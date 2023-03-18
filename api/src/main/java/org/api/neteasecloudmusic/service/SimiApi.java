@@ -1,10 +1,10 @@
 package org.api.neteasecloudmusic.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
 import org.core.pojo.TbSingerPojo;
 import org.core.service.QukuService;
-import org.core.service.TbSingerService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,14 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service("NeteaseCloud" + "SimiApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "SimiApi")
 public class SimiApi {
     
     @Autowired
     private QukuService qukuService;
-    
-    @Autowired
-    private TbSingerService singerService;
     
     /**
      * 获取相似歌手

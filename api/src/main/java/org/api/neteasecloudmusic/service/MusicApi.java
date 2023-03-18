@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.api.common.service.MusicCommonApi;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.song.lyric.Klyric;
 import org.api.neteasecloudmusic.model.vo.song.lyric.Lrc;
 import org.api.neteasecloudmusic.model.vo.song.lyric.SongLyricRes;
@@ -21,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service("MusicApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "MusicApi")
 public class MusicApi {
     
     @Autowired

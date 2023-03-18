@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * 歌单中间层
  */
 @Slf4j
-@Service
+@Service(NeteaseCloudConfig.NETEASECLOUD + "CollectApi")
 public class CollectApi {
     
     @Autowired

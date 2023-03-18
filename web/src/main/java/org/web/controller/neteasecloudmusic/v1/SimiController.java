@@ -1,6 +1,7 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
 import org.api.neteasecloudmusic.service.SimiApi;
 import org.core.common.result.NeteaseResult;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("NeteaseCloud" + "SimiController")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "SimiController")
 @RequestMapping("/")
 @Slf4j
 public class SimiController {

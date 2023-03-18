@@ -2,6 +2,7 @@ package org.api.neteasecloudmusic.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.toplist.artist.ArtistsItem;
 import org.api.neteasecloudmusic.model.vo.toplist.artist.TopListArtistRes;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.Creator;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service("NeteaseCloud" + "TopListApi")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "TopListApi")
 public class TopListApi {
     
     @Autowired

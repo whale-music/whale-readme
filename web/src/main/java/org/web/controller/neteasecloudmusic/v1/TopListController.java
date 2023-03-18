@@ -2,6 +2,7 @@ package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.toplist.artist.TopListArtistRes;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("NeteaseCloud" + "TopListController")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "TopListController")
 @RequestMapping("/")
 @Slf4j
 public class TopListController {

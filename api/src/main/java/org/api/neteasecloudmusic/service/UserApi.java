@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.Creator;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
 import org.api.neteasecloudmusic.model.vo.playlist.PlaylistItem;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
  * @since 2022-10-22
  */
 @Slf4j
-@Service("neteasecloudUser")
+@Service(NeteaseCloudConfig.NETEASECLOUD + "UserApi")
 public class UserApi {
     // 用户服务
     @Autowired
@@ -258,8 +259,6 @@ public class UserApi {
      * 用户播放音乐数量
      *
      * @param uid  用户ID
-     * @param type
-     * @return
      */
     public List<UserRecordRes> userRecord(Long uid, Long type) {
         ArrayList<UserRecordRes> res = new ArrayList<>();

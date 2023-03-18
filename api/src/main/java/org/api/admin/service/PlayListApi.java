@@ -267,7 +267,7 @@ public class PlayListApi {
         // 标题icon
         Meta meta = new Meta();
         meta.setTitle("menus.playList");
-        meta.setIcon("menu");
+        meta.setIcon("ep:menu");
         meta.setRank(3);
         // 标题路由
         RouterVo routerVo = new RouterVo();
@@ -285,14 +285,13 @@ public class PlayListApi {
         for (TbCollectPojo tbCollectPojo : list) {
             Children e = new Children();
             e.setName(String.valueOf(tbCollectPojo.getId()));
-            // e.setPath("/playlist/index/?id=" + tbCollectPojo.getId());
             e.setPath("/playlist/" + tbCollectPojo.getId());
             e.setComponent("() => import('@/views/playlist/index')");
             
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
-            playListMeta.setIcon("headset");
+            playListMeta.setIcon("ep:headset");
             
             e.setMeta(playListMeta);
             children.add(e);

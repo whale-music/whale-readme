@@ -3,6 +3,7 @@ package org.web.controller.admin.v1;
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
 import org.api.admin.model.res.router.Children;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@RestController("adminLogin")
+@RestController(AdminConfig.ADMIN + "LoginController")
 @RequestMapping("/admin/user")
 public class LoginController extends BaseController {
     

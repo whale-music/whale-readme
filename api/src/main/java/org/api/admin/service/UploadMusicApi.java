@@ -7,6 +7,7 @@ import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.SingerReq;
 import org.api.admin.model.res.AudioInfoRes;
@@ -46,7 +47,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@Service(AdminConfig.ADMIN + "UploadMusicApi")
 @Slf4j
 public class UploadMusicApi {
     

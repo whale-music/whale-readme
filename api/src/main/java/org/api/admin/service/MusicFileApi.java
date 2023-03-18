@@ -1,6 +1,7 @@
 package org.api.admin.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.res.MusicFileRes;
 import org.core.config.SaveConfig;
 import org.core.pojo.TbMusicUrlPojo;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Service("MusicFileApi")
+@Service(AdminConfig.ADMIN + "MusicFileApi")
 public class MusicFileApi {
     /**
      * 音乐地址服务

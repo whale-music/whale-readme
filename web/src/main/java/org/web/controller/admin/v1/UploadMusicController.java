@@ -1,6 +1,7 @@
 package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.UploadMusicApi;
 import org.core.common.result.R;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@RestController("AdminAddMusic")
+@RestController(AdminConfig.ADMIN + "UploadMusicController")
 @RequestMapping("/admin/upload")
 @Slf4j
 @CrossOrigin

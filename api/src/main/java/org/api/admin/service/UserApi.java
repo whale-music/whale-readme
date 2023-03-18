@@ -2,6 +2,7 @@ package org.api.admin.service;
 
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
 import org.core.config.JwtConfig;
@@ -13,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service("adminUser")
+@Service(AdminConfig.ADMIN + "UserApi")
 public class UserApi {
     @Autowired
     private JwtConfig jwtConfig;

@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.utils.MyPageUtil;
-import org.core.config.SaveConfig;
 import org.core.pojo.*;
 import org.core.service.*;
 import org.springframework.beans.BeanUtils;
@@ -20,14 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service("PlayListApi")
+@Service(AdminConfig.ADMIN + "PlayListApi")
 public class PlayListApi {
-    
-    /**
-     * 歌单表
-     */
-    @Autowired
-    private TbCollectService collectService;
     
     /**
      * 音乐表
@@ -51,22 +45,10 @@ public class PlayListApi {
     private TbAlbumService albumService;
     
     /**
-     * 音乐地址服务
-     */
-    @Autowired
-    private TbMusicUrlService musicUrlService;
-    
-    /**
      * 歌单与音乐中间表
      */
     @Autowired
     private TbCollectMusicService collectMusicService;
-    
-    /**
-     * 访问音乐文件地址
-     */
-    @Autowired
-    private SaveConfig config;
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.SingerReq;
-import org.api.admin.service.UploadMusicApi;
+import org.api.admin.service.MusicFlowApi;
 import org.api.model.album.Album;
 import org.api.model.album.AlbumRes;
 import org.api.model.lyric.Lyric;
@@ -42,7 +42,7 @@ class TestUploadMusicApi {
      *
      * @param musicIds 音乐ID
      */
-    public List<MusicDetails> saveMusicInfoList(List<Integer> musicIds, String cookie, UploadMusicApi uploadMusicApi, Long userId) {
+    public List<MusicDetails> saveMusicInfoList(List<Integer> musicIds, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         int allPageIndex = PageUtil.totalPage(musicIds.size(), 20);
         List<MusicDetails> tbMusicPojos = new ArrayList<>();
         for (int i = 0; i < allPageIndex; i++) {
@@ -55,14 +55,14 @@ class TestUploadMusicApi {
             // 歌曲下载地址信息
             Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
             for (SongsItem song : songDetail.getSongs()) {
-                MusicDetails musicDetails = saveMusicInfo(songUrlMap, song, cookie, uploadMusicApi, userId);
+                MusicDetails musicDetails = saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, userId);
                 tbMusicPojos.add(musicDetails);
             }
         }
         return tbMusicPojos;
     }
     
-    private MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, UploadMusicApi uploadMusicApi, Long userId) {
+    private MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
@@ -132,7 +132,7 @@ class TestUploadMusicApi {
         }
         dto.setUploadFlag(true);
         try {
-            return uploadMusicApi.saveMusicInfo(dto);
+            return musicFlowApi.saveMusicInfo(dto);
         } catch (IOException e) {
             log.warn(e.getMessage(), e);
         }

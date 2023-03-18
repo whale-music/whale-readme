@@ -3,7 +3,7 @@ package org.api.test;
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.service.UploadMusicApi;
+import org.api.admin.service.MusicFlowApi;
 import org.api.model.LikePlay;
 import org.api.model.playlist.PlayList;
 import org.api.model.playlist.PrivilegesItem;
@@ -28,7 +28,7 @@ class TestSaveMusicList {
     // 本地用户音乐
     long localUserId = 396908669358213L;
     @Autowired
-    private UploadMusicApi uploadMusicApi;
+    private MusicFlowApi musicFlowApi;
     @Autowired
     private CollectApi collectApi;
     
@@ -61,7 +61,7 @@ class TestSaveMusicList {
         PlayList playList = RequestMusic163.getPlayList(String.valueOf(playListId), cookie);
         List<Integer> collect = playList.getPrivileges().stream().map(PrivilegesItem::getId).collect(Collectors.toList());
         // 保存音乐到本地数据库，并返回保存的音乐信息
-        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(collect, cookie, uploadMusicApi, localUserId);
+        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(collect, cookie, musicFlowApi, localUserId);
         // 创建歌单
         TbCollectPojo collectApiPlayList = collectApi.createPlayList(localUserId, "导入歌单");
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
@@ -93,7 +93,7 @@ class TestSaveMusicList {
      */
     private void saveUserLikeMusicList(String userID, Long localUserId) {
         LikePlay like = RequestMusic163.like(userID, cookie);
-        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(like.getIds(), cookie, uploadMusicApi, localUserId);
+        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(like.getIds(), cookie, musicFlowApi, localUserId);
         for (MusicDetails tbMusicPojo : musicPojoList) {
             if (tbMusicPojo.getMusicUrl() != null && tbMusicPojo.getMusic().getId() != null) {
                 try {

@@ -3,7 +3,7 @@ package org.web.controller.admin.v1;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
-import org.api.admin.service.UploadMusicApi;
+import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.pojo.MusicDetails;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -25,7 +25,7 @@ import java.util.Set;
 @CrossOrigin
 public class MusicFlowController {
     @Autowired
-    private UploadMusicApi uploadMusic;
+    private MusicFlowApi uploadMusic;
     
     /**
      * 上传临时文件

@@ -49,9 +49,9 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service(AdminConfig.ADMIN + "UploadMusicApi")
+@Service(AdminConfig.ADMIN + "MusicFlowApi")
 @Slf4j
-public class UploadMusicApi {
+public class MusicFlowApi {
     
     /**
      * 音乐文件导入后缀名

@@ -6,9 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
-import org.api.admin.model.res.router.Children;
-import org.api.admin.model.res.router.Meta;
-import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.UserApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
@@ -25,9 +22,6 @@ import org.web.controller.BaseController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @RestController(AdminConfig.ADMIN + "LoginController")
 @RequestMapping("/admin/user")
@@ -82,29 +76,5 @@ public class LoginController extends BaseController {
             return R.success(userRes);
         }
         throw new BaseException(ResultCode.USER_NOT_EXIST);
-    }
-    
-    @GetMapping("/getAsyncRoutes")
-    public R getAsyncRoutes() {
-        RouterVo routerVo = new RouterVo();
-        routerVo.setPath("/permission");
-        Meta meta = new Meta();
-        meta.setTitle("menus.permission");
-        meta.setIcon("lollipop");
-        meta.setRank(3);
-        routerVo.setMeta(meta);
-        ArrayList<Children> children = new ArrayList<>();
-        Children e = new Children();
-        e.setName("/permission/page/index");
-        Meta meta1 = new Meta();
-        meta1.setTitle("menus.permissionPage");
-        meta1.setAuths(Arrays.asList("admin", "common"));
-        meta1.setIcon("lollipop");
-        e.setPath("/permission/page/index");
-        e.setMeta(meta1);
-        
-        children.add(e);
-        routerVo.setChildren(children);
-        return R.success(List.of(routerVo));
     }
 }

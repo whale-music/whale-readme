@@ -18,6 +18,7 @@ import org.core.common.result.ResultCode;
 import org.core.pojo.*;
 import org.core.service.*;
 import org.core.utils.AliasUtil;
+import org.core.utils.CollectSortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -120,24 +121,15 @@ public class UserApi {
         PlayListVo playListVo = new PlayListVo();
         playListVo.setPlaylist(new ArrayList<>());
         playListVo.setVersion("0");
-        
+    
         LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
                                                                        .eq(TbCollectPojo::getUserId, uid)
                                                                        .orderByAsc(TbCollectPojo::getSort);
         Page<TbCollectPojo> collectPojoPage = collectService.page(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
-        
-        // 遍历，把用户喜爱歌单排序到第一位
-        List<TbCollectPojo> last = new ArrayList<>();
-        for (int i = 0; i < collectPojoPage.getRecords().size(); i++) {
-            if (Objects.equals(collectPojoPage.getRecords().get(i).getId(), uid)) {
-                last.add(collectPojoPage.getRecords().get(i));
-                collectPojoPage.getRecords().remove(i);
-                break;
-            }
-        }
-        last.addAll(collectPojoPage.getRecords());
+    
+        List<TbCollectPojo> last = CollectSortUtil.userLikeUserSort(uid, collectPojoPage.getRecords());
         collectPojoPage.setRecords(last);
-        
+    
         // 是否有下一页
         playListVo.setMore(collectPojoPage.hasNext());
         List<TbCollectPojo> collectPojoList = collectPojoPage.getRecords();

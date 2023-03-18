@@ -12,4 +12,5 @@ class Children {
     private String path;
     private String name;
     private Meta meta;
+    private String component;
 }

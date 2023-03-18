@@ -11,6 +11,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.SingerReq;
 import org.api.admin.model.res.AudioInfoRes;
+import org.api.admin.model.res.MusicFileRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
@@ -29,6 +30,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jetbrains.annotations.NotNull;
 import org.oss.factory.OSSFactory;
+import org.oss.service.OSSService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -528,37 +530,33 @@ public class UploadMusicApi {
     /**
      * 查询音乐URL表
      *
-     * @param musicId 音乐id
+     * @param musicIds 音乐id
      * @return 音乐URL列表
      */
-    public List<TbMusicUrlPojo> getMusicUrl(String musicId) {
-        List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery()
-                                                                 .eq(TbMusicUrlPojo::getId, musicId));
-        if (list == null || list.isEmpty()) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
-        }
+    public List<MusicFileRes> getMusicUrl(Set<String> musicIds) {
+        List<MusicFileRes> files = new ArrayList<>();
+        List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
-            tbMusicUrlPojo.setUrl(config.getHost() + tbMusicUrlPojo.getUrl());
+            MusicFileRes musicFileRes = new MusicFileRes();
+            try {
+                OSSService aList = OSSFactory.ossFactory("AList");
+                String musicAddresses = aList.getMusicAddresses(
+                        config.getHost(),
+                        config.getObjectSave(),
+                        tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType());
+                musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
+                musicFileRes.setSize(tbMusicUrlPojo.getSize());
+                musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
+                musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
+                musicFileRes.setRawUrl(musicAddresses);
+                musicFileRes.setExists(true);
+            } catch (Exception e) {
+                musicFileRes.setRawUrl("");
+                musicFileRes.setExists(false);
+                continue;
+            }
+            files.add(musicFileRes);
         }
-        return list;
-    }
-    
-    /**
-     * 下载音乐接口
-     *
-     * @param musicFilePath 音乐地址
-     * @return 音乐数据
-     */
-    public ResponseEntity<FileSystemResource> downloadMusicFile(String musicFilePath) {
-        LocalFileUtil.checkFileNameLegal(musicFilePath);
-        File file = LocalFileUtil.checkFilePath(config.getObjectSave(), musicFilePath);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + musicFilePath);
-        return ResponseEntity.ok()
-                             .headers(headers)
-                             .contentLength(file.length())
-                             .contentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE))
-                             .body(new FileSystemResource(file));
+        return files;
     }
 }

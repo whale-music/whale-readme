@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Set;
 
-@RestController(AdminConfig.ADMIN + "UploadMusicController")
-@RequestMapping("/admin/upload")
+@RestController(AdminConfig.ADMIN + "MusicFlowController")
+@RequestMapping("/admin/music")
 @Slf4j
 @CrossOrigin
-public class UploadMusicController {
+public class MusicFlowController {
     @Autowired
     private UploadMusicApi uploadMusic;
     
@@ -32,7 +33,7 @@ public class UploadMusicController {
      * @param uploadFile 临时文件
      * @return 返回音乐数据
      */
-    @PostMapping("/music/file")
+    @PostMapping("/get/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
     }
@@ -43,7 +44,7 @@ public class UploadMusicController {
      * @param musicTempFile 临时文件
      * @return 字节数据
      */
-    @GetMapping("/temp/{music}")
+    @GetMapping("/get/temp/{music}")
     public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("music") String musicTempFile) {
         return uploadMusic.getMusicTempFile(musicTempFile);
     }
@@ -54,7 +55,7 @@ public class UploadMusicController {
      * @param dto 音乐信息
      * @return 返回成功信息
      */
-    @PostMapping("/music/info")
+    @PostMapping("/upload/info")
     public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) throws IOException {
         MusicDetails musicDetails = uploadMusic.saveMusicInfo(dto);
         return R.success(musicDetails);
@@ -66,19 +67,8 @@ public class UploadMusicController {
      * @param musicId 音乐id
      * @return url
      */
-    @GetMapping("/music/{musicId}")
-    public R getMusicUrl(@PathVariable("musicId") String musicId) {
+    @GetMapping("/get/{musicId}")
+    public R getMusicUrl(@PathVariable("musicId") Set<String> musicId) {
         return R.success(uploadMusic.getMusicUrl(musicId));
-    }
-    
-    /**
-     * 获取上传本地音乐字节数据
-     *
-     * @param musicFilePath 临时文件
-     * @return 字节数据
-     */
-    @GetMapping("/download/{music}")
-    public ResponseEntity<FileSystemResource> downloadMusicFile(@PathVariable("music") String musicFilePath) {
-        return uploadMusic.downloadMusicFile(musicFilePath);
     }
 }

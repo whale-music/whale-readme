@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.web.controller.BaseController;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Objects;
@@ -98,15 +99,16 @@ public class LoginController extends BaseController {
     }
     
     @GetMapping("/login/qr/create")
-    public NeteaseResult qrCreate(@RequestParam("key") String key) {
+    public NeteaseResult qrCreate(HttpServletRequest request, @RequestParam("key") String key) {
         String data = GlobeDataUtil.getData(key);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
             r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
             return r.error(ResultCode.QR_ERROR);
         }
-        String value = "/login/sure?" + data;
-        r.put("qrurl", value);
+        String localhost = request.getServerName() + ":" + request.getServerPort();
+        String value = "/login-key/index.html?key=" + data;
+        r.put("qrurl", localhost + value);
         r.put("qrimg", Base64Util.encode(value));
         return r;
     }

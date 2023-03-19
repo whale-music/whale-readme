@@ -6,13 +6,14 @@ import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
+import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
+import org.api.neteasecloudmusic.service.LoginApi;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
 import org.core.config.CookieConfig;
-import org.core.config.JwtConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
 import org.core.utils.JwtUtil;
@@ -41,10 +42,10 @@ import java.util.UUID;
 public class LoginController extends BaseController {
     
     @Autowired
-    private JwtConfig jwtConfig;
+    private UserApi user;
     
     @Autowired
-    private UserApi user;
+    private LoginApi loginApi;
     
     
     /**
@@ -139,15 +140,24 @@ public class LoginController extends BaseController {
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
         String sign = JwtUtil.sign(userPojo.getUsername(), data);
         GlobeDataUtil.remove(key);
-        
+    
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
         response.addCookie(cookie);
-        
+    
         NeteaseResult r = new NeteaseResult();
         r.put("code", 803);
         r.put("message", "授权登陆成功");
         r.put(CookieConfig.COOKIE_NAME_COOKIE, CookieConfig.COOKIE_NAME_MUSIC_U + "=" + sign);
         return r;
+    }
+    
+    @RequestMapping(value = "/login/status", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult loginStatus(@RequestParam(value = "uid", required = false) Long uid) {
+        uid = uid == null ? UserUtil.getUser().getId() : uid;
+        LoginStatusRes res = loginApi.status(uid);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(res));
+        return r.success();
     }
     
     /**

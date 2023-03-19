@@ -50,7 +50,8 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/user/playlist",
                 "/likelist",
                 "/scrobble",
-                "/admin/playlist/getAsyncRoutes"
+                "/admin/playlist/getAsyncRoutes",
+                "/login/status",
         };
         // 放行登录和注册,注销
         if (!Arrays.asList(passPath).contains(request.getRequestURI())) {

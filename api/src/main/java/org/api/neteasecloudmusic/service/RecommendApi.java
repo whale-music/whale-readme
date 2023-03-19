@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "RecommendApi")
@@ -163,34 +161,60 @@ public class RecommendApi {
             dailySongsItem.setPublishTime(tbMusicPojo.getCreateTime().getNano());
             dailySongsItem.setReason(reason);
             dailySongsItem.setRecommendReason(reason);
-            
+    
+            // 歌手信息
+            ArrayList<org.api.neteasecloudmusic.model.vo.recommend.songs.Artist> artists = new ArrayList<>();
             List<ArItem> ar = new ArrayList<>();
             List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
             for (TbSingerPojo tbSingerPojo : singerByMusicId) {
                 ArItem arItem = new ArItem();
                 arItem.setName(tbSingerPojo.getSingerName());
                 arItem.setId(tbSingerPojo.getId());
-                String alias = Optional.ofNullable(tbSingerPojo.getAlias()).orElse("");
-                arItem.setAlias(Arrays.asList(alias.split(",")));
+                arItem.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
                 ar.add(arItem);
+        
+                // 兼容web api
+                org.api.neteasecloudmusic.model.vo.recommend.songs.Artist artist = new org.api.neteasecloudmusic.model.vo.recommend.songs.Artist();
+                artist.setName(tbSingerPojo.getSingerName());
+                artist.setId(tbSingerPojo.getId());
+                artist.setPicUrl(tbSingerPojo.getPic());
+                artist.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                artist.setMusicSize(qukuService.getMusicCountBySingerId(tbSingerPojo.getId()));
+                artist.setAlbumSize(qukuService.getAlbumCountBySingerId(tbMusicPojo.getId()));
+                artists.add(artist);
             }
             dailySongsItem.setAr(ar);
-            
-            
+            dailySongsItem.setArtists(artists);
+    
+    
             TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
             Al al = new Al();
             al.setPicStr(albumByAlbumId.getPic());
             al.setId(albumByAlbumId.getId());
             al.setName(albumByAlbumId.getAlbumName());
             dailySongsItem.setAl(al);
-            
-            
+    
+            // 兼容web api
+            org.api.neteasecloudmusic.model.vo.recommend.songs.Album album = new org.api.neteasecloudmusic.model.vo.recommend.songs.Album();
+            album.setPicUrl(albumByAlbumId.getPic());
+            album.setArtist(CollUtil.isEmpty(artists) ? null : artists.get(0));
+            album.setId(albumByAlbumId.getId());
+            album.setName(albumByAlbumId.getAlbumName());
+            album.setAlias(AliasUtil.getAliasList(albumByAlbumId.getAliasName()));
+            album.setCompany(albumByAlbumId.getCompany());
+            album.setArtists(artists);
+            album.setBlurPicUrl(albumByAlbumId.getPic());
+            album.setSubType(albumByAlbumId.getSubType());
+            album.setSize(qukuService.getAlbumMusicCountByAlbumId(albumByAlbumId.getId()));
+            album.setPublishTime((long) albumByAlbumId.getPublishTime().getNano());
+            dailySongsItem.setAlbum(album);
+    
             Privilege privilege = new Privilege();
             privilege.setId(tbMusicPojo.getId());
             dailySongsItem.setPrivilege(privilege);
             dailySongsItems.add(dailySongsItem);
-            
-            
+    
+    
             RecommendReasonsItem recommendReasonsItem = new RecommendReasonsItem();
             recommendReasonsItem.setSongId(tbMusicPojo.getId());
             recommendReasonsItem.setReason(reason);

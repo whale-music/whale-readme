@@ -74,7 +74,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 判断是否携带用户信息
         if (token == null) {
             response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter().println(R.error(ResultCode.TOKEN_INVALID.getCode(), ResultCode.TOKEN_INVALID.getResultMsg()));
+            response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
             return false;
         }
     

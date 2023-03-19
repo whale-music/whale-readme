@@ -6,16 +6,14 @@ import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
 import org.api.neteasecloudmusic.model.vo.subcount.Subcount;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
+import org.api.neteasecloudmusic.model.vo.user.detail.UserDetailRes;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.web.controller.BaseController;
 
 import java.util.List;
@@ -73,7 +71,7 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      * @return 返回用户歌单
      */
-    @GetMapping("/user/playlist")
+    @RequestMapping(value = "/user/playlist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Long pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Long pageSize) {
         uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         // 如果歌单查询没有值，直接返回
@@ -113,16 +111,28 @@ public class UserController extends BaseController {
     }
     
     
-    
+    /**
+     * 获取用户听歌历史记录
+     *
+     * @param uid 用户ID
+     */
     @GetMapping("/user/record")
     public NeteaseResult userRecord(@RequestParam("uid") Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
-        List<UserRecordRes> res =  user.userRecord(uid,type);
+        List<UserRecordRes> res = user.userRecord(uid, type);
         NeteaseResult r = new NeteaseResult();
         if (type == 1) {
             r.put("weekData", res);
         } else if (type == 0) {
             r.put("allData", res);
         }
+        return r.success();
+    }
+    
+    @RequestMapping(value = "/user/detail", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult userDetail(@RequestParam("uid") Long uid) {
+        UserDetailRes res = user.userDetail(uid);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(res));
         return r.success();
     }
 }

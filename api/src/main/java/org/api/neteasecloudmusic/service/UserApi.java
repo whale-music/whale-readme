@@ -9,6 +9,10 @@ import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.Creator;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
 import org.api.neteasecloudmusic.model.vo.playlist.PlaylistItem;
+import org.api.neteasecloudmusic.model.vo.user.detail.Profile;
+import org.api.neteasecloudmusic.model.vo.user.detail.ProfileVillageInfo;
+import org.api.neteasecloudmusic.model.vo.user.detail.UserDetailRes;
+import org.api.neteasecloudmusic.model.vo.user.detail.UserPoint;
 import org.api.neteasecloudmusic.model.vo.user.record.Al;
 import org.api.neteasecloudmusic.model.vo.user.record.ArItem;
 import org.api.neteasecloudmusic.model.vo.user.record.Song;
@@ -308,5 +312,41 @@ public class UserApi {
      */
     public SysUserPojo checkPhone(Long phone, String countrycode) {
         return accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
+    }
+    
+    /**
+     * 获取用户详情
+     *
+     * @param uid 用户ID
+     * @return
+     */
+    public UserDetailRes userDetail(Long uid) {
+        UserDetailRes res = new UserDetailRes();
+        SysUserPojo accUserPojo = accountService.getById(uid);
+        res.setLevel(23333);
+        res.setListenSongs(23333);
+        UserPoint userPoint = new UserPoint();
+        userPoint.setUserId(accUserPojo.getId());
+        userPoint.setUpdateTime(accUserPojo.getUpdateTime().getNano());
+        userPoint.setStatus(1);
+        res.setUserPoint(userPoint);
+        
+        
+        Profile profile = new Profile();
+        profile.setUserId(accUserPojo.getId());
+        profile.setAvatarUrl(accUserPojo.getAvatarUrl());
+        profile.setBackgroundUrl(accUserPojo.getBackgroundUrl());
+        profile.setEventCount(233);
+        profile.setFollows(2333);
+        profile.setFolloweds(23333);
+        res.setProfile(profile);
+        
+        ProfileVillageInfo profileVillageInfo = new ProfileVillageInfo();
+        profileVillageInfo.setTitle("crown");
+        profileVillageInfo.setImageUrl(accUserPojo.getAvatarUrl());
+        profileVillageInfo.setTargetUrl(accUserPojo.getBackgroundUrl());
+        res.setProfileVillageInfo(profileVillageInfo);
+        
+        return res;
     }
 }

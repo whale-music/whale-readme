@@ -74,7 +74,7 @@ public class RecommendController {
     /**
      * 推荐歌曲
      */
-    @GetMapping("/recommend/songs")
+    @RequestMapping(value = "/recommend/songs", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult recommendSongs() {
         RecommendSongerRes res = recommendApi.recommendSongs(31);
         NeteaseResult r = new NeteaseResult();

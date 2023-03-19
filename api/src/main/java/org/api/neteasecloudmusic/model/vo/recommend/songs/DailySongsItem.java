@@ -25,6 +25,8 @@ public class DailySongsItem {
     private Object noCopyrightRcmd;
     private Object crbt;
     private List<ArItem> ar;
+    private List<Artist> artists;
+    private Album album;
     private Object rtUrl;
     private String name;
     private Integer no;

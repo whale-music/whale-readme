@@ -24,40 +24,26 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.debug("请求路径: {}", request.getServletPath());
         log.debug("请求参数: {}", request.getQueryString());
+        log.debug("请求信息: {}", request.getPathInfo());
         // 如果不是映射到方法直接通过
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         // 放行路径
         String[] passPath = {
-                "/music/info",
-                "/login/refresh",
+                "/login/cellphone",
+                "/register/account",
                 "/logout",
-                "/refreshToken",
-                "/user/subcount",
-                "/user/account",
-                "/like",
-                "/activate/init/profile",
-                "/playlist/create",
-                "/playlist/name/update",
-                "/playlist/desc/update",
-                "/playlist/tags/update",
-                "/playlist/delete",
-                "/playlist/subscribe",
-                "/playlist/tracks",
-                "/album/sublist",
-                "/artist/sublist",
-                "/user/playlist",
-                "/likelist",
-                "/scrobble",
-                "/admin/playlist/getAsyncRoutes",
-                "/login/status",
+                "/admin/login/register",
+                "/admin/login/account",
+                "/admin/user/register",
+                "/admin/user/login",
         };
         // 放行登录和注册,注销
-        if (!Arrays.asList(passPath).contains(request.getRequestURI())) {
+        if (Arrays.asList(passPath).contains(request.getRequestURI())) {
             return true;
         }
-        log.debug(request.getPathInfo());
+
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
         log.debug("token值：{}", token);
@@ -71,11 +57,9 @@ public class JwtInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        // 判断是否携带用户信息
+        // 判断是否携带用户信息，没有就放行
         if (token == null) {
-            response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
-            return false;
+            return true;
         }
     
         // 验证 token

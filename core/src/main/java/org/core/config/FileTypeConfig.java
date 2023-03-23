@@ -14,5 +14,5 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix="file-type")
 public class FileTypeConfig {
-    private List<String> fileTypes;
+    private List<String> suffix;
 }

@@ -112,7 +112,7 @@ public class MusicFlowApi {
             if (StringUtils.isBlank(filename)) {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
-            fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType.getFileTypes());
+            fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType.getSuffix());
             path = checkFileMd5(md5, new File(pathTemp, md5 + "." + fileSuffix));
             // 本地没有则保存
             if (path == null) {
@@ -126,7 +126,7 @@ public class MusicFlowApi {
             audioInfoRes.setIsExist(true);
         } else {
             // 下载文件
-            fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getFileTypes());
+            fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getSuffix());
             byte[] bytes = HttpUtil.downloadBytes(url);
             String md5 = DigestUtils.md5DigestAsHex(bytes);
             File dest = new File(pathTemp, md5 + "." + fileSuffix);

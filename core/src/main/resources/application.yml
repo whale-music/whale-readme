@@ -67,6 +67,7 @@ jwt-config:
   expire-time: 86400000
 
 file-type:
-  - mp3
-  - ogg
-  - flac
+  suffix:
+    - mp3
+    - ogg
+    - flac

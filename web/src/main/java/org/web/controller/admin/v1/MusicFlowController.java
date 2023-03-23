@@ -33,7 +33,7 @@ public class MusicFlowController {
      * @param uploadFile 临时文件
      * @return 返回音乐数据
      */
-    @PostMapping("/get/file")
+    @PostMapping("/upload/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
     }

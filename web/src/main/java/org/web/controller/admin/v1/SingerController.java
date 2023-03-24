@@ -8,10 +8,10 @@ import org.api.admin.model.res.SingerRes;
 import org.api.admin.service.SingerApi;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController(AdminConfig.ADMIN + "SingerController")
 @RequestMapping("/admin/singer")
@@ -26,5 +26,11 @@ public class SingerController {
     public R getAllSingerList(@RequestBody AlbumReq req) {
         Page<SingerRes> page = singerApi.getAllSingerList(req);
         return R.success(page);
+    }
+    
+    @GetMapping("/select")
+    public R getSelectedSinger(@RequestParam(value = "name", required = false) String name) {
+        List<Map<String, Object>> maps = singerApi.getSelectedSinger(name);
+        return R.success(maps);
     }
 }

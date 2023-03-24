@@ -19,7 +19,6 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PARAM_IS_BLANK("10002", "参数为空"),
     PARAM_TYPE_BIND_ERROR("10003", "参数类型错误"),
     PARAM_NOT_COMPLETE("10004", "参数缺失"),
-    TOKEN_INVALID("10004", "Token 无效"),
     COOKIE_INVALID("10005", "Cookie 无效"),
     FILENAME_INVALID("10006", "文件名无效"),
     SAVE_NAME_INVALID("10007", "存储名称无效"),

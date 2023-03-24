@@ -8,10 +8,10 @@ import org.api.admin.model.res.AlbumRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController(AdminConfig.ADMIN + "AlbumController")
 @RequestMapping("/admin/album")
@@ -25,5 +25,16 @@ public class AlbumController {
     public R getAllAlbumList(@RequestBody AlbumReq req) {
         Page<AlbumRes> page = albumApi.getAllAlbumList(req);
         return R.success(page);
+    }
+    
+    /**
+     * 添加音乐时选择专辑接口
+     *
+     * @param name 专辑ID
+     */
+    @GetMapping("/select")
+    public R getSelectAlbumList(@RequestParam(value = "name", required = false) String name) {
+        List<Map<String, Object>> albums = albumApi.getSelectAlbumList(name);
+        return R.success(albums);
     }
 }

@@ -1,5 +1,6 @@
 package org.api.admin.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -18,8 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 @Service(AdminConfig.ADMIN + "SingerApi")
 public class SingerApi {
@@ -69,15 +69,33 @@ public class SingerApi {
             long albumSize = albumSingerService.count(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
                                                               .eq(TbAlbumSingerPojo::getSingerId, singerPojo.getId()));
             long musicSize = musicSingerService.count(Wrappers.<TbMusicSingerPojo>lambdaQuery().eq(TbMusicSingerPojo::getSingerId, singerPojo.getId()));
-            
+    
             SingerRes singerRes = new SingerRes();
             BeanUtils.copyProperties(singerPojo, singerRes);
             singerRes.setAlbumSize(String.valueOf(albumSize));
             singerRes.setMusicSize(String.valueOf(musicSize));
             singerResPage.getRecords().add(singerRes);
         }
-        
-        
+    
+    
         return singerResPage;
+    }
+    
+    public List<Map<String, Object>> getSelectedSinger(String name) {
+        LambdaQueryWrapper<TbSingerPojo> desc = Wrappers.<TbSingerPojo>lambdaQuery()
+                                                        .like(StringUtils.isNotBlank(name), TbSingerPojo::getSingerName, name)
+                                                        .orderByDesc(TbSingerPojo::getUpdateTime);
+        
+        Page<TbSingerPojo> page = singerService.page(new Page<>(0, 10), desc);
+        
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
+        for (TbSingerPojo albumPojo : page.getRecords()) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("value", albumPojo.getSingerName());
+            map.put("link", String.valueOf(albumPojo.getId()));
+            map.putAll(BeanUtil.beanToMap(albumPojo));
+            maps.add(map);
+        }
+        return maps;
     }
 }

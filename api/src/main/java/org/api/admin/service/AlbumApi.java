@@ -1,5 +1,6 @@
 package org.api.admin.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -150,5 +151,29 @@ public class AlbumApi {
                 musicWrapper.orderBy(true, order, TbAlbumPojo::getCreateTime);
                 break;
         }
+    }
+    
+    
+    /**
+     * 添加音乐时选择专辑接口
+     *
+     * @param name 专辑名
+     */
+    public List<Map<String, Object>> getSelectAlbumList(String name) {
+        LambdaQueryWrapper<TbAlbumPojo> desc = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                       .like(StringUtils.isNotBlank(name), TbAlbumPojo::getAlbumName, name)
+                                                       .orderByDesc(TbAlbumPojo::getUpdateTime);
+        
+        Page<TbAlbumPojo> page = albumService.page(new Page<>(0, 10), desc);
+        
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
+        for (TbAlbumPojo albumPojo : page.getRecords()) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("value", albumPojo.getAlbumName());
+            map.put("link", String.valueOf(albumPojo.getId()));
+            map.putAll(BeanUtil.beanToMap(albumPojo));
+            maps.add(map);
+        }
+        return maps;
     }
 }

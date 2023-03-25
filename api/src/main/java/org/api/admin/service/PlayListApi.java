@@ -155,7 +155,7 @@ public class PlayListApi {
             MusicPageRes e = new MusicPageRes();
             e.setId(musicPojo.getId());
             e.setMusicName(musicPojo.getMusicName());
-            e.setMusicNameAlias(musicPojo.getAliaName());
+            e.setMusicNameAlias(musicPojo.getAliasName());
         
             // 专辑
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumMap.get(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
@@ -201,7 +201,7 @@ public class PlayListApi {
             // 别名
             list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                   .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
-                                                  .like(TbMusicPojo::getAliaName, req.getMusicName())));
+                                                  .like(TbMusicPojo::getAliasName, req.getMusicName())));
             return list.stream().map(TbMusicPojo::getId).distinct().collect(Collectors.toList());
         }
         return Collections.emptyList();

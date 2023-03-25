@@ -98,7 +98,7 @@ class TestUploadMusicApi {
             Data data = Optional.ofNullable(singerInfo.getData()).orElse(new Data());
             // 歌手别名
             Artist artist = Optional.ofNullable(data.getArtist()).orElse(new Artist());
-            singerReq.setAlias(StringUtils.join(artist.getAlias(), ","));
+            singerReq.setAliasName(StringUtils.join(artist.getAlias(), ","));
             // 歌手封面
             singerReq.setPic(artist.getCover());
             // 歌手描述

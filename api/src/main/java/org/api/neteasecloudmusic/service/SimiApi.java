@@ -32,7 +32,7 @@ public class SimiApi {
             artistRes.setId(tbSingerPojo.getId());
             artistRes.setPicUrl(tbSingerPojo.getPic());
             artistRes.setName(tbSingerPojo.getSingerName());
-            artistRes.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+            artistRes.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
             artistRes.setAlbumSize(qukuService.getAlbumCountBySingerId(tbSingerPojo.getId()));
             artistRes.setMusicSize(qukuService.getMusicCountBySingerId(tbSingerPojo.getId()));
             artistRes.setBriefDesc(tbSingerPojo.getIntroduction());

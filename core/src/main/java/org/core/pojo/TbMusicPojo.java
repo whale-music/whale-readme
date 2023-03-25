@@ -37,7 +37,7 @@ public class TbMusicPojo implements Serializable {
 
     @ApiModelProperty("歌曲别名，数组则使用逗号分割")
     @TableField("alia_name")
-    private String aliaName;
+    private String aliasName;
 
     @ApiModelProperty("歌曲封面地址")
     @TableField("pic")

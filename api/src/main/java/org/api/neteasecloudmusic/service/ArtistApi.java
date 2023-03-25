@@ -52,7 +52,7 @@ public class ArtistApi {
             DataItem e = new DataItem();
             e.setName(tbSingerPojo.getSingerName());
             e.setId(tbSingerPojo.getId());
-            String singerAlias = Optional.ofNullable(tbSingerPojo.getAlias()).orElse("");
+            String singerAlias = Optional.ofNullable(tbSingerPojo.getAliasName()).orElse("");
             e.setAlias(Arrays.asList(singerAlias.split(",")));
             e.setPicUrl(tbSingerPojo.getPic());
             e.setAlbumSize(qukuService.getAlbumCountBySingerId(e.getId()));
@@ -121,7 +121,7 @@ public class ArtistApi {
         artist.setName(singerPojo.getSingerName());
         artist.setId(singerPojo.getId());
         artist.setPicUrl(singerPojo.getPic());
-        artist.setAlias(AliasUtil.getAliasList(singerPojo.getAlias()));
+        artist.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
         artist.setImg1v1IdStr(singerPojo.getPic());
         artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
         artist.setBriefDesc(singerPojo.getIntroduction());
@@ -132,7 +132,7 @@ public class ArtistApi {
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             HotSongsItem hotSongsItem = new HotSongsItem();
             hotSongsItem.setName(tbMusicPojo.getMusicName());
-            hotSongsItem.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliaName()));
+            hotSongsItem.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             hotSongsItem.setId(tbMusicPojo.getId());
             
             TbAlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
@@ -148,7 +148,7 @@ public class ArtistApi {
             for (TbSingerPojo tbSingerPojo : singerByMusicId) {
                 ArItem arItem = new ArItem();
                 arItem.setId(tbSingerPojo.getId());
-                arItem.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                arItem.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
                 arItem.setName(tbSingerPojo.getSingerName());
                 ar.add(arItem);
             }

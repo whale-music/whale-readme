@@ -209,7 +209,7 @@ public class PlayListController {
             
             e.setName(musicPojo.getMusicName());
             e.setId(musicPojo.getId());
-            e.setAlia(Arrays.asList(musicPojo.getAliaName().split(",")));
+            e.setAlia(Arrays.asList(musicPojo.getAliasName().split(",")));
             Al al = new Al();
             al.setName(musicPojo.getMusicName());
             al.setPicUrl(musicPojo.getPic());

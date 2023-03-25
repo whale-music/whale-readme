@@ -98,7 +98,7 @@ public class MusicApi {
                 ArItem e1 = new ArItem();
                 e1.setName(tbSingerPojo.getSingerName());
                 e1.setId(tbSingerPojo.getId());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAlias()).orElse("").split(",")));
+                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAliasName()).orElse("").split(",")));
                 ar.add(e1);
             }
             e.setAr(ar);

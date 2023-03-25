@@ -135,7 +135,7 @@ create table if not exists tb_music
     id          bigint       not null comment '音乐ID'
         primary key,
     music_name  varchar(128) null comment '音乐名',
-    alia_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
+    alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
     lyric       longtext     null comment '歌词',
     k_lyric     longtext     null comment '逐字歌词',
@@ -148,7 +148,7 @@ create table if not exists tb_music
     comment '所有音乐列表';
 
 create index tb_music_alia_name_index
-    on tb_music (alia_name);
+    on tb_music (alias_name);
 
 create index tb_music_music_name_index
     on tb_music (music_name);
@@ -202,7 +202,7 @@ create table if not exists tb_singer
     id           bigint       not null comment '歌手ID'
         primary key,
     singer_name  varchar(128) not null comment '歌手名',
-    alias        varchar(255) null comment '歌手别名',
+    alias_name   varchar(255) null comment '歌手别名',
     sex          varchar(64)  null comment '歌手性别',
     pic          varchar(512) null comment '封面',
     birth        date         null comment '出生年月',

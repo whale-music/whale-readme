@@ -61,7 +61,7 @@ public class AlbumApi {
                 e1.setAlbumSize(0);
                 e1.setName(singerListByAlbumId.getSingerName());
                 e1.setId(singerListByAlbumId.getId());
-                String alias = Optional.ofNullable(singerListByAlbumId.getAlias()).orElse("");
+                String alias = Optional.ofNullable(singerListByAlbumId.getAliasName()).orElse("");
                 e1.setAlias(Arrays.asList(alias.split(",")));
                 e1.setPicUrl(singerListByAlbumId.getPic());
                 artists.add(e1);
@@ -122,7 +122,7 @@ public class AlbumApi {
             List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(musicPojo.getId());
             for (TbSingerPojo tbSingerPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
-                e1.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                e1.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
                 e1.setName(tbSingerPojo.getSingerName());
                 e1.setId(tbSingerPojo.getId());
                 ar.add(e1);

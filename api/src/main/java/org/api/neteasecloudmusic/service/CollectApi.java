@@ -462,7 +462,7 @@ public class CollectApi {
             TracksItem e = new TracksItem();
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
-            e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliaName()));
+            e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             e.setPublishTime((long) tbMusicPojo.getCreateTime().getNano());
             ArrayList<ArItem> ar = new ArrayList<>();
             
@@ -472,7 +472,7 @@ public class CollectApi {
                 ArItem e1 = new ArItem();
                 e1.setId(tbSingerPojo.getId());
                 e1.setName(tbSingerPojo.getSingerName());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAlias()).orElse("").split(",")));
+                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAliasName()).orElse("").split(",")));
                 ar.add(e1);
             }
             e.setAr(ar);

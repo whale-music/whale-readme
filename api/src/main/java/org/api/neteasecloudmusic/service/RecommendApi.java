@@ -67,7 +67,7 @@ public class RecommendApi {
             // 歌曲信息
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
-            e.setAlias(List.of(tbMusicPojo.getAliaName().split(",")));
+            e.setAlias(List.of(tbMusicPojo.getAliasName().split(",")));
             // 歌曲下载地址
             List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(tbMusicPojo.getId());
             if (CollUtil.isNotEmpty(musicUrlByMusicId)) {
@@ -170,7 +170,7 @@ public class RecommendApi {
                 ArItem arItem = new ArItem();
                 arItem.setName(tbSingerPojo.getSingerName());
                 arItem.setId(tbSingerPojo.getId());
-                arItem.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                arItem.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
                 ar.add(arItem);
         
                 // 兼容web api
@@ -178,7 +178,7 @@ public class RecommendApi {
                 artist.setName(tbSingerPojo.getSingerName());
                 artist.setId(tbSingerPojo.getId());
                 artist.setPicUrl(tbSingerPojo.getPic());
-                artist.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAlias()));
+                artist.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
                 artist.setMusicSize(qukuService.getMusicCountBySingerId(tbSingerPojo.getId()));
                 artist.setAlbumSize(qukuService.getAlbumCountBySingerId(tbMusicPojo.getId()));
                 artists.add(artist);
@@ -246,7 +246,7 @@ public class RecommendApi {
                 artistsItem.setId(singerListByAlbumId.getId());
                 artistsItem.setPicUrl(singerListByAlbumId.getPic());
                 artistsItem.setName(singerListByAlbumId.getSingerName());
-                artistsItem.setAlias(AliasUtil.getAliasList(singerListByAlbumId.getAlias()));
+                artistsItem.setAlias(AliasUtil.getAliasList(singerListByAlbumId.getAliasName()));
                 artistsItem.setBriefDesc(singerListByAlbumId.getIntroduction());
                 artists.add(artistsItem);
             }

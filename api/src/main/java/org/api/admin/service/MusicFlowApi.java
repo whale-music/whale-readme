@@ -314,7 +314,7 @@ public class MusicFlowApi {
         LambdaQueryWrapper<TbMusicPojo> musicPojoLambdaQueryWrapper = Wrappers.lambdaQuery();
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getMusicName()), TbMusicPojo::getMusicName, dto.getMusicName());
         String join = StringUtils.join(dto.getAliaName(), ",");
-        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(join), TbMusicPojo::getAliaName, join);
+        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(join), TbMusicPojo::getAliasName, join);
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getPic()), TbMusicPojo::getPic, dto.getPic());
     
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getLyric()), TbMusicPojo::getLyric, dto.getLyric());
@@ -337,7 +337,7 @@ public class MusicFlowApi {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
         // music 信息表
         tbMusicPojo.setMusicName(dto.getMusicName());
-        tbMusicPojo.setAliaName(aliaNames);
+        tbMusicPojo.setAliasName(aliaNames);
         tbMusicPojo.setPic(dto.getPic());
         tbMusicPojo.setLyric(dto.getLyric());
         tbMusicPojo.setKLyric(dto.getKLyric());

@@ -35,10 +35,6 @@ public class TbAlbumPojo implements Serializable {
     @TableField("album_name")
     private String albumName;
     
-    @ApiModelProperty("专辑别名")
-    @TableField("alias_name")
-    private String aliasName;
-    
     @ApiModelProperty("专辑版本（比如录音室版，现场版）")
     @TableField("sub_type")
     private String subType;

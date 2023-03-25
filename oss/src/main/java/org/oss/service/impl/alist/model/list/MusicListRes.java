@@ -2,7 +2,7 @@ package org.oss.service.impl.alist.model.list;
 
 public class MusicListRes {
 	private Integer code;
-	private Data data;
+	private MusicDataItem musicDataItem;
 	private String message;
 	
 	public Integer getCode() {
@@ -13,12 +13,12 @@ public class MusicListRes {
 		this.code = code;
 	}
 	
-	public Data getData() {
-		return data;
+	public MusicDataItem getData() {
+		return musicDataItem;
 	}
 	
-	public void setData(Data data) {
-		this.data = data;
+	public void setData(MusicDataItem musicDataItem) {
+		this.musicDataItem = musicDataItem;
 	}
 	
 	public String getMessage() {

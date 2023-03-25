@@ -18,7 +18,6 @@ import org.oss.service.impl.alist.model.list.MusicListRes;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Request {
     
@@ -53,15 +52,15 @@ public class Request {
         }
     }
     
-    public static List<String> list(String host, String path) {
+    public static List<ContentItem> list(String host, String objectSave) {
         MusicListReq musicListReq = new MusicListReq();
-        musicListReq.setPath(path);
+        musicListReq.setPath('/' + objectSave);
         musicListReq.setPage(1);
         musicListReq.setPerPage(0);
         try {
             String resStr = req(host + "/api/fs/list", JSON.toJSONString(musicListReq));
             MusicListRes res = JSON.parseObject(resStr, MusicListRes.class);
-            return res.getData().getContent().stream().map(ContentItem::getName).collect(Collectors.toList());
+            return res.getData().getContent();
         } catch (Exception e) {
             log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
             return ListUtil.empty();

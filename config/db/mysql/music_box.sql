@@ -61,13 +61,13 @@ create table if not exists tb_album
     id           bigint       not null comment '专辑表ID'
         primary key,
     album_name   varchar(512) not null comment '专辑名',
-    alias_name   varchar(512) null comment '专辑别名',
+    sub_type     varchar(128) null comment '专辑版本（比如录音室版，现场版）',
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
     pic          varchar(512) null comment '专辑封面地址',
     publish_time datetime     null comment '专辑发布时间',
-    create_time  datetime     null comment '创建时间',
-    update_time  datetime     null comment '修改时间'
+    update_time  datetime     null comment '修改时间',
+    create_time  datetime     null comment '创建时间'
 )
     comment '歌曲专辑表';
 
@@ -152,14 +152,6 @@ create index tb_music_alia_name_index
 
 create index tb_music_music_name_index
     on tb_music (music_name);
-
-create table if not exists tb_music_singer
-(
-    music_id  bigint not null comment '歌曲ID',
-    singer_id bigint not null comment '歌手ID',
-    primary key (music_id, singer_id)
-)
-    comment '歌曲和歌手的中间表';
 
 create table if not exists tb_music_url
 (

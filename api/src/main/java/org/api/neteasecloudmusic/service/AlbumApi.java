@@ -137,7 +137,6 @@ public class AlbumApi {
         Integer albumMusicCountByAlbumId = qukuService.getAlbumMusicCountByAlbumId(id);
     
         org.api.neteasecloudmusic.model.vo.album.album.Album album = new org.api.neteasecloudmusic.model.vo.album.album.Album();
-        album.setAlias(AliasUtil.getAliasList(tbAlbumPojo.getAliasName()));
         album.setName(tbAlbumPojo.getAlbumName());
         album.setId(tbAlbumPojo.getId());
         album.setDescription(tbAlbumPojo.getDescription());

@@ -9,11 +9,8 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.SingerRes;
 import org.api.admin.utils.MyPageUtil;
-import org.core.pojo.TbAlbumSingerPojo;
-import org.core.pojo.TbMusicSingerPojo;
 import org.core.pojo.TbSingerPojo;
-import org.core.service.TbAlbumSingerService;
-import org.core.service.TbMusicSingerService;
+import org.core.service.QukuService;
 import org.core.service.TbSingerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +26,7 @@ public class SingerApi {
     private TbSingerService singerService;
     
     @Autowired
-    private TbAlbumSingerService albumSingerService;
-    
-    @Autowired
-    private TbMusicSingerService musicSingerService;
+    private QukuService qukuService;
     
     /**
      * 设置分页查询排序
@@ -66,9 +60,8 @@ public class SingerApi {
         BeanUtils.copyProperties(page, singerResPage);
         singerResPage.setRecords(new ArrayList<>());
         for (TbSingerPojo singerPojo : page.getRecords()) {
-            long albumSize = albumSingerService.count(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
-                                                              .eq(TbAlbumSingerPojo::getSingerId, singerPojo.getId()));
-            long musicSize = musicSingerService.count(Wrappers.<TbMusicSingerPojo>lambdaQuery().eq(TbMusicSingerPojo::getSingerId, singerPojo.getId()));
+            long albumSize = qukuService.getAlbumCountBySingerId(singerPojo.getId());
+            long musicSize = qukuService.getMusicCountBySingerId(singerPojo.getId());
     
             SingerRes singerRes = new SingerRes();
             BeanUtils.copyProperties(singerPojo, singerRes);

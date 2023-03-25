@@ -26,7 +26,7 @@ class TestSaveMusicList {
     
     static String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c50a72fdf0cc97532e1e2f6d7efc8affd3519e07624a9f00535f3dd833cb266a5025ff223deb3065a43726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
     // 本地用户音乐
-    long localUserId = 396908669358213L;
+    long localUserId = 399757637947525L;
     @Autowired
     private MusicFlowApi musicFlowApi;
     @Autowired

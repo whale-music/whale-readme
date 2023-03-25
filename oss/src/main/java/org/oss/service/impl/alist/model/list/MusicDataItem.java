@@ -2,7 +2,7 @@ package org.oss.service.impl.alist.model.list;
 
 import java.util.List;
 
-public class Data {
+public class MusicDataItem {
     private Integer total;
     private String provider;
     private String readme;

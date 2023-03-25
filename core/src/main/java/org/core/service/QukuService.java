@@ -3,6 +3,7 @@ package org.core.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.pojo.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public interface QukuService {
      * 批量获取专辑数据
      * Long -> Album ID
      */
-    List<TbAlbumPojo> getAlbumListByAlbumId(List<Long> albumIds);
+    List<TbAlbumPojo> getAlbumListByAlbumId(Collection<Long> albumIds);
     
     /**
      * 批量获取歌手信息
@@ -88,6 +89,12 @@ public interface QukuService {
      */
     List<TbSingerPojo> getSingerListByAlbumIds(List<Long> albumIds);
     
+    /**
+     * 通过歌手ID获取专辑列表
+     *
+     * @param ids 歌手ID
+     */
+    List<TbAlbumPojo> getAlbumListBySingerIds(List<Long> ids);
     
     /**
      * 获取用户收藏专辑
@@ -118,6 +125,20 @@ public interface QukuService {
      * @param id 专辑ID
      */
     List<TbMusicPojo> getMusicListByAlbumId(Long id);
+    
+    /**
+     * 根据专辑ID查找音乐
+     *
+     * @param ids 专辑ID
+     */
+    List<TbMusicPojo> getMusicListByAlbumId(Collection<Long> ids);
+    
+    /**
+     * 根据歌手名查找音乐
+     *
+     * @param name 歌手
+     */
+    List<TbMusicPojo> getMusicListBySingerName(String name);
     
     /**
      * 获取歌手下音乐信息

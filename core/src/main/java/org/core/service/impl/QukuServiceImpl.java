@@ -1,10 +1,12 @@
 package org.core.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.pojo.*;
@@ -24,9 +26,6 @@ public class QukuServiceImpl implements QukuService {
     
     @Autowired
     private TbAlbumService albumService;
-    
-    @Autowired
-    private TbMusicSingerService musicSingerService;
     
     @Autowired
     private TbSingerService singerService;
@@ -91,7 +90,7 @@ public class QukuServiceImpl implements QukuService {
      * 通过专辑ID 获取专辑信息
      */
     @Override
-    public List<TbAlbumPojo> getAlbumListByAlbumId(List<Long> albumIds) {
+    public List<TbAlbumPojo> getAlbumListByAlbumId(Collection<Long> albumIds) {
         return albumService.listByIds(albumIds);
     }
     
@@ -101,8 +100,13 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public List<TbSingerPojo> getSingerListByMusicId(List<Long> musicIds) {
-        List<TbMusicSingerPojo> list = musicSingerService.list(Wrappers.<TbMusicSingerPojo>lambdaQuery().in(TbMusicSingerPojo::getMusicId, musicIds));
-        return getTbSingerPojoList(CollUtil.isEmpty(list), list.stream().map(TbMusicSingerPojo::getSingerId));
+        List<TbMusicPojo> musicPojoList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicIds));
+        if (CollUtil.isEmpty(musicPojoList)) {
+            return Collections.emptyList();
+        }
+        Set<Long> albumIds = musicPojoList.stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
+        List<TbAlbumSingerPojo> list = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery().in(TbAlbumSingerPojo::getAlbumId, albumIds));
+        return getTbSingerPojoList(CollUtil.isEmpty(list), list.stream().map(TbAlbumSingerPojo::getSingerId));
     }
     
     /**
@@ -171,13 +175,16 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 获取歌手音乐数量
+     * 通过歌手获取歌手拥有的音乐数量
      *
      * @param id 歌手ID
      */
     @Override
     public Long getMusicCountBySingerId(Long id) {
-        return musicSingerService.count(Wrappers.<TbMusicSingerPojo>lambdaQuery().eq(TbMusicSingerPojo::getSingerId, id));
+        List<TbAlbumSingerPojo> albumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
+                                                                                      .eq(TbAlbumSingerPojo::getSingerId, id));
+        Set<Long> albumIds = albumSingerPojoList.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toSet());
+        return musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, albumIds));
     }
     
     /**
@@ -188,8 +195,18 @@ public class QukuServiceImpl implements QukuService {
         return getSingerListByAlbumIds(Collections.singletonList(albumIds));
     }
     
+    @Override
+    public List<TbAlbumPojo> getAlbumListBySingerIds(List<Long> ids) {
+        LambdaQueryWrapper<TbAlbumSingerPojo> in = Wrappers.<TbAlbumSingerPojo>lambdaQuery().in(TbAlbumSingerPojo::getSingerId, ids);
+        List<TbAlbumSingerPojo> list = albumSingerService.list(in);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        return getAlbumListByAlbumId(list.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toSet()));
+    }
+    
     /**
-     * 获取专辑歌手列表
+     * 通过专辑ID获取歌手列表
      */
     @Override
     public List<TbSingerPojo> getSingerListByAlbumIds(List<Long> albumIds) {
@@ -197,6 +214,12 @@ public class QukuServiceImpl implements QukuService {
         return getTbSingerPojoList(CollUtil.isEmpty(list), list.stream().map(TbAlbumSingerPojo::getSingerId));
     }
     
+    /**
+     * 通过专辑ID获取歌手
+     *
+     * @param empty      是否执行
+     * @param longStream 专辑ID流
+     */
     private List<TbSingerPojo> getTbSingerPojoList(boolean empty, Stream<Long> longStream) {
         if (empty) {
             return Collections.emptyList();
@@ -260,6 +283,32 @@ public class QukuServiceImpl implements QukuService {
         return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, id));
     }
     
+    @Override
+    public List<TbMusicPojo> getMusicListByAlbumId(Collection<Long> ids) {
+        return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, ids));
+    }
+    
+    /**
+     * 根据歌手名查找音乐
+     *
+     * @param name 歌手
+     */
+    @Override
+    public List<TbMusicPojo> getMusicListBySingerName(String name) {
+        if (StringUtils.isNotBlank(name)) {
+            List<TbSingerPojo> singerList = singerService.list(Wrappers.<TbSingerPojo>lambdaQuery().like(TbSingerPojo::getSingerName, name));
+            List<Long> singerIdsList = singerList.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
+            List<TbAlbumSingerPojo> albumIds = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
+                                                                               .eq(TbAlbumSingerPojo::getSingerId, singerIdsList));
+            if (IterUtil.isNotEmpty(albumIds)) {
+                return getMusicListByAlbumId(albumIds.stream()
+                                                     .map(TbAlbumSingerPojo::getAlbumId)
+                                                     .collect(Collectors.toSet()));
+            }
+        }
+        return Collections.emptyList();
+    }
+    
     /**
      * 获取歌手下音乐信息
      *
@@ -267,10 +316,12 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public List<TbMusicPojo> getMusicListBySingerId(Long id) {
-        List<TbMusicSingerPojo> tbMusicSingerPojos = musicSingerService.list(Wrappers.<TbMusicSingerPojo>lambdaQuery()
-                                                                                     .eq(TbMusicSingerPojo::getSingerId, id));
-        Set<Long> collect = tbMusicSingerPojos.stream().map(TbMusicSingerPojo::getMusicId).collect(Collectors.toSet());
-        return musicService.listByIds(collect);
+        List<TbAlbumPojo> albumListBySingerIds = getAlbumListBySingerIds(Collections.singletonList(id));
+        if (CollUtil.isEmpty(albumListBySingerIds)) {
+            return Collections.emptyList();
+        }
+        Set<Long> albumIds = albumListBySingerIds.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
+        return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, albumIds));
     }
     
     /**

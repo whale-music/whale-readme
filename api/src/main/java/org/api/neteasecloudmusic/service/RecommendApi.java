@@ -200,7 +200,6 @@ public class RecommendApi {
             album.setArtist(CollUtil.isEmpty(artists) ? null : artists.get(0));
             album.setId(albumByAlbumId.getId());
             album.setName(albumByAlbumId.getAlbumName());
-            album.setAlias(AliasUtil.getAliasList(albumByAlbumId.getAliasName()));
             album.setCompany(albumByAlbumId.getCompany());
             album.setArtists(artists);
             album.setBlurPicUrl(albumByAlbumId.getPic());

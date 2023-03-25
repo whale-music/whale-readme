@@ -94,7 +94,6 @@ public class ArtistApi {
             HotAlbumsItem e = new HotAlbumsItem();
             e.setId(tbAlbumPojo.getId());
             e.setName(tbAlbumPojo.getAlbumName());
-            e.setAlias(AliasUtil.getAliasList(tbAlbumPojo.getAliasName()));
             e.setCompany(tbAlbumPojo.getCompany());
             e.setPicUrl(tbAlbumPojo.getPic());
             e.setBlurPicUrl(tbAlbumPojo.getPic());
@@ -141,7 +140,6 @@ public class ArtistApi {
             al.setId(albumByMusicId.getId());
             al.setName(albumByMusicId.getAlbumName());
             al.setPicUrl(albumByMusicId.getPic());
-            al.setAlia(AliasUtil.getAliasList(albumByMusicId.getAliasName()));
             hotSongsItem.setAl(al);
             hotSongs.add(hotSongsItem);
             

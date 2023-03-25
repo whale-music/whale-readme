@@ -120,7 +120,7 @@ class TestSaveMusicList {
                 log.info("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }
         }
-        log.info("一共存储{}个音乐信息一下是音乐名", musicPojoList.size());
+        log.info("一共存储{}个音乐信息以下是音乐名", musicPojoList.size());
         musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getMusicName).forEach(System.out::println);
     }
 }

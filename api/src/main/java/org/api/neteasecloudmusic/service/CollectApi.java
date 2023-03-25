@@ -465,14 +465,14 @@ public class CollectApi {
             e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             e.setPublishTime((long) tbMusicPojo.getCreateTime().getNano());
             ArrayList<ArItem> ar = new ArrayList<>();
-            
+    
             // 艺术家数据
-            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
-            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
-                e1.setId(tbSingerPojo.getId());
-                e1.setName(tbSingerPojo.getSingerName());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAliasName()).orElse("").split(",")));
+                e1.setId(tbArtistPojo.getId());
+                e1.setName(tbArtistPojo.getArtistName());
+                e1.setAlias(Arrays.asList(Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("").split(",")));
                 ar.add(e1);
             }
             e.setAr(ar);

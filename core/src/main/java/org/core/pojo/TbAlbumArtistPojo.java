@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author Sakura
@@ -24,18 +24,18 @@ import java.io.Serializable;
 @Setter
 @Accessors(chain = true)
 @TableName("tb_album_singer")
-@ApiModel(value = "TbAlbumSingerPojo对象", description = "歌手和专辑中间表")
-public class TbAlbumSingerPojo implements Serializable {
-
+@ApiModel(value = "TbAlbumArtistPojo对象", description = "歌手和专辑中间表")
+public class TbAlbumArtistPojo implements Serializable {
+    
     private static final long serialVersionUID = 1L;
-
+    
     @ApiModelProperty("专辑ID")
     @TableId(value = "album_id", type = IdType.ASSIGN_ID)
     private Long albumId;
-
+    
     @ApiModelProperty("歌手ID")
-    @TableField("singer_id")
-    private Long singerId;
+    @TableField("artist_id")
+    private Long artistId;
 
 
 }

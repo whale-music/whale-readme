@@ -32,10 +32,10 @@ public class SingerRes{
 	@Override
  	public String toString(){
 		return 
-			"SingerRes{" + 
-			"code = '" + code + '\'' + 
-			",data = '" + data + '\'' + 
-			",message = '" + message + '\'' + 
-			"}";
+			"ArtistRes{" +
+					"code = '" + code + '\'' +
+					",data = '" + data + '\'' +
+					",message = '" + message + '\'' +
+					"}";
 		}
 }

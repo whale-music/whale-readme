@@ -12,6 +12,6 @@ import java.util.List;
 public class MusicDetails {
     private TbMusicPojo music;
     private TbAlbumPojo album;
-    private List<TbSingerPojo> singer;
+    private List<TbArtistPojo> singer;
     private TbMusicUrlPojo musicUrl;
 }

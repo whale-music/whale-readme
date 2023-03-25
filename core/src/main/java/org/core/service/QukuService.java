@@ -35,12 +35,12 @@ public interface QukuService {
      * 批量获取歌手信息
      * Long -> music ID
      */
-    List<TbSingerPojo> getSingerListByMusicId(List<Long> musicIds);
+    List<TbArtistPojo> getSingerListByMusicId(List<Long> musicIds);
     
     /**
      * 获取歌手信息
      */
-    List<TbSingerPojo> getSingerByMusicId(Long musicId);
+    List<TbArtistPojo> getSingerByMusicId(Long musicId);
     
     /**
      * 获取歌曲下载地址
@@ -82,12 +82,12 @@ public interface QukuService {
     /**
      * 获取专辑歌手列表
      */
-    List<TbSingerPojo> getSingerListByAlbumIds(Long albumIds);
+    List<TbArtistPojo> getSingerListByAlbumIds(Long albumIds);
     
     /**
      * 获取专辑歌手列表
      */
-    List<TbSingerPojo> getSingerListByAlbumIds(List<Long> albumIds);
+    List<TbArtistPojo> getSingerListByAlbumIds(List<Long> albumIds);
     
     /**
      * 通过歌手ID获取专辑列表
@@ -110,7 +110,7 @@ public interface QukuService {
      *
      * @param user 用户信息
      */
-    List<TbSingerPojo> getUserLikeSingerList(SysUserPojo user);
+    List<TbArtistPojo> getUserLikeSingerList(SysUserPojo user);
     
     /**
      * 获取歌手所有专辑数量
@@ -152,5 +152,5 @@ public interface QukuService {
      *
      * @param count 获取数量
      */
-    List<TbSingerPojo> randomSinger(int count);
+    List<TbArtistPojo> randomSinger(int count);
 }

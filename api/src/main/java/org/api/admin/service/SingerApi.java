@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
-import org.api.admin.model.res.SingerRes;
+import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
-import org.core.pojo.TbSingerPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.service.QukuService;
 import org.core.service.TbSingerService;
 import org.springframework.beans.BeanUtils;
@@ -31,39 +31,39 @@ public class SingerApi {
     /**
      * 设置分页查询排序
      */
-    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbSingerPojo> musicWrapper) {
+    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbArtistPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
         switch (Optional.ofNullable(orderBy).orElse("")) {
             case "id":
-                musicWrapper.orderBy(true, order, TbSingerPojo::getId);
+                musicWrapper.orderBy(true, order, TbArtistPojo::getId);
                 break;
             case "updateTime":
-                musicWrapper.orderBy(true, order, TbSingerPojo::getUpdateTime);
+                musicWrapper.orderBy(true, order, TbArtistPojo::getUpdateTime);
                 break;
             case "createTime":
             default:
-                musicWrapper.orderBy(true, order, TbSingerPojo::getCreateTime);
+                musicWrapper.orderBy(true, order, TbArtistPojo::getCreateTime);
                 break;
         }
     }
     
-    public Page<SingerRes> getAllSingerList(AlbumReq req) {
+    public Page<ArtistRes> getAllSingerList(AlbumReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
         
-        Page<TbSingerPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
-        LambdaQueryWrapper<TbSingerPojo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotBlank(req.getSingerName()), TbSingerPojo::getSingerName, req.getSingerName());
+        Page<TbArtistPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
+        LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotBlank(req.getSingerName()), TbArtistPojo::getArtistName, req.getSingerName());
         pageOrderBy(req.getOrder(), req.getOrderBy(), queryWrapper);
         singerService.page(page, queryWrapper);
         
-        Page<SingerRes> singerResPage = new Page<>();
+        Page<ArtistRes> singerResPage = new Page<>();
         BeanUtils.copyProperties(page, singerResPage);
         singerResPage.setRecords(new ArrayList<>());
-        for (TbSingerPojo singerPojo : page.getRecords()) {
+        for (TbArtistPojo singerPojo : page.getRecords()) {
             long albumSize = qukuService.getAlbumCountBySingerId(singerPojo.getId());
             long musicSize = qukuService.getMusicCountBySingerId(singerPojo.getId());
-    
-            SingerRes singerRes = new SingerRes();
+            
+            ArtistRes singerRes = new ArtistRes();
             BeanUtils.copyProperties(singerPojo, singerRes);
             singerRes.setAlbumSize(String.valueOf(albumSize));
             singerRes.setMusicSize(String.valueOf(musicSize));
@@ -75,16 +75,16 @@ public class SingerApi {
     }
     
     public List<Map<String, Object>> getSelectedSinger(String name) {
-        LambdaQueryWrapper<TbSingerPojo> desc = Wrappers.<TbSingerPojo>lambdaQuery()
-                                                        .like(StringUtils.isNotBlank(name), TbSingerPojo::getSingerName, name)
-                                                        .orderByDesc(TbSingerPojo::getUpdateTime);
-        
-        Page<TbSingerPojo> page = singerService.page(new Page<>(0, 10), desc);
-        
+        LambdaQueryWrapper<TbArtistPojo> desc = Wrappers.<TbArtistPojo>lambdaQuery()
+                                                        .like(StringUtils.isNotBlank(name), TbArtistPojo::getArtistName, name)
+                                                        .orderByDesc(TbArtistPojo::getUpdateTime);
+    
+        Page<TbArtistPojo> page = singerService.page(new Page<>(0, 10), desc);
+    
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
-        for (TbSingerPojo albumPojo : page.getRecords()) {
+        for (TbArtistPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("value", albumPojo.getSingerName());
+            map.put("value", albumPojo.getArtistName());
             map.put("link", String.valueOf(albumPojo.getId()));
             map.putAll(BeanUtil.beanToMap(albumPojo));
             maps.add(map);

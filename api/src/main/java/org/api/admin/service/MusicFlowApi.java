@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
-import org.api.admin.model.req.SingerReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
 import org.core.common.exception.BaseException;
@@ -209,21 +209,21 @@ public class MusicFlowApi {
             LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
         }
         // 保存歌手和音乐中间表
-        List<TbSingerPojo> tbSingerPojos = saveAndReturnMusicAndSingList(dto);
-        Set<Long> singIds = tbSingerPojos.stream().map(TbSingerPojo::getId).collect(Collectors.toSet());
-        
+        List<TbArtistPojo> tbArtistPojos = saveAndReturnMusicAndSingList(dto);
+        Set<Long> singIds = tbArtistPojos.stream().map(TbArtistPojo::getId).collect(Collectors.toSet());
+    
         // 保存专辑表，如果没有则新建。
         TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, singIds);
         // 保存音乐表
         TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, singIds, albumPojo);
         // 上传文件
         TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
-        
+    
         MusicDetails musicDetails = new MusicDetails();
         musicDetails.setMusic(musicPojo);
         musicDetails.setMusicUrl(tbMusicUrlPojo);
         musicDetails.setAlbum(albumPojo);
-        musicDetails.setSinger(tbSingerPojos);
+        musicDetails.setSinger(tbArtistPojos);
         return musicDetails;
     }
     
@@ -384,10 +384,10 @@ public class MusicFlowApi {
         // 根据歌手和专辑ID查找关联ID，如果有则更新专辑表。
         if (IterUtil.isNotEmpty(albumList) && IterUtil.isNotEmpty(singerIds)) {
             // 专辑表找到后，在中间表同时满足专辑ID和歌手ID两个列表，只找到同一个专辑ID
-            List<TbAlbumSingerPojo> tbAlbumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
-                                                                                            .in(TbAlbumSingerPojo::getSingerId, singerIds)
-                                                                                            .in(TbAlbumSingerPojo::getAlbumId, albumList));
-            albumIds = tbAlbumSingerPojoList.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toList());
+            List<TbAlbumArtistPojo> tbAlbumArtistPojoList = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                                            .in(TbAlbumArtistPojo::getArtistId, singerIds)
+                                                                                            .in(TbAlbumArtistPojo::getAlbumId, albumList));
+            albumIds = tbAlbumArtistPojoList.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toList());
         }
         List<Long> distinct = CollUtil.distinct(albumIds);
         ExceptionUtil.isNull(distinct.size() > 1, ResultCode.ALBUM_NOT_EXIST);
@@ -413,11 +413,11 @@ public class MusicFlowApi {
             albumService.saveOrUpdate(albumPojo);
             // 更新歌手和专辑中间表
             if (IterUtil.isNotEmpty(singerIds)) {
-                List<TbAlbumSingerPojo> albumSingerPojoArrayList = new ArrayList<>();
+                List<TbAlbumArtistPojo> albumSingerPojoArrayList = new ArrayList<>();
                 for (Long id : singerIds) {
-                    TbAlbumSingerPojo e = new TbAlbumSingerPojo();
+                    TbAlbumArtistPojo e = new TbAlbumArtistPojo();
                     e.setAlbumId(albumPojo.getId());
-                    e.setSingerId(id);
+                    e.setArtistId(id);
                     albumSingerPojoArrayList.add(e);
                 }
                 albumSingerService.saveBatch(albumSingerPojoArrayList);
@@ -438,39 +438,39 @@ public class MusicFlowApi {
      * @param dto 前端请求数据
      * @return 返回音乐和歌手ID
      */
-    private List<TbSingerPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
+    private List<TbArtistPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
-        if (IterUtil.isEmpty(dto.getSinger()) || StringUtils.isBlank(dto.getSinger().get(0).getSingerName())) {
+        if (IterUtil.isEmpty(dto.getSinger()) || StringUtils.isBlank(dto.getSinger().get(0).getArtistName())) {
             return Collections.emptyList();
         }
         // 有歌手ID直接返回数据
         if (CollUtil.isNotEmpty(dto.getSinger()) && dto.getSinger().get(0) != null && dto.getSinger().get(0).getId() != null) {
-            List<Long> singerIds = dto.getSinger().stream().map(TbSingerPojo::getId).filter(Objects::isNull).collect(Collectors.toList());
+            List<Long> singerIds = dto.getSinger().stream().map(TbArtistPojo::getId).filter(Objects::isNull).collect(Collectors.toList());
             return singerService.listByIds(singerIds);
         }
         // 有歌手，数据库中有，查询出歌手和音乐主键ID
         // 获取前端传入所有歌手
         List<String> singerNameList = dto.getSinger()
                                          .stream()
-                                         .map(TbSingerPojo::getSingerName)
+                                         .map(TbArtistPojo::getArtistName)
                                          .collect(Collectors.toList());
-        
+    
         // 查询数据库中歌手
-        List<TbSingerPojo> singList = singerService.list(Wrappers.<TbSingerPojo>lambdaQuery()
-                                                                 .in(TbSingerPojo::getSingerName, singerNameList));
-        
-        
-        List<TbSingerPojo> saveBatch = new ArrayList<>();
+        List<TbArtistPojo> singList = singerService.list(Wrappers.<TbArtistPojo>lambdaQuery()
+                                                                 .in(TbArtistPojo::getArtistName, singerNameList));
+    
+    
+        List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
-        List<SingerReq> singerReqList = dto.getSinger();
-        for (SingerReq singerReq : singerReqList) {
-            TbSingerPojo pojo = new TbSingerPojo();
+        List<ArtistReq> singerReqList = dto.getSinger();
+        for (ArtistReq singerReq : singerReqList) {
+            TbArtistPojo pojo = new TbArtistPojo();
             BeanUtils.copyProperties(singerReq, pojo);
             // 覆盖数据中的数据，防止出现脏数据(多个相同的歌手)
-            for (TbSingerPojo tbSingerPojo : singList) {
-                if (StringUtils.equalsIgnoreCase(singerReq.getSingerName(), tbSingerPojo.getSingerName())) {
+            for (TbArtistPojo tbArtistPojo : singList) {
+                if (StringUtils.equalsIgnoreCase(singerReq.getArtistName(), tbArtistPojo.getArtistName())) {
                     // 歌曲家名字相同，就把数据库中的ID拷贝到前端传入的数据中，直接更新数据库
-                    pojo.setId(tbSingerPojo.getId());
+                    pojo.setId(tbArtistPojo.getId());
                 }
             }
             saveBatch.add(pojo);

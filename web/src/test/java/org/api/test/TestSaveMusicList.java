@@ -75,12 +75,12 @@ class TestSaveMusicList {
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
             tbMusicPojo.setMusicUrl(Optional.ofNullable(tbMusicPojo.getMusicUrl()).orElse(new TbMusicUrlPojo()));
-            
+    
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
             log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
-            for (TbSingerPojo tbSingerPojo : tbMusicPojo.getSinger()) {
-                log.info("添加歌手：{}\tID:{}", tbSingerPojo.getSingerName(), tbSingerPojo.getId());
+            for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
+                log.info("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }
         }
         log.info("一共存储{}个音乐信息", musicPojoList.size());
@@ -116,8 +116,8 @@ class TestSaveMusicList {
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
             log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
-            for (TbSingerPojo tbSingerPojo : tbMusicPojo.getSinger()) {
-                log.info("添加歌手：{}\tID:{}", tbSingerPojo.getSingerName(), tbSingerPojo.getId());
+            for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
+                log.info("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }
         }
         log.info("一共存储{}个音乐信息一下是音乐名", musicPojoList.size());

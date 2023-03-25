@@ -11,10 +11,10 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.AlbumRes;
 import org.api.admin.utils.MyPageUtil;
+import org.core.pojo.TbAlbumArtistPojo;
 import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbAlbumSingerPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbSingerPojo;
 import org.core.service.TbAlbumService;
 import org.core.service.TbAlbumSingerService;
 import org.core.service.TbMusicService;
@@ -63,14 +63,14 @@ public class AlbumApi {
         
         List<Long> singerAlbumIdList = new ArrayList<>();
         if (StringUtils.isNotBlank(req.getSingerName())) {
-            LambdaQueryWrapper<TbSingerPojo> singerWrapper = Wrappers.<TbSingerPojo>lambdaQuery().like(TbSingerPojo::getSingerName, req.getSingerName());
-            List<TbSingerPojo> singerList = singerService.list(singerWrapper);
+            LambdaQueryWrapper<TbArtistPojo> singerWrapper = Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, req.getSingerName());
+            List<TbArtistPojo> singerList = singerService.list(singerWrapper);
             // 查询歌手表
             if (CollUtil.isNotEmpty(singerList)) {
-                List<Long> collect = singerList.stream().map(TbSingerPojo::getId).collect(Collectors.toList());
-                List<TbAlbumSingerPojo> list = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
-                                                                               .in(TbAlbumSingerPojo::getSingerId, collect));
-                singerAlbumIdList = list.stream().map(TbAlbumSingerPojo::getAlbumId).collect(Collectors.toList());
+                List<Long> collect = singerList.stream().map(TbArtistPojo::getId).collect(Collectors.toList());
+                List<TbAlbumArtistPojo> list = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                               .in(TbAlbumArtistPojo::getArtistId, collect));
+                singerAlbumIdList = list.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toList());
             }
         }
         List<Long> albumListId = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
@@ -85,18 +85,18 @@ public class AlbumApi {
         albumService.page(albumPojoPage, lambdaQueryWrapper);
         
         // 获取专辑ID，以供查询歌手信息
-        List<TbAlbumSingerPojo> albumSingerPojos = new ArrayList<>();
+        List<TbAlbumArtistPojo> albumSingerPojos = new ArrayList<>();
         List<TbMusicPojo> musicPojoList = new ArrayList<>();
-        Map<Long, TbSingerPojo> tbSingerPojoMap = new HashMap<>();
+        Map<Long, TbArtistPojo> tbSingerPojoMap = new HashMap<>();
         if (CollUtil.isNotEmpty(albumPojoPage.getRecords())) {
             List<Long> collect = albumPojoPage.getRecords().stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
-            albumSingerPojos = albumSingerService.list(Wrappers.<TbAlbumSingerPojo>lambdaQuery()
-                                                               .in(CollUtil.isNotEmpty(collect), TbAlbumSingerPojo::getAlbumId, collect));
-            List<TbSingerPojo> tbSingerPojos = singerService.listByIds(albumSingerPojos.stream()
-                                                                                       .map(TbAlbumSingerPojo::getSingerId)
+            albumSingerPojos = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                               .in(CollUtil.isNotEmpty(collect), TbAlbumArtistPojo::getAlbumId, collect));
+            List<TbArtistPojo> tbArtistPojos = singerService.listByIds(albumSingerPojos.stream()
+                                                                                       .map(TbAlbumArtistPojo::getArtistId)
                                                                                        .collect(Collectors.toList()));
-            tbSingerPojoMap = tbSingerPojos.stream().collect(Collectors.toMap(TbSingerPojo::getId, tbSingerPojo -> tbSingerPojo));
-            
+            tbSingerPojoMap = tbArtistPojos.stream().collect(Collectors.toMap(TbArtistPojo::getId, tbSingerPojo -> tbSingerPojo));
+    
             // 查询专辑中歌曲数量
             if (CollUtil.isNotEmpty(collect)) {
                 musicPojoList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, collect));
@@ -116,9 +116,9 @@ public class AlbumApi {
             int[] singerIds = CollUtil.indexOfAll(albumSingerPojos,
                     tbAlbumSingerPojo -> ObjectUtil.equals(tbAlbumPojo.getId(), tbAlbumSingerPojo.getAlbumId()));
             for (int singerId : singerIds) {
-                Long singerId1 = Optional.ofNullable(albumSingerPojos.get(singerId)).orElse(new TbAlbumSingerPojo()).getSingerId();
-                TbSingerPojo tbSingerPojo = tbSingerPojoMap.get(singerId1);
-                albumRes.getSinger().add(tbSingerPojo);
+                Long singerId1 = Optional.ofNullable(albumSingerPojos.get(singerId)).orElse(new TbAlbumArtistPojo()).getArtistId();
+                TbArtistPojo tbArtistPojo = tbSingerPojoMap.get(singerId1);
+                albumRes.getSinger().add(tbArtistPojo);
             }
             
             // 获取专辑下歌曲数量

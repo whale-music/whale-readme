@@ -2,7 +2,7 @@ package org.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.core.mapper.TbSingerMapper;
-import org.core.pojo.TbSingerPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.service.TbSingerService;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-12-02
  */
 @Service
-public class TbSingerServiceImpl extends ServiceImpl<TbSingerMapper, TbSingerPojo> implements TbSingerService {
+public class TbSingerServiceImpl extends ServiceImpl<TbSingerMapper, TbArtistPojo> implements TbSingerService {
 
 }

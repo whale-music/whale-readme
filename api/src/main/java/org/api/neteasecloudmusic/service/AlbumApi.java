@@ -13,8 +13,8 @@ import org.api.neteasecloudmusic.model.vo.album.sublist.ArtistsItem;
 import org.api.neteasecloudmusic.model.vo.album.sublist.DataItem;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbAlbumPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbSingerPojo;
 import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +54,12 @@ public class AlbumApi {
             e.setSize(albumSize);
             e.setPicUrl(tbAlbumPojo.getPic());
             ArrayList<ArtistsItem> artists = new ArrayList<>();
-            List<TbSingerPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(tbAlbumPojo.getId());
-            for (TbSingerPojo singerListByAlbumId : singerListByAlbumIds) {
+            List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(tbAlbumPojo.getId());
+            for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
                 ArtistsItem e1 = new ArtistsItem();
                 // 艺术家下专辑数量专辑
                 e1.setAlbumSize(0);
-                e1.setName(singerListByAlbumId.getSingerName());
+                e1.setName(singerListByAlbumId.getArtistName());
                 e1.setId(singerListByAlbumId.getId());
                 String alias = Optional.ofNullable(singerListByAlbumId.getAliasName()).orElse("");
                 e1.setAlias(Arrays.asList(alias.split(",")));
@@ -82,14 +82,14 @@ public class AlbumApi {
         album.setAlbumId(albumByAlbumId.getId());
         album.setCoverUrl(albumByAlbumId.getPic());
         album.setBlurImgUrl(albumByAlbumId.getPic());
-        
-        List<TbSingerPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
-        TbSingerPojo tbSingerPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbSingerPojo() : singerListByAlbumIds.get(0);
-        album.setArtistId(tbSingerPojo.getId());
-        album.setArtistName(tbSingerPojo.getSingerName());
-        album.setArtistNames(tbSingerPojo.getSingerName());
-        album.setArtistAvatarUrl(tbSingerPojo.getPic());
-        
+    
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
+        TbArtistPojo tbArtistPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbArtistPojo() : singerListByAlbumIds.get(0);
+        album.setArtistId(tbArtistPojo.getId());
+        album.setArtistName(tbArtistPojo.getArtistName());
+        album.setArtistNames(tbArtistPojo.getArtistName());
+        album.setArtistAvatarUrl(tbArtistPojo.getPic());
+    
         Product product = new Product();
         String description = albumByAlbumId.getDescription();
         ArrayList<DescrItem> descr = new ArrayList<>();
@@ -119,16 +119,16 @@ public class AlbumApi {
             e.setAl(al);
     
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(musicPojo.getId());
-            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(musicPojo.getId());
+            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
-                e1.setAlia(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
-                e1.setName(tbSingerPojo.getSingerName());
-                e1.setId(tbSingerPojo.getId());
+                e1.setAlia(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
+                e1.setName(tbArtistPojo.getArtistName());
+                e1.setId(tbArtistPojo.getId());
                 ar.add(e1);
             }
             e.setAr(ar);
-            
+    
             songs.add(e);
         }
         AlbumRes res = new AlbumRes();
@@ -146,28 +146,28 @@ public class AlbumApi {
         album.setSize(albumMusicCountByAlbumId);
     
     
-        List<TbSingerPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
         ArrayList<org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem> artists = new ArrayList<>();
-        for (TbSingerPojo singerListByAlbumId : singerListByAlbumIds) {
+        for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
             org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem e = new org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem();
-            e.setName(singerListByAlbumId.getSingerName());
+            e.setName(singerListByAlbumId.getArtistName());
             e.setId(singerListByAlbumId.getId());
             e.setAlbumSize(albumMusicCountByAlbumId);
             e.setPicUrl(singerListByAlbumId.getPic());
-            
+        
             artists.add(e);
         }
         album.setArtists(artists);
     
-        TbSingerPojo tbSingerPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbSingerPojo() : singerListByAlbumIds.get(0);
+        TbArtistPojo tbArtistPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbArtistPojo() : singerListByAlbumIds.get(0);
         Artist artist = new Artist();
-        artist.setId(tbSingerPojo.getId());
+        artist.setId(tbArtistPojo.getId());
         artist.setName(tbAlbumPojo.getAlbumName());
         artist.setAlbumSize(qukuService.getAlbumCountBySingerId(tbAlbumPojo.getId()));
-        artist.setPicUrl(tbSingerPojo.getPic());
-        artist.setImg1v1Url(tbSingerPojo.getPic());
+        artist.setPicUrl(tbArtistPojo.getPic());
+        artist.setImg1v1Url(tbArtistPojo.getPic());
         album.setArtist(artist);
-        
+    
         res.setAlbum(album);
         return res;
     }

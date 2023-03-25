@@ -11,8 +11,8 @@ import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.ListItem;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
 import org.core.pojo.SysUserPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbSingerPojo;
 import org.core.service.AccountService;
 import org.core.service.QukuService;
 import org.core.service.TbCollectService;
@@ -43,13 +43,13 @@ public class TopListApi {
     
     public TopListArtistRes artist(String type) {
         TopListArtistRes res = new TopListArtistRes();
-        Page<TbSingerPojo> page = new Page<>(1L, 200L);
+        Page<TbArtistPojo> page = new Page<>(1L, 200L);
         singerService.page(page);
         ArrayList<ArtistsItem> artists = new ArrayList<>();
-        for (TbSingerPojo singerPojo : page.getRecords()) {
+        for (TbArtistPojo singerPojo : page.getRecords()) {
             ArtistsItem e = new ArtistsItem();
             e.setId(singerPojo.getId());
-            e.setName(singerPojo.getSingerName());
+            e.setName(singerPojo.getArtistName());
             e.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
             e.setPicUrl(singerPojo.getPic());
             e.setAlbumSize(qukuService.getAlbumCountBySingerId(singerPojo.getId()));

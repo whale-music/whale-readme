@@ -6,8 +6,8 @@ import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
-import org.api.admin.model.req.SingerReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.model.album.Album;
 import org.api.model.album.AlbumRes;
@@ -88,12 +88,12 @@ class TestUploadMusicApi {
         dto.setPic(dtoAlbum.getPicUrl());
         
         // 歌手
-        ArrayList<SingerReq> singer = new ArrayList<>();
+        ArrayList<ArtistReq> singer = new ArrayList<>();
         for (ArItem arItem : song.getAr()) {
-            SingerReq singerReq = new SingerReq();
+            ArtistReq singerReq = new ArtistReq();
             SingerRes singerInfo = RequestMusic163.getSingerInfo(arItem.getId(), TestSaveMusicList.cookie);
             // 歌手名
-            singerReq.setSingerName(arItem.getName());
+            singerReq.setArtistName(arItem.getName());
             // 歌手别名
             Data data = Optional.ofNullable(singerInfo.getData()).orElse(new Data());
             // 歌手别名

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
-import org.api.admin.model.res.SingerRes;
+import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.SingerApi;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class SingerController {
     
     @PostMapping("/allSinger")
     public R getAllSingerList(@RequestBody AlbumReq req) {
-        Page<SingerRes> page = singerApi.getAllSingerList(req);
+        Page<ArtistRes> page = singerApi.getAllSingerList(req);
         return R.success(page);
     }
     

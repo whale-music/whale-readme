@@ -91,14 +91,14 @@ public class MusicApi {
             e.setName(tbMusicPojo.getMusicName());
             e.setPublishTime(tbMusicPojo.getCreateTime().getNano());
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
             
             // 歌手
-            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
-                e1.setName(tbSingerPojo.getSingerName());
-                e1.setId(tbSingerPojo.getId());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbSingerPojo.getAliasName()).orElse("").split(",")));
+                e1.setName(tbArtistPojo.getArtistName());
+                e1.setId(tbArtistPojo.getId());
+                e1.setAlias(Arrays.asList(Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("").split(",")));
                 ar.add(e1);
             }
             e.setAr(ar);

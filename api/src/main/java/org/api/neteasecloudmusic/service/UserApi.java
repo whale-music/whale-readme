@@ -246,8 +246,8 @@ public class UserApi {
      * @return 关注数量
      */
     public Long getUserBySinger(Long userId) {
-        LambdaQueryWrapper<TbUserSingerPojo> lambdaQueryWrapper = Wrappers.<TbUserSingerPojo>lambdaQuery()
-                                                                          .eq(TbUserSingerPojo::getUserId, userId);
+        LambdaQueryWrapper<TbUserArtistPojo> lambdaQueryWrapper = Wrappers.<TbUserArtistPojo>lambdaQuery()
+                                                                          .eq(TbUserArtistPojo::getUserId, userId);
         return userSingerService.count(lambdaQueryWrapper);
     }
     
@@ -278,14 +278,14 @@ public class UserApi {
             song.setName(tbMusicPojo.getMusicName());
             song.setId(tbMusicPojo.getId());
             song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-            
-            List<TbSingerPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+    
+            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
             ArrayList<ArItem> ar = new ArrayList<>();
-            for (TbSingerPojo tbSingerPojo : singerByMusicId) {
+            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e = new ArItem();
-                e.setAlias(AliasUtil.getAliasList(tbSingerPojo.getAliasName()));
-                e.setName(tbSingerPojo.getSingerName());
-                e.setId(tbSingerPojo.getId());
+                e.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
+                e.setName(tbArtistPojo.getArtistName());
+                e.setId(tbArtistPojo.getId());
                 ar.add(e);
             }
             song.setAr(ar);

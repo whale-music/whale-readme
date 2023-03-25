@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.core.pojo.TbAlbumPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
-import org.core.pojo.TbSingerPojo;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MusicRes extends TbMusicPojo {
     @ApiModelProperty("歌手")
-    private List<TbSingerPojo> singerList;
+    private List<TbArtistPojo> singerList;
     
     @ApiModelProperty("专辑名")
     private TbAlbumPojo album;

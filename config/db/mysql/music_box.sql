@@ -159,7 +159,9 @@ create table if not exists tb_music
     sort        bigint       null comment '排序字段',
     time_length int          null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
-    create_time datetime     null comment '创建时间'
+    create_time datetime     null comment '创建时间',
+    constraint tb_music_id_music_name_alias_name_album_id_uindex
+        unique (id, music_name, alias_name, album_id)
 )
     comment '所有音乐列表';
 

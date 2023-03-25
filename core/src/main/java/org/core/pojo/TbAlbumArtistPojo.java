@@ -23,7 +23,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("tb_album_singer")
+@TableName("tb_album_artist")
 @ApiModel(value = "TbAlbumArtistPojo对象", description = "歌手和专辑中间表")
 public class TbAlbumArtistPojo implements Serializable {
     

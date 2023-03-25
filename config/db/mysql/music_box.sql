@@ -74,13 +74,29 @@ create table if not exists tb_album
 create index tb_album_album_name_index
     on tb_album (album_name);
 
-create table if not exists tb_album_singer
+create table if not exists tb_album_artist
 (
     album_id  bigint not null comment '专辑ID',
-    singer_id bigint not null comment '歌手ID',
-    primary key (album_id, singer_id)
+    artist_id bigint not null comment '歌手ID',
+    primary key (album_id, artist_id)
 )
     comment '歌手和专辑中间表';
+
+create table if not exists tb_artist
+(
+    id           bigint       not null comment '歌手ID'
+        primary key,
+    artist_name  varchar(128) not null comment '歌手名',
+    alias_name   varchar(255) null comment '歌手别名',
+    sex          varchar(64)  null comment '歌手性别',
+    pic          varchar(512) null comment '封面',
+    birth        date         null comment '出生年月',
+    location     varchar(64)  null comment '所在国家',
+    introduction longtext     null comment '歌手介绍',
+    create_time  datetime     null comment '创建时间',
+    update_time  datetime     null comment '修改时间'
+)
+    comment '歌手表';
 
 create table if not exists tb_collect
 (
@@ -197,22 +213,6 @@ create table if not exists tb_rank
 )
     comment '音乐播放排行榜';
 
-create table if not exists tb_singer
-(
-    id           bigint       not null comment '歌手ID'
-        primary key,
-    singer_name  varchar(128) not null comment '歌手名',
-    alias_name   varchar(255) null comment '歌手别名',
-    sex          varchar(64)  null comment '歌手性别',
-    pic          varchar(512) null comment '封面',
-    birth        date         null comment '出生年月',
-    location     varchar(64)  null comment '所在国家',
-    introduction longtext     null comment '歌手介绍',
-    create_time  datetime     null comment '创建时间',
-    update_time  datetime     null comment '修改时间'
-)
-    comment '歌手表';
-
 create table if not exists tb_tag
 (
     id          bigint      not null
@@ -233,11 +233,11 @@ create table if not exists tb_user_album
 )
     comment '用户收藏专辑表';
 
-create table if not exists tb_user_singer
+create table if not exists tb_user_artist
 (
     user_id   bigint not null comment '用户ID',
-    singer_id bigint not null comment '歌手ID',
-    primary key (user_id, singer_id)
+    artist_id bigint not null comment '歌手ID',
+    primary key (user_id, artist_id)
 )
     comment '用户关注歌曲家';
 

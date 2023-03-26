@@ -76,6 +76,7 @@ public class ArtistApi {
         artist.setName(singerPojo.getArtistName());
         artist.setAlias(AliasUtil.getAliasList(singerPojo.getArtistName()));
         artist.setPicIdStr(singerPojo.getPic());
+        artist.setPicUrl(singerPojo.getPic());
         artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
         artist.setAlbumSize(qukuService.getAlbumCountBySingerId(singerPojo.getId()));
     

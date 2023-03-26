@@ -238,7 +238,7 @@ public class RecommendApi {
             recommendAlbumNewRes.setPicUrl(albumPojo.getPic());
             recommendAlbumNewRes.setDescription(albumPojo.getDescription());
     
-            List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(albumPojo.getId());
+            List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(albumPojo.getId());
             List<org.api.neteasecloudmusic.model.vo.recommend.albumnew.ArtistsItem> artists = new ArrayList<>();
             for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
                 org.api.neteasecloudmusic.model.vo.recommend.albumnew.ArtistsItem artistsItem = new org.api.neteasecloudmusic.model.vo.recommend.albumnew.ArtistsItem();

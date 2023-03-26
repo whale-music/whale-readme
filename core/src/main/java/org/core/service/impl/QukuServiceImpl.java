@@ -191,8 +191,8 @@ public class QukuServiceImpl implements QukuService {
      * 获取专辑歌手列表
      */
     @Override
-    public List<TbArtistPojo> getSingerListByAlbumIds(Long albumIds) {
-        return getSingerListByAlbumIds(Collections.singletonList(albumIds));
+    public List<TbArtistPojo> getArtistListByAlbumIds(Long albumIds) {
+        return getArtistListByAlbumIds(Collections.singletonList(albumIds));
     }
     
     @Override
@@ -209,7 +209,7 @@ public class QukuServiceImpl implements QukuService {
      * 通过专辑ID获取歌手列表
      */
     @Override
-    public List<TbArtistPojo> getSingerListByAlbumIds(List<Long> albumIds) {
+    public List<TbArtistPojo> getArtistListByAlbumIds(List<Long> albumIds) {
         List<TbAlbumArtistPojo> list = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, albumIds));
         return getTbSingerPojoList(CollUtil.isEmpty(list), list.stream().map(TbAlbumArtistPojo::getArtistId));
     }

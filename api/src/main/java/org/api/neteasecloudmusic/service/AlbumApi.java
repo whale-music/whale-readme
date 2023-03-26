@@ -54,7 +54,7 @@ public class AlbumApi {
             e.setSize(albumSize);
             e.setPicUrl(tbAlbumPojo.getPic());
             ArrayList<ArtistsItem> artists = new ArrayList<>();
-            List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(tbAlbumPojo.getId());
+            List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(tbAlbumPojo.getId());
             for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
                 ArtistsItem e1 = new ArtistsItem();
                 // 艺术家下专辑数量专辑
@@ -83,7 +83,7 @@ public class AlbumApi {
         album.setCoverUrl(albumByAlbumId.getPic());
         album.setBlurImgUrl(albumByAlbumId.getPic());
     
-        List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(id);
         TbArtistPojo tbArtistPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbArtistPojo() : singerListByAlbumIds.get(0);
         album.setArtistId(tbArtistPojo.getId());
         album.setArtistName(tbArtistPojo.getArtistName());
@@ -142,11 +142,12 @@ public class AlbumApi {
         album.setDescription(tbAlbumPojo.getDescription());
         album.setCompany(tbAlbumPojo.getCompany());
         album.setSubType(tbAlbumPojo.getSubType());
+        album.setPicUrl(tbAlbumPojo.getPic());
         album.setPublishTime(tbAlbumPojo.getPublishTime().getNano());
         album.setSize(albumMusicCountByAlbumId);
     
     
-        List<TbArtistPojo> singerListByAlbumIds = qukuService.getSingerListByAlbumIds(id);
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(id);
         ArrayList<org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem> artists = new ArrayList<>();
         for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
             org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem e = new org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem();

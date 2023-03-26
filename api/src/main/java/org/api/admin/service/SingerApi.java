@@ -52,7 +52,7 @@ public class SingerApi {
         
         Page<TbArtistPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotBlank(req.getSingerName()), TbArtistPojo::getArtistName, req.getSingerName());
+        queryWrapper.like(StringUtils.isNotBlank(req.getArtistName()), TbArtistPojo::getArtistName, req.getArtistName());
         pageOrderBy(req.getOrder(), req.getOrderBy(), queryWrapper);
         singerService.page(page, queryWrapper);
         
@@ -90,5 +90,9 @@ public class SingerApi {
             maps.add(map);
         }
         return maps;
+    }
+    
+    public List<TbArtistPojo> getSingerListByAlbumId(Long albumId) {
+        return qukuService.getArtistListByAlbumIds(albumId);
     }
 }

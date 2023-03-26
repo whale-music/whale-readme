@@ -54,16 +54,16 @@ public class AlbumApi {
     
     public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-        
+    
         List<TbAlbumPojo> albumList = new ArrayList<>();
         if (StringUtils.isNotBlank(req.getAlbumName())) {
             LambdaQueryWrapper<TbAlbumPojo> albumWrapper = Wrappers.<TbAlbumPojo>lambdaQuery().like(TbAlbumPojo::getAlbumName, req.getAlbumName());
             albumList = albumService.list(albumWrapper);
         }
-        
+    
         List<Long> singerAlbumIdList = new ArrayList<>();
-        if (StringUtils.isNotBlank(req.getSingerName())) {
-            LambdaQueryWrapper<TbArtistPojo> singerWrapper = Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, req.getSingerName());
+        if (StringUtils.isNotBlank(req.getArtistName())) {
+            LambdaQueryWrapper<TbArtistPojo> singerWrapper = Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, req.getArtistName());
             List<TbArtistPojo> singerList = singerService.list(singerWrapper);
             // 查询歌手表
             if (CollUtil.isNotEmpty(singerList)) {

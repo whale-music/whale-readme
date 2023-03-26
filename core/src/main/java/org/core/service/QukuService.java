@@ -82,12 +82,12 @@ public interface QukuService {
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getSingerListByAlbumIds(Long albumIds);
+    List<TbArtistPojo> getArtistListByAlbumIds(Long albumIds);
     
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getSingerListByAlbumIds(List<Long> albumIds);
+    List<TbArtistPojo> getArtistListByAlbumIds(List<Long> albumIds);
     
     /**
      * 通过歌手ID获取专辑列表

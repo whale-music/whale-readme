@@ -7,6 +7,7 @@ import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.SingerApi;
 import org.core.common.result.R;
+import org.core.pojo.TbArtistPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +33,11 @@ public class SingerController {
     public R getSelectedSinger(@RequestParam(value = "name", required = false) String name) {
         List<Map<String, Object>> maps = singerApi.getSelectedSinger(name);
         return R.success(maps);
+    }
+    
+    @GetMapping("/getArtistByAlbumId")
+    public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
+        List<TbArtistPojo> byAlbumId = singerApi.getSingerListByAlbumId(albumId);
+        return R.success(byAlbumId);
     }
 }

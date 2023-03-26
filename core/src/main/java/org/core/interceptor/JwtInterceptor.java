@@ -1,11 +1,10 @@
 package org.core.interceptor;
 
-import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
-import org.core.common.result.R;
-import org.core.common.result.ResultCode;
+import org.apache.commons.lang3.StringUtils;
+import org.core.config.CookieConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
@@ -16,7 +15,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
@@ -24,6 +22,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.debug("请求路径: {}", request.getServletPath());
         log.debug("请求参数: {}", request.getQueryString());
+        log.debug("请求信息: {}", request.getPathInfo());
         // 如果不是映射到方法直接通过
         if (!(handler instanceof HandlerMethod)) {
             return true;
@@ -35,42 +34,49 @@ public class JwtInterceptor implements HandlerInterceptor {
                 "/logout",
                 "/admin/login/register",
                 "/admin/login/account",
+                "/admin/user/register",
+                "/admin/user/login",
         };
         // 放行登录和注册,注销
         if (Arrays.asList(passPath).contains(request.getRequestURI())) {
             return true;
         }
-        log.debug(request.getPathInfo());
+    
+        String getTempFile = "/admin/music/get/temp/";
+        int length = getTempFile.length();
+        if (length < request.getRequestURI().length()) {
+            String substring = request.getRequestURI().substring(0, length);
+            if (StringUtils.equals(getTempFile, substring)) {
+                return true;
+            }
+        }
+    
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
         log.debug("token值：{}", token);
         // 如果token的值是空的就从cookie里面取值
         if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
-            Optional<Cookie> first = Arrays.stream(request.getCookies())
-                                           .filter(cookie -> !"undefined".equalsIgnoreCase(cookie.getValue()))
-                                           .filter(cookie -> Header.COOKIE.getValue()
-                                                                          .equalsIgnoreCase(cookie.getName()))
-                                           .findFirst();
-            token = first.map(Cookie::getValue).orElse(null);
+            for (Cookie cookie : request.getCookies()) {
+                if (StringUtils.equalsIgnoreCase(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
+                        CookieConfig.COOKIE_NAME_MUSIC_U)) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
         }
-        // 判断是否携带用户信息
+        // 判断是否携带用户信息，没有就放行
         if (token == null) {
-            response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter()
-                    .println(R.error(ResultCode.TOKEN_INVALID.getCode(),
-                            ResultCode.TOKEN_INVALID.getResultMsg()));
-            return false;
+            return true;
         }
-        
+    
         // 验证 token
         try {
             JwtUtil.checkSign(token);
         } catch (JWTVerificationException e) {
-            response.setHeader("content-type", "application/json; charset=utf-8");
-            response.getWriter()
-                    .println(R.error(ResultCode.COOKIE_INVALID.getCode(),
-                            ResultCode.COOKIE_INVALID.getResultMsg()));
-            return false;
+            // response.setHeader("content-type", "application/json; charset=utf-8");
+            // response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
+            log.warn("Cookie失效");
+            return true;
         }
         
         // 验证通过后， 这里测试取出JWT中存放的数据

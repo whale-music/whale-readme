@@ -1,32 +1,23 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.api.neteasecloudmusic.model.vo.playlist.Creator;
+import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
-import org.api.neteasecloudmusic.model.vo.playlist.PlaylistItem;
 import org.api.neteasecloudmusic.model.vo.subcount.Subcount;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
-import org.api.neteasecloudmusic.service.CollectApi;
+import org.api.neteasecloudmusic.model.vo.user.detail.UserDetailRes;
+import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.result.NeteaseResult;
 import org.core.pojo.SysUserPojo;
-import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbCollectTagPojo;
-import org.core.pojo.TbTagPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.web.controller.BaseController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * <p>
@@ -36,7 +27,7 @@ import java.util.stream.Collectors;
  * @author Sakura
  * @since 2022-10-22
  */
-@RestController("NeteaseCloudUser")
+@RestController(NeteaseCloudConfig.NETEASECLOUD + "UserController")
 @RequestMapping("/")
 @Slf4j
 public class UserController extends BaseController {
@@ -44,8 +35,6 @@ public class UserController extends BaseController {
     @Autowired
     private UserApi user;
     
-    @Autowired
-    private CollectApi collect;
     
     /**
      * 获取用户信息
@@ -82,75 +71,14 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      * @return 返回用户歌单
      */
-    @GetMapping("/user/playlist")
-    public NeteaseResult userPlayList(@RequestParam("uid") String uid, Long pageSize, Long pageIndex) {
-        if (pageIndex == null || pageSize == null) {
-            pageIndex = 0L;
-            pageSize = 30L;
-        }
-        PlayListVo playListVo = new PlayListVo();
-        playListVo.setPlaylist(new ArrayList<>());
-        playListVo.setVersion("0");
-        
-        
+    @RequestMapping(value = "/user/playlist", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Long pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Long pageSize) {
+        uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         // 如果歌单查询没有值，直接返回
-        Page<TbCollectPojo> collectPojoPage = user.getPlayList(uid, pageIndex, pageSize);
-        // 是否有下一页
-        playListVo.setMore(collectPojoPage.hasNext());
-        List<TbCollectPojo> collectPojoList = collectPojoPage.getRecords();
-        if (collectPojoList == null || collectPojoList.isEmpty()) {
-            NeteaseResult neteaseResult = new NeteaseResult();
-            neteaseResult.putAll(BeanUtil.beanToMap(playListVo));
-            return neteaseResult.success();
-        }
-        // 导出歌单id
-        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
-        // 根据歌单和tag的中间表来获取tag id列表
-        List<TbCollectTagPojo> collectIdAndTagsIdList = collect.getCollectTagIdList(collectIds);
-        // 根据tag id 列表获取tag Name列表
-        List<Long> tagIdList = collectIdAndTagsIdList.stream()
-                                                     .map(TbCollectTagPojo::getTagId)
-                                                     .collect(Collectors.toList());
-        List<TbTagPojo> collectTagList = collect.getTagPojoList(tagIdList);
-        
-        
-        for (TbCollectPojo tbCollectPojo : collectPojoList) {
-            PlaylistItem item = new PlaylistItem();
-            // 是否订阅
-            item.setSubscribed(false);
-            // 创作者
-            Creator creator = new Creator();
-            item.setCreator(creator);
-            // 用户ID
-            item.setUserId(tbCollectPojo.getUserId());
-            // 封面图像ID
-            item.setCoverImgUrl(tbCollectPojo.getPic());
-            // 创建时间
-            item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
-            // 描述
-            item.setDescription(tbCollectPojo.getDescription());
-            // 判断中间表是否有值
-            // 判断tag表是否有值
-            if (!collectIdAndTagsIdList.isEmpty() && collectTagList != null && !collectTagList.isEmpty()) {
-                // 歌单tag
-                // 先查找歌单和tag中间表，再查找tag记录表
-                List<String> tags = collectIdAndTagsIdList.stream()
-                                                          .filter(tbCollectTagPojo -> tbCollectTagPojo.getCollectId()
-                                                                                                      .equals(tbCollectPojo.getId()))
-                                                          .map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(),
-                                                                  collectTagList))
-                                                          .collect(Collectors.toList());
-                item.setTags(tags);
-            }
-            // 歌单名
-            item.setName(tbCollectPojo.getPlayListName());
-            // 歌单ID
-            item.setId(tbCollectPojo.getId());
-            
-            playListVo.getPlaylist().add(item);
-        }
+        PlayListVo playList = user.getPlayList(uid, pageIndex, pageSize);
+    
         NeteaseResult neteaseResult = new NeteaseResult();
-        neteaseResult.putAll(BeanUtil.beanToMap(playListVo));
+        neteaseResult.putAll(BeanUtil.beanToMap(playList));
         return neteaseResult.success();
     }
     
@@ -184,18 +112,27 @@ public class UserController extends BaseController {
     
     
     /**
-     * 获取歌单tag
+     * 获取用户听歌历史记录
      *
-     * @param tagId   tag id
-     * @param tagList 风格
-     * @return 风格名称
+     * @param uid 用户ID
      */
-    private String getTags(Long tagId, List<TbTagPojo> tagList) {
-        for (TbTagPojo tag : tagList) {
-            if (Objects.equals(tag.getId(), tagId)) {
-                return tag.getTagName();
-            }
+    @GetMapping("/user/record")
+    public NeteaseResult userRecord(@RequestParam("uid") Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
+        List<UserRecordRes> res = user.userRecord(uid, type);
+        NeteaseResult r = new NeteaseResult();
+        if (type == 1) {
+            r.put("weekData", res);
+        } else if (type == 0) {
+            r.put("allData", res);
         }
-        return null;
+        return r.success();
+    }
+    
+    @RequestMapping(value = "/user/detail", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult userDetail(@RequestParam("uid") Long uid) {
+        UserDetailRes res = user.userDetail(uid);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(res));
+        return r.success();
     }
 }

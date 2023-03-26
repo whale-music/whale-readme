@@ -2,32 +2,34 @@ package org.api.admin.service;
 
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.model.dto.UserDto;
-import org.api.admin.model.vo.UserVo;
+import org.api.admin.config.AdminConfig;
+import org.api.admin.model.req.UserReq;
+import org.api.admin.model.res.UserRes;
 import org.core.pojo.SysUserPojo;
-import org.core.service.SysUserService;
+import org.core.service.AccountService;
 import org.core.utils.JwtUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service("adminUser")
+@Service(AdminConfig.ADMIN + "UserApi")
 public class UserApi {
+    
     // 用户服务
     @Autowired
-    private SysUserService userService;
+    private AccountService accountService;
     
-    public void createAccount(UserDto req) {
-        userService.createAccount(req);
+    public void createAccount(UserReq req) {
+        accountService.createAccount(req);
     }
     
-    public UserVo login(String phone, String password) {
-        SysUserPojo userPojo = userService.login(phone, password);
+    public UserRes login(String phone, String password) {
+        SysUserPojo userPojo = accountService.login(phone, password);
         String sign = JwtUtil.sign(userPojo.getUsername(), JSON.toJSONString(userPojo));
-        UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(userPojo, userVo);
-        userVo.setToken(sign);
-        return userVo;
+        UserRes userRes = new UserRes();
+        BeanUtils.copyProperties(userPojo, userRes);
+        userRes.setToken(sign);
+        return userRes;
     }
 }

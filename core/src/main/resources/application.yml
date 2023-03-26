@@ -1,6 +1,6 @@
 server:
   # 配置启动端口号
-  port: 8080
+  port: 8000
   servlet:
     session:
       timeout: 259200000000
@@ -10,7 +10,7 @@ server:
 ########## log ##########
 logging:
   level:
-    root: info
+    root: debug
   pattern:
     # 时间；日志级别；类；方法；行(行不能使用圆括号)
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %C.%M[%line] - %msg%n"
@@ -20,7 +20,7 @@ spring:
   datasource:
     #引用项目中的数据库文件
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/music_box?useUnicode=true&characterEncoding=UTF-8&useSSL=false&&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/whale_music?useUnicode=true&characterEncoding=UTF-8&useSSL=false&&serverTimezone=UTC
     username: root
     password: root
   servlet:
@@ -50,10 +50,24 @@ mybatis-plus:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-music-config:
+save-config:
   # 保存模式
-  save-mode: local
-  object-save: data
-  host: http://127.0.0.1:8080/upload/download/
-  access-key: admin
-  secret-key: c81e728d9d4c2f636f067f89cc14862c
+  save-mode: AList
+  # 请求对象地址 (必须)
+  object-save: /123
+  # 请求地址(必须)
+  host: http://43.139.22.243:5244
+  # 账户(可选)
+  access-key:
+  # 密码(可选)
+  secret-key:
+
+jwt-config:
+  seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c
+  expire-time: 86400000
+
+file-type:
+  suffix:
+    - mp3
+    - ogg
+    - flac

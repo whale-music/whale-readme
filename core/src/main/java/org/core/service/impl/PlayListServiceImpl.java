@@ -1,0 +1,76 @@
+package org.core.service.impl;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
+import org.core.pojo.TbCollectMusicPojo;
+import org.core.pojo.TbCollectPojo;
+import org.core.pojo.TbMusicPojo;
+import org.core.service.PlayListService;
+import org.core.service.TbCollectMusicService;
+import org.core.service.TbCollectService;
+import org.core.service.TbMusicService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service("PlayListServiceImpl")
+public class PlayListServiceImpl implements PlayListService {
+    
+    @Autowired
+    private TbCollectService collectService;
+    
+    @Autowired
+    private TbCollectMusicService collectMusicService;
+    
+    @Autowired
+    private TbMusicService musicService;
+    
+    public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size) {
+        collectPojo = Optional.ofNullable(collectPojo).orElse(new TbCollectPojo());
+        Page<TbCollectPojo> page = new Page<>(current, size);
+        LambdaQueryWrapper<TbCollectPojo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(collectPojo.getId() != null, TbCollectPojo::getId, collectPojo.getId());
+        queryWrapper.like(StringUtils.isNotBlank(collectPojo.getPlayListName()), TbCollectPojo::getPlayListName, collectPojo.getPlayListName());
+        // 只查询普通歌单
+        queryWrapper.eq(TbCollectPojo::getType, Short.valueOf("0"));
+        collectService.page(page, queryWrapper);
+        return page;
+    }
+    
+    public List<TbCollectPojo> randomPlayList(Long limit) {
+        List<TbCollectPojo> tbCollectPojos = new ArrayList<>();
+        long count = collectService.count();
+        if (count == 0) {
+            return new ArrayList<>();
+        }
+        for (int i = 0; i < limit; i++) {
+            long randomNum = RandomUtil.randomLong(count);
+            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L);
+            tbCollectPojos.addAll(playList.getRecords());
+        }
+        Set<TbCollectPojo> playerSet = new TreeSet<>(Comparator.comparing(TbCollectPojo::getId));
+        playerSet.addAll(tbCollectPojos);
+        return new ArrayList<>(playerSet);
+    }
+    
+    /**
+     * 获取歌单下所有音乐
+     *
+     * @param id 歌单ID
+     */
+    public List<TbMusicPojo> getPlayListAllMusic(Long id) {
+        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, id));
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        List<Long> musicIds = list.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        return musicService.listByIds(musicIds);
+    }
+    
+}

@@ -1,7 +1,7 @@
 package org.core.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.core.pojo.TbSingerPojo;
+import org.core.pojo.TbArtistPojo;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import org.core.pojo.TbSingerPojo;
  * @author Sakura
  * @since 2022-12-02
  */
-public interface TbSingerService extends IService<TbSingerPojo> {
+public interface TbSingerService extends IService<TbArtistPojo> {
 
 }

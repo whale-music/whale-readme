@@ -2,7 +2,7 @@ package org.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.core.pojo.TbUserSingerPojo;
+import org.core.pojo.TbUserArtistPojo;
 
 /**
  * <p>
@@ -13,6 +13,6 @@ import org.core.pojo.TbUserSingerPojo;
  * @since 2022-12-02
  */
 @Mapper
-public interface TbUserSingerMapper extends BaseMapper<TbUserSingerPojo> {
+public interface TbUserSingerMapper extends BaseMapper<TbUserArtistPojo> {
 
 }

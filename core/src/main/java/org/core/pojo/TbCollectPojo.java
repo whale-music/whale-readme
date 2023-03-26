@@ -30,23 +30,27 @@ public class TbCollectPojo implements Serializable {
     @ApiModelProperty("歌单表ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
-    @ApiModelProperty("歌单名")
+    
+    @ApiModelProperty("歌单名（包括用户喜爱歌单）")
     @TableField("play_list_name")
     private String playListName;
-
+    
     @ApiModelProperty("封面地址")
     @TableField("pic")
     private String pic;
-
+    
+    @ApiModelProperty("歌单类型，0为普通歌单，1为用户喜爱歌单，")
+    @TableField("type")
+    private Short type;
+    
     @ApiModelProperty("简介")
     @TableField("description")
     private String description;
-
+    
     @ApiModelProperty("创建人ID")
     @TableField("user_id")
     private Long userId;
-
+    
     @ApiModelProperty("排序字段")
     @TableField("sort")
     private Long sort;

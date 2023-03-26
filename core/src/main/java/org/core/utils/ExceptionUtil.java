@@ -8,12 +8,13 @@ public class ExceptionUtil {
     
     public static void isNull(boolean flag, ResultCode code) {
         if (flag) {
-            throw new BaseException(code);
+            throw new BaseException(code.getResultMsg());
         }
     }
-    public static void isNull(boolean flag,Throwable e) {
+    
+    public static void isNull(boolean flag, ResultCode code, Throwable e) {
         if (flag) {
-            throw new RuntimeException(e);
+            throw new BaseException(code, e);
         }
     }
 }

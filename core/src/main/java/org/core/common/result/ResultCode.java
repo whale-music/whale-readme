@@ -12,40 +12,29 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 默认失败状态码 */
     ERROR("100", "操作失败，未知指定错误信息"),
-    
+    QR_ERROR("800", "二维码不存在或已过期"),
     
     /* 参数错误：10001-19999 */
     PARAM_IS_INVALID("10001", "参数无效"),
     PARAM_IS_BLANK("10002", "参数为空"),
     PARAM_TYPE_BIND_ERROR("10003", "参数类型错误"),
     PARAM_NOT_COMPLETE("10004", "参数缺失"),
-    TOKEN_INVALID("10004", "Token 无效"),
     COOKIE_INVALID("10005", "Cookie 无效"),
-    // 文件名无效
     FILENAME_INVALID("10006", "文件名无效"),
+    SAVE_NAME_INVALID("10007", "存储名称无效"),
     
     
     /* 用户错误：20001-29999*/
     USER_NOT_LOGIN("20001", "用户未登录"),
-    
     USER_LOGIN_ERROR("20002", "账号不存在或密码错误"),
-    
     USER_ACCOUNT_FORBIDDEN("20003", "账号已被禁用"),
-    
     USER_HAS_EXISTED("20005", "用户已存在"),
-    
-    USER_NOT_EXIST("20006", "用户名不存在!"),
-    
+    USER_NOT_EXIST("20006", "用户不存在!"),
     DUPLICATE_USER_NAME_ERROR("20007", "用户名不能重复!"),
-    
     SONG_LIST_DOES_NOT_EXIST("20008", "歌单不存在!"),
-    
     SONG_NOT_EXIST("20009", "歌曲不存在!"),
-    
     SONG_EXIST("20010", "数据库中歌曲已存在!"),
-    
     SONG_UPLOADED("20011", "歌曲已上传!"),
-    
     MULTIPLE_SONGS("20012", "数据库中有多个相似歌曲请手动添加!"),
     ALBUM_NOT_EXIST("20013", "专辑已存在!"),
     ALBUM_ERROR("20014", "专辑专辑错误!"),
@@ -59,8 +48,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 系统错误：40001-49999 */
     SYSTEM_INNER_ERROR("40001", "系统内部错误，请稍后重试"),
-    
     INTERNAL_SERVER_ERROR("40002", "未知异常"),
+    LOCAL_FILE("40003", "本地文件"),
     
     /* 数据错误：50001-599999 */
     DATA_NONE("50001", "数据未找到"),

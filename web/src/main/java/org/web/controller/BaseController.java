@@ -1,12 +1,16 @@
 package org.web.controller;
 
 import cn.hutool.http.Header;
+import com.alibaba.fastjson2.JSON;
 import org.api.neteasecloudmusic.model.vo.user.Account;
 import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.core.common.result.NeteaseResult;
+import org.core.config.CookieConfig;
 import org.core.pojo.SysUserPojo;
+import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +53,21 @@ public class BaseController {
         UserUtil.removeUser();
         NeteaseResult r = new NeteaseResult();
         r.success();
+        return r;
+    }
+    
+    @NotNull
+    protected NeteaseResult getNeteaseResult(HttpServletResponse response, SysUserPojo userPojo) {
+        String userStr = JSON.toJSONString(userPojo);
+        String sign = JwtUtil.sign(userPojo.getUsername(), userStr);
+        // 写入用户信息到cookie
+        Cookie cookie1 = new Cookie(CookieConfig.COOKIE_NAME_COOKIE, sign);
+        Cookie cookie2 = new Cookie(CookieConfig.COOKIE_NAME_MUSIC_U, sign);
+        response.addCookie(cookie1);
+        response.addCookie(cookie2);
+    
+        NeteaseResult r = new NeteaseResult();
+        r.put("token", sign);
         return r;
     }
 }

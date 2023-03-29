@@ -63,11 +63,6 @@ public class RequestMusic163 {
         return JSON.parseObject(request, AlbumRes.class);
     }
     
-    public static SongUrl getNewSongUrl(List<Integer> musicIds, String cookie) {
-        String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=exhigh", cookie);
-        return JSON.parseObject(request, SongUrl.class);
-    }
-    
     /**
      * 获取歌曲下载地址
      */

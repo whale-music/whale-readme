@@ -1,23 +1,33 @@
 package org.plugin.controller;
 
-import org.plugin.service.sync.impl.music163.Music163SyncPluginImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RestController("plugins")
 @RequestMapping("/admin")
 public class PluginController {
     
-    @Autowired
-    private Music163SyncPluginImpl music163SyncPlugin;
     
-    @PostMapping("/plugins")
-    private String sync(@RequestParam("playId") String playId, @RequestParam("cookie") String cookie) throws IOException {
-        return music163SyncPlugin.sync(playId, cookie, cookie).toString();
+    @GetMapping("/getAllPlugins")
+    public String getAllPlugin(@RequestParam("userId") String userId) {
+        return "";
+    }
+    
+    
+    @GetMapping("/getPluginParams")
+    public String getPluginParams(@RequestParam("pluginId") String pluginId) {
+        return "";
+    }
+    
+    @GetMapping("/getPluginRuntimeTask")
+    public String getPluginRuntimeTask(@RequestParam("userId") String userId) {
+        return "";
+    }
+    
+    @GetMapping("/getPluginRuntimeMessages")
+    public String getPluginRuntimeMessages(@RequestParam("runtimeId") String runtimeId) {
+        return "";
     }
 }

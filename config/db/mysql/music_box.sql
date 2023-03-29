@@ -200,6 +200,49 @@ create index tb_music_url_music_id_index
 create index tb_music_url_size_index
     on tb_music_url (size);
 
+create table if not exists tb_plugin
+(
+    id          bigint       not null comment '插件ID'
+        primary key,
+    plugin_name varchar(255) not null comment '插件名称',
+    create_name varchar(255) null comment '插件创建者',
+    code        longtext     null comment '插件代码',
+    user_id     bigint       not null comment '插件创建者',
+    create_time datetime     not null comment '创建时间',
+    update_time datetime     not null comment '更新时间',
+    constraint id
+        unique (id)
+);
+
+create table if not exists tb_plugin_msg
+(
+    id          bigint not null comment '插件消息ID'
+        primary key,
+    plugin_id   bigint not null comment '插件ID',
+    task_id     bigint not null comment '任务ID',
+    user_id     bigint not null comment '用户ID',
+    msg         text   null comment '插件运行消息',
+    create_time bigint not null comment '创建时间',
+    update_time bigint not null comment '更新时间',
+    constraint id
+        unique (id)
+);
+
+create index tb_plugin_msg_task_id_user_id_index
+    on tb_plugin_msg (task_id, user_id);
+
+create table if not exists tb_plugin_task
+(
+    id          bigint       not null comment '任务ID'
+        primary key,
+    task_name   varchar(255) null comment '任务名',
+    user_id     bigint       not null comment '用户创建ID',
+    create_time datetime     not null comment '创建时间',
+    update_time datetime     not null comment '更新时间',
+    constraint id
+        unique (id)
+);
+
 create table if not exists tb_rank
 (
     id              bigint        not null

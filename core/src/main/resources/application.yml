@@ -10,7 +10,10 @@ server:
 ########## log ##########
 logging:
   level:
-    root: debug
+    org.core: debug
+    org.api: debug
+    org.oss: debug
+    org.web: debug
   pattern:
     # 时间；日志级别；类；方法；行(行不能使用圆括号)
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %C.%M[%line] - %msg%n"

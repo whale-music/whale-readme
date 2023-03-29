@@ -1,24 +1,56 @@
 package org.plugin.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.core.common.result.R;
+import org.plugin.model.res.PluginLabelValue;
+import org.plugin.model.res.PluginReq;
+import org.plugin.model.res.PluginRes;
+import org.plugin.service.PluginService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController("plugins")
 @RequestMapping("/admin")
 public class PluginController {
     
+    @Autowired
+    private PluginService pluginService;
     
-    @GetMapping("/getAllPlugins")
-    public String getAllPlugin(@RequestParam("userId") String userId) {
-        return "";
+    @PostMapping("/saveOrUpdatePlugin")
+    public R saveOrUpdatePlugin(@RequestBody PluginReq req) {
+        pluginService.saveOrUpdatePlugin(req);
+        return R.success();
     }
     
+    @GetMapping("/getAllPlugins")
+    public R getAllPlugin(@RequestParam("userId") Long userId) {
+        List<PluginRes> list = pluginService.getAllPlugin(userId);
+        return R.success(list);
+    }
     
+    /**
+     * 查询插件入参
+     *
+     * @param pluginId 插件ID
+     * @return 插件入参
+     */
     @GetMapping("/getPluginParams")
-    public String getPluginParams(@RequestParam("pluginId") String pluginId) {
-        return "";
+    public R getPluginParams(@RequestParam("pluginId") String pluginId) {
+        List<PluginLabelValue> list = pluginService.getPluginParams(pluginId);
+        return R.success(list);
+    }
+    
+    /**
+     * 运行插件任务
+     *
+     * @param pluginId 插件ID
+     * @param req      插件入参
+     */
+    @GetMapping("/getPluginParams")
+    public R execPluginTask(@RequestParam("pluginId") String pluginId, List<PluginLabelValue> req) {
+        pluginService.execPluginTask(pluginId, req);
+        return R.success();
     }
     
     @GetMapping("/getPluginRuntimeTask")

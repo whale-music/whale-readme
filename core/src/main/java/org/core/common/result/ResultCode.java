@@ -23,6 +23,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     FILENAME_INVALID("10006", "文件名无效"),
     SAVE_NAME_INVALID("10007", "存储名称无效"),
     
+    PLUGIN_EXISTED("50005", "插件不存在"),
+    
     
     /* 用户错误：20001-29999*/
     USER_NOT_LOGIN("20001", "用户未登录"),
@@ -58,6 +60,9 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     DATA_EXISTED("50003", "数据已存在"),
     SAVE_FAIL("50004", "保存错误!!请检查日志"),
+    
+    PLUGIN_CODE("50005", "插件代码数据错误，检查代码，或直接删除重新创建"),
+    
     
     /* 接口错误：60001-69999 */
     INTERFACE_INNER_INVOKE_ERROR("60001", "内部系统接口调用异常"),

@@ -7,14 +7,14 @@ import org.plugin.model.res.PluginRes;
 import java.util.List;
 
 public interface PluginService {
-    List<PluginRes> getAllPlugin(Long userId);
+    List<PluginRes> getAllPlugin(Long userId, Long pluginId);
     
     /**
      * 添加插件代码
      *
      * @param req 保存或更新数据
      */
-    void saveOrUpdatePlugin(PluginReq req);
+    PluginRes saveOrUpdatePlugin(PluginReq req);
     
     /**
      * 查询插件入参

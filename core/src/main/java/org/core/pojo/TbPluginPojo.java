@@ -46,6 +46,10 @@ public class TbPluginPojo implements Serializable {
     @TableField("code")
     private String code;
     
+    @ApiModelProperty("插件描述")
+    @TableField("description")
+    private String description;
+    
     @ApiModelProperty("插件创建者")
     @TableField("user_id")
     private Long userId;

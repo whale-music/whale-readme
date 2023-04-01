@@ -1,6 +1,7 @@
 package org.plugin.controller;
 
 import org.core.common.result.R;
+import org.core.utils.UserUtil;
 import org.plugin.model.res.PluginLabelValue;
 import org.plugin.model.res.PluginReq;
 import org.plugin.model.res.PluginRes;
@@ -19,13 +20,19 @@ public class PluginController {
     
     @PostMapping("/saveOrUpdatePlugin")
     public R saveOrUpdatePlugin(@RequestBody PluginReq req) {
-        pluginService.saveOrUpdatePlugin(req);
-        return R.success();
+        PluginRes res = pluginService.saveOrUpdatePlugin(req);
+        return R.success(res);
     }
     
+    /**
+     * 获取所有插件
+     *
+     * @param userId 用户ID
+     * @return 插件信息
+     */
     @GetMapping("/getAllPlugins")
-    public R getAllPlugin(@RequestParam("userId") Long userId) {
-        List<PluginRes> list = pluginService.getAllPlugin(userId);
+    public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "id", required = false) Long id) {
+        List<PluginRes> list = pluginService.getAllPlugin(userId == null ? UserUtil.getUser().getId() : userId, id);
         return R.success(list);
     }
     
@@ -47,7 +54,7 @@ public class PluginController {
      * @param pluginId 插件ID
      * @param req      插件入参
      */
-    @GetMapping("/getPluginParams")
+    @GetMapping("/execPluginTask")
     public R execPluginTask(@RequestParam("pluginId") String pluginId, List<PluginLabelValue> req) {
         pluginService.execPluginTask(pluginId, req);
         return R.success();

@@ -91,6 +91,7 @@ public class MusicFlowApi {
     
     String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp";
     
+    private static final Object lock = new Object();
     /**
      * 上传文件或音乐URL下载到临时目录
      *
@@ -335,6 +336,12 @@ public class MusicFlowApi {
     @NotNull
     private TbMusicPojo saveMusicInfoTable(AudioInfoReq dto, TbAlbumPojo albumPojo, TbMusicPojo musicPojo, String aliaNames) {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
+        synchronized (lock) {
+            long sort = musicService.count() + 1;
+            if (tbMusicPojo.getSort() == null) {
+                tbMusicPojo.setSort(sort);
+            }
+        }
         // music 信息表
         tbMusicPojo.setMusicName(dto.getMusicName());
         tbMusicPojo.setAliasName(aliaNames);
@@ -342,7 +349,6 @@ public class MusicFlowApi {
         tbMusicPojo.setLyric(dto.getLyric());
         tbMusicPojo.setKLyric(dto.getKLyric());
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
-        tbMusicPojo.setSort(musicService.count() + 1);
         tbMusicPojo.setTimeLength(dto.getTimeLength());
         // 保存音乐表
         boolean save = musicService.saveOrUpdate(tbMusicPojo);

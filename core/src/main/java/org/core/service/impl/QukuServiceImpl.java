@@ -9,8 +9,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.iservice.*;
 import org.core.pojo.*;
-import org.core.service.*;
+import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class QukuServiceImpl implements QukuService {
     private TbAlbumService albumService;
     
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
     
     /**
      * 音乐地址服务
@@ -40,10 +41,10 @@ public class QukuServiceImpl implements QukuService {
     private TbUserAlbumService userAlbumService;
     
     @Autowired
-    private TbAlbumSingerService albumSingerService;
+    private TbAlbumArtistService albumSingerService;
     
     @Autowired
-    private TbUserSingerService userSingerService;
+    private TbUserArtistService userSingerService;
     
     /**
      * 获取专辑信息
@@ -122,7 +123,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public List<TbMusicUrlPojo> getMusicUrl(Long musicId) {
-        return getMusicUrl(Set.of(musicId));
+        return getMusicUrl(new HashSet<>(Collections.singletonList(musicId)));
     }
     
     @Override

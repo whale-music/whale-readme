@@ -10,13 +10,13 @@ import org.api.neteasecloudmusic.model.vo.toplist.playlist.PlaylistsItem;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.ListItem;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
+import org.core.iservice.TbArtistService;
+import org.core.iservice.TbCollectService;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.service.AccountService;
 import org.core.service.QukuService;
-import org.core.service.TbCollectService;
-import org.core.service.TbSingerService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class TopListApi {
     private QukuService qukuService;
     
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
     
     @Autowired
     private AccountService accountService;

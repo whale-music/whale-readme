@@ -14,8 +14,9 @@ import org.api.admin.model.res.router.Children;
 import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.utils.MyPageUtil;
+import org.core.iservice.*;
 import org.core.pojo.*;
-import org.core.service.*;
+import org.core.service.QukuService;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class PlayListApi {
      * 歌手表
      */
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
     
     @Autowired
     private QukuService qukuService;
@@ -49,7 +50,7 @@ public class PlayListApi {
     private TbAlbumService albumService;
     
     @Autowired
-    private TbAlbumSingerService albumSingerService;
+    private TbAlbumArtistService albumSingerService;
     
     @Autowired
     private TbCollectService collectService;

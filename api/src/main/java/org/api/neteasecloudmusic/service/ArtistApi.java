@@ -14,11 +14,11 @@ import org.api.neteasecloudmusic.model.vo.artist.artist.ArtistRes;
 import org.api.neteasecloudmusic.model.vo.artist.artist.HotSongsItem;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.ArtistSubListRes;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.DataItem;
+import org.core.iservice.TbAlbumArtistService;
+import org.core.iservice.TbAlbumService;
+import org.core.iservice.TbArtistService;
 import org.core.pojo.*;
 import org.core.service.QukuService;
-import org.core.service.TbAlbumService;
-import org.core.service.TbAlbumSingerService;
-import org.core.service.TbSingerService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,13 +36,13 @@ public class ArtistApi {
     private QukuService qukuService;
     
     @Autowired
-    private TbAlbumSingerService albumSingerService;
+    private TbAlbumArtistService albumSingerService;
     
     @Autowired
     private TbAlbumService albumService;
     
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
     
     public ArtistSubListRes artistSublist(SysUserPojo user) {
         ArtistSubListRes res = new ArtistSubListRes();

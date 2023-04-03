@@ -11,14 +11,14 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.AlbumRes;
 import org.api.admin.utils.MyPageUtil;
+import org.core.iservice.TbAlbumArtistService;
+import org.core.iservice.TbAlbumService;
+import org.core.iservice.TbArtistService;
+import org.core.iservice.TbMusicService;
 import org.core.pojo.TbAlbumArtistPojo;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
-import org.core.service.TbAlbumService;
-import org.core.service.TbAlbumSingerService;
-import org.core.service.TbMusicService;
-import org.core.service.TbSingerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,14 +39,14 @@ public class AlbumApi {
      * 专辑歌手中间表
      */
     @Autowired
-    private TbAlbumSingerService albumSingerService;
+    private TbAlbumArtistService albumSingerService;
     
     
     /**
      * 歌手表
      */
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
     
     @Autowired
     private TbMusicService musicService;

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.ArtistRes;
-import org.api.admin.service.SingerApi;
+import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
 import org.core.pojo.TbArtistPojo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,23 +21,23 @@ public class SingerController {
     
     
     @Autowired
-    private SingerApi singerApi;
+    private ArtistApi artistApi;
     
     @PostMapping("/allSinger")
     public R getAllSingerList(@RequestBody AlbumReq req) {
-        Page<ArtistRes> page = singerApi.getAllSingerList(req);
+        Page<ArtistRes> page = artistApi.getAllSingerList(req);
         return R.success(page);
     }
     
     @GetMapping("/select")
     public R getSelectedSinger(@RequestParam(value = "name", required = false) String name) {
-        List<Map<String, Object>> maps = singerApi.getSelectedSinger(name);
+        List<Map<String, Object>> maps = artistApi.getSelectedSinger(name);
         return R.success(maps);
     }
     
     @GetMapping("/getArtistByAlbumId")
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
-        List<TbArtistPojo> byAlbumId = singerApi.getSingerListByAlbumId(albumId);
+        List<TbArtistPojo> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
     }
 }

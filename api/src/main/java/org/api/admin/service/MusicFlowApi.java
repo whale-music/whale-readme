@@ -17,8 +17,8 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
 import org.core.config.SaveConfig;
+import org.core.iservice.*;
 import org.core.pojo.*;
-import org.core.service.*;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -73,7 +73,7 @@ public class MusicFlowApi {
      * 歌手服务
      */
     @Autowired
-    private TbSingerService singerService;
+    private TbArtistService singerService;
 
     /**
      * 专辑表
@@ -87,7 +87,7 @@ public class MusicFlowApi {
     private SaveConfig config;
     
     @Autowired
-    private TbAlbumSingerService albumSingerService;
+    private TbAlbumArtistService albumSingerService;
     
     String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp";
     

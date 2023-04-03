@@ -19,8 +19,10 @@ import org.api.neteasecloudmusic.model.vo.user.record.Song;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.iservice.*;
 import org.core.pojo.*;
-import org.core.service.*;
+import org.core.service.AccountService;
+import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ public class UserApi {
     
     // 用户关注歌手表
     @Autowired
-    private TbUserSingerService userSingerService;
+    private TbUserArtistService userSingerService;
     
     @Autowired
     private TbRankService rankService;

@@ -6,13 +6,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.core.iservice.TbCollectMusicService;
+import org.core.iservice.TbCollectService;
+import org.core.iservice.TbMusicService;
 import org.core.pojo.TbCollectMusicPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.service.PlayListService;
-import org.core.service.TbCollectMusicService;
-import org.core.service.TbCollectService;
-import org.core.service.TbMusicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

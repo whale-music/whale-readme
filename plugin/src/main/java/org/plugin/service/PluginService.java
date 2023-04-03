@@ -1,6 +1,9 @@
 package org.plugin.service;
 
+import org.core.pojo.TbPluginMsgPojo;
+import org.core.pojo.TbPluginTaskPojo;
 import org.plugin.model.res.PluginLabelValue;
+import org.plugin.model.res.PluginMsgRes;
 import org.plugin.model.res.PluginReq;
 import org.plugin.model.res.PluginRes;
 
@@ -22,13 +25,20 @@ public interface PluginService {
      * @param pluginId 插件ID
      * @return 插件入参
      */
-    List<PluginLabelValue> getPluginParams(String pluginId);
+    List<PluginLabelValue> getPluginParams(Long pluginId);
     
     /**
      * 运行插件任务
      *
      * @param pluginId 插件ID
-     * @param req      插件入参
+     * @param onLine
+     * @param id
      */
-    void execPluginTask(String pluginId, List<PluginLabelValue> req);
+    void execPluginTask(Long pluginId, Boolean onLine, Long id);
+    
+    List<PluginMsgRes> getPluginRuntimeMessages(Long runtimeId);
+    
+    List<TbPluginMsgPojo> onLineExecPluginTask(Long pluginId, Long id);
+    
+    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId);
 }

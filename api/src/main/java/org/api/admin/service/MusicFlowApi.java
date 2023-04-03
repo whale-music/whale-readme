@@ -451,8 +451,10 @@ public class MusicFlowApi {
         }
         // 有歌手ID直接返回数据
         if (CollUtil.isNotEmpty(dto.getSinger()) && dto.getSinger().get(0) != null && dto.getSinger().get(0).getId() != null) {
-            List<Long> singerIds = dto.getSinger().stream().map(TbArtistPojo::getId).filter(Objects::isNull).collect(Collectors.toList());
-            return singerService.listByIds(singerIds);
+            List<Long> singerIds = dto.getSinger().stream().map(TbArtistPojo::getId).filter(Objects::nonNull).collect(Collectors.toList());
+            List<TbArtistPojo> tbArtistPojos = singerService.listByIds(singerIds);
+            ExceptionUtil.isNull(CollUtil.isNotEmpty(tbArtistPojos), ResultCode.ALBUM_NOT_EXIST);
+            return tbArtistPojos;
         }
         // 有歌手，数据库中有，查询出歌手和音乐主键ID
         // 获取前端传入所有歌手

@@ -1,8 +1,11 @@
 package org.plugin.controller;
 
 import org.core.common.result.R;
+import org.core.pojo.TbPluginMsgPojo;
+import org.core.pojo.TbPluginTaskPojo;
 import org.core.utils.UserUtil;
 import org.plugin.model.res.PluginLabelValue;
+import org.plugin.model.res.PluginMsgRes;
 import org.plugin.model.res.PluginReq;
 import org.plugin.model.res.PluginRes;
 import org.plugin.service.PluginService;
@@ -43,7 +46,7 @@ public class PluginController {
      * @return 插件入参
      */
     @GetMapping("/getPluginParams")
-    public R getPluginParams(@RequestParam("pluginId") String pluginId) {
+    public R getPluginParams(@RequestParam("pluginId") Long pluginId) {
         List<PluginLabelValue> list = pluginService.getPluginParams(pluginId);
         return R.success(list);
     }
@@ -52,21 +55,27 @@ public class PluginController {
      * 运行插件任务
      *
      * @param pluginId 插件ID
-     * @param req      插件入参
      */
-    @GetMapping("/execPluginTask")
-    public R execPluginTask(@RequestParam("pluginId") String pluginId, List<PluginLabelValue> req) {
-        pluginService.execPluginTask(pluginId, req);
-        return R.success();
+    @PostMapping("/execPluginTask")
+    public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
+        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId);
+        if (Boolean.TRUE.equals(onLine)) {
+            List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginId, pojo.getId());
+            return R.success(tbPluginMsgPojos);
+        } else {
+            pluginService.execPluginTask(pluginId, onLine, pojo.getId());
+            return R.success(pojo.getId());
+        }
     }
     
     @GetMapping("/getPluginRuntimeTask")
-    public String getPluginRuntimeTask(@RequestParam("userId") String userId) {
+    public String getPluginRuntimeTask(@RequestParam("userId") Long userId) {
         return "";
     }
     
     @GetMapping("/getPluginRuntimeMessages")
-    public String getPluginRuntimeMessages(@RequestParam("runtimeId") String runtimeId) {
-        return "";
+    public R getPluginRuntimeMessages(@RequestParam("runtimeId") Long runtimeId) {
+        List<PluginMsgRes> list = pluginService.getPluginRuntimeMessages(runtimeId);
+        return R.success(list);
     }
 }

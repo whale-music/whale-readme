@@ -1,7 +1,6 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.createplatlist.CreatePlaylistVo;
@@ -9,11 +8,12 @@ import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
+import org.core.common.page.Page;
 import org.core.common.result.NeteaseResult;
+import org.core.pojo.CollectPojo;
+import org.core.pojo.MusicPojo;
+import org.core.pojo.MusicUrlPojo;
 import org.core.pojo.SysUserPojo;
-import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +47,7 @@ public class PlayListController {
     public NeteaseResult createPlayList(@RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
         
-        TbCollectPojo collectPojo = collect.createPlayList(user.getId(), name);
+        CollectPojo collectPojo = collect.createPlayList(user.getId(), name);
         
         CreatePlaylistVo vo = new CreatePlaylistVo();
         vo.setPlaylist(new Playlist());
@@ -73,7 +73,7 @@ public class PlayListController {
     @GetMapping("/playlist/name/update")
     public NeteaseResult updatePlayListName(@RequestParam("id") Long collectId, @RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
-        TbCollectPojo collectPojo = new TbCollectPojo();
+        CollectPojo collectPojo = new CollectPojo();
         collectPojo.setId(collectId);
         collectPojo.setPlayListName(name);
         collect.updatePlayList(user.getId(), collectPojo);
@@ -91,7 +91,7 @@ public class PlayListController {
     @GetMapping("/playlist/desc/update")
     public NeteaseResult updatePlayListDesc(@RequestParam("id") Long collectId, @RequestParam("desc") String desc) {
         SysUserPojo user = UserUtil.getUser();
-        TbCollectPojo collectPojo = new TbCollectPojo();
+        CollectPojo collectPojo = new CollectPojo();
         collectPojo.setId(collectId);
         collectPojo.setDescription(desc);
         collect.updatePlayList(user.getId(), collectPojo);
@@ -119,9 +119,9 @@ public class PlayListController {
      * 删除歌单
      */
     @GetMapping("/playlist/delete")
-    public NeteaseResult removePlayList(@RequestParam("id") String collectIds) {
+    public NeteaseResult removePlayList(@RequestParam("id") List<Long> collectIds) {
         SysUserPojo user = UserUtil.getUser();
-        collect.removePlayList(user.getId(), collectIds.split(","));
+        collect.removePlayList(user.getId(), collectIds);
         return new NeteaseResult().success();
     }
     
@@ -131,7 +131,7 @@ public class PlayListController {
      * @param collectId 歌单ID
      */
     @GetMapping("/playlist/subscribe")
-    public NeteaseResult subscribePlayList(@RequestParam("id") String collectId, @RequestParam("t") Integer flag) {
+    public NeteaseResult subscribePlayList(@RequestParam("id") Long collectId, @RequestParam("t") Integer flag) {
         SysUserPojo user = UserUtil.getUser();
         collect.subscribePlayList(user.getId(), collectId, flag);
         return new NeteaseResult().success();
@@ -146,51 +146,51 @@ public class PlayListController {
      */
     @GetMapping("/playlist/track/all")
     public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false, defaultValue = "9223372036854775807") Long pageSize, @RequestParam(value = "offset", required = false, defaultValue = "0") Long pageIndex) {
-        Page<TbMusicPojo> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
+        Page<MusicPojo> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
-                                             .map(TbMusicPojo::getId)
+                                             .map(MusicPojo::getId)
                                              .collect(Collectors.toList());
-        List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
+        List<MusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
-        for (TbMusicPojo musicPojo : playListAllSong.getRecords()) {
-            Map<Integer, TbMusicUrlPojo> musicInfoMaps = musicInfos.stream()
-                                                                   .collect(Collectors.toMap(TbMusicUrlPojo::getRate,
+        for (MusicPojo musicPojo : playListAllSong.getRecords()) {
+            Map<Integer, MusicUrlPojo> musicInfoMaps = musicInfos.stream()
+                                                                 .collect(Collectors.toMap(MusicUrlPojo::getRate,
                                                                            tbMusicUrlPojo -> tbMusicUrlPojo));
             SongsItem e = new SongsItem();
             // Sq 无损
-            Optional<TbMusicUrlPojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
+            Optional<MusicUrlPojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
             musicInfoMaps.remove(320000);
             Sq sqPojo = new Sq();
-            TbMusicUrlPojo sqOrElse = sq.orElse(new TbMusicUrlPojo());
+            MusicUrlPojo sqOrElse = sq.orElse(new MusicUrlPojo());
             sqPojo.setBr(sqOrElse.getRate());
             sqPojo.setSize(sqOrElse.getSize());
             e.setSq(sqPojo);
             musicInfoMaps.remove(320000);
-    
+            
             // l 低质量
-            Optional<TbMusicUrlPojo> l = Optional.ofNullable(musicInfoMaps.get(128000));
+            Optional<MusicUrlPojo> l = Optional.ofNullable(musicInfoMaps.get(128000));
             musicInfoMaps.remove(128000);
             L lPojo = new L();
-            TbMusicUrlPojo lOrElse = l.orElse(new TbMusicUrlPojo());
+            MusicUrlPojo lOrElse = l.orElse(new MusicUrlPojo());
             lPojo.setBr(lOrElse.getRate());
             lPojo.setSize(lOrElse.getSize());
             e.setL(lPojo);
-    
+            
             // m 中质量
-            Optional<TbMusicUrlPojo> m = Optional.ofNullable(musicInfoMaps.get(192000));
+            Optional<MusicUrlPojo> m = Optional.ofNullable(musicInfoMaps.get(192000));
             musicInfoMaps.remove(192000);
             M mPojo = new M();
-            TbMusicUrlPojo mOrElse = m.orElse(new TbMusicUrlPojo());
+            MusicUrlPojo mOrElse = m.orElse(new MusicUrlPojo());
             mPojo.setBr(mOrElse.getRate());
             mPojo.setSize(mOrElse.getSize());
             e.setM(mPojo);
-    
+            
             // h高质量
-            Optional<TbMusicUrlPojo> h = Optional.ofNullable(musicInfoMaps.get(320000));
+            Optional<MusicUrlPojo> h = Optional.ofNullable(musicInfoMaps.get(320000));
             musicInfoMaps.remove(320000);
             H hPojo = new H();
-            TbMusicUrlPojo hOrElse = h.orElse(new TbMusicUrlPojo());
+            MusicUrlPojo hOrElse = h.orElse(new MusicUrlPojo());
             hPojo.setBr(hOrElse.getRate());
             hPojo.setSize(hOrElse.getSize());
             e.setH(hPojo);
@@ -199,7 +199,7 @@ public class PlayListController {
             musicInfoMaps.forEach(
                     (integer, tbMusicUrlPojo) -> {
                         A aPojo = new A();
-                        TbMusicUrlPojo aOrElse = Optional.ofNullable(tbMusicUrlPojo).orElse(new TbMusicUrlPojo());
+                        MusicUrlPojo aOrElse = Optional.ofNullable(tbMusicUrlPojo).orElse(new MusicUrlPojo());
                         aPojo.setBr(aOrElse.getRate());
                         aPojo.setSize(aOrElse.getSize());
                         e.setA(aPojo);
@@ -243,7 +243,7 @@ public class PlayListController {
                 collectId,
                 songIds,
                 flag);
-    
+        
         NeteaseResult r = new NeteaseResult();
         r.put("body", map);
         r.put("status", 200);

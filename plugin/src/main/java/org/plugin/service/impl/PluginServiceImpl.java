@@ -1,13 +1,13 @@
 package org.plugin.service.impl;
 
 import com.alibaba.fastjson2.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.exception.BaseException;
+import org.core.common.page.LambdaQueryWrapper;
 import org.core.common.result.ResultCode;
-import org.core.pojo.TbPluginPojo;
+import org.core.iservice.PluginService;
+import org.core.pojo.PluginPojo;
 import org.core.service.QukuService;
-import org.core.service.TbPluginService;
 import org.core.utils.UserUtil;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -16,7 +16,6 @@ import org.plugin.model.res.PluginLabelValue;
 import org.plugin.model.res.PluginLabelValueListRes;
 import org.plugin.model.res.PluginReq;
 import org.plugin.model.res.PluginRes;
-import org.plugin.service.PluginService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -28,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
-public class PluginServiceImpl implements PluginService {
+@Service("PluginServiceHandle")
+public class PluginServiceImpl implements org.plugin.service.PluginService {
     
     @Autowired
-    private TbPluginService pluginService;
+    private PluginService pluginService;
     
     @Autowired
     private QukuService qukuService;
@@ -42,14 +41,14 @@ public class PluginServiceImpl implements PluginService {
     
     @Override
     public List<PluginRes> getAllPlugin(Long userId, Long pluginId) {
-        LambdaQueryWrapper<TbPluginPojo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(pluginId != null, TbPluginPojo::getId, pluginId);
-        wrapper.eq(TbPluginPojo::getUserId, userId);
-        List<TbPluginPojo> list = pluginService.list(wrapper);
+        LambdaQueryWrapper<PluginPojo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(pluginId != null, PluginPojo::getId, pluginId);
+        wrapper.eq(PluginPojo::getUserId, userId);
+        List<PluginPojo> list = pluginService.list(wrapper);
         ArrayList<PluginRes> pluginRes = new ArrayList<>();
-        for (TbPluginPojo tbPluginPojo : list) {
+        for (PluginPojo pluginPojo : list) {
             PluginRes p = new PluginRes();
-            BeanUtils.copyProperties(tbPluginPojo, p);
+            BeanUtils.copyProperties(pluginPojo, p);
             pluginRes.add(p);
         }
         return pluginRes;
@@ -64,7 +63,7 @@ public class PluginServiceImpl implements PluginService {
     public PluginRes saveOrUpdatePlugin(PluginReq req) {
         req.setUserId(req.getUserId() == null ? UserUtil.getUser().getId() : req.getUserId());
         pluginService.saveOrUpdate(req);
-        TbPluginPojo byId = pluginService.getById(req.getId());
+        PluginPojo byId = pluginService.getById(req.getId());
         PluginRes pluginRes = new PluginRes();
         BeanUtils.copyProperties(byId, pluginRes);
         return pluginRes;
@@ -77,8 +76,8 @@ public class PluginServiceImpl implements PluginService {
      * @return 插件入参
      */
     @Override
-    public List<PluginLabelValue> getPluginParams(String pluginId) {
-        TbPluginPojo byId = pluginService.getById(pluginId);
+    public List<PluginLabelValue> getPluginParams(Long pluginId) {
+        PluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             return Collections.emptyList();
         }
@@ -97,8 +96,8 @@ public class PluginServiceImpl implements PluginService {
     
     @Async
     @Override
-    public void execPluginTask(String pluginId, List<PluginLabelValue> req) {
-        TbPluginPojo byId = pluginService.getById(pluginId);
+    public void execPluginTask(Long pluginId, List<PluginLabelValue> req) {
+        PluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
         }

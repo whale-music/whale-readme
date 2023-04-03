@@ -1,13 +1,13 @@
 package org.web.controller.admin.v1;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.SingerApi;
+import org.core.common.page.Page;
 import org.core.common.result.R;
-import org.core.pojo.TbArtistPojo;
+import org.core.pojo.ArtistPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +37,7 @@ public class SingerController {
     
     @GetMapping("/getArtistByAlbumId")
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
-        List<TbArtistPojo> byAlbumId = singerApi.getSingerListByAlbumId(albumId);
+        List<ArtistPojo> byAlbumId = singerApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
     }
 }

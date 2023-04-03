@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.PageCommon;
-import org.core.pojo.TbAlbumPojo;
+import org.core.pojo.AlbumPojo;
 
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class AlbumReq extends TbAlbumPojo {
+public class AlbumReq extends AlbumPojo {
     @ApiModelProperty("歌手名")
     private String artistName;
     

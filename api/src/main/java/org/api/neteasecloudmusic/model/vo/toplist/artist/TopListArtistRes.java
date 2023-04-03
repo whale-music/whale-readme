@@ -5,8 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TopListArtistRes{
-	private List<ArtistsItem> artists;
-	private long updateTime;
-	private int type;
+public class TopListArtistRes {
+    private List<ArtistsItem> artists;
+    private long updateTime;
+    private int type;
 }

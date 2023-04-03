@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbArtistPojo;
+import org.core.pojo.ArtistPojo;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class ArtistRes extends TbArtistPojo {
+public class ArtistRes extends ArtistPojo {
     @ApiModelProperty("专辑数量")
     private String albumSize;
     

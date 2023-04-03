@@ -1,75 +1,162 @@
 package org.core.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-/**
- * <p>
- * 字典数据表
- * </p>
- *
- * @author Sakura
- * @since 2022-12-07
- */
-@Getter
-@Setter
-@Accessors(chain = true)
-@TableName("sys_dict_data")
-@ApiModel(value = "SysDictDataPojo对象", description = "字典数据表")
-public class SysDictDataPojo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("字典编码")
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "sys_dict_data", schema = "whale_music")
+public class SysDictDataPojo {
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @Column(name = "id")
     private Long id;
-
-    @ApiModelProperty("字典排序")
-    @TableField("dict_sort")
+    @Basic
+    @Column(name = "dict_sort")
     private Integer dictSort;
-
-    @ApiModelProperty("字典记录实际数据")
-    @TableField("dict_label")
+    @Basic
+    @Column(name = "dict_label")
     private String dictLabel;
-
-    @ApiModelProperty("字典键值")
-    @TableField("dict_value")
+    @Basic
+    @Column(name = "dict_value")
     private String dictValue;
-
-    @ApiModelProperty("字典类型")
-    @TableField("dict_type")
+    @Basic
+    @Column(name = "dict_type")
     private String dictType;
-
-    @ApiModelProperty("状态（0正常 1停用）")
-    @TableField("status")
+    @Basic
+    @Column(name = "status")
     private String status;
-
-    @ApiModelProperty("创建者")
-    @TableField("create_by")
+    @Basic
+    @Column(name = "create_by")
     private String createBy;
-
-    @ApiModelProperty("更新者")
-    @TableField("update_by")
+    @Basic
+    @Column(name = "update_by")
     private String updateBy;
-
-    @ApiModelProperty("备注")
-    @TableField("remark")
+    @Basic
+    @Column(name = "remark")
     private String remark;
-
-    @ApiModelProperty("创建时间")
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @Basic
+    @Column(name = "create_time")
+    @CreatedDate
     private LocalDateTime createTime;
-
-    @ApiModelProperty("更新时间")
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @Basic
+    @Column(name = "update_time")
+    @LastModifiedDate
     private LocalDateTime updateTime;
-
-
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public Integer getDictSort() {
+        return dictSort;
+    }
+    
+    public void setDictSort(Integer dictSort) {
+        this.dictSort = dictSort;
+    }
+    
+    public String getDictLabel() {
+        return dictLabel;
+    }
+    
+    public void setDictLabel(String dictLabel) {
+        this.dictLabel = dictLabel;
+    }
+    
+    public String getDictValue() {
+        return dictValue;
+    }
+    
+    public void setDictValue(String dictValue) {
+        this.dictValue = dictValue;
+    }
+    
+    public String getDictType() {
+        return dictType;
+    }
+    
+    public void setDictType(String dictType) {
+        this.dictType = dictType;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    public String getCreateBy() {
+        return createBy;
+    }
+    
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+    
+    public String getUpdateBy() {
+        return updateBy;
+    }
+    
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
+    
+    public String getRemark() {
+        return remark;
+    }
+    
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+    
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+    
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+    
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+    
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SysDictDataPojo that = (SysDictDataPojo) o;
+        return id == that.id && Objects.equals(dictSort, that.dictSort) && Objects.equals(dictLabel,
+                that.dictLabel) && Objects.equals(dictValue, that.dictValue) && Objects.equals(dictType,
+                that.dictType) && Objects.equals(status, that.status) && Objects.equals(createBy,
+                that.createBy) && Objects.equals(updateBy, that.updateBy) && Objects.equals(remark,
+                that.remark) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, dictSort, dictLabel, dictValue, dictType, status, createBy, updateBy, remark, createTime, updateTime);
+    }
 }
+
+

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AudioInfoReq {
     @ApiModelProperty("音乐ID")
-    private Integer id;
+    private Long id;
     
     @ApiModelProperty("音乐来源")
     @NotBlank

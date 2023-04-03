@@ -3,7 +3,7 @@ package org.api.neteasecloudmusic.service;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
-import org.core.pojo.TbArtistPojo;
+import org.core.pojo.ArtistPojo;
 import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +26,16 @@ public class SimiApi {
      */
     public List<SimiArtistRes> simiArtist(Long id) {
         ArrayList<SimiArtistRes> simiArtistRes = new ArrayList<>();
-        List<TbArtistPojo> tbArtistPojos = qukuService.randomSinger(20);
-        for (TbArtistPojo tbArtistPojo : tbArtistPojos) {
+        List<ArtistPojo> artistPojos = qukuService.randomSinger(20);
+        for (ArtistPojo artistPojo : artistPojos) {
             SimiArtistRes artistRes = new SimiArtistRes();
-            artistRes.setId(tbArtistPojo.getId());
-            artistRes.setPicUrl(tbArtistPojo.getPic());
-            artistRes.setName(tbArtistPojo.getArtistName());
-            artistRes.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
-            artistRes.setAlbumSize(qukuService.getAlbumCountBySingerId(tbArtistPojo.getId()));
-            artistRes.setMusicSize(qukuService.getMusicCountBySingerId(tbArtistPojo.getId()));
-            artistRes.setBriefDesc(tbArtistPojo.getIntroduction());
+            artistRes.setId(artistPojo.getId());
+            artistRes.setPicUrl(artistPojo.getPic());
+            artistRes.setName(artistPojo.getArtistName());
+            artistRes.setAlias(AliasUtil.getAliasList(artistPojo.getAliasName()));
+            artistRes.setAlbumSize(qukuService.getAlbumCountBySingerId(artistPojo.getId()));
+            artistRes.setMusicSize(qukuService.getMusicCountBySingerId(artistPojo.getId()));
+            artistRes.setBriefDesc(artistPojo.getIntroduction());
             simiArtistRes.add(artistRes);
         }
         return simiArtistRes;

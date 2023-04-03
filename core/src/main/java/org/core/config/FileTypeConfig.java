@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Configuration
-@ConfigurationProperties(prefix="file-type")
+@ConfigurationProperties(prefix = "file-type")
 public class FileTypeConfig {
     private List<String> suffix;
 }

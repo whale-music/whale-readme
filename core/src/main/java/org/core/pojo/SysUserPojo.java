@@ -1,79 +1,222 @@
 package org.core.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.io.Serializable;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Objects;
 
-/**
- * <p>
- * 系统用户表
- * </p>
- *
- * @author Sakura
- * @since 2022-12-07
- */
-@Getter
-@Setter
-@Accessors(chain = true)
-@TableName("sys_user")
-@ApiModel(value = "SysUserPojo对象", description = "系统用户表")
-public class SysUserPojo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("系统用户ID")
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
+@Entity
+@Table(name = "sys_user", schema = "whale_music")
+public class SysUserPojo {
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @Column(name = "id")
     private Long id;
-
-    @ApiModelProperty("登录用户名")
-    @TableField("username")
+    @Basic
+    @Column(name = "username")
     private String username;
-
-    @ApiModelProperty("登录显示昵称")
-    @TableField("nickname")
+    @Basic
+    @Column(name = "nickname")
     private String nickname;
-
-    @ApiModelProperty("用户密码")
-    @TableField("password")
+    @Basic
+    @Column(name = "password")
     private String password;
-
-    @ApiModelProperty("头像URL")
-    @TableField("avatar_url")
+    @Basic
+    @Column(name = "avatar_url")
     private String avatarUrl;
-
-    @ApiModelProperty("背景照片URL")
-    @TableField("background_url")
+    @Basic
+    @Column(name = "background_url")
     private String backgroundUrl;
-
-    @ApiModelProperty("个性签名")
-    @TableField("signature")
+    @Basic
+    @Column(name = "signature")
     private String signature;
-
-    @ApiModelProperty("账户类型")
-    @TableField("account_type")
+    @Basic
+    @Column(name = "account_type")
     private Integer accountType;
-
-    @ApiModelProperty("最后登录IP")
-    @TableField("last_login_ip")
+    @Basic
+    @Column(name = "last_login_ip")
     private String lastLoginIp;
-
-    @ApiModelProperty("最后登录时间")
-    @TableField("last_login_time")
+    @Basic
+    @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
-
-    @ApiModelProperty("创建时间")
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @Basic
+    @Column(name = "create_time")
+    @CreatedDate
     private LocalDateTime createTime;
-
-    @ApiModelProperty("修改时间")
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @Basic
+    @Column(name = "update_time")
+    @LastModifiedDate
     private LocalDateTime updateTime;
-
-
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<CollectPojo> tbCollectsById;
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<RankPojo> tbRanksById;
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<UserAlbumPojo> tbUserAlbumsById;
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<UserArtistPojo> tbUserArtistsById;
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public String getNickname() {
+        return nickname;
+    }
+    
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+    
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+    
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+    
+    public void setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
+    }
+    
+    public String getSignature() {
+        return signature;
+    }
+    
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+    
+    public Integer getAccountType() {
+        return accountType;
+    }
+    
+    public void setAccountType(Integer accountType) {
+        this.accountType = accountType;
+    }
+    
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+    
+    public void setLastLoginIp(String lastLoginIp) {
+        this.lastLoginIp = lastLoginIp;
+    }
+    
+    public LocalDateTime getLastLoginTime() {
+        return lastLoginTime;
+    }
+    
+    public void setLastLoginTime(LocalDateTime lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+    
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+    
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+    
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+    
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SysUserPojo that = (SysUserPojo) o;
+        return id == that.id && Objects.equals(username, that.username) && Objects.equals(nickname,
+                that.nickname) && Objects.equals(password, that.password) && Objects.equals(avatarUrl,
+                that.avatarUrl) && Objects.equals(backgroundUrl, that.backgroundUrl) && Objects.equals(signature,
+                that.signature) && Objects.equals(accountType, that.accountType) && Objects.equals(lastLoginIp,
+                that.lastLoginIp) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(createTime,
+                that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,
+                username,
+                nickname,
+                password,
+                avatarUrl,
+                backgroundUrl,
+                signature,
+                accountType,
+                lastLoginIp,
+                lastLoginTime,
+                createTime,
+                updateTime);
+    }
+    
+    public Collection<CollectPojo> getTbCollectsById() {
+        return tbCollectsById;
+    }
+    
+    public void setTbCollectsById(Collection<CollectPojo> tbCollectsById) {
+        this.tbCollectsById = tbCollectsById;
+    }
+    
+    public Collection<RankPojo> getTbRanksById() {
+        return tbRanksById;
+    }
+    
+    public void setTbRanksById(Collection<RankPojo> tbRanksById) {
+        this.tbRanksById = tbRanksById;
+    }
+    
+    public Collection<UserAlbumPojo> getTbUserAlbumsById() {
+        return tbUserAlbumsById;
+    }
+    
+    public void setTbUserAlbumsById(Collection<UserAlbumPojo> tbUserAlbumsById) {
+        this.tbUserAlbumsById = tbUserAlbumsById;
+    }
+    
+    public Collection<UserArtistPojo> getTbUserArtistsById() {
+        return tbUserArtistsById;
+    }
+    
+    public void setTbUserArtistsById(Collection<UserArtistPojo> tbUserArtistsById) {
+        this.tbUserArtistsById = tbUserArtistsById;
+    }
 }

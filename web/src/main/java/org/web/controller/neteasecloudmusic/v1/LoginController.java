@@ -142,10 +142,10 @@ public class LoginController extends BaseController {
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
         String sign = JwtUtil.sign(userPojo.getUsername(), data);
         GlobeDataUtil.remove(key);
-    
+        
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
         response.addCookie(cookie);
-    
+        
         NeteaseResult r = new NeteaseResult();
         r.put("code", 803);
         r.put("message", "授权登陆成功");

@@ -33,10 +33,16 @@ create table if not exists sys_dict_data
 (
     64
 ) collate utf8_bin default '' null comment '创建者',
-    update_by varchar(64) collate utf8_bin  default ''  null comment '更新者',
-    remark      varchar(500) collate utf8_bin             null comment '备注',
-    create_time datetime                                  null comment '创建时间',
-    update_time datetime                                  null comment '更新时间'
+    update_by varchar
+(
+    64
+) collate utf8_bin default '' null comment '更新者',
+    remark varchar
+(
+    500
+) collate utf8_bin null comment '备注',
+    create_time datetime null comment '创建时间',
+    update_time datetime null comment '更新时间'
     )
     comment '字典数据表';
 
@@ -163,21 +169,13 @@ create table if not exists tb_album
     512
 ) null comment '专辑封面地址',
     publish_time datetime null comment '专辑发布时间',
-    update_time  datetime     null comment '修改时间',
-    create_time  datetime     null comment '创建时间'
+    update_time datetime null comment '修改时间',
+    create_time datetime null comment '创建时间'
     )
     comment '歌曲专辑表';
 
 create index tb_album_album_name_index
     on tb_album (album_name);
-
-create table if not exists tb_album_artist
-(
-    album_id  bigint not null comment '专辑ID',
-    artist_id bigint not null comment '歌手ID',
-    primary key (album_id, artist_id)
-    )
-    comment '歌手和专辑中间表';
 
 create table if not exists tb_artist
 (
@@ -207,12 +205,58 @@ create table if not exists tb_artist
     512
 ) null comment '封面',
     birth date null comment '出生年月',
-    location varchar(64)  null comment '所在国家',
-    introduction longtext     null comment '歌手介绍',
-    create_time  datetime     null comment '创建时间',
-    update_time  datetime     null comment '修改时间'
+    location varchar
+(
+    64
+) null comment '所在国家',
+    introduction longtext null comment '歌手介绍',
+    create_time datetime null comment '创建时间',
+    update_time datetime null comment '修改时间'
     )
     comment '歌手表';
+
+create table if not exists tb_album_artist
+(
+    album_id
+    bigint
+    not
+    null
+    comment
+    '专辑ID',
+    artist_id
+    bigint
+    not
+    null
+    comment
+    '歌手ID',
+    primary
+    key
+(
+    album_id,
+    artist_id
+),
+    constraint tb_album_artist_tb_album_id_fk
+    foreign key
+(
+    album_id
+) references tb_album
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_album_artist_tb_artist_id_fk
+    foreign key
+(
+    artist_id
+) references tb_artist
+(
+    id
+)
+    on update cascade
+    on delete cascade
+    )
+    comment '歌手和专辑中间表';
 
 create table if not exists tb_collect
 (
@@ -250,61 +294,22 @@ create table if not exists tb_collect
     unique
 (
     sort
+),
+    constraint tb_collect_sys_user_id_fk
+    foreign key
+(
+    user_id
+) references sys_user
+(
+    id
 )
+    on update cascade
+    on delete set null
     )
     comment '歌单列表';
 
 create index tb_collect_play_list_name_index
     on tb_collect (play_list_name);
-
-create table if not exists tb_collect_music
-(
-    collect_id bigint not null comment '歌单ID',
-    music_id   bigint not null comment '音乐ID',
-    primary key (collect_id, music_id)
-    )
-    comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';
-
-create table if not exists tb_collect_tag
-(
-    collect_id bigint not null comment '歌单ID',
-    tag_id     bigint not null comment 'tag ID',
-    primary key (collect_id, tag_id)
-    )
-    comment '歌单风格中间表';
-
-create table if not exists tb_history
-(
-    music_id
-    bigint
-    not
-    null
-    comment
-    '歌曲ID'
-    primary
-    key,
-    count
-    int
-    null
-    comment
-    '听歌次数',
-    type
-    int
-    null
-    comment
-    '历史类型',
-    create_time
-    datetime
-    null
-    comment
-    '创建时间',
-    update_time
-    datetime
-    null
-    comment
-    '修改时间'
-)
-    comment '音乐播放历史(包括歌单，音乐，专辑）';
 
 create table if not exists tb_music
 (
@@ -343,9 +348,127 @@ create table if not exists tb_music
     music_name,
     alias_name,
     album_id
+),
+    constraint tb_music_tb_album_id_fk
+    foreign key
+(
+    album_id
+) references tb_album
+(
+    id
 )
+    on update cascade
+    on delete set null
     )
     comment '所有音乐列表';
+
+create table if not exists tb_collect_music
+(
+    collect_id
+    bigint
+    not
+    null
+    comment
+    '歌单ID',
+    music_id
+    bigint
+    not
+    null
+    comment
+    '音乐ID',
+    primary
+    key
+(
+    collect_id,
+    music_id
+),
+    constraint tb_collect_music_tb_collect_id_fk
+    foreign key
+(
+    collect_id
+) references tb_collect
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_collect_music_tb_music_id_fk
+    foreign key
+(
+    music_id
+) references tb_music
+(
+    id
+)
+    on update cascade
+    on delete cascade
+    )
+    comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';
+
+create table if not exists tb_history
+(
+    music_id
+    bigint
+    not
+    null
+    comment
+    '歌曲ID'
+    primary
+    key,
+    count
+    int
+    null
+    comment
+    '听歌次数',
+    type
+    int
+    null
+    comment
+    '历史类型',
+    create_time
+    datetime
+    null
+    comment
+    '创建时间',
+    update_time
+    datetime
+    null
+    comment
+    '修改时间',
+    constraint
+    tb_history_tb_album_id_fk
+    foreign
+    key
+(
+    music_id
+) references tb_album
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_history_tb_collect_id_fk
+    foreign key
+(
+    music_id
+) references tb_collect
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_history_tb_music_id_fk
+    foreign key
+(
+    music_id
+) references tb_music
+(
+    id
+)
+    on update cascade
+    on delete cascade
+    )
+    comment '音乐播放历史(包括歌单，音乐，专辑）';
 
 create index tb_music_alia_name_index
     on tb_music (alias_name);
@@ -403,7 +526,17 @@ create table if not exists tb_music_url
     unique
 (
     id
+),
+    constraint tb_music_url_tb_music_id_fk
+    foreign key
+(
+    music_id
+) references tb_music
+(
+    id
 )
+    on update cascade
+    on delete cascade
     )
     comment '音乐下载地址';
 
@@ -436,7 +569,7 @@ create table if not exists tb_plugin
     255
 ) null comment '插件创建者',
     code longtext null comment '插件代码',
-    `describe` text null comment '插件描述',
+    description text null comment '插件描述',
     user_id bigint not null comment '插件创建者',
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',
@@ -577,7 +710,17 @@ create table if not exists tb_rank
     unique
 (
     id
+),
+    constraint tb_rank_sys_user_id_fk
+    foreign key
+(
+    user_id
+) references sys_user
+(
+    id
 )
+    on update cascade
+    on delete cascade
     )
     comment '音乐播放排行榜';
 
@@ -604,19 +747,132 @@ create table if not exists tb_tag
     )
     comment '标签表（风格）';
 
+create table if not exists tb_collect_tag
+(
+    collect_id
+    bigint
+    not
+    null
+    comment
+    '歌单ID',
+    tag_id
+    bigint
+    not
+    null
+    comment
+    'tag ID',
+    primary
+    key
+(
+    collect_id,
+    tag_id
+),
+    constraint tb_collect_tag_tb_collect_id_fk
+    foreign key
+(
+    collect_id
+) references tb_collect
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_collect_tag_tb_tag_id_fk
+    foreign key
+(
+    tag_id
+) references tb_tag
+(
+    id
+)
+    on update cascade
+    on delete cascade
+    )
+    comment '歌单风格中间表';
+
 create table if not exists tb_user_album
 (
-    user_id  bigint not null comment '用户ID',
-    album_id bigint not null comment '专辑ID',
-    primary key (user_id, album_id)
+    user_id
+    bigint
+    not
+    null
+    comment
+    '用户ID',
+    album_id
+    bigint
+    not
+    null
+    comment
+    '专辑ID',
+    primary
+    key
+(
+    user_id,
+    album_id
+),
+    constraint tb_user_album_sys_user_id_fk
+    foreign key
+(
+    user_id
+) references sys_user
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_user_album_tb_album_id_fk
+    foreign key
+(
+    album_id
+) references tb_album
+(
+    id
+)
+    on update cascade
+    on delete cascade
     )
     comment '用户收藏专辑表';
 
 create table if not exists tb_user_artist
 (
-    user_id   bigint not null comment '用户ID',
-    artist_id bigint not null comment '歌手ID',
-    primary key (user_id, artist_id)
+    user_id
+    bigint
+    not
+    null
+    comment
+    '用户ID',
+    artist_id
+    bigint
+    not
+    null
+    comment
+    '歌手ID',
+    primary
+    key
+(
+    user_id,
+    artist_id
+),
+    constraint tb_user_artist_sys_user_id_fk
+    foreign key
+(
+    user_id
+) references sys_user
+(
+    id
+)
+    on update cascade
+    on delete cascade,
+    constraint tb_user_artist_tb_artist_id_fk
+    foreign key
+(
+    artist_id
+) references tb_artist
+(
+    id
+)
+    on update cascade
+    on delete cascade
     )
     comment '用户关注歌曲家';
 

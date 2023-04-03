@@ -1,7 +1,5 @@
 package org.api.admin.model.res;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -41,10 +39,8 @@ public class MusicPageRes implements Serializable {
     private Boolean order;
     
     @ApiModelProperty("歌曲时长")
-    @TableField("time_length")
     private Integer timeLength;
     
     @ApiModelProperty("创建时间")
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

@@ -1,6 +1,5 @@
 package org.api.neteasecloudmusic.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.toplist.artist.ArtistsItem;
@@ -10,13 +9,14 @@ import org.api.neteasecloudmusic.model.vo.toplist.playlist.PlaylistsItem;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.ListItem;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
+import org.core.common.page.Page;
+import org.core.iservice.ArtistService;
+import org.core.iservice.CollectService;
+import org.core.pojo.ArtistPojo;
+import org.core.pojo.CollectPojo;
 import org.core.pojo.SysUserPojo;
-import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbCollectPojo;
 import org.core.service.AccountService;
 import org.core.service.QukuService;
-import org.core.service.TbCollectService;
-import org.core.service.TbSingerService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +33,20 @@ public class TopListApi {
     private QukuService qukuService;
     
     @Autowired
-    private TbSingerService singerService;
+    private ArtistService artistService;
     
     @Autowired
     private AccountService accountService;
     
     @Autowired
-    private TbCollectService collectService;
+    private CollectService collectService;
     
     public TopListArtistRes artist(String type) {
         TopListArtistRes res = new TopListArtistRes();
-        Page<TbArtistPojo> page = new Page<>(1L, 200L);
-        singerService.page(page);
+        Page<ArtistPojo> page = new Page<>(1L, 200L);
+        artistService.page(page);
         ArrayList<ArtistsItem> artists = new ArrayList<>();
-        for (TbArtistPojo singerPojo : page.getRecords()) {
+        for (ArtistPojo singerPojo : page.getRecords()) {
             ArtistsItem e = new ArtistsItem();
             e.setId(singerPojo.getId());
             e.setName(singerPojo.getArtistName());
@@ -63,13 +63,13 @@ public class TopListApi {
     
     public TopListRes toplist() {
         TopListRes res = new TopListRes();
-        List<TbCollectPojo> playList = collectService.list();
+        List<CollectPojo> playList = collectService.list();
         ArrayList<ListItem> list = new ArrayList<>();
-        for (TbCollectPojo tbCollectPojo : playList) {
+        for (CollectPojo collectPojo : playList) {
             ListItem e = new ListItem();
-            e.setId(tbCollectPojo.getId());
-            e.setName(tbCollectPojo.getPlayListName());
-            e.setCreateTime((long) tbCollectPojo.getCreateTime().getNano());
+            e.setId(collectPojo.getId());
+            e.setName(collectPojo.getPlayListName());
+            e.setCreateTime((long) collectPojo.getCreateTime().getNano());
             list.add(e);
         }
         res.setList(list);
@@ -78,22 +78,22 @@ public class TopListApi {
     
     public TopListPlayListRes topPlaylist(String order, String cat, Long offset, Long limit) {
         TopListPlayListRes res = new TopListPlayListRes();
-        Page<TbCollectPojo> page = new Page<>(offset,limit);
+        Page<CollectPojo> page = new Page<>(offset, limit);
         collectService.page(page);
         ArrayList<PlaylistsItem> playlists = new ArrayList<>();
-        for (TbCollectPojo tbCollectPojo : page.getRecords()) {
+        for (CollectPojo collectPojo : page.getRecords()) {
             PlaylistsItem e = new PlaylistsItem();
-            e.setId(tbCollectPojo.getId());
-            e.setName(tbCollectPojo.getPlayListName());
-            e.setUserId(tbCollectPojo.getUserId());
-            e.setCreateTime(tbCollectPojo.getCreateTime().getNano());
+            e.setId(collectPojo.getId());
+            e.setName(collectPojo.getPlayListName());
+            e.setUserId(collectPojo.getUserId());
+            e.setCreateTime(collectPojo.getCreateTime().getNano());
             // 收藏人数
             e.setSubscribedCount(0);
             // 播放次数
             e.setPlayCount(0);
-            e.setDescription(tbCollectPojo.getDescription());
-    
-            SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
+            e.setDescription(collectPojo.getDescription());
+            
+            SysUserPojo userPojo = accountService.getById(collectPojo.getUserId());
             Creator creator = new Creator();
             creator.setAvatarUrl(userPojo.getAvatarUrl());
             creator.setBackgroundUrl(userPojo.getBackgroundUrl());
@@ -103,7 +103,7 @@ public class TopListApi {
             
             playlists.add(e);
         }
-        BeanUtils.copyProperties(page,res);
+        BeanUtils.copyProperties(page, res);
         res.setPlaylists(playlists);
         return res;
     }

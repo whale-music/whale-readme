@@ -38,7 +38,7 @@ public class PlayListController {
      * @return 返回数据
      */
     @RequestMapping(value = "/{playId}", method = {RequestMethod.GET, RequestMethod.POST})
-    public R getPlaylist(@PathVariable("playId") String playId) {
+    public R getPlaylist(@PathVariable("playId") Long playId) {
         return R.success(playList.getPlaylist(playId));
     }
     

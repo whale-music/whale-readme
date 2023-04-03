@@ -22,7 +22,7 @@ public interface PluginService {
      * @param pluginId 插件ID
      * @return 插件入参
      */
-    List<PluginLabelValue> getPluginParams(String pluginId);
+    List<PluginLabelValue> getPluginParams(Long pluginId);
     
     /**
      * 运行插件任务
@@ -30,5 +30,5 @@ public interface PluginService {
      * @param pluginId 插件ID
      * @param req      插件入参
      */
-    void execPluginTask(String pluginId, List<PluginLabelValue> req);
+    void execPluginTask(Long pluginId, List<PluginLabelValue> req);
 }

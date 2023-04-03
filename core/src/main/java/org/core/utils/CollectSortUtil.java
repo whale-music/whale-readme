@@ -1,6 +1,6 @@
 package org.core.utils;
 
-import org.core.pojo.TbCollectPojo;
+import org.core.pojo.CollectPojo;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class CollectSortUtil {
      * @param collectPojoList 用户ID
      */
     @NotNull
-    public static List<TbCollectPojo> userLikeUserSort(Long uid, List<TbCollectPojo> collectPojoList) {
+    public static List<CollectPojo> userLikeUserSort(Long uid, List<CollectPojo> collectPojoList) {
         // 遍历，把用户喜爱歌单排序到第一位
-        List<TbCollectPojo> last = new ArrayList<>();
+        List<CollectPojo> last = new ArrayList<>();
         for (int i = 0; i < collectPojoList.size(); i++) {
             if (Objects.equals(collectPojoList.get(i).getId(), uid)) {
                 last.add(collectPojoList.get(i));

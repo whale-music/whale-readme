@@ -2,7 +2,7 @@ package org.api.neteasecloudmusic.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
-import org.core.pojo.TbArtistPojo;
+import org.core.pojo.ArtistPojo;
 import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class SongApi {
     /**
      * 获取歌曲下艺术家信息
      */
-    public List<TbArtistPojo> getSingerByMusicId(String musicId) {
+    public List<ArtistPojo> getSingerByMusicId(String musicId) {
         return qukuService.getSingerByMusicId(Long.valueOf(musicId));
     }
 }

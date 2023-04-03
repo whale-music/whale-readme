@@ -6,8 +6,8 @@ import java.util.List;
 
 @Data
 public class PlayListVo {
-	private int code;
-	private List<PlaylistItem> playlist;
-	private boolean more;
-	private String version;
+    private int code;
+    private List<PlaylistItem> playlist;
+    private boolean more;
+    private String version;
 }

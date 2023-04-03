@@ -1,9 +1,6 @@
 package org.api.neteasecloudmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.Creator;
@@ -18,14 +15,22 @@ import org.api.neteasecloudmusic.model.vo.user.record.ArItem;
 import org.api.neteasecloudmusic.model.vo.user.record.Song;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
+import org.core.common.page.Page;
+import org.core.common.reflection.ReflectionFieldName;
 import org.core.common.result.ResultCode;
+import org.core.iservice.*;
 import org.core.pojo.*;
-import org.core.service.*;
+import org.core.service.AccountService;
+import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,20 +51,20 @@ public class UserApi {
     
     // 歌单表
     @Autowired
-    private TbCollectService collectService;
+    private CollectService collectService;
     
     @Autowired
-    private TbCollectMusicService collectMusicService;
+    private CollectMusicService collectMusicService;
     
     // 用户关注歌手表
     @Autowired
-    private TbUserSingerService userSingerService;
+    private UserArtistService userArtistService;
     
     @Autowired
-    private TbRankService rankService;
+    private RankService rankService;
     
     @Autowired
-    private TbMusicService musicService;
+    private MusicService musicService;
     
     @Autowired
     private QukuService qukuService;
@@ -107,8 +112,8 @@ public class UserApi {
      * @param userPojo 用户信息
      */
     public void updateUserPojo(SysUserPojo userPojo) {
-        boolean b = accountService.updateById(userPojo);
-        if (b) {
+        SysUserPojo pojo = accountService.updateById(userPojo);
+        if (pojo != null) {
             log.debug("用户名初始化成功");
         } else {
             throw new BaseException(ResultCode.USER_NOT_EXIST);
@@ -121,43 +126,45 @@ public class UserApi {
      * @param uid 用户ID
      * @return 返回用户所有歌单
      */
-    public PlayListVo getPlayList(Long uid, Long pageIndex, Long pageSize) {
+    public PlayListVo getPlayList(Long uid, Integer pageIndex, Integer pageSize) {
         PlayListVo playListVo = new PlayListVo();
         playListVo.setPlaylist(new ArrayList<>());
         playListVo.setVersion("0");
-    
-        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getUserId, uid)
-                                                                       .orderByAsc(TbCollectPojo::getSort);
-        Page<TbCollectPojo> collectPojoPage = collectService.page(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
-    
-        List<TbCollectPojo> last = CollectSortUtil.userLikeUserSort(uid, collectPojoPage.getRecords());
+        
+        Specification<CollectPojo> collectPojoSpecification = (root, query, criteriaBuilder) -> {
+            Predicate equal = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getUserId)), uid);
+            Order desc = criteriaBuilder.desc(root.get(ReflectionFieldName.getFieldName(CollectPojo::getSort)));
+            query.orderBy(desc, desc);
+            return query.where(equal).getRestriction();
+        };
+        Page<CollectPojo> collectPojoPage = collectService.findAll(collectPojoSpecification, PageRequest.of(pageIndex, pageSize));
+        
+        List<CollectPojo> last = CollectSortUtil.userLikeUserSort(uid, collectPojoPage.getRecords());
         collectPojoPage.setRecords(last);
-    
+        
         // 是否有下一页
         playListVo.setMore(collectPojoPage.hasNext());
-        List<TbCollectPojo> collectPojoList = collectPojoPage.getRecords();
+        List<CollectPojo> collectPojoList = collectPojoPage.getRecords();
         if (CollUtil.isEmpty(collectPojoList)) {
             return new PlayListVo();
         }
         // 导出歌单id
-        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
+        List<Long> collectIds = collectPojoList.stream().map(CollectPojo::getId).collect(Collectors.toList());
         // 根据歌单和tag的中间表来获取tag id列表
-        List<TbCollectTagPojo> collectIdAndTagsIdList = collectApi.getCollectTagIdList(collectIds);
+        List<CollectTagPojo> collectIdAndTagsIdList = collectApi.getCollectTagIdList(collectIds);
         // 根据tag id 列表获取tag Name列表
         List<Long> tagIdList = collectIdAndTagsIdList.stream()
-                                                     .map(TbCollectTagPojo::getTagId)
+                                                     .map(CollectTagPojo::getTagId)
                                                      .collect(Collectors.toList());
-        List<TbTagPojo> collectTagList = collectApi.getTagPojoList(tagIdList);
+        List<TagPojo> collectTagList = collectApi.getTagPojoList(tagIdList);
         
         
-        for (TbCollectPojo tbCollectPojo : collectPojoList) {
+        for (CollectPojo collectPojo : collectPojoList) {
             PlaylistItem item = new PlaylistItem();
             // 是否订阅
             item.setSubscribed(false);
             // 歌单数量
-            item.setTrackCount(collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                                 .eq(TbCollectMusicPojo::getCollectId, tbCollectPojo.getId())));
+            item.setTrackCount(collectMusicService.countLambda(CollectMusicPojo::getCollectId, collectPojo.getId()));
             // 创作者
             Creator creator = new Creator();
             SysUserPojo account = Optional.ofNullable(accountService.getById(uid)).orElse(new SysUserPojo());
@@ -167,13 +174,13 @@ public class UserApi {
             creator.setBackgroundUrl(account.getBackgroundUrl());
             item.setCreator(creator);
             // 用户ID
-            item.setUserId(tbCollectPojo.getUserId());
+            item.setUserId(collectPojo.getUserId());
             // 封面图像ID
-            item.setCoverImgUrl(tbCollectPojo.getPic());
+            item.setCoverImgUrl(collectPojo.getPic());
             // 创建时间
-            item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
+            item.setCreateTime(collectPojo.getCreateTime().getNano());
             // 描述
-            item.setDescription(tbCollectPojo.getDescription());
+            item.setDescription(collectPojo.getDescription());
             // 判断中间表是否有值
             // 判断tag表是否有值
             if (!collectIdAndTagsIdList.isEmpty() && collectTagList != null && !collectTagList.isEmpty()) {
@@ -181,15 +188,15 @@ public class UserApi {
                 // 先查找歌单和tag中间表，再查找tag记录表
                 List<String> tags = collectIdAndTagsIdList.stream()
                                                           .filter(tbCollectTagPojo -> tbCollectTagPojo.getCollectId()
-                                                                                                      .equals(tbCollectPojo.getId()))
+                                                                                                      .equals(collectPojo.getId()))
                                                           .map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(), collectTagList))
                                                           .collect(Collectors.toList());
                 item.setTags(tags);
             }
             // 歌单名
-            item.setName(tbCollectPojo.getPlayListName());
+            item.setName(collectPojo.getPlayListName());
             // 歌单ID
-            item.setId(tbCollectPojo.getId());
+            item.setId(collectPojo.getId());
             
             playListVo.getPlaylist().add(item);
         }
@@ -203,8 +210,8 @@ public class UserApi {
      * @param tagList 风格
      * @return 风格名称
      */
-    private String getTags(Long tagId, List<TbTagPojo> tagList) {
-        for (TbTagPojo tag : tagList) {
+    private String getTags(Long tagId, List<TagPojo> tagList) {
+        for (TagPojo tag : tagList) {
             if (Objects.equals(tag.getId(), tagId)) {
                 return tag.getTagName();
             }
@@ -219,10 +226,12 @@ public class UserApi {
      * @return 歌单数量
      */
     public Long getCreatedPlaylistCount(Long userId) {
-        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getType, Short.valueOf("0"))
-                                                                       .eq(TbCollectPojo::getUserId, userId);
-        return collectService.count(lambdaQueryWrapper);
+        Specification<CollectPojo> collectPojoSpecification = (root, query, criteriaBuilder) -> {
+            Predicate equal = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getType)), Short.valueOf("0"));
+            Predicate equal1 = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getUserId)), userId);
+            return query.where(equal1, equal).getRestriction();
+        };
+        return collectService.count(collectPojoSpecification);
     }
     
     
@@ -233,11 +242,13 @@ public class UserApi {
      * @return 订阅歌单总数
      */
     public Long getSubPlaylistCount(Long userId) {
-        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getUserId, userId)
-                                                                       .eq(TbCollectPojo::getType, Short.valueOf("0"))
-                                                                       .eq(TbCollectPojo::getSubscribed, true);
-        return collectService.count(lambdaQueryWrapper);
+        Specification<CollectPojo> collectPojoSpecification = (root, query, criteriaBuilder) -> {
+            Predicate equal = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getType)), Short.valueOf("0"));
+            Predicate equal1 = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getUserId)), userId);
+            Predicate equal2 = criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(CollectPojo::getSubscribed)), true);
+            return query.where(equal, equal1, equal2).getRestriction();
+        };
+        return collectService.count(collectPojoSpecification);
     }
     
     /**
@@ -246,51 +257,49 @@ public class UserApi {
      * @return 关注数量
      */
     public Long getUserBySinger(Long userId) {
-        LambdaQueryWrapper<TbUserArtistPojo> lambdaQueryWrapper = Wrappers.<TbUserArtistPojo>lambdaQuery()
-                                                                          .eq(TbUserArtistPojo::getUserId, userId);
-        return userSingerService.count(lambdaQueryWrapper);
+        return userArtistService.countLambda(UserArtistPojo::getUserId, userId);
     }
     
     /**
      * 用户播放音乐数量
      *
-     * @param uid  用户ID
+     * @param uid 用户ID
      */
     public List<UserRecordRes> userRecord(Long uid, Long type) {
         ArrayList<UserRecordRes> res = new ArrayList<>();
-        List<TbRankPojo> list = rankService.list(Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, uid));
-        Map<Long, TbRankPojo> rankPojoMap = list.stream().collect(Collectors.toMap(TbRankPojo::getId, tbRankPojo -> tbRankPojo));
+        List<RankPojo> list = rankService.listLambdaEq(RankPojo::getUserId, uid);
+        Map<Long, RankPojo> rankPojoMap = list.stream().collect(Collectors.toMap(RankPojo::getId, tbRankPojo -> tbRankPojo));
         
-        List<TbMusicPojo> musicPojoList;
+        List<MusicPojo> musicPojoList;
         if (CollUtil.isEmpty(list)) {
-            Page<TbMusicPojo> page = musicService.page(new Page<>(0, 100L));
+            Page<MusicPojo> page = musicService.findAll(null, PageRequest.of(0, 100));
             musicPojoList = page.getRecords();
         } else {
-            List<Long> musicIds = list.stream().map(TbRankPojo::getId).collect(Collectors.toList());
+            List<Long> musicIds = list.stream().map(RankPojo::getId).collect(Collectors.toList());
             musicPojoList = musicService.listByIds(musicIds);
         }
         
-        for (TbMusicPojo tbMusicPojo : musicPojoList) {
+        for (MusicPojo musicPojo : musicPojoList) {
             UserRecordRes userRecordRes = new UserRecordRes();
-            int count = rankPojoMap.get(tbMusicPojo.getId()) == null ? 0 : rankPojoMap.get(tbMusicPojo.getId()).getBroadcastCount();
+            int count = rankPojoMap.get(musicPojo.getId()) == null ? 0 : rankPojoMap.get(musicPojo.getId()).getBroadcastCount();
             userRecordRes.setPlayCount(count);
             Song song = new Song();
-            song.setName(tbMusicPojo.getMusicName());
-            song.setId(tbMusicPojo.getId());
-            song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-    
-            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            song.setName(musicPojo.getMusicName());
+            song.setId(musicPojo.getId());
+            song.setAlia(AliasUtil.getAliasList(musicPojo.getAliasName()));
+            
+            List<ArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(musicPojo.getId());
             ArrayList<ArItem> ar = new ArrayList<>();
-            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
+            for (ArtistPojo artistPojo : singerByMusicId) {
                 ArItem e = new ArItem();
-                e.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
-                e.setName(tbArtistPojo.getArtistName());
-                e.setId(tbArtistPojo.getId());
+                e.setAlias(AliasUtil.getAliasList(artistPojo.getAliasName()));
+                e.setName(artistPojo.getArtistName());
+                e.setId(artistPojo.getId());
                 ar.add(e);
             }
             song.setAr(ar);
             
-            TbAlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
+            AlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(musicPojo.getId());
             Al al = new Al();
             al.setId(albumByMusicId.getId());
             al.setPicUrl(albumByMusicId.getPic());
@@ -311,7 +320,7 @@ public class UserApi {
      * @param countrycode 手机号默认86
      */
     public SysUserPojo checkPhone(Long phone, String countrycode) {
-        return accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
+        return accountService.getOne(SysUserPojo::getUsername, phone).orElseThrow(() -> new BaseException(ResultCode.USER_NOT_EXIST));
     }
     
     /**

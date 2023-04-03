@@ -22,20 +22,20 @@ class TestDownloadMusic {
     @Test
     void testDownloadMusic() {
         Log log = Log.get();
-    
+        
         String playId = "6389917304";
         String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c5a61c09bbb039cd86abedcdb3013fda14519e07624a9f0053212155e70d424b8dfb6cda0c285e97283726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
         LikePlay like = RequestMusic163.like(playId, cookie);
-    
+        
         List<Integer> ids = like.getIds();
         int allPageIndex = PageUtil.totalPage(ids.size(), 20);
-    
+        
         File saveFile = FileUtil.mkdir(dest);
         List<String> fileNames = FileUtil.listFileNames(dest);
         List<String> fileMd5s = fileNames.stream().map(s -> StringUtils.split(s, '.')[0]).collect(Collectors.toList());
         // 获取所有文件名
         Map<String, String> collect = fileNames.stream().collect(Collectors.toMap(s -> StringUtils.split(s, '.')[0], String::new));
-    
+        
         for (int i = 0; i < allPageIndex; i++) {
             List<Integer> page = ListUtil.page(i, 20, ids);
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
@@ -72,7 +72,7 @@ class TestDownloadMusic {
                     }
                     System.out.println(md5);
                 }
-    
+                
             });
         }
         for (String s : collect.keySet()) {

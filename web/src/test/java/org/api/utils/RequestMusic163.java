@@ -19,8 +19,8 @@ import java.io.File;
 import java.util.List;
 
 public class RequestMusic163 {
-    private static final Log log = Log.get();
     public final static String host = "http://43.139.22.243:3000";
+    private static final Log log = Log.get();
     
     private RequestMusic163() {
     }

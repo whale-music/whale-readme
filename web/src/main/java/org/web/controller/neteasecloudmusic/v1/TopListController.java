@@ -41,7 +41,7 @@ public class TopListController {
     public NeteaseResult artist(String type) {
         TopListArtistRes res = topListApi.artist(type);
         NeteaseResult r = new NeteaseResult();
-        r.put("list",res);
+        r.put("list", res);
         return r.success();
     }
 }

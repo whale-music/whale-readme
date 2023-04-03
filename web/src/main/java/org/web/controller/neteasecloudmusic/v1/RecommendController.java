@@ -1,7 +1,6 @@
 package org.web.controller.neteasecloudmusic.v1;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.personalfm.PersonalFMRes;
@@ -10,6 +9,7 @@ import org.api.neteasecloudmusic.model.vo.recommend.albumnew.RecommendAlbumNewRe
 import org.api.neteasecloudmusic.model.vo.recommend.resource.DailyRecommendResourceRes;
 import org.api.neteasecloudmusic.model.vo.recommend.songs.RecommendSongerRes;
 import org.api.neteasecloudmusic.service.RecommendApi;
+import org.core.common.page.Page;
 import org.core.common.result.NeteaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -85,10 +85,10 @@ public class RecommendController {
      * 全部新碟
      */
     @GetMapping("/album/new")
-    public NeteaseResult albumNew(String area,@RequestParam(value = "offset",required = false,defaultValue = "0") Long offset, @RequestParam(value = "limit",required = false,defaultValue = "30") Long limit) {
+    public NeteaseResult albumNew(String area, @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset, @RequestParam(value = "limit", required = false, defaultValue = "30") Integer limit) {
         Page<RecommendAlbumNewRes> res = recommendApi.albumNew(area, offset, limit);
         NeteaseResult r = new NeteaseResult();
-        r.putAll(BeanUtil.beanToMap(res,"records"));
+        r.putAll(BeanUtil.beanToMap(res, "records"));
         r.put("albums", res.getRecords());
         return r.success();
     }

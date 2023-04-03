@@ -1,0 +1,52 @@
+package org.core.pojo;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.io.Serializable;
+import java.util.Objects;
+
+public class AlbumArtistPojoPK implements Serializable {
+    @Column(name = "album_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long albumId;
+    @Column(name = "artist_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long artistId;
+    
+    public Long getAlbumId() {
+        return albumId;
+    }
+    
+    public void setAlbumId(Long albumId) {
+        this.albumId = albumId;
+    }
+    
+    public Long getArtistId() {
+        return artistId;
+    }
+    
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AlbumArtistPojoPK that = (AlbumArtistPojoPK) o;
+        return albumId == that.albumId && artistId == that.artistId;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(albumId, artistId);
+    }
+}

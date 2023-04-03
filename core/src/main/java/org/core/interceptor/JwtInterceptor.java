@@ -41,7 +41,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (Arrays.asList(passPath).contains(request.getRequestURI())) {
             return true;
         }
-    
+        
         String getTempFile = "/admin/music/get/temp/";
         int length = getTempFile.length();
         if (length < request.getRequestURI().length()) {
@@ -50,7 +50,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-    
+        
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
         log.debug("token值：{}", token);
@@ -68,7 +68,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (token == null) {
             return true;
         }
-    
+        
         // 验证 token
         try {
             JwtUtil.checkSign(token);

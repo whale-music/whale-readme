@@ -17,7 +17,7 @@ class OSSFactoryTest {
     void testOssFactory() {
         OSSService result1 = OSSFactory.ossFactory("AList");
         OSSService result2 = OSSFactory.ossFactory("AList");
-    
+        
         Assertions.assertEquals(new AListOSSServiceImpl().getMode(), result1.getMode());
         Assertions.assertEquals(result1, result2);
     }

@@ -4,10 +4,19 @@ import com.github.yitter.contract.IdGeneratorOptions;
 import com.github.yitter.idgen.YitIdHelper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(scanBasePackages = {"org.core", "org.web", "org.api", "org.oss", "org.plugin"})
 @EnableAsync
+@EnableJpaAuditing
+@EnableJpaRepositories(basePackages = "org.core.repository")
+@ComponentScan(basePackages = {"org.core.iservice","org.core.service.*"})
+@EntityScan("org.core.pojo")
 public class MusicBoxSpringBoot {
     public static void main(String[] args) {
         // 创建 IdGeneratorOptions 对象，可在构造函数中输入 WorkerId：
@@ -20,6 +29,7 @@ public class MusicBoxSpringBoot {
         YitIdHelper.setIdGenerator(options);
         // 以上过程只需全局一次，且应在生成ID之前完成。
     
-        SpringApplication.run(MusicBoxSpringBoot.class, args);
+        ConfigurableApplicationContext run = SpringApplication.run(MusicBoxSpringBoot.class, args);
+        System.out.println("run.getId() = " + run.getId());
     }
 }

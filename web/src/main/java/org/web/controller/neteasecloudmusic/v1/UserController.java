@@ -72,11 +72,11 @@ public class UserController extends BaseController {
      * @return 返回用户歌单
      */
     @RequestMapping(value = "/user/playlist", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Long pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Long pageSize) {
+    public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Integer pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Integer pageSize) {
         uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         // 如果歌单查询没有值，直接返回
         PlayListVo playList = user.getPlayList(uid, pageIndex, pageSize);
-    
+        
         NeteaseResult neteaseResult = new NeteaseResult();
         neteaseResult.putAll(BeanUtil.beanToMap(playList));
         return neteaseResult.success();

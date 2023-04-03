@@ -33,25 +33,19 @@ spring:
       max-file-size: 200MB
       # 设置 整个请求的大小
       max-request-size: 200MB
-      # 设置上传文件位置
-      # location: ./
-# mybatis-plus相关配置
-mybatis-plus:
-  # xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
-  mapper-locations: classpath:mapper/*.xml
-  # 以下配置均有默认值,可以不设置
-  global-config:
-    db-config:
-      #主键类型 AUTO:"数据库ID自增" INPUT:"用户输入ID",ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
-      id-type: auto
-      #驼峰下划线转换
-      table-underline: true
+  jpa:
+    #这个参数是在建表的时候，将默认的存储引擎切换为 InnoDB 用的
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    #配置在日志中打印出执行的 SQL 语句信息。
+    show-sql: true
+    open-in-view: true
+    hibernate:
+      #配置指明在程序启动的时候要删除并且创建实体类对应的表
+      ddl-auto: update
+      naming:
+        #指定jpa的自动表生成策略，驼峰自动映射为下划线格式
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
 
-  configuration:
-    # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
-    map-underscore-to-camel-case: true
-    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 save-config:
   # 保存模式

@@ -1,12 +1,13 @@
 package org.core.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
+import org.core.common.reflection.ReflectionFieldName;
 import org.core.common.result.ResultCode;
+import org.core.iservice.impl.SysUserServiceImpl;
 import org.core.pojo.SysUserPojo;
 import org.core.service.AccountService;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,7 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
      * @param user 用户信息
      */
     public void createAccount(SysUserPojo user) {
-        long count = this.count(Wrappers.<SysUserPojo>lambdaQuery()
-                                        .eq(StringUtils.isNotBlank(user.getUsername()),
-                                                SysUserPojo::getUsername,
-                                                user.getUsername()));
+        long count = this.countLambda(StringUtils.isNotBlank(user.getUsername()), SysUserPojo::getUsername, user.getUsername());
         if (count == 0) {
             user.setLastLoginTime(LocalDateTime.now());
             this.save(user);
@@ -41,13 +39,11 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
      * @return 返回用户信息
      */
     public SysUserPojo login(String phone, String password) {
-        LambdaQueryWrapper<SysUserPojo> lambdaQuery = new LambdaQueryWrapper<>();
-        lambdaQuery.eq(SysUserPojo::getUsername, phone);
-        lambdaQuery.eq(SysUserPojo::getPassword, password);
-        SysUserPojo one = this.getOne(lambdaQuery);
-        if (one == null) {
-            throw new BaseException(ResultCode.USER_NOT_EXIST);
-        }
+        Specification<SysUserPojo> where = Specification.where((root, query, criteriaBuilder) -> query.where(
+                criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(SysUserPojo::getUsername)), phone),
+                criteriaBuilder.equal(root.get(ReflectionFieldName.getFieldName(SysUserPojo::getPassword)), password)
+        ).getRestriction());
+        SysUserPojo one = this.getOne(where).orElseThrow(() -> new BaseException(ResultCode.USER_NOT_EXIST));
         one.setPassword(null);
         return one;
     }

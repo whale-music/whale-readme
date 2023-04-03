@@ -2,7 +2,7 @@ package org.api.common.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.core.config.SaveConfig;
-import org.core.pojo.TbMusicUrlPojo;
+import org.core.pojo.MusicUrlPojo;
 import org.core.service.QukuService;
 import org.oss.factory.OSSFactory;
 import org.oss.service.OSSService;
@@ -26,22 +26,22 @@ public class MusicCommonApi {
     @Autowired
     private SaveConfig config;
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId) {
+    public List<MusicUrlPojo> getMusicUrlByMusicId(Long musicId) {
         return getMusicUrlByMusicId(Set.of(musicId));
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds) {
-        List<TbMusicUrlPojo> list = qukuService.getMusicUrl(musicIds);
-        for (TbMusicUrlPojo tbMusicUrlPojo : list) {
+    public List<MusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds) {
+        List<MusicUrlPojo> list = qukuService.getMusicUrl(musicIds);
+        for (MusicUrlPojo musicUrlPojo : list) {
             try {
                 OSSService aList = OSSFactory.ossFactory("AList");
                 // 获取音乐地址
                 String musicAddresses = aList.getMusicAddresses(config.getHost(),
                         config.getObjectSave(),
-                        tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType());
-                tbMusicUrlPojo.setUrl(musicAddresses);
+                        musicUrlPojo.getMd5() + "." + musicUrlPojo.getEncodeType());
+                musicUrlPojo.setUrl(musicAddresses);
             } catch (Exception e) {
-                tbMusicUrlPojo.setUrl("");
+                musicUrlPojo.setUrl("");
                 log.error("获取下载地址出错" + e.getMessage(), e);
             }
         }

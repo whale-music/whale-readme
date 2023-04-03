@@ -33,9 +33,9 @@ public class BaseController {
         
         profile.setLastLoginIP(account.getLastLoginIp());
         profile.setLastLoginTime(account.getLastLoginTime());
-    
+        
         profile.setCreateTime(account.getCreateTime().getNano());
-    
+        
         userVo.setAccount(new Account());
         Account userVoAccount = userVo.getAccount();
         userVoAccount.setId(account.getId());
@@ -65,7 +65,7 @@ public class BaseController {
         Cookie cookie2 = new Cookie(CookieConfig.COOKIE_NAME_MUSIC_U, sign);
         response.addCookie(cookie1);
         response.addCookie(cookie2);
-    
+        
         NeteaseResult r = new NeteaseResult();
         r.put("token", sign);
         return r;

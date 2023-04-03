@@ -3,9 +3,9 @@ package org.api.neteasecloudmusic.model.vo.user.record;
 import lombok.Data;
 
 @Data
-public class H{
-	private int br;
-	private int fid;
-	private int size;
-	private int vd;
+public class H {
+    private int br;
+    private int fid;
+    private int size;
+    private int vd;
 }

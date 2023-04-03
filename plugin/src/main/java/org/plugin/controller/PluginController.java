@@ -43,7 +43,7 @@ public class PluginController {
      * @return 插件入参
      */
     @GetMapping("/getPluginParams")
-    public R getPluginParams(@RequestParam("pluginId") String pluginId) {
+    public R getPluginParams(@RequestParam("pluginId") Long pluginId) {
         List<PluginLabelValue> list = pluginService.getPluginParams(pluginId);
         return R.success(list);
     }
@@ -55,7 +55,7 @@ public class PluginController {
      * @param req      插件入参
      */
     @GetMapping("/execPluginTask")
-    public R execPluginTask(@RequestParam("pluginId") String pluginId, List<PluginLabelValue> req) {
+    public R execPluginTask(@RequestParam("pluginId") Long pluginId, List<PluginLabelValue> req) {
         pluginService.execPluginTask(pluginId, req);
         return R.success();
     }

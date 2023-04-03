@@ -24,9 +24,6 @@ public class OSSFactory {
     
     private static final String INTERFACE_NAME = "org.oss.service.OSSService";
     
-    private OSSFactory() {
-    }
-    
     static {
         Set<Class<?>> classes = ClassUtil.scanPackage(PACKAGE_NAME);
         for (Class<?> aClass : classes) {
@@ -42,6 +39,9 @@ public class OSSFactory {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+    
+    private OSSFactory() {
     }
     
     /**

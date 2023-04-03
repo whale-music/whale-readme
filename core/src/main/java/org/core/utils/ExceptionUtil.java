@@ -4,7 +4,8 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 
 public class ExceptionUtil {
-    private ExceptionUtil() {}
+    private ExceptionUtil() {
+    }
     
     public static void isNull(boolean flag, ResultCode code) {
         if (flag) {

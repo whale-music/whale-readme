@@ -8,6 +8,6 @@ import java.util.List;
 public class ArItem {
     private String name;
     private List<Object> tns;
-    private List<Object> alias;
+    private List<String> alias;
     private Long id;
 }

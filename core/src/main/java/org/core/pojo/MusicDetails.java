@@ -10,8 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MusicDetails {
-    private TbMusicPojo music;
-    private TbAlbumPojo album;
-    private List<TbArtistPojo> singer;
-    private TbMusicUrlPojo musicUrl;
+    private MusicPojo music;
+    private AlbumPojo album;
+    private List<ArtistPojo> singer;
+    private MusicUrlPojo musicUrl;
 }

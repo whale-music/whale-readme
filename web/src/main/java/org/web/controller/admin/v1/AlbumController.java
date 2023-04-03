@@ -1,11 +1,11 @@
 package org.web.controller.admin.v1;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.res.AlbumRes;
 import org.api.admin.service.AlbumApi;
+import org.core.common.page.Page;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

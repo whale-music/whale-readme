@@ -16,5 +16,5 @@ import java.util.List;
 @NoArgsConstructor
 public class PlayListMusicRes extends TbMusicPojo {
     private TbAlbumPojo album;
-    private List<TbArtistPojo> singers;
+    private List<TbArtistPojo> artists;
 }

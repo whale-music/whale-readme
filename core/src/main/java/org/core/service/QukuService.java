@@ -5,6 +5,7 @@ import org.core.pojo.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface QukuService {
@@ -35,12 +36,21 @@ public interface QukuService {
      * 批量获取歌手信息
      * Long -> music ID
      */
-    List<TbArtistPojo> getSingerListByMusicId(List<Long> musicIds);
+    List<TbArtistPojo> getArtistListByMusicId(List<Long> musicIds);
+    
+    /**
+     * (此接口用于优化歌单请求过慢)
+     * 批量获取歌手信息，优化版本
+     * key 值为音乐ID
+     * value 为歌手
+     * 并且查询时增加缓存查找，防止多次访问数据库，造成qps过高
+     */
+    Map<Long, List<TbArtistPojo>> getArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
     
     /**
      * 获取歌手信息
      */
-    List<TbArtistPojo> getSingerByMusicId(Long musicId);
+    List<TbArtistPojo> getArtistByMusicId(Long musicId);
     
     /**
      * 获取歌曲下载地址

@@ -85,7 +85,7 @@ public class RecommendApi {
             
             // 歌手信息
             ArrayList<ArtistsItem> artists = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getArtistByMusicId(tbMusicPojo.getId());
             int albumSize = qukuService.getAlbumMusicCountByAlbumId(tbMusicPojo.getAlbumId());
             for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArtistsItem artistsItem = new ArtistsItem();
@@ -165,7 +165,7 @@ public class RecommendApi {
             // 歌手信息
             ArrayList<org.api.neteasecloudmusic.model.vo.recommend.songs.Artist> artists = new ArrayList<>();
             List<ArItem> ar = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(tbMusicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getArtistByMusicId(tbMusicPojo.getId());
             for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem arItem = new ArItem();
                 arItem.setName(tbArtistPojo.getArtistName());

@@ -22,6 +22,6 @@ public class SongApi {
      * 获取歌曲下艺术家信息
      */
     public List<TbArtistPojo> getSingerByMusicId(String musicId) {
-        return qukuService.getSingerByMusicId(Long.valueOf(musicId));
+        return qukuService.getArtistByMusicId(Long.valueOf(musicId));
     }
 }

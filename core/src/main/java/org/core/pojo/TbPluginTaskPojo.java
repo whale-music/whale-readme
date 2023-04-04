@@ -35,6 +35,10 @@ public class TbPluginTaskPojo implements Serializable {
     @TableField("plugin_id")
     private Long pluginId;
     
+    @ApiModelProperty("当前任务执行状态,0: run,1: stop,2: error")
+    @TableField("status")
+    private Short status;
+    
     @ApiModelProperty("用户创建ID")
     @TableField("user_id")
     private Long userId;

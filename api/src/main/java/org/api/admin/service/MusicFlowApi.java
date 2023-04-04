@@ -19,6 +19,7 @@ import org.core.config.FileTypeConfig;
 import org.core.config.SaveConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
+import org.core.service.AccountService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -69,12 +70,16 @@ public class MusicFlowApi {
      */
     @Autowired
     private TbMusicUrlService musicUrlService;
+    
+    @Autowired
+    private AccountService accountService;
+    
     /**
      * 歌手服务
      */
     @Autowired
     private TbArtistService singerService;
-
+    
     /**
      * 专辑表
      */
@@ -241,7 +246,10 @@ public class MusicFlowApi {
         urlPojo = urlPojo == null ? new TbMusicUrlPojo() : urlPojo;
         urlPojo.setMusicId(musicPojo.getId());
         urlPojo.setOrigin(dto.getOrigin());
-        urlPojo.setUserId(dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId());
+        Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
+        SysUserPojo byId = accountService.getById(userId);
+        ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
+        urlPojo.setUserId(byId.getId());
         // 上传到本地时读取本地文件数据，否则使用前端传入的数据
         if (Boolean.TRUE.equals(dto.getUploadFlag())) {
             if (dto.getSize() == null

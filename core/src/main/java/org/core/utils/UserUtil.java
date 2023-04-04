@@ -13,7 +13,7 @@ public class UserUtil {
     
     public static SysUserPojo getUser() {
         if (USER.get() == null) {
-            throw new BaseException(ResultCode.USER_NOT_LOGIN);
+            throw new BaseException(ResultCode.USER_NOT_LOGIN.getResultMsg());
         }
         return USER.get();
     }

@@ -1,5 +1,6 @@
 package org.plugin.service.impl;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -94,34 +96,48 @@ public class PluginServiceImpl implements PluginService {
             return pluginLabelValue.getParams();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new BaseException(ResultCode.PLUGIN_CODE);
+            throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
     }
     
     /**
-     * 运行插件代码
+     * 运行插件任务
      *
+     * @param req      插件入参
      * @param pluginId 插件ID
-     * @param id       任务ID
+     * @param onLine   是否在线运行
+     * @param taskId   任务ID
      */
     @Async
     @Override
-    public void execPluginTask(Long pluginId, Boolean onLine, Long id) {
-        List<PluginLabelValue> req = getPluginParams(pluginId);
+    public void execPluginTask(List<PluginLabelValue> req, Long pluginId, Boolean onLine, Long taskId) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
         }
         try (Context ctx = Context.enter()) {
-            Scriptable scope = ctx.initStandardObjects();
-            ctx.evaluateString(scope, byId.getCode(), "<cmd>", 0, null);
-            Function getParams = (Function) scope.get("saveMusic", scope);
-            Map<String, String> map = req.stream().collect(Collectors.toMap(PluginLabelValue::getKey, PluginLabelValue::getValue));
-            getParams.call(ctx, scope, scope, List.of(map, id, pluginPackage).toArray());
+            execCode(req, taskId, byId.getCode(), ctx);
+            TbPluginTaskPojo entity = new TbPluginTaskPojo();
+            entity.setId(taskId);
+            entity.setStatus((short) 1);
+            pluginTaskService.updateById(entity);
         } catch (Exception e) {
+            TbPluginTaskPojo entity = new TbPluginTaskPojo();
+            entity.setId(taskId);
+            entity.setStatus((short) 2);
+            pluginTaskService.updateById(entity);
+            pluginPackage.log(taskId.toString(), String.valueOf(entity.getUserId()), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
+    }
+    
+    private Object execCode(List<PluginLabelValue> req, Long id, String code, Context ctx) {
+        Scriptable scope = ctx.initStandardObjects();
+        ctx.evaluateString(scope, code, "<cmd>", 0, null);
+        Function getParams = (Function) scope.get("saveMusic", scope);
+        Map<String, String> map = req.stream().collect(Collectors.toMap(PluginLabelValue::getKey, PluginLabelValue::getValue));
+        return getParams.call(ctx, scope, scope, List.of(JSON.toJSONString(map), id, pluginPackage).toArray());
     }
     
     /**
@@ -131,28 +147,28 @@ public class PluginServiceImpl implements PluginService {
     public List<PluginMsgRes> getPluginRuntimeMessages(Long runtimeId) {
         List<TbPluginMsgPojo> list = pluginMsgService.list(Wrappers.<TbPluginMsgPojo>lambdaQuery().eq(TbPluginMsgPojo::getTaskId, runtimeId));
         ArrayList<PluginMsgRes> pluginMsgRes = new ArrayList<>();
-        BeanUtils.copyProperties(list, pluginMsgRes);
+        for (TbPluginMsgPojo tbPluginMsgPojo : list) {
+            PluginMsgRes pluginRes = new PluginMsgRes();
+            BeanUtils.copyProperties(tbPluginMsgPojo, pluginRes);
+            pluginMsgRes.add(pluginRes);
+        }
         return pluginMsgRes;
     }
     
     /**
+     * @param req      插件入参
      * @param pluginId 插件ID
      * @param taskId   任务ID
      */
     @Override
-    public List<TbPluginMsgPojo> onLineExecPluginTask(Long pluginId, Long taskId) {
+    public List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> req, Long pluginId, Long taskId) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
         }
-        List<PluginLabelValue> req = getPluginParams(pluginId);
-        TbPluginTaskPojo taskPojo = getTbPluginTaskPojo(pluginId);
         try (Context ctx = Context.enter()) {
-            Scriptable scope = ctx.initStandardObjects();
-            ctx.evaluateString(scope, byId.getCode(), "<cmd>", 0, null);
-            Function getParams = (Function) scope.get("saveMusic", scope);
-            Map<String, String> map = req.stream().collect(Collectors.toMap(PluginLabelValue::getKey, PluginLabelValue::getValue));
-            Object call = getParams.call(ctx, scope, scope, List.of(JSON.toJSONString(map), taskPojo.getId(), pluginPackage).toArray());
+            Object call = execCode(req, taskId, byId.getCode(), ctx);
+            
             List<TbPluginMsgPojo> tbPluginMsgPojos = new ArrayList<>();
             if (call instanceof NativeArray array) {
                 for (Object o : array) {
@@ -160,9 +176,10 @@ public class PluginServiceImpl implements PluginService {
                     NativeObject object = (NativeObject) o;
                     e.setPluginId(pluginId);
                     e.setTaskId(taskId);
-                    Long date = Long.valueOf(object.get("date").toString());
-                    e.setCreateTime(date);
-                    e.setUpdateTime(date);
+                    long date = Long.parseLong(object.get("date").toString());
+                    LocalDateTime of = LocalDateTimeUtil.of(date);
+                    e.setCreateTime(of);
+                    e.setUpdateTime(of);
                     e.setMsg(JSON.toJSONString(object.get("params")));
                     tbPluginMsgPojos.add(e);
                 }
@@ -181,7 +198,28 @@ public class PluginServiceImpl implements PluginService {
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
         entity.setPluginId(pluginId);
         entity.setUserId(UserUtil.getUser().getId());
+        entity.setStatus((short) 0);
         pluginTaskService.save(entity);
         return entity;
+    }
+    
+    /**
+     * @param taskPojo 任务运行信息
+     * @return 返回运行信息
+     */
+    @Override
+    public List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo) {
+        if (taskPojo.getId() != null) {
+            TbPluginTaskPojo byId = pluginTaskService.getById(taskPojo.getId());
+            return Collections.singletonList(byId);
+        }
+        if (taskPojo.getUserId() != null) {
+            LambdaQueryWrapper<TbPluginTaskPojo> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(TbPluginTaskPojo::getUserId, taskPojo.getUserId());
+            wrapper.eq(taskPojo.getStatus() != null, TbPluginTaskPojo::getStatus, taskPojo.getStatus());
+            wrapper.eq(taskPojo.getPluginId() != null, TbPluginTaskPojo::getPluginId, taskPojo.getPluginId());
+            return pluginTaskService.list(wrapper);
+        }
+        return Collections.emptyList();
     }
 }

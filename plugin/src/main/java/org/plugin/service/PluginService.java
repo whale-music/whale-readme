@@ -30,15 +30,18 @@ public interface PluginService {
     /**
      * 运行插件任务
      *
-     * @param pluginId 插件ID
-     * @param onLine
-     * @param id
+     * @param pluginLabelValue 插件入参
+     * @param pluginId         插件ID
+     * @param onLine           是否在线运行
+     * @param taskId           任务ID
      */
-    void execPluginTask(Long pluginId, Boolean onLine, Long id);
+    void execPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Boolean onLine, Long taskId);
     
     List<PluginMsgRes> getPluginRuntimeMessages(Long runtimeId);
     
-    List<TbPluginMsgPojo> onLineExecPluginTask(Long pluginId, Long id);
+    List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Long id);
     
     TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId);
+    
+    List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo);
 }

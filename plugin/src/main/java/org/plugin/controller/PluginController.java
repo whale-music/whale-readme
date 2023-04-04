@@ -57,20 +57,21 @@ public class PluginController {
      * @param pluginId 插件ID
      */
     @PostMapping("/execPluginTask")
-    public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
+    public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
         TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId);
         if (Boolean.TRUE.equals(onLine)) {
-            List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginId, pojo.getId());
+            List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo.getId());
             return R.success(tbPluginMsgPojos);
         } else {
-            pluginService.execPluginTask(pluginId, onLine, pojo.getId());
+            pluginService.execPluginTask(pluginLabelValue, pluginId, onLine, pojo.getId());
             return R.success(pojo.getId());
         }
     }
     
-    @GetMapping("/getPluginRuntimeTask")
-    public String getPluginRuntimeTask(@RequestParam("userId") Long userId) {
-        return "";
+    @PostMapping("/getPluginRuntimeTask")
+    public R getPluginRuntimeTask(@RequestBody TbPluginTaskPojo taskPojo) {
+        List<TbPluginTaskPojo> list = pluginService.getPluginRuntimeTask(taskPojo);
+        return R.success(list);
     }
     
     @GetMapping("/getPluginRuntimeMessages")

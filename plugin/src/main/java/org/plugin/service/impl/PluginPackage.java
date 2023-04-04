@@ -1,10 +1,12 @@
 package org.plugin.service.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.pojo.MusicDetails;
@@ -13,11 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * 插件包装类转换方法调用
  */
 @Service
+@Slf4j
 public class PluginPackage {
     
     @Autowired
@@ -59,4 +63,13 @@ public class PluginPackage {
             throw new HttpException("http请求失败" + e);
         }
     }
+    
+    public static void print(Object o) {
+        log.info(o.toString());
+    }
+    
+    public static String getDate() {
+        return cn.hutool.core.date.DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
+    }
+    
 }

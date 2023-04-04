@@ -33,7 +33,7 @@ public class AudioInfoReq {
     private String type;
     
     @ApiModelProperty("歌手")
-    private List<ArtistReq> singer;
+    private List<ArtistReq> artists;
     
     @ApiModelProperty("专辑")
     private AlbumReq album;

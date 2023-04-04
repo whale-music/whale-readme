@@ -120,14 +120,12 @@ public class PluginServiceImpl implements PluginService {
             getParams.call(ctx, scope, scope, List.of(map, id, pluginPackage).toArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            // Context.exit();
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
     }
     
     /**
-     * @param runtimeId
-     * @return
+     * @param runtimeId 任务ID
      */
     @Override
     public List<PluginMsgRes> getPluginRuntimeMessages(Long runtimeId) {
@@ -138,12 +136,11 @@ public class PluginServiceImpl implements PluginService {
     }
     
     /**
-     * @param pluginId
-     * @param id
-     * @return
+     * @param pluginId 插件ID
+     * @param taskId   任务ID
      */
     @Override
-    public List<TbPluginMsgPojo> onLineExecPluginTask(Long pluginId, Long id) {
+    public List<TbPluginMsgPojo> onLineExecPluginTask(Long pluginId, Long taskId) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
@@ -155,26 +152,25 @@ public class PluginServiceImpl implements PluginService {
             ctx.evaluateString(scope, byId.getCode(), "<cmd>", 0, null);
             Function getParams = (Function) scope.get("saveMusic", scope);
             Map<String, String> map = req.stream().collect(Collectors.toMap(PluginLabelValue::getKey, PluginLabelValue::getValue));
-            Object call = getParams.call(ctx, scope, scope, List.of(map, taskPojo.getId(), pluginPackage).toArray());
+            Object call = getParams.call(ctx, scope, scope, List.of(JSON.toJSONString(map), taskPojo.getId(), pluginPackage).toArray());
             List<TbPluginMsgPojo> tbPluginMsgPojos = new ArrayList<>();
-            if (call instanceof NativeArray) {
-                ((NativeArray) call).forEach(o -> {
+            if (call instanceof NativeArray array) {
+                for (Object o : array) {
                     TbPluginMsgPojo e = new TbPluginMsgPojo();
                     NativeObject object = (NativeObject) o;
                     e.setPluginId(pluginId);
-                    e.setTaskId(id);
+                    e.setTaskId(taskId);
                     Long date = Long.valueOf(object.get("date").toString());
                     e.setCreateTime(date);
                     e.setUpdateTime(date);
-                    e.setMsg(String.valueOf(object.get("params")));
+                    e.setMsg(JSON.toJSONString(object.get("params")));
                     tbPluginMsgPojos.add(e);
-                });
+                }
                 return tbPluginMsgPojos;
             }
             return tbPluginMsgPojos;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            // Context.exit();
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
     }

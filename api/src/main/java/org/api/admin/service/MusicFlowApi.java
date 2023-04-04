@@ -446,19 +446,19 @@ public class MusicFlowApi {
      */
     private List<TbArtistPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
-        if (IterUtil.isEmpty(dto.getSinger()) || StringUtils.isBlank(dto.getSinger().get(0).getArtistName())) {
+        if (IterUtil.isEmpty(dto.getArtists()) || StringUtils.isBlank(dto.getArtists().get(0).getArtistName())) {
             return Collections.emptyList();
         }
         // 有歌手ID直接返回数据
-        if (CollUtil.isNotEmpty(dto.getSinger()) && dto.getSinger().get(0) != null && dto.getSinger().get(0).getId() != null) {
-            List<Long> singerIds = dto.getSinger().stream().map(TbArtistPojo::getId).filter(Objects::nonNull).collect(Collectors.toList());
+        if (CollUtil.isNotEmpty(dto.getArtists()) && dto.getArtists().get(0) != null && dto.getArtists().get(0).getId() != null) {
+            List<Long> singerIds = dto.getArtists().stream().map(TbArtistPojo::getId).filter(Objects::nonNull).collect(Collectors.toList());
             List<TbArtistPojo> tbArtistPojos = singerService.listByIds(singerIds);
             ExceptionUtil.isNull(CollUtil.isNotEmpty(tbArtistPojos), ResultCode.ALBUM_NOT_EXIST);
             return tbArtistPojos;
         }
         // 有歌手，数据库中有，查询出歌手和音乐主键ID
         // 获取前端传入所有歌手
-        List<String> singerNameList = dto.getSinger()
+        List<String> singerNameList = dto.getArtists()
                                          .stream()
                                          .map(TbArtistPojo::getArtistName)
                                          .collect(Collectors.toList());
@@ -470,7 +470,7 @@ public class MusicFlowApi {
     
         List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
-        List<ArtistReq> singerReqList = dto.getSinger();
+        List<ArtistReq> singerReqList = dto.getArtists();
         for (ArtistReq singerReq : singerReqList) {
             TbArtistPojo pojo = new TbArtistPojo();
             BeanUtils.copyProperties(singerReq, pojo);

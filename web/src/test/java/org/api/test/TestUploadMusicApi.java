@@ -117,7 +117,7 @@ class TestUploadMusicApi {
             dto.setKLyric("");
             log.warn(e.getMessage() + "网络错误");
         }
-        dto.setSinger(singer);
+        dto.setArtists(singer);
         dto.setOrigin("163Music");
         // 获取歌曲md5值
         DataItem dataItem = songUrlMap.get(song.getId());

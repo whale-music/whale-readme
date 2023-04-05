@@ -4,7 +4,7 @@ import java.util.List;
 
 public class LikePlay {
     private int code;
-    private List<Integer> ids;
+    private List<Long> ids;
     private long checkPoint;
     
     
@@ -16,11 +16,11 @@ public class LikePlay {
         this.code = code;
     }
     
-    public List<Integer> getIds() {
+    public List<Long> getIds() {
         return ids;
     }
     
-    public void setIds(List<Integer> ids) {
+    public void setIds(List<Long> ids) {
         this.ids = ids;
     }
     

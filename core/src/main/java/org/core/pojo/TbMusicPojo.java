@@ -43,14 +43,6 @@ public class TbMusicPojo implements Serializable {
     @TableField("pic")
     private String pic;
 
-    @ApiModelProperty("歌词")
-    @TableField("lyric")
-    private String lyric;
-    
-    @ApiModelProperty("逐字歌词")
-    @TableField("k_lyric")
-    private String kLyric;
-
     @ApiModelProperty("专辑ID")
     @TableField("album_id")
     private Long albumId;

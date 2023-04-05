@@ -135,8 +135,6 @@ create table if not exists tb_music
     music_name  varchar(128) null comment '音乐名',
     alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     pic         varchar(512) null comment '歌曲封面地址',
-    lyric       longtext     null comment '歌词',
-    k_lyric     longtext     null comment '逐字歌词',
     album_id    bigint       null comment '专辑ID',
     sort        bigint       null comment '排序字段',
     time_length int          null comment '歌曲时长',
@@ -183,6 +181,23 @@ create table if not exists tb_history
             on update cascade on delete cascade
 )
     comment '音乐播放历史(包括歌单，音乐，专辑）';
+
+create table if not exists tb_lyric
+(
+    id          bigint      not null comment '主键'
+        primary key,
+    music_id    bigint      not null comment '音乐ID',
+    type        varchar(24) not null comment '歌词类型',
+    lyric       longtext    not null comment '歌词',
+    create_time datetime    not null comment '创建时间',
+    update_time datetime    not null comment '修改时间',
+    constraint id
+        unique (id),
+    constraint tb_lyric_tb_music_id_fk
+        foreign key (music_id) references tb_music (id)
+            on update cascade on delete cascade
+)
+    comment '歌词表';
 
 create index tb_music_alia_name_index
     on tb_music (alias_name);
@@ -240,14 +255,14 @@ create table if not exists tb_plugin
 
 create table if not exists tb_plugin_msg
 (
-    id          bigint not null comment '插件消息ID'
+    id          bigint   not null comment '插件消息ID'
         primary key,
-    plugin_id   bigint not null comment '插件ID',
-    task_id     bigint not null comment '任务ID',
-    user_id     bigint not null comment '用户ID',
-    msg         text   null comment '插件运行消息',
-    create_time bigint not null comment '创建时间',
-    update_time bigint not null comment '更新时间',
+    plugin_id   bigint   not null comment '插件ID',
+    task_id     bigint   not null comment '任务ID',
+    user_id     bigint   not null comment '用户ID',
+    msg         text     null comment '插件运行消息',
+    create_time datetime not null comment '创建时间',
+    update_time datetime not null comment '更新时间',
     constraint id
         unique (id)
 )
@@ -261,6 +276,7 @@ create table if not exists tb_plugin_task
     id          bigint   not null comment '任务ID'
         primary key,
     plugin_id   bigint   not null comment '插件ID',
+    status      tinyint  not null comment '当前任务执行状态,0: run,1: stop',
     user_id     bigint   not null comment '用户创建ID',
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',

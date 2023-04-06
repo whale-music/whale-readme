@@ -60,14 +60,14 @@ public class Data{
 
 	@Override
  	public String toString(){
-		return 
-			"Data{" + 
-			"videoCount = '" + videoCount + '\'' + 
-			",artist = '" + artist + '\'' + 
-			",blacklist = '" + blacklist + '\'' + 
-			",preferShow = '" + preferShow + '\'' + 
-			",showPriMsg = '" + showPriMsg + '\'' + 
-			",secondaryExpertIdentiy = '" + secondaryExpertIdentiy + '\'' + 
-			"}";
+		return
+				"DataRes{" +
+						"videoCount = '" + videoCount + '\'' +
+						",artist = '" + artist + '\'' +
+						",blacklist = '" + blacklist + '\'' +
+						",preferShow = '" + preferShow + '\'' +
+						",showPriMsg = '" + showPriMsg + '\'' +
+						",secondaryExpertIdentiy = '" + secondaryExpertIdentiy + '\'' +
+						"}";
 		}
 }

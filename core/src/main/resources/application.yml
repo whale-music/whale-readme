@@ -61,9 +61,9 @@ save-config:
   # 请求地址(必须)
   host: http://43.139.22.243:5244
   # 账户(可选)
-  access-key:
+  access-key: admin
   # 密码(可选)
-  secret-key:
+  secret-key: g2ftb7As
 
 jwt-config:
   seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c

@@ -24,7 +24,7 @@ class TestDownloadMusic {
         Log log = Log.get();
     
         String playId = "6389917304";
-        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c5a61c09bbb039cd86abedcdb3013fda14519e07624a9f0053212155e70d424b8dfb6cda0c285e97283726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
+        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c50b50b01f699cc9e22a9ed7c459f23d1f519e07624a9f0053af3a6f5228cb1247688c59aaba91d09f3726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
         LikePlay like = RequestMusic163.like(playId, cookie);
     
         List<Long> ids = like.getIds();

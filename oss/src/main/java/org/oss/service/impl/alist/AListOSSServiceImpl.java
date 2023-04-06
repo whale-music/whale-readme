@@ -2,6 +2,7 @@ package org.oss.service.impl.alist;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
+import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -9,14 +10,20 @@ import org.oss.service.OSSService;
 import org.oss.service.impl.alist.model.list.ContentItem;
 import org.oss.service.impl.alist.util.Request;
 
+import java.util.Collections;
 import java.util.List;
 
 public class AListOSSServiceImpl implements OSSService {
     
     private static final String SERVICE_NAME = "AList";
     
+    private static final String LOGIN_KEY = "loginKey";
     // 创建缓存，默认4毫秒过期
-    TimedCache<String, ContentItem> timedCache = CacheUtil.newTimedCache(1000L * 60L * 60L);
+    TimedCache<String, ContentItem> musicUrltimedCache = CacheUtil.newTimedCache(1000L * 60L * 60L);
+    // 创建缓存，默认4毫秒过期
+    TimedCache<String, String> loginTimeCache = CacheUtil.newTimedCache(1000L * 60L * 60L);
+    private String accessKey = "";
+    private String secretKey = "";
     
     @Override
     public boolean isCurrentOSS(String serviceName) {
@@ -30,7 +37,15 @@ public class AListOSSServiceImpl implements OSSService {
     
     @Override
     public boolean isConnected(String host, String accessKey, String secretKey) {
-        return false;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+        String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
+        if (StringUtils.isBlank(loginCacheStr)) {
+            String login = login(host, this.accessKey, this.secretKey);
+            loginTimeCache.put(LOGIN_KEY, login);
+            return StringUtils.isNotBlank(loginTimeCache.get(LOGIN_KEY));
+        }
+        return true;
     }
     
     @Override
@@ -43,16 +58,30 @@ public class AListOSSServiceImpl implements OSSService {
         return getCacheMusicAddress(host, objectSave, path);
     }
     
+    private String login(String host, String accessKey, String secretKey) {
+        return Request.login(host, accessKey, secretKey);
+    }
+    
     public String getCacheMusicAddress(String host, String objectSave, String path) {
         try {
-            ContentItem item = timedCache.get(path);
+            String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
+            if (StringUtils.isBlank(loginCacheStr)) {
+                boolean connected = isConnected(host, this.accessKey, this.secretKey);
+                if (!connected) {
+                    throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
+                }
+            }
+            // 音乐地址URL缓存
+            ContentItem item = musicUrltimedCache.get(path);
             // 获取所有文件保存到缓存中
             if (item == null) {
-                List<ContentItem> list = Request.list(host, objectSave);
+                Headers headers = new Headers();
+                headers.put("Authorization", Collections.singletonList(loginCacheStr));
+                List<ContentItem> list = Request.list(host, objectSave, headers);
                 for (ContentItem contentItem : list) {
-                    timedCache.put(contentItem.getName(), contentItem);
+                    musicUrltimedCache.put(contentItem.getName(), contentItem);
                 }
-                item = timedCache.get(path);
+                item = musicUrltimedCache.get(path);
             }
             // 没有找到文件直接抛出异常
             if (item == null) {

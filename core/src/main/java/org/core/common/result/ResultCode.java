@@ -22,7 +22,6 @@ public enum ResultCode implements BaseErrorInfoInterface {
     COOKIE_INVALID("10005", "Cookie 无效"),
     FILENAME_INVALID("10006", "文件名无效"),
     SAVE_NAME_INVALID("10007", "存储名称无效"),
-    
     PLUGIN_EXISTED("50005", "插件不存在"),
     
     
@@ -44,7 +43,6 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     /* 业务错误：30001-39999 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST("30001", "业务逻辑出现问题"),
-    
     NULL_POINTER_EXCEPTION("30002", "空指针错误"),
     
     
@@ -60,8 +58,9 @@ public enum ResultCode implements BaseErrorInfoInterface {
     
     DATA_EXISTED("50003", "数据已存在"),
     SAVE_FAIL("50004", "保存错误!!请检查日志"),
-    
     PLUGIN_CODE("50005", "插件代码数据错误，检查代码，或直接删除重新创建"),
+    OSS_ERROR("50006", "存储错误"),
+    OSS_LOGIN_ERROR("50007", "OSS登录错误"),
     
     
     /* 接口错误：60001-69999 */

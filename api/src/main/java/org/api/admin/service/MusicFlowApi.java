@@ -13,6 +13,7 @@ import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
+import org.api.common.service.MusicCommonApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
@@ -33,7 +34,6 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jetbrains.annotations.NotNull;
 import org.oss.factory.OSSFactory;
-import org.oss.service.OSSService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -98,6 +98,9 @@ public class MusicFlowApi {
     
     @Autowired
     private TbAlbumArtistService albumSingerService;
+    
+    @Autowired
+    private MusicCommonApi musicCommonApi;
     
     String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp";
     
@@ -550,21 +553,22 @@ public class MusicFlowApi {
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
-                OSSService aList = OSSFactory.ossFactory("AList");
-                String musicAddresses = aList.getMusicAddresses(
-                        config.getHost(),
-                        config.getObjectSave(),
-                        tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType());
+                TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo);
                 musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
-                musicFileRes.setRawUrl(musicAddresses);
+                musicFileRes.setRawUrl(url.getUrl());
                 musicFileRes.setExists(true);
-            } catch (Exception e) {
+            } catch (BaseException e) {
+                if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
+                    throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
+                }
                 musicFileRes.setRawUrl("");
                 musicFileRes.setExists(false);
                 continue;
+            } catch (Exception e) {
+                throw new BaseException(e.getMessage());
             }
             files.add(musicFileRes);
         }

@@ -25,13 +25,13 @@ public class BaseException extends RuntimeException {
     }
     
     public BaseException(BaseErrorInfoInterface errorInfoInterface) {
-        super(errorInfoInterface.getCode());
+        super(errorInfoInterface.getCode() + "," + errorInfoInterface.getResultMsg());
         this.errorCode = errorInfoInterface.getCode();
         this.errorMsg = errorInfoInterface.getResultMsg();
     }
     
     public BaseException(BaseErrorInfoInterface errorInfoInterface, Throwable cause) {
-        super(errorInfoInterface.getCode(), cause);
+        super(errorInfoInterface.getCode() + "," + errorInfoInterface.getResultMsg(), cause);
         this.errorCode = errorInfoInterface.getCode();
         this.errorMsg = errorInfoInterface.getResultMsg();
     }
@@ -43,13 +43,13 @@ public class BaseException extends RuntimeException {
     }
     
     public BaseException(String errorCode, String errorMsg) {
-        super(errorCode);
+        super(errorCode + "," + errorMsg);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
     
     public BaseException(String errorCode, String errorMsg, Throwable cause) {
-        super(errorCode, cause);
+        super(errorCode + "," + errorMsg, cause);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }

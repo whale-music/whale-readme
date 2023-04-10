@@ -1,4 +1,4 @@
-package org.plugin.model.res;
+package org.plugin.converter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

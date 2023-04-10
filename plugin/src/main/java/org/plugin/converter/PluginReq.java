@@ -1,12 +1,12 @@
-package org.plugin.model.res;
+package org.plugin.converter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.core.pojo.TbPluginMsgPojo;
+import org.core.pojo.TbPluginPojo;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PluginMsgRes extends TbPluginMsgPojo {
+public class PluginReq extends TbPluginPojo {
 }

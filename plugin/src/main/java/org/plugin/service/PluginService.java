@@ -2,10 +2,10 @@ package org.plugin.service;
 
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
-import org.plugin.model.res.PluginLabelValue;
-import org.plugin.model.res.PluginMsgRes;
-import org.plugin.model.res.PluginReq;
-import org.plugin.model.res.PluginRes;
+import org.plugin.converter.PluginLabelValue;
+import org.plugin.converter.PluginMsgRes;
+import org.plugin.converter.PluginReq;
+import org.plugin.converter.PluginRes;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface PluginService {
     
     List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Long id);
     
-    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId);
+    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long id);
     
     List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo);
 }

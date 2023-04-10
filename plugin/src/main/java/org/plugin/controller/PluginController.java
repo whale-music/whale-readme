@@ -4,10 +4,10 @@ import org.core.common.result.R;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
 import org.core.utils.UserUtil;
-import org.plugin.model.res.PluginLabelValue;
-import org.plugin.model.res.PluginMsgRes;
-import org.plugin.model.res.PluginReq;
-import org.plugin.model.res.PluginRes;
+import org.plugin.converter.PluginLabelValue;
+import org.plugin.converter.PluginMsgRes;
+import org.plugin.converter.PluginReq;
+import org.plugin.converter.PluginRes;
 import org.plugin.service.PluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +58,7 @@ public class PluginController {
      */
     @PostMapping("/execPluginTask")
     public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
-        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId);
+        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
         if (Boolean.TRUE.equals(onLine)) {
             List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo.getId());
             return R.success(tbPluginMsgPojos);

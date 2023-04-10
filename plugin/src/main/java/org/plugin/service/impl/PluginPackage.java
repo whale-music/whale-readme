@@ -1,89 +1,88 @@
 package org.plugin.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.http.HttpException;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.http.Method;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.pojo.MusicDetails;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
-import org.core.service.QukuService;
 import org.core.service.TbPluginMsgService;
 import org.core.service.TbPluginTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.plugin.common.Func;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 插件包装类转换方法调用
  */
-@Service
+// @Service
 @Slf4j
 public class PluginPackage {
     
-    @Autowired
-    private QukuService qukuService;
+    private final MusicFlowApi musicFlowApi;
     
-    @Autowired
-    private MusicFlowApi musicFlowApi;
+    private final TbPluginMsgService pluginMsgService;
     
-    @Autowired
-    private TbPluginMsgService pluginMsgService;
+    private final TbPluginTaskService pluginTaskService;
+    private final List<TbPluginMsgPojo> msgPackages = new ArrayList<>();
+    private Long taskId;
+    private Long userId;
+    private Func func;
     
-    @Autowired
-    private TbPluginTaskService pluginTaskService;
-    
-    public String saveMusic(String json) throws IOException {
-        AudioInfoReq dto = JSON.parseObject(json, AudioInfoReq.class);
-        for (ArtistReq artist : dto.getArtists()) {
-            JSONArray array = JSON.parseArray(artist.getAliasName());
-            artist.setAliasName(CollUtil.join(array, ","));
-        }
-        MusicDetails musicDetails = musicFlowApi.saveMusicInfo(dto);
-        return JSON.toJSONString(musicDetails);
+    public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, Long taskId, Long userId, Func func) {
+        this.musicFlowApi = musicFlowApi;
+        this.pluginMsgService = pluginMsgService;
+        this.pluginTaskService = pluginTaskService;
+        this.taskId = taskId;
+        this.userId = userId;
+        this.func = func;
     }
     
-    public String get(String http, String cookie) {
-        try (HttpResponse execute = HttpUtil.createRequest(Method.GET, http).header("Cookie", cookie).execute()) {
-            return execute.body();
-        } catch (HttpException e) {
-            throw new HttpException("http请求失败" + e);
-        }
+    public Func getFunc() {
+        return func;
     }
     
-    public String post(String http, String cookie) {
-        try (HttpResponse execute = HttpUtil.createRequest(Method.POST, http).header("Cookie", cookie).execute()) {
-            return execute.body();
-        } catch (HttpException e) {
-            throw new HttpException("http请求失败" + e);
-        }
+    public void setFunc(Func func) {
+        this.func = func;
     }
     
-    public void log(String taskId, String userId, Object o) {
-        log.info(o.toString());
-        Long taskIdLong = Long.valueOf(taskId);
+    public Long getTaskId() {
+        return taskId;
+    }
+    
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+    
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+    
+    public List<TbPluginMsgPojo> getLogs() {
+        return msgPackages;
+    }
+    
+    public MusicDetails saveMusic(AudioInfoReq dto) throws IOException {
+        return musicFlowApi.saveMusicInfo(dto);
+    }
+    
+    public void log(String format, Object... arguments) {
+        log.info(format, arguments);
         TbPluginMsgPojo entity = new TbPluginMsgPojo();
-        TbPluginTaskPojo taskServiceById = pluginTaskService.getById(taskIdLong);
+        TbPluginTaskPojo taskServiceById = pluginTaskService.getById(taskId);
         entity.setPluginId(taskServiceById.getPluginId());
-        entity.setTaskId(taskIdLong);
-        entity.setMsg(o.toString());
-        entity.setUserId(Long.valueOf(Optional.ofNullable(userId).orElse("")));
+        entity.setTaskId(taskId);
+        entity.setMsg(CharSequenceUtil.format(format, arguments));
+        entity.setUserId(userId);
+        
+        msgPackages.add(entity);
         pluginMsgService.save(entity);
     }
-    
-    public static String getDate() {
-        return cn.hutool.core.date.DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
-    }
-    
 }

@@ -1,4 +1,4 @@
-package org.plugin.model.res;
+package org.plugin.converter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,5 +8,5 @@ import org.core.pojo.TbPluginPojo;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PluginReq extends TbPluginPojo {
+public class PluginRes extends TbPluginPojo {
 }

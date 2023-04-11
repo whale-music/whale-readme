@@ -41,7 +41,7 @@ public interface PluginService {
     
     List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Long id);
     
-    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long id);
+    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId);
     
     List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo);
 }

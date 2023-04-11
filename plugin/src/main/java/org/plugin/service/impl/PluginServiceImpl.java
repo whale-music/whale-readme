@@ -19,6 +19,7 @@ import org.core.service.TbPluginTaskService;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.Func;
+import org.plugin.common.TaskStatus;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.converter.PluginMsgRes;
 import org.plugin.converter.PluginReq;
@@ -154,12 +155,12 @@ public class PluginServiceImpl implements PluginService {
             onLineExecPluginTask(req, pluginId, taskId);
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
             entity.setId(taskId);
-            entity.setStatus((short) 1);
+            entity.setStatus(TaskStatus.RUN_STATUS);
             pluginTaskService.updateById(entity);
         } catch (Exception e) {
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
             entity.setId(taskId);
-            entity.setStatus((short) 2);
+            entity.setStatus(TaskStatus.ERROR_STATUS);
             pluginTaskService.updateById(entity);
             PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService, taskId, UserUtil.getUser().getId(), null);
             pluginPackage.log(taskId.toString(), String.valueOf(entity.getUserId()), e.getMessage());
@@ -197,16 +198,20 @@ public class PluginServiceImpl implements PluginService {
         Func func = runCode(byId.getCode(), getClassName(byId.getCode()));
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService, taskId, UserUtil.getUser().getId(), func);
         func.apply(req, pluginPackage);
+        TbPluginTaskPojo entity = new TbPluginTaskPojo();
+        entity.setId(taskId);
+        entity.setStatus(TaskStatus.STOP_STATUS);
+        pluginTaskService.updateById(entity);
         return pluginPackage.getLogs();
     }
     
     
     @Override
-    public TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long id) {
+    public TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId) {
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
         entity.setPluginId(pluginId);
-        entity.setUserId(id);
-        entity.setStatus((short) 0);
+        entity.setUserId(userId);
+        entity.setStatus(TaskStatus.RUN_STATUS);
         pluginTaskService.save(entity);
         return entity;
     }

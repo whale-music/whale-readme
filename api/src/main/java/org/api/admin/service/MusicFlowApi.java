@@ -13,12 +13,15 @@ import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
+import org.api.common.service.MusicCommonApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
+import org.core.config.LyricConfig;
 import org.core.config.SaveConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
+import org.core.service.AccountService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -31,7 +34,6 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
 import org.jetbrains.annotations.NotNull;
 import org.oss.factory.OSSFactory;
-import org.oss.service.OSSService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -64,17 +66,23 @@ public class MusicFlowApi {
      */
     @Autowired
     private TbMusicService musicService;
+    
+    private static final Object lock = new Object();
+    
     /**
      * 音乐保存数据链接表
      */
     @Autowired
     private TbMusicUrlService musicUrlService;
+    @Autowired
+    private TbLyricService lyricService;
+    
     /**
      * 歌手服务
      */
     @Autowired
     private TbArtistService singerService;
-
+    
     /**
      * 专辑表
      */
@@ -88,8 +96,12 @@ public class MusicFlowApi {
     
     @Autowired
     private TbAlbumArtistService albumSingerService;
+    @Autowired
+    private AccountService accountService;
     
     String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp";
+    @Autowired
+    private MusicCommonApi musicCommonApi;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -216,6 +228,8 @@ public class MusicFlowApi {
         TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, singIds);
         // 保存音乐表
         TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, singIds, albumPojo);
+        // 保存歌词
+        List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
         // 上传文件
         TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
     
@@ -224,7 +238,46 @@ public class MusicFlowApi {
         musicDetails.setMusicUrl(tbMusicUrlPojo);
         musicDetails.setAlbum(albumPojo);
         musicDetails.setSinger(tbArtistPojos);
+        musicDetails.setLyrics(lyricPojoList);
         return musicDetails;
+    }
+    
+    /**
+     * 保存歌词数据
+     *
+     * @param dto       前端数据
+     * @param musicPojo 歌词信息
+     * @return 返回保存歌词
+     */
+    private List<TbLyricPojo> saveLyric(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        if (musicPojo == null || musicPojo.getId() == null) {
+            return Collections.emptyList();
+        }
+        
+        List<TbLyricPojo> list = new ArrayList<>();
+        if (StringUtils.isNotBlank(dto.getLyric())) {
+            TbLyricPojo entity = new TbLyricPojo();
+            entity.setMusicId(musicPojo.getId());
+            entity.setType(LyricConfig.LYRIC);
+            entity.setLyric(dto.getLyric());
+            list.add(entity);
+        }
+        if (StringUtils.isNotBlank(dto.getTLyric())) {
+            TbLyricPojo entity = new TbLyricPojo();
+            entity.setMusicId(musicPojo.getId());
+            entity.setType(LyricConfig.T_LYRIC);
+            entity.setLyric(dto.getTLyric());
+            list.add(entity);
+        }
+        if (StringUtils.isNotBlank(dto.getKLyric())) {
+            TbLyricPojo entity = new TbLyricPojo();
+            entity.setMusicId(musicPojo.getId());
+            entity.setType(LyricConfig.K_LYRIC);
+            entity.setLyric(dto.getKLyric());
+            list.add(entity);
+        }
+        lyricService.saveBatch(list);
+        return list;
     }
     
     
@@ -240,7 +293,10 @@ public class MusicFlowApi {
         urlPojo = urlPojo == null ? new TbMusicUrlPojo() : urlPojo;
         urlPojo.setMusicId(musicPojo.getId());
         urlPojo.setOrigin(dto.getOrigin());
-        urlPojo.setUserId(dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId());
+        Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
+        SysUserPojo byId = accountService.getById(userId);
+        ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
+        urlPojo.setUserId(byId.getId());
         // 上传到本地时读取本地文件数据，否则使用前端传入的数据
         if (Boolean.TRUE.equals(dto.getUploadFlag())) {
             if (dto.getSize() == null
@@ -316,9 +372,6 @@ public class MusicFlowApi {
         String join = StringUtils.join(dto.getAliaName(), ",");
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(join), TbMusicPojo::getAliasName, join);
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getPic()), TbMusicPojo::getPic, dto.getPic());
-    
-        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getLyric()), TbMusicPojo::getLyric, dto.getLyric());
-        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getKLyric()), TbMusicPojo::getKLyric, dto.getKLyric());
         TbMusicPojo one = musicService.getOne(musicPojoLambdaQueryWrapper);
         return saveMusicInfoTable(dto, albumPojo, one, aliaNames);
     }
@@ -335,14 +388,17 @@ public class MusicFlowApi {
     @NotNull
     private TbMusicPojo saveMusicInfoTable(AudioInfoReq dto, TbAlbumPojo albumPojo, TbMusicPojo musicPojo, String aliaNames) {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
+        synchronized (lock) {
+            long sort = musicService.count() + 1;
+            if (tbMusicPojo.getSort() == null) {
+                tbMusicPojo.setSort(sort);
+            }
+        }
         // music 信息表
         tbMusicPojo.setMusicName(dto.getMusicName());
         tbMusicPojo.setAliasName(aliaNames);
         tbMusicPojo.setPic(dto.getPic());
-        tbMusicPojo.setLyric(dto.getLyric());
-        tbMusicPojo.setKLyric(dto.getKLyric());
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
-        tbMusicPojo.setSort(musicService.count() + 1);
         tbMusicPojo.setTimeLength(dto.getTimeLength());
         // 保存音乐表
         boolean save = musicService.saveOrUpdate(tbMusicPojo);
@@ -440,17 +496,19 @@ public class MusicFlowApi {
      */
     private List<TbArtistPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
-        if (IterUtil.isEmpty(dto.getSinger()) || StringUtils.isBlank(dto.getSinger().get(0).getArtistName())) {
+        if (IterUtil.isEmpty(dto.getArtists()) || StringUtils.isBlank(dto.getArtists().get(0).getArtistName())) {
             return Collections.emptyList();
         }
         // 有歌手ID直接返回数据
-        if (CollUtil.isNotEmpty(dto.getSinger()) && dto.getSinger().get(0) != null && dto.getSinger().get(0).getId() != null) {
-            List<Long> singerIds = dto.getSinger().stream().map(TbArtistPojo::getId).filter(Objects::isNull).collect(Collectors.toList());
-            return singerService.listByIds(singerIds);
+        if (CollUtil.isNotEmpty(dto.getArtists()) && dto.getArtists().get(0) != null && dto.getArtists().get(0).getId() != null) {
+            List<Long> singerIds = dto.getArtists().stream().map(TbArtistPojo::getId).filter(Objects::nonNull).collect(Collectors.toList());
+            List<TbArtistPojo> tbArtistPojos = singerService.listByIds(singerIds);
+            ExceptionUtil.isNull(CollUtil.isNotEmpty(tbArtistPojos), ResultCode.ALBUM_NOT_EXIST);
+            return tbArtistPojos;
         }
         // 有歌手，数据库中有，查询出歌手和音乐主键ID
         // 获取前端传入所有歌手
-        List<String> singerNameList = dto.getSinger()
+        List<String> singerNameList = dto.getArtists()
                                          .stream()
                                          .map(TbArtistPojo::getArtistName)
                                          .collect(Collectors.toList());
@@ -462,7 +520,7 @@ public class MusicFlowApi {
     
         List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
-        List<ArtistReq> singerReqList = dto.getSinger();
+        List<ArtistReq> singerReqList = dto.getArtists();
         for (ArtistReq singerReq : singerReqList) {
             TbArtistPojo pojo = new TbArtistPojo();
             BeanUtils.copyProperties(singerReq, pojo);
@@ -492,21 +550,22 @@ public class MusicFlowApi {
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
-                OSSService aList = OSSFactory.ossFactory("AList");
-                String musicAddresses = aList.getMusicAddresses(
-                        config.getHost(),
-                        config.getObjectSave(),
-                        tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType());
+                TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo);
                 musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
-                musicFileRes.setRawUrl(musicAddresses);
+                musicFileRes.setRawUrl(url.getUrl());
                 musicFileRes.setExists(true);
-            } catch (Exception e) {
+            } catch (BaseException e) {
+                if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
+                    throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
+                }
                 musicFileRes.setRawUrl("");
                 musicFileRes.setExists(false);
                 continue;
+            } catch (Exception e) {
+                throw new BaseException(e.getMessage());
             }
             files.add(musicFileRes);
         }

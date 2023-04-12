@@ -4,8 +4,10 @@ import com.github.yitter.contract.IdGeneratorOptions;
 import com.github.yitter.idgen.YitIdHelper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(scanBasePackages = {"org.core", "org.web", "org.api", "org.oss"})
+@EnableAsync
 public class MusicBoxSpringBoot {
     public static void main(String[] args) {
         // 创建 IdGeneratorOptions 对象，可在构造函数中输入 WorkerId：

@@ -119,7 +119,7 @@ public class AlbumApi {
             e.setAl(al);
     
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getSingerByMusicId(musicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
             for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
                 e1.setAlia(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));

@@ -13,5 +13,6 @@ public class MusicDetails {
     private TbMusicPojo music;
     private TbAlbumPojo album;
     private List<TbArtistPojo> singer;
+    private List<TbLyricPojo> lyrics;
     private TbMusicUrlPojo musicUrl;
 }

@@ -15,7 +15,7 @@ public class PrivilegesItem {
     private String plLevel;
     private String maxBrLevel;
     private int maxbr;
-    private int id;
+    private Long id;
     private int sp;
     private int payed;
     private Object rscl;

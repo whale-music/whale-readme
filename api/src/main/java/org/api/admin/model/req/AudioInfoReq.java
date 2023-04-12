@@ -33,7 +33,7 @@ public class AudioInfoReq {
     private String type;
     
     @ApiModelProperty("歌手")
-    private List<ArtistReq> singer;
+    private List<ArtistReq> artists;
     
     @ApiModelProperty("专辑")
     private AlbumReq album;
@@ -41,8 +41,11 @@ public class AudioInfoReq {
     @ApiModelProperty("音乐歌词")
     private String lyric;
     
-    @ApiModelProperty("音乐歌词")
+    @ApiModelProperty("逐字歌词")
     private String kLyric;
+    
+    @ApiModelProperty("未知歌词")
+    private String tLyric;
     
     @ApiModelProperty("音乐时长")
     private Integer timeLength;

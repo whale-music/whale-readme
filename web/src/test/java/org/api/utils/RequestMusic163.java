@@ -10,6 +10,7 @@ import org.api.model.LikePlay;
 import org.api.model.album.AlbumRes;
 import org.api.model.lyric.Lyric;
 import org.api.model.playlist.PlayList;
+import org.api.model.playlistdetail.PlayListDetailRes;
 import org.api.model.singer.SingerRes;
 import org.api.model.song.SongDetail;
 import org.api.model.url.SongUrl;
@@ -42,15 +43,25 @@ public class RequestMusic163 {
         return JSON.parseObject(request, LikePlay.class);
     }
     
+    /**
+     * 歌单详情（获取歌单内所有数据）
+     *
+     * @param playId 歌单名
+     */
+    public static PlayListDetailRes getPlayDetail(String playId, String cookie) {
+        String request = req(host + "/playlist/detail?id=" + playId, cookie);
+        return JSON.parseObject(request, PlayListDetailRes.class);
+    }
+    
     public static PlayList getPlayList(String playId, String cookie) {
         String request = req(host + "/playlist/track/all?id=" + playId, cookie);
         return JSON.parseObject(request, PlayList.class);
     }
     
     /**
-     * 获取歌单信息
+     * 获取歌曲详情
      */
-    public static SongDetail getSongDetail(List<Integer> musicIds, String cookie) {
+    public static SongDetail getSongDetail(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/detail?ids=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
         return JSON.parseObject(request, SongDetail.class);
     }
@@ -63,15 +74,10 @@ public class RequestMusic163 {
         return JSON.parseObject(request, AlbumRes.class);
     }
     
-    public static SongUrl getNewSongUrl(List<Integer> musicIds, String cookie) {
-        String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=exhigh", cookie);
-        return JSON.parseObject(request, SongUrl.class);
-    }
-    
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrl(List<Integer> musicIds, String cookie, int flag) {
+    public static SongUrl getSongUrl(List<Long> musicIds, String cookie, int flag) {
         if (flag == 0) {
             return getSongUrlV1(musicIds, cookie);
         }
@@ -84,7 +90,7 @@ public class RequestMusic163 {
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrlV1(List<Integer> musicIds, String cookie) {
+    public static SongUrl getSongUrlV1(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
         return JSON.parseObject(request, SongUrl.class);
     }
@@ -92,7 +98,7 @@ public class RequestMusic163 {
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrlV2(List<Integer> musicIds, String cookie) {
+    public static SongUrl getSongUrlV2(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=hires", cookie);
         return JSON.parseObject(request, SongUrl.class);
     }

@@ -42,16 +42,16 @@ class TestUploadMusicApi {
      *
      * @param musicIds 音乐ID
      */
-    public List<MusicDetails> saveMusicInfoList(List<Integer> musicIds, String cookie, MusicFlowApi musicFlowApi, Long userId) {
+    public List<MusicDetails> saveMusicInfoList(List<Long> musicIds, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         int allPageIndex = PageUtil.totalPage(musicIds.size(), 20);
         List<MusicDetails> tbMusicPojos = new ArrayList<>();
         for (int i = 0; i < allPageIndex; i++) {
-            List<Integer> page = ListUtil.page(i, 20, musicIds);
+            List<Long> page = ListUtil.page(i, 20, musicIds);
             // 获取分页后的音乐数据
             SongDetail songDetail = RequestMusic163.getSongDetail(page, cookie);
             // 获取歌曲下载地址数据
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
-            
+        
             // 歌曲下载地址信息
             Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
             for (SongsItem song : songDetail.getSongs()) {
@@ -62,7 +62,7 @@ class TestUploadMusicApi {
         return tbMusicPojos;
     }
     
-    private MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, MusicFlowApi musicFlowApi, Long userId) {
+    public MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
@@ -112,12 +112,14 @@ class TestUploadMusicApi {
             dto.setLyric(StringUtils.isNotBlank(lyric.getLrc().getLyric()) ? lyric.getLrc().getLyric() : null);
             // 逐字歌词
             dto.setKLyric(StringUtils.isNotBlank(lyric.getKlyric().getLyric()) ? lyric.getKlyric().getLyric() : null);
+            // 未知歌词
+            dto.setTLyric(StringUtils.isNotBlank(lyric.getTlyric().getLyric()) ? lyric.getTlyric().getLyric() : null);
         } catch (Exception e) {
             dto.setLyric("");
             dto.setKLyric("");
             log.warn(e.getMessage() + "网络错误");
         }
-        dto.setSinger(singer);
+        dto.setArtists(singer);
         dto.setOrigin("163Music");
         // 获取歌曲md5值
         DataItem dataItem = songUrlMap.get(song.getId());

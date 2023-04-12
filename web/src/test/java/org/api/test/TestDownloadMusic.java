@@ -24,10 +24,10 @@ class TestDownloadMusic {
         Log log = Log.get();
     
         String playId = "6389917304";
-        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c5a61c09bbb039cd86abedcdb3013fda14519e07624a9f0053212155e70d424b8dfb6cda0c285e97283726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
+        String cookie = "MUSIC_U=d33658da9213990dece8c775a34a34c50b50b01f699cc9e22a9ed7c459f23d1f519e07624a9f0053af3a6f5228cb1247688c59aaba91d09f3726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
         LikePlay like = RequestMusic163.like(playId, cookie);
     
-        List<Integer> ids = like.getIds();
+        List<Long> ids = like.getIds();
         int allPageIndex = PageUtil.totalPage(ids.size(), 20);
     
         File saveFile = FileUtil.mkdir(dest);
@@ -37,7 +37,7 @@ class TestDownloadMusic {
         Map<String, String> collect = fileNames.stream().collect(Collectors.toMap(s -> StringUtils.split(s, '.')[0], String::new));
     
         for (int i = 0; i < allPageIndex; i++) {
-            List<Integer> page = ListUtil.page(i, 20, ids);
+            List<Long> page = ListUtil.page(i, 20, ids);
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
             songUrl.getData().parallelStream().forEach(datum -> {
                 if (fileMd5s.contains(datum.getMd5())) {

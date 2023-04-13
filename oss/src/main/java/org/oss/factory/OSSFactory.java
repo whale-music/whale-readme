@@ -6,6 +6,7 @@ import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.SaveConfig;
 import org.oss.service.OSSService;
 
 import java.util.Arrays;
@@ -47,13 +48,14 @@ public class OSSFactory {
     /**
      * 获取音乐处理工厂
      *
-     * @param serviceName 音乐地址处理
+     * @param config 保存信息
      */
-    public static OSSService ossFactory(String serviceName) {
-        OSSService oss = map.get(serviceName);
+    public static OSSService ossFactory(SaveConfig config) {
+        OSSService oss = map.get(config.getSaveMode());
         if (oss == null) {
             throw new BaseException(ResultCode.SAVE_NAME_INVALID);
         }
+        oss.isConnected(config);
         return oss;
     }
 }

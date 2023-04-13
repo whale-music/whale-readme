@@ -22,8 +22,6 @@ import org.api.model.url.DataItem;
 import org.api.model.url.SongUrl;
 import org.api.utils.RequestMusic163;
 import org.core.pojo.MusicDetails;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.web.MusicBoxSpringBoot;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@SpringBootTest(classes = MusicBoxSpringBoot.class)
 @Slf4j
 class TestUploadMusicApi {
     
@@ -42,7 +39,7 @@ class TestUploadMusicApi {
      *
      * @param musicIds 音乐ID
      */
-    public List<MusicDetails> saveMusicInfoList(List<Long> musicIds, String cookie, MusicFlowApi musicFlowApi, Long userId) {
+    public static List<MusicDetails> saveMusicInfoList(List<Long> musicIds, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         int allPageIndex = PageUtil.totalPage(musicIds.size(), 20);
         List<MusicDetails> tbMusicPojos = new ArrayList<>();
         for (int i = 0; i < allPageIndex; i++) {
@@ -51,7 +48,7 @@ class TestUploadMusicApi {
             SongDetail songDetail = RequestMusic163.getSongDetail(page, cookie);
             // 获取歌曲下载地址数据
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
-    
+        
             // 歌曲下载地址信息
             Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
             for (SongsItem song : songDetail.getSongs()) {
@@ -62,7 +59,17 @@ class TestUploadMusicApi {
         return tbMusicPojos;
     }
     
-    public MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, MusicFlowApi musicFlowApi, Long userId) {
+    /**
+     * 保存音乐信息
+     *
+     * @param songUrlMap   歌曲URL
+     * @param song         歌曲信息
+     * @param cookie       cookie
+     * @param musicFlowApi 服务类
+     * @param userId       音乐信息
+     * @return 保存成功的音乐信息
+     */
+    public static MusicDetails saveMusicInfo(Map<Integer, DataItem> songUrlMap, SongsItem song, String cookie, MusicFlowApi musicFlowApi, Long userId) {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
@@ -129,11 +136,11 @@ class TestUploadMusicApi {
             dto.setMd5(dataItem.getMd5());
             dto.setLevel(dataItem.getLevel());
             // 上传md5值
-            dto.setMusicTemp(dataItem.getUrl());
+            dto.setMusicTemp(dataItem.getMd5() + "." + dataItem.getType());
             dto.setSize((long) dataItem.getSize());
         }
-        // false保存音乐文件到存储对象，或只保存音乐信息到数据库
-        dto.setUploadFlag(false);
+        // true: 只存储到数据库，不上传, false: 读取本地数据或网络数据上传到数据库
+        dto.setUploadFlag(true);
         try {
             return musicFlowApi.saveMusicInfo(dto);
         } catch (IOException e) {

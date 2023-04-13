@@ -166,10 +166,7 @@ public class PlayListApi {
         Map<Long, TbMusicUrlPojo> urlPojoMap;
         // 获取音乐地址
         try {
-            Set<Long> collect = page.getRecords()
-                                    .parallelStream()
-                                    .map(TbMusicPojo::getId)
-                                    .collect(Collectors.toSet());
+            Set<Long> collect = page.getRecords().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toSet());
             List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(collect, Boolean.TRUE.equals(req.getRefresh()));
             urlPojoMap = musicUrlByMusicId.parallelStream()
                                           .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId, musicUrlPojo -> musicUrlPojo));

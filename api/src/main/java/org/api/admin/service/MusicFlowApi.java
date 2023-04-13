@@ -337,12 +337,11 @@ public class MusicFlowApi {
                 String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
                 file = getMusicFile(dto, pathname);
                 FileUtil.rename(file, dto.getMd5() + "." + dto.getType(), true);
-                OSSFactory.ossFactory(config.getSaveMode()).isConnected(config.getHost(), config.getAccessKey(), config.getSecretKey());
             } else {
                 // 读取本地文件
                 file = new File(pathTemp, dto.getMusicTemp());
             }
-            String uploadPath = OSSFactory.ossFactory(config.getSaveMode()).upload(config.getHost(), config.getObjectSave(), file);
+            String uploadPath = OSSFactory.ossFactory(config).upload(file);
             long size = FileUtil.size(file);
             FileUtil.del(file);
             // music URL 地址表

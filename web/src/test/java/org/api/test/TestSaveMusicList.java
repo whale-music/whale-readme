@@ -65,7 +65,7 @@ class TestSaveMusicList {
         Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
         SongDetail songDetail = RequestMusic163.getSongDetail(List.of(musicId), cookie);
         for (SongsItem song : songDetail.getSongs()) {
-            MusicDetails musicDetails = new TestUploadMusicApi().saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, localUserId);
+            MusicDetails musicDetails = TestUploadMusicApi.saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, localUserId);
             log.info(musicDetails.toString());
         }
     }
@@ -82,7 +82,7 @@ class TestSaveMusicList {
         // 反转歌曲ID顺序，保持添加歌曲顺序
         Collections.reverse(collect);
         // 保存音乐到本地数据库，并返回保存的音乐信息
-        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(collect, cookie, musicFlowApi, localUserId);
+        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(collect, cookie, musicFlowApi, localUserId);
         // 创建歌单
         TbCollectPojo collectApiPlayList = collectApi.createPlayList(localUserId, "导入歌单");
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
@@ -114,7 +114,7 @@ class TestSaveMusicList {
      */
     private void saveUserLikeMusicList(String userID, Long localUserId) {
         LikePlay like = RequestMusic163.like(userID, cookie);
-        List<MusicDetails> musicPojoList = new TestUploadMusicApi().saveMusicInfoList(like.getIds(), cookie, musicFlowApi, localUserId);
+        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(like.getIds(), cookie, musicFlowApi, localUserId);
         for (MusicDetails tbMusicPojo : musicPojoList) {
             if (tbMusicPojo.getMusicUrl() != null && tbMusicPojo.getMusic().getId() != null) {
                 try {

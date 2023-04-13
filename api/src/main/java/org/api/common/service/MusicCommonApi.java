@@ -8,7 +8,6 @@ import org.core.config.SaveConfig;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.service.QukuService;
 import org.oss.factory.OSSFactory;
-import org.oss.service.OSSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +31,8 @@ public class MusicCommonApi {
     private SaveConfig config;
     
     private static String getMusicAddresses(TbMusicUrlPojo tbMusicUrlPojo, SaveConfig config, boolean refresh) {
-        OSSService aList = OSSFactory.ossFactory(config.getSaveMode());
-        boolean connected = aList.isConnected(config.getHost(), config.getAccessKey(), config.getSecretKey());
-        if (!connected) {
-            throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
-        }
         // 获取音乐地址
-        return aList.getMusicAddresses(config.getHost(), config.getObjectSave(),
-                tbMusicUrlPojo.getMd5() + "." + tbMusicUrlPojo.getEncodeType(), refresh);
+        return OSSFactory.ossFactory(config).getMusicAddresses(tbMusicUrlPojo.getUrl(), refresh);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {
@@ -67,7 +60,7 @@ public class MusicCommonApi {
             } catch (BaseException e) {
                 if (Objects.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                     tbMusicUrlPojo.setUrl("");
-                    log.error("异常已经捕获\n获取下载地址出错: {}", e.getMessage());
+                    log.error("获取下载地址出错: {}", e.getMessage());
                     continue;
                 }
                 throw new BaseException(e.getErrorCode(), e.getErrorCode());

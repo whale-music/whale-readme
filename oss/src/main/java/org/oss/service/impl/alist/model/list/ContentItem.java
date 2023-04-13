@@ -8,6 +8,23 @@ public class ContentItem {
 	private String sign;
 	private String modified;
 	private Integer type;
+	private String path;
+	
+	public Boolean getDir() {
+		return isDir;
+	}
+	
+	public void setDir(Boolean dir) {
+		isDir = dir;
+	}
+	
+	public String getPath() {
+		return path;
+	}
+	
+	public void setPath(String path) {
+		this.path = path;
+	}
 	
 	public Integer getSize() {
 		return size;

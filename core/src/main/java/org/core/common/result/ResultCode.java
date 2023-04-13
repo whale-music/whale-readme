@@ -22,7 +22,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     COOKIE_INVALID("10005", "Cookie 无效"),
     FILENAME_INVALID("10006", "文件名无效"),
     SAVE_NAME_INVALID("10007", "存储名称无效"),
-    PLUGIN_EXISTED("50005", "插件不存在"),
+    PLUGIN_EXISTED("10008", "插件不存在"),
+    FILENAME_EXIST("10009", "文件名不存在"),
     
     
     /* 用户错误：20001-29999*/

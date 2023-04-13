@@ -2,8 +2,9 @@ package org.oss.service.impl.local;
 
 import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.SaveConfig;
+import org.core.utils.ExceptionUtil;
 import org.oss.service.OSSService;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,8 @@ import java.io.File;
 public class LocalOSSServiceImpl implements OSSService {
     
     private static final String SERVICE_NAME = "Local";
+    
+    private SaveConfig config;
     
     @Override
     public boolean isCurrentOSS(String serviceName) {
@@ -25,28 +28,33 @@ public class LocalOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public boolean isConnected(String host, String accessKey, String secretKey) {
-        throw new BaseException(ResultCode.LOCAL_FILE);
+    public boolean isConnected(SaveConfig config) {
+        this.config = config;
+        return true;
     }
     
     @Override
-    public void isExist(String host, String objectSaveConfig, String file) {
-        FileUtil.mkParentDirs("./" + objectSaveConfig);
+    public void isExist(String name) {
+        boolean flag = false;
+        for (String s : config.getObjectSave()) {
+            flag = FileUtil.isFile(s + FileUtil.FILE_SEPARATOR + name);
+        }
+        ExceptionUtil.isNull(flag, ResultCode.FILENAME_EXIST);
     }
     
     @Override
-    public String getMusicAddresses(String host, String objectSave, String musicFlag, boolean refresh) {
+    public String getMusicAddresses(String name, boolean refresh) {
         return null;
     }
     
     @Override
-    public String upload(String host, String objectSaveConfig, File srcFile) {
-        FileUtil.copy(srcFile, new File(objectSaveConfig, srcFile.getName()), true);
+    public String upload(File srcFile) {
+        FileUtil.copy(srcFile, new File(config.getObjectSave().get(config.getAssignObjectSave()), srcFile.getName()), true);
         return srcFile.getName();
     }
     
     @Override
-    public boolean delete(String host, String objectSaveConfig, String filePath) {
-        return FileUtil.del(filePath);
+    public boolean delete(String name) {
+        return FileUtil.del(name);
     }
 }

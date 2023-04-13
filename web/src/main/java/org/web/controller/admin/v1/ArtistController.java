@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController(AdminConfig.ADMIN + "SingerController")
+@RestController(AdminConfig.ADMIN + "ArtistController")
 @RequestMapping("/admin/singer")
 @Slf4j
-public class SingerController {
+public class ArtistController {
     
     
     @Autowired

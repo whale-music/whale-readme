@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service(AdminConfig.ADMIN + "PlayListApi")
@@ -108,14 +109,14 @@ public class PlayListApi {
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             PlayListMusicRes e1 = new PlayListMusicRes();
             BeanUtils.copyProperties(tbMusicPojo, e1, "lyric");
-        
+    
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumPojoMap.get(tbMusicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             tbAlbumPojo.setDescription("");
             e1.setAlbum(tbAlbumPojo);
-        
+    
             List<TbArtistPojo> tbArtistPojos = artistMaps.get(tbMusicPojo.getId());
             e1.setArtists(tbArtistPojos);
-        
+    
             playListMusicRes.add(e1);
         }
         return playListMusicRes;
@@ -163,15 +164,19 @@ public class PlayListApi {
                                      .collect(Collectors.toMap(TbArtistPojo::getId, tbSingerPojo -> tbSingerPojo));
         }
         // 填充信息
-        Map<Long, TbMusicUrlPojo> urlPojoMap;
+        Map<Long, TbMusicUrlPojo> urlPojoMap = new HashMap<>();
         // 获取音乐地址
         try {
             Set<Long> collect = page.getRecords().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toSet());
             List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(collect, Boolean.TRUE.equals(req.getRefresh()));
             urlPojoMap = musicUrlByMusicId.parallelStream()
-                                          .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId, musicUrlPojo -> musicUrlPojo));
-        } catch (Exception ex) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
+                                          .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId,
+                                                  Function.identity(),
+                                                  (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
+        } catch (BaseException ex) {
+            if (!StringUtils.equals(ex.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+                throw new BaseException(ResultCode.SONG_NOT_EXIST);
+            }
         }
         List<MusicPageRes> musicPageRes = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
@@ -179,6 +184,7 @@ public class PlayListApi {
             e.setId(musicPojo.getId());
             e.setMusicName(musicPojo.getMusicName());
             e.setMusicNameAlias(musicPojo.getAliasName());
+            e.setPic(musicPojo.getPic());
             TbMusicUrlPojo tbMusicUrlPojo = Optional.ofNullable(urlPojoMap.get(musicPojo.getId())).orElse(new TbMusicUrlPojo());
             e.setIsExist(StringUtils.isNotBlank(tbMusicUrlPojo.getUrl()));
             e.setMusicRawUrl(tbMusicUrlPojo.getUrl());
@@ -186,7 +192,8 @@ public class PlayListApi {
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumMap.get(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             e.setAlbumId(tbAlbumPojo.getId());
             e.setAlbumName(tbAlbumPojo.getAlbumName());
-        
+            e.setPublishTime(tbAlbumPojo.getPublishTime());
+    
             // 歌手
             // 获取歌手ID
             Set<Long> collect = albumSingerPojoList.stream()
@@ -217,16 +224,17 @@ public class PlayListApi {
      * @return 歌曲ID
      */
     private List<Long> getMusicIdByMusicName(MusicPageReq req) {
-        if (StringUtils.isNotBlank(req.getMusicName())) {
+        if (StringUtils.isNotBlank(req.getMusicName()) || CollUtil.isNotEmpty(req.getMusicIds())) {
             List<TbMusicPojo> list = new ArrayList<>();
             // 音乐名
             list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                   .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
-                                                  .like(TbMusicPojo::getMusicName, req.getMusicName())));
+                                                  .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())));
             // 别名
             list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                   .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
-                                                  .like(TbMusicPojo::getAliasName, req.getMusicName())));
+                                                  .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getAliasName, req.getMusicName())));
+        
             return list.stream().map(TbMusicPojo::getId).distinct().collect(Collectors.toList());
         }
         return Collections.emptyList();

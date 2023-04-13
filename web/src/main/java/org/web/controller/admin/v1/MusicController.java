@@ -19,11 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Set;
 
-@RestController(AdminConfig.ADMIN + "MusicFlowController")
+@RestController(AdminConfig.ADMIN + "MusicController")
 @RequestMapping("/admin/music")
 @Slf4j
 @CrossOrigin
-public class MusicFlowController {
+public class MusicController {
     @Autowired
     private MusicFlowApi uploadMusic;
     
@@ -68,7 +68,7 @@ public class MusicFlowController {
      * @param refresh 是否刷新
      * @return url
      */
-    @GetMapping("/get/{musicId}")
+    @GetMapping("/url/{musicId}")
     public R getMusicUrl(@PathVariable("musicId") Set<String> musicId, @RequestParam(value = "refresh", required = false, defaultValue = "false") Boolean refresh) {
         return R.success(uploadMusic.getMusicUrl(musicId, refresh));
     }

@@ -48,7 +48,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -99,7 +98,7 @@ public class MusicFlowApi {
     @Autowired
     private AccountService accountService;
     
-    String pathTemp = FileUtil.getTmpDirPath() + "\\musicTemp";
+    String pathTemp = FileUtil.getTmpDirPath() + FileUtil.FILE_SEPARATOR + "musicTemp";
     @Autowired
     private MusicCommonApi musicCommonApi;
     
@@ -206,40 +205,22 @@ public class MusicFlowApi {
                              .body(new FileSystemResource(file));
     }
     
-    /**
-     * 保存音乐
-     * 更新表: 音乐信息表  歌手表 专辑表
-     * 如果上传文件更新: 音乐地址表
-     *
-     * @param dto 音乐信息
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public MusicDetails saveMusicInfo(AudioInfoReq dto) throws IOException {
-        // 检测是读取本地缓存文件
-        if (Boolean.FALSE.equals(dto.getUploadFlag())) {
-            // 检查文件目录是否合法
-            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+    private static File getMusicFile(AudioInfoReq dto, String path) throws IOException {
+        // 检测本地是否有已上传的数据
+        if (FileUtil.isFile(path)) {
+            File file = new File(path);
+            String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+            if (StringUtils.equals(md5, dto.getMd5())) {
+                return file;
+            }
         }
-        // 保存歌手和音乐中间表
-        List<TbArtistPojo> tbArtistPojos = saveAndReturnMusicAndSingList(dto);
-        Set<Long> singIds = tbArtistPojos.stream().map(TbArtistPojo::getId).collect(Collectors.toSet());
-    
-        // 保存专辑表，如果没有则新建。
-        TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, singIds);
-        // 保存音乐表
-        TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, singIds, albumPojo);
-        // 保存歌词
-        List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
-        // 上传文件
-        TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
-    
-        MusicDetails musicDetails = new MusicDetails();
-        musicDetails.setMusic(musicPojo);
-        musicDetails.setMusicUrl(tbMusicUrlPojo);
-        musicDetails.setAlbum(albumPojo);
-        musicDetails.setSinger(tbArtistPojos);
-        musicDetails.setLyrics(lyricPojoList);
-        return musicDetails;
+        File file = new File(path);
+        HttpUtil.downloadFile(dto.getMusicTemp(), file, 60000);
+        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+        if (StringUtils.equals(md5, dto.getMd5())) {
+            return file;
+        }
+        throw new BaseException(ResultCode.DOWNLOAD_ERROR);
     }
     
     /**
@@ -280,6 +261,41 @@ public class MusicFlowApi {
         return list;
     }
     
+    /**
+     * 保存音乐
+     * 更新表: 音乐信息表  歌手表 专辑表
+     * 如果上传文件更新: 音乐地址表
+     *
+     * @param dto 音乐信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public MusicDetails saveMusicInfo(AudioInfoReq dto) throws IOException {
+        // 检测是读取本地缓存文件， 并且是本地地址
+        if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
+            // 检查文件目录是否合法
+            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+        }
+        // 保存歌手和音乐中间表
+        List<TbArtistPojo> tbArtistPojos = saveAndReturnMusicAndSingList(dto);
+        Set<Long> singIds = tbArtistPojos.stream().map(TbArtistPojo::getId).collect(Collectors.toSet());
+        
+        // 保存专辑表，如果没有则新建。
+        TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, singIds);
+        // 保存音乐表
+        TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, singIds, albumPojo);
+        // 保存歌词
+        List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
+        // 上传文件
+        TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
+        
+        MusicDetails musicDetails = new MusicDetails();
+        musicDetails.setMusic(musicPojo);
+        musicDetails.setMusicUrl(tbMusicUrlPojo);
+        musicDetails.setAlbum(albumPojo);
+        musicDetails.setSinger(tbArtistPojos);
+        musicDetails.setLyrics(lyricPojoList);
+        return musicDetails;
+    }
     
     /**
      * 上传文件
@@ -316,13 +332,21 @@ public class MusicFlowApi {
             urlPojo.setEncodeType(dto.getType());
             urlPojo.setUrl(dto.getMusicTemp());
         } else {
-            // 读取本地文件
-            File file = new File(pathTemp, dto.getMusicTemp());
-            String uploadPath = OSSFactory.ossFactory(config.getSaveMode())
-                                          .upload(config.getObjectSave(), file.getPath());
-            Files.delete(file.toPath());
+            File file;
+            if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
+                String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
+                file = getMusicFile(dto, pathname);
+                FileUtil.rename(file, dto.getMd5() + "." + dto.getType(), true);
+                OSSFactory.ossFactory(config.getSaveMode()).isConnected(config.getHost(), config.getAccessKey(), config.getSecretKey());
+            } else {
+                // 读取本地文件
+                file = new File(pathTemp, dto.getMusicTemp());
+            }
+            String uploadPath = OSSFactory.ossFactory(config.getSaveMode()).upload(config.getHost(), config.getObjectSave(), file);
+            long size = FileUtil.size(file);
+            FileUtil.del(file);
             // music URL 地址表
-            urlPojo.setSize(FileUtil.size(file));
+            urlPojo.setSize(size);
             urlPojo.setRate(dto.getRate());
             urlPojo.setLevel(dto.getLevel());
             urlPojo.setMd5(dto.getMd5());
@@ -542,21 +566,22 @@ public class MusicFlowApi {
      * 查询音乐URL表
      *
      * @param musicIds 音乐id
+     * @param refresh  是否刷新
      * @return 音乐URL列表
      */
-    public List<MusicFileRes> getMusicUrl(Set<String> musicIds) {
+    public List<MusicFileRes> getMusicUrl(Set<String> musicIds, Boolean refresh) {
         List<MusicFileRes> files = new ArrayList<>();
         List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
-                TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo);
+                TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
                 musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
                 musicFileRes.setRawUrl(url.getUrl());
-                musicFileRes.setExists(true);
+                musicFileRes.setExists(StringUtils.isBlank(url.getUrl()));
             } catch (BaseException e) {
                 if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
                     throw new BaseException(ResultCode.OSS_LOGIN_ERROR);

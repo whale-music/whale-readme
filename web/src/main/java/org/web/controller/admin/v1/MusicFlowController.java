@@ -65,10 +65,11 @@ public class MusicFlowController {
      * 获取音乐URL
      *
      * @param musicId 音乐id
+     * @param refresh 是否刷新
      * @return url
      */
     @GetMapping("/get/{musicId}")
-    public R getMusicUrl(@PathVariable("musicId") Set<String> musicId) {
-        return R.success(uploadMusic.getMusicUrl(musicId));
+    public R getMusicUrl(@PathVariable("musicId") Set<String> musicId, @RequestParam(value = "refresh", required = false, defaultValue = "false") Boolean refresh) {
+        return R.success(uploadMusic.getMusicUrl(musicId, refresh));
     }
 }

@@ -38,6 +38,9 @@ public class MusicPageReq implements Serializable {
     @ApiModelProperty(value = "结束时间")
     private LocalDateTime afterDate;
     
+    @ApiModelProperty("是否刷新缓存")
+    private Boolean refresh;
+    
     @ApiModelProperty("分页数据")
-    PageCommon page;
+    private PageCommon page;
 }

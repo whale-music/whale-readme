@@ -69,7 +69,7 @@ public class RecommendApi {
             e.setName(tbMusicPojo.getMusicName());
             e.setAlias(List.of(tbMusicPojo.getAliasName().split(",")));
             // 歌曲下载地址
-            List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(tbMusicPojo.getId());
+            List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(tbMusicPojo.getId(), false);
             if (CollUtil.isNotEmpty(musicUrlByMusicId)) {
                 e.setMp3Url(musicUrlByMusicId.get(0).getUrl());
             }
@@ -172,7 +172,7 @@ public class RecommendApi {
                 arItem.setId(tbArtistPojo.getId());
                 arItem.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
                 ar.add(arItem);
-        
+    
                 // 兼容web api
                 org.api.neteasecloudmusic.model.vo.recommend.songs.Artist artist = new org.api.neteasecloudmusic.model.vo.recommend.songs.Artist();
                 artist.setName(tbArtistPojo.getArtistName());
@@ -259,7 +259,7 @@ public class RecommendApi {
             }
             recommendAlbumNewResPage.getRecords().add(recommendAlbumNewRes);
         }
-        BeanUtils.copyProperties(albumPojoList,recommendAlbumNewResPage,"records");
+        BeanUtils.copyProperties(albumPojoList, recommendAlbumNewResPage, "records");
         return recommendAlbumNewResPage;
     }
     

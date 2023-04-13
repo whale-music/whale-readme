@@ -51,7 +51,7 @@ class TestUploadMusicApi {
             SongDetail songDetail = RequestMusic163.getSongDetail(page, cookie);
             // 获取歌曲下载地址数据
             SongUrl songUrl = RequestMusic163.getSongUrl(page, cookie, 1);
-        
+    
             // 歌曲下载地址信息
             Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
             for (SongsItem song : songDetail.getSongs()) {
@@ -129,16 +129,17 @@ class TestUploadMusicApi {
             dto.setMd5(dataItem.getMd5());
             dto.setLevel(dataItem.getLevel());
             // 上传md5值
-            dto.setMusicTemp(dataItem.getMd5());
+            dto.setMusicTemp(dataItem.getUrl());
             dto.setSize((long) dataItem.getSize());
         }
-        dto.setUploadFlag(true);
+        // false保存音乐文件到存储对象，或只保存音乐信息到数据库
+        dto.setUploadFlag(false);
         try {
             return musicFlowApi.saveMusicInfo(dto);
         } catch (IOException e) {
             log.warn(e.getMessage(), e);
         }
         log.info("上传成功{}:{}", song.getId(), dto.getMusicName());
-        return null;
+        throw new NullPointerException();
     }
 }

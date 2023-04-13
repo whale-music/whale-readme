@@ -51,7 +51,7 @@ public class MusicApi {
     private TbLyricService lyricService;
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
-        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(Set.copyOf(id));
+        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(Set.copyOf(id), false);
         List<TbMusicPojo> musicPojos = musicService.listByIds(id);
         Map<Long, TbMusicPojo> musicPojoMap = musicPojos.stream().collect(Collectors.toMap(TbMusicPojo::getId, tbMusicPojo -> tbMusicPojo));
         SongUrlRes songUrlRes = new SongUrlRes();
@@ -207,14 +207,14 @@ public class MusicApi {
             TbCollectPojo collectPojo = collectService.getById(sourceid);
             if (collectPojo != null) {
                 rankPojo.setBroadcastType(1);
-            }else {
+            } else {
                 TbAlbumPojo albumPojo = albumService.getById(sourceid);
                 if (albumPojo != null) {
                     rankPojo.setBroadcastType(2);
                 }
             }
             entityList.add(rankPojo);
-        }else{
+        } else {
             Integer broadcastCount = sourcePojo.getBroadcastCount();
             broadcastCount = broadcastCount + 1;
             sourcePojo.setBroadcastCount(broadcastCount);

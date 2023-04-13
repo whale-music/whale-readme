@@ -35,19 +35,18 @@ public class LocalOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public String getMusicAddresses(String host, String objectSave, String path) {
+    public String getMusicAddresses(String host, String objectSave, String musicFlag, boolean refresh) {
         return null;
     }
     
     @Override
-    public String upload(String objectSaveConfig, String filePath) {
-        File srcFile = new File(filePath);
+    public String upload(String host, String objectSaveConfig, File srcFile) {
         FileUtil.copy(srcFile, new File(objectSaveConfig, srcFile.getName()), true);
         return srcFile.getName();
     }
     
     @Override
-    public boolean delete(String filePath) {
+    public boolean delete(String host, String objectSaveConfig, String filePath) {
         return FileUtil.del(filePath);
     }
 }

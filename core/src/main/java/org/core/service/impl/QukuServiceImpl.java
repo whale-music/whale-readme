@@ -227,6 +227,9 @@ public class QukuServiceImpl implements QukuService {
     public Long getMusicCountBySingerId(Long id) {
         List<TbAlbumArtistPojo> albumSingerPojoList = albumArtistService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
                                                                                       .eq(TbAlbumArtistPojo::getArtistId, id));
+        if (CollUtil.isEmpty(albumSingerPojoList)) {
+            return 0L;
+        }
         Set<Long> albumIds = albumSingerPojoList.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toSet());
         return musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, albumIds));
     }

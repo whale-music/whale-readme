@@ -61,6 +61,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLUGIN_CODE("50005", "插件代码数据错误，检查代码，或直接删除重新创建"),
     OSS_ERROR("50006", "存储错误"),
     OSS_LOGIN_ERROR("50007", "OSS登录错误"),
+    OSS_UPLOAD_ERROR("50008", "OSS上传错误"),
+    DOWNLOAD_ERROR("50009", "下载错误"),
     
     
     /* 接口错误：60001-69999 */

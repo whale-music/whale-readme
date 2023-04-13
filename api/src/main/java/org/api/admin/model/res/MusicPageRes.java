@@ -40,6 +40,12 @@ public class MusicPageRes implements Serializable {
     @ApiModelProperty(value = "数据排序", example = "true: ASC, false: DESC")
     private Boolean order;
     
+    @ApiModelProperty("音乐是否存在")
+    private Boolean isExist;
+    
+    @ApiModelProperty("音乐地址")
+    private String musicRawUrl;
+    
     @ApiModelProperty("歌曲时长")
     @TableField("time_length")
     private Integer timeLength;

@@ -10,6 +10,7 @@ import org.api.model.playlistdetail.TrackIdsItem;
 import org.api.model.song.SongDetail;
 import org.api.model.song.SongsItem;
 import org.api.model.url.DataItem;
+import org.api.model.url.SongUrl;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
 import org.core.pojo.*;
@@ -59,8 +60,9 @@ class TestSaveMusicList {
     @Test
     void testUploadMusic() {
         // 第三方音乐ID
-        Long musicId = 31365604L;
-        Map<Integer, DataItem> songUrlMap = new HashMap<>();
+        Long musicId = 2033902938L;
+        SongUrl songUrl = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
+        Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
         SongDetail songDetail = RequestMusic163.getSongDetail(List.of(musicId), cookie);
         for (SongsItem song : songDetail.getSongs()) {
             MusicDetails musicDetails = new TestUploadMusicApi().saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, localUserId);

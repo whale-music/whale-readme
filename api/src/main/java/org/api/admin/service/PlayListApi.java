@@ -14,6 +14,9 @@ import org.api.admin.model.res.router.Children;
 import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.utils.MyPageUtil;
+import org.api.common.service.MusicCommonApi;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.QukuService;
@@ -60,6 +63,9 @@ public class PlayListApi {
      */
     @Autowired
     private TbCollectMusicService collectMusicService;
+    
+    @Autowired
+    private MusicCommonApi musicCommonApi;
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
@@ -157,18 +163,33 @@ public class PlayListApi {
                                      .collect(Collectors.toMap(TbArtistPojo::getId, tbSingerPojo -> tbSingerPojo));
         }
         // 填充信息
+        Map<Long, TbMusicUrlPojo> urlPojoMap;
+        // 获取音乐地址
+        try {
+            Set<Long> collect = page.getRecords()
+                                    .parallelStream()
+                                    .map(TbMusicPojo::getId)
+                                    .collect(Collectors.toSet());
+            List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(collect, Boolean.TRUE.equals(req.getRefresh()));
+            urlPojoMap = musicUrlByMusicId.parallelStream()
+                                          .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId, musicUrlPojo -> musicUrlPojo));
+        } catch (Exception ex) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST);
+        }
         List<MusicPageRes> musicPageRes = new ArrayList<>();
         for (TbMusicPojo musicPojo : page.getRecords()) {
             MusicPageRes e = new MusicPageRes();
             e.setId(musicPojo.getId());
             e.setMusicName(musicPojo.getMusicName());
             e.setMusicNameAlias(musicPojo.getAliasName());
-    
+            TbMusicUrlPojo tbMusicUrlPojo = Optional.ofNullable(urlPojoMap.get(musicPojo.getId())).orElse(new TbMusicUrlPojo());
+            e.setIsExist(StringUtils.isNotBlank(tbMusicUrlPojo.getUrl()));
+            e.setMusicRawUrl(tbMusicUrlPojo.getUrl());
             // 专辑
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumMap.get(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             e.setAlbumId(tbAlbumPojo.getId());
             e.setAlbumName(tbAlbumPojo.getAlbumName());
-    
+        
             // 歌手
             // 获取歌手ID
             Set<Long> collect = albumSingerPojoList.stream()

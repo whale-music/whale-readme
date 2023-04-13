@@ -56,7 +56,7 @@ public class AudioInfoReq {
     @ApiModelProperty("音乐质量")
     private String level;
     
-    @ApiModelProperty("大小")
+    @ApiModelProperty("音乐文件大小")
     private Long size;
     
     @ApiModelProperty("文件md5")
@@ -68,7 +68,7 @@ public class AudioInfoReq {
     @NotBlank
     private String musicTemp;
     
-    @ApiModelProperty("true: 只存储到数据库，不上传, false: 读取本地数据上传到数据库")
+    @ApiModelProperty("true: 只存储到数据库，不上传, false: 读取本地数据或网络数据上传到数据库")
     private Boolean uploadFlag;
     
     @ApiModelProperty("隐藏字段，测试时使用")

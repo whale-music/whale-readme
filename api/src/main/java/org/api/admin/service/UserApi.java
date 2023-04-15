@@ -32,4 +32,10 @@ public class UserApi {
         userRes.setToken(sign);
         return userRes;
     }
+    
+    public SysUserPojo getUserInfo(Long id) {
+        SysUserPojo byId = accountService.getById(id);
+        byId.setPassword("");
+        return byId;
+    }
 }

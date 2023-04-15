@@ -19,6 +19,7 @@ import org.core.pojo.TbAlbumArtistPojo;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
+import org.core.service.QukuService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,6 @@ public class AlbumApi {
     @Autowired
     private TbAlbumArtistService albumSingerService;
     
-    
     /**
      * 歌手表
      */
@@ -51,10 +51,13 @@ public class AlbumApi {
     @Autowired
     private TbMusicService musicService;
     
+    @Autowired
+    private QukuService qukuService;
+    
     
     public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-    
+        
         List<TbAlbumPojo> albumList = new ArrayList<>();
         if (StringUtils.isNotBlank(req.getAlbumName())) {
             LambdaQueryWrapper<TbAlbumPojo> albumWrapper = Wrappers.<TbAlbumPojo>lambdaQuery().like(TbAlbumPojo::getAlbumName, req.getAlbumName());
@@ -109,7 +112,7 @@ public class AlbumApi {
         page.setRecords(new ArrayList<>());
         for (TbAlbumPojo tbAlbumPojo : albumPojoPage.getRecords()) {
             AlbumRes albumRes = new AlbumRes();
-            albumRes.setSinger(new ArrayList<>());
+            albumRes.setArtistList(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
             
             // 获取专辑中所有歌手
@@ -118,7 +121,7 @@ public class AlbumApi {
             for (int singerId : singerIds) {
                 Long singerId1 = Optional.ofNullable(albumSingerPojos.get(singerId)).orElse(new TbAlbumArtistPojo()).getArtistId();
                 TbArtistPojo tbArtistPojo = tbSingerPojoMap.get(singerId1);
-                albumRes.getSinger().add(tbArtistPojo);
+                albumRes.getArtistList().add(tbArtistPojo);
             }
             
             // 获取专辑下歌曲数量
@@ -165,7 +168,7 @@ public class AlbumApi {
                                                        .orderByDesc(TbAlbumPojo::getUpdateTime);
         
         Page<TbAlbumPojo> page = albumService.page(new Page<>(0, 10), desc);
-        
+    
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
@@ -175,5 +178,19 @@ public class AlbumApi {
             maps.add(map);
         }
         return maps;
+    }
+    
+    public AlbumRes getAlbumInfo(Long albumId) {
+        TbAlbumPojo byId = albumService.getById(albumId);
+        Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
+        List<TbMusicPojo> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
+        List<TbArtistPojo> artistListByAlbumIds = qukuService.getArtistListByAlbumIds(albumId);
+        
+        AlbumRes albumRes = new AlbumRes();
+        albumRes.setArtistList(artistListByAlbumIds);
+        albumRes.setMusicList(musicListByAlbumId);
+        BeanUtils.copyProperties(byId, albumRes);
+        albumRes.setAlbumSize(Long.valueOf(albumCount));
+        return albumRes;
     }
 }

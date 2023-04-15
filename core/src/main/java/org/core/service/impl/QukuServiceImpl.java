@@ -46,6 +46,12 @@ public class QukuServiceImpl implements QukuService {
     @Autowired
     private TbUserArtistService userSingerService;
     
+    @Autowired
+    private TbCollectMusicService collectMusicService;
+    
+    @Autowired
+    private TbCollectService collectService;
+    
     /**
      * 获取专辑信息
      */
@@ -161,14 +167,6 @@ public class QukuServiceImpl implements QukuService {
         return getArtistListByMusicId(Collections.singletonList(musicId));
     }
     
-    /**
-     * 获取歌曲URL下载地址
-     */
-    @Override
-    public List<TbMusicUrlPojo> getMusicUrl(Long musicId) {
-        return getMusicUrl(new HashSet<>(Collections.singletonList(musicId)));
-    }
-    
     @Override
     public List<TbMusicUrlPojo> getMusicUrl(Set<Long> musicId) {
         LambdaQueryWrapper<TbMusicUrlPojo> in = Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicId);
@@ -243,7 +241,7 @@ public class QukuServiceImpl implements QukuService {
     }
     
     @Override
-    public List<TbAlbumPojo> getAlbumListBySingerIds(List<Long> ids) {
+    public List<TbAlbumPojo> getAlbumListByArtistIds(List<Long> ids) {
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, ids);
         List<TbAlbumArtistPojo> list = albumArtistService.list(in);
         if (CollUtil.isEmpty(list)) {
@@ -341,7 +339,7 @@ public class QukuServiceImpl implements QukuService {
      * @param name 歌手
      */
     @Override
-    public List<TbMusicPojo> getMusicListBySingerName(String name) {
+    public List<TbMusicPojo> getMusicListByArtistName(String name) {
         if (StringUtils.isNotBlank(name)) {
             List<TbArtistPojo> singerList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, name));
             List<Long> singerIdsList = singerList.stream().map(TbArtistPojo::getId).collect(Collectors.toList());
@@ -360,13 +358,13 @@ public class QukuServiceImpl implements QukuService {
      * @param id 歌手ID
      */
     @Override
-    public List<TbMusicPojo> getMusicListBySingerId(Long id) {
-        List<TbAlbumPojo> albumListBySingerIds = getAlbumListBySingerIds(Collections.singletonList(id));
+    public List<TbMusicPojo> getMusicListByArtistId(Long id) {
+        List<TbAlbumPojo> albumListBySingerIds = getAlbumListByArtistIds(Collections.singletonList(id));
         if (CollUtil.isEmpty(albumListBySingerIds)) {
             return Collections.emptyList();
         }
         Set<Long> albumIds = albumListBySingerIds.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, albumIds));
+        return musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, albumIds));
     }
     
     /**
@@ -384,5 +382,53 @@ public class QukuServiceImpl implements QukuService {
             res.addAll(page.getRecords());
         }
         return res;
+    }
+    
+    /**
+     * 添加音乐到歌单
+     *
+     * @param userID        用户ID
+     * @param tbCollectPojo 歌单数据
+     * @param songIds       歌曲列表
+     * @param flag          删除还是添加
+     */
+    @Override
+    public void addMusicToCollect(Long userID, TbCollectPojo tbCollectPojo, List<Long> songIds, boolean flag) {
+        if (flag) {
+            // 查询歌单内歌曲是否存在
+            long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                           .eq(TbCollectMusicPojo::getCollectId, tbCollectPojo.getId())
+                                                           .in(TbCollectMusicPojo::getMusicId, songIds));
+            if (count > 0) {
+                throw new BaseException(ResultCode.SONG_NOT_EXIST);
+            }
+            
+            // 添加
+            List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
+            
+            long allCount = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                              .eq(TbCollectMusicPojo::getCollectId, tbCollectPojo.getId()));
+            List<TbCollectMusicPojo> collect = new ArrayList<>(tbMusicPojo.size());
+            for (TbMusicPojo musicPojo : tbMusicPojo) {
+                TbCollectMusicPojo tbCollectMusicPojo = new TbCollectMusicPojo();
+                tbCollectMusicPojo.setCollectId(tbCollectPojo.getId());
+                tbCollectMusicPojo.setMusicId(musicPojo.getId());
+                allCount++;
+                tbCollectMusicPojo.setSort(allCount);
+            }
+            collectMusicService.saveBatch(collect);
+            Long songId = songIds.get(songIds.size() - 1);
+            // 更新封面
+            TbMusicPojo musicPojo = musicService.getById(songId);
+            if (musicPojo != null) {
+                tbCollectPojo.setPic(musicPojo.getPic());
+            }
+            collectService.updateById(tbCollectPojo);
+        } else {
+            // 删除歌曲
+            collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                               .eq(TbCollectMusicPojo::getCollectId, tbCollectPojo.getId())
+                                               .in(TbCollectMusicPojo::getMusicId, songIds));
+        }
     }
 }

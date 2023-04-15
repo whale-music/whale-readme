@@ -38,8 +38,8 @@ public class PlayListController {
      * @return 返回数据
      */
     @RequestMapping(value = "/{playId}", method = {RequestMethod.GET, RequestMethod.POST})
-    public R getPlaylist(@PathVariable("playId") String playId) {
-        return R.success(playList.getPlaylist(playId));
+    public R getPlaylist(@PathVariable("playId") String playId, @RequestBody(required = false) MusicPageReq page) {
+        return R.success(playList.getPlaylist(playId, page));
     }
     
     /**

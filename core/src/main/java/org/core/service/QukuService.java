@@ -53,11 +53,6 @@ public interface QukuService {
     List<TbArtistPojo> getArtistByMusicId(Long musicId);
     
     /**
-     * 获取歌曲下载地址
-     */
-    List<TbMusicUrlPojo> getMusicUrl(Long musicId);
-    
-    /**
      * 批量获取歌曲下载地址
      */
     List<TbMusicUrlPojo> getMusicUrl(Set<Long> musicId);
@@ -104,7 +99,7 @@ public interface QukuService {
      *
      * @param ids 歌手ID
      */
-    List<TbAlbumPojo> getAlbumListBySingerIds(List<Long> ids);
+    List<TbAlbumPojo> getAlbumListByArtistIds(List<Long> ids);
     
     /**
      * 获取用户收藏专辑
@@ -148,14 +143,14 @@ public interface QukuService {
      *
      * @param name 歌手
      */
-    List<TbMusicPojo> getMusicListBySingerName(String name);
+    List<TbMusicPojo> getMusicListByArtistName(String name);
     
     /**
      * 获取歌手下音乐信息
      *
      * @param id 歌手ID
      */
-    List<TbMusicPojo> getMusicListBySingerId(Long id);
+    List<TbMusicPojo> getMusicListByArtistId(Long id);
     
     /**
      * 随机获取歌手
@@ -163,4 +158,15 @@ public interface QukuService {
      * @param count 获取数量
      */
     List<TbArtistPojo> randomSinger(int count);
+    
+    /**
+     * 添加音乐到歌单
+     *
+     * @param userID        用户ID
+     * @param tbCollectPojo 歌单数据
+     * @param songIds       歌曲列表
+     * @param flag          删除还是添加
+     */
+    void addMusicToCollect(Long userID, TbCollectPojo tbCollectPojo, List<Long> songIds, boolean flag);
+    
 }

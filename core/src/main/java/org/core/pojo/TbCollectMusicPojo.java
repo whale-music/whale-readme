@@ -26,16 +26,18 @@ import java.io.Serializable;
 @TableName("tb_collect_music")
 @ApiModel(value = "TbCollectMusicPojo对象", description = "歌单和音乐的中间表，用于记录歌单中的每一个音乐")
 public class TbCollectMusicPojo implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     @ApiModelProperty("歌单ID")
     @TableId(value = "collect_id", type = IdType.ASSIGN_ID)
     private Long collectId;
-
+    
     @ApiModelProperty("音乐ID")
     @TableField("music_id")
     private Long musicId;
-
-
+    
+    @ApiModelProperty("添加顺序")
+    @TableField("sort")
+    private Long sort;
 }

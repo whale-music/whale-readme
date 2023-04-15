@@ -29,6 +29,10 @@ public class AListOSSServiceImpl implements OSSService {
     
     private SaveConfig config;
     
+    static {
+        musicUrltimedCache.schedulePrune(1000);
+    }
+    
     @Override
     public boolean isCurrentOSS(String serviceName) {
         return StringUtils.equals(SERVICE_NAME, serviceName);

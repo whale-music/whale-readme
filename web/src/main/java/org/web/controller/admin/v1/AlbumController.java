@@ -27,6 +27,12 @@ public class AlbumController {
         return R.success(page);
     }
     
+    @GetMapping("/{albumId}")
+    public R getAlbumInfo(@PathVariable Long albumId) {
+        AlbumRes res = albumApi.getAlbumInfo(albumId);
+        return R.success(res);
+    }
+    
     /**
      * 添加音乐时选择专辑接口
      *

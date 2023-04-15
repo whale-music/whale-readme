@@ -87,18 +87,31 @@ public class PlayListApi {
     }
     
     
-    public List<PlayListMusicRes> getPlaylist(String playId) {
+    public Page<PlayListMusicRes> getPlaylist(String playId, MusicPageReq page) {
+        page = Optional.ofNullable(page).orElse(new MusicPageReq());
+        PageCommon other = new PageCommon();
+        other.setPageIndex(0);
+        other.setPageNum(10);
+        page.setPage(Optional.ofNullable(page.getPage()).orElse(other));
+        
+        Page<TbCollectMusicPojo> playListMusicResPage = new Page<>(page.getPage().getPageIndex(), page.getPage().getPageNum());
         ArrayList<PlayListMusicRes> playListMusicRes = new ArrayList<>();
-        List<TbCollectMusicPojo> collectMusicList = collectMusicService.listByIds(Collections.singletonList(playId));
-        if (CollUtil.isEmpty(collectMusicList)) {
-            return Collections.emptyList();
+        collectMusicService.page(playListMusicResPage,
+                Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, playId).orderByAsc(TbCollectMusicPojo::getSort));
+        if (CollUtil.isEmpty(playListMusicResPage.getRecords())) {
+            return new Page<>();
         }
-        List<Long> musicIds = collectMusicList.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
-        List<TbMusicPojo> musicPojoList = musicService.listByIds(musicIds);
+        List<Long> musicIds = playListMusicResPage.getRecords().stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        
+        LambdaQueryWrapper<TbMusicPojo> like = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                       .in(CollUtil.isNotEmpty(musicIds), TbMusicPojo::getId, musicIds)
+                                                       .like(StringUtils.isNotBlank(page.getMusicName()), TbMusicPojo::getMusicName, page.getMusicName())
+                                                       .like(StringUtils.isNotBlank(page.getMusicName()), TbMusicPojo::getAliasName, page.getMusicName());
+        List<TbMusicPojo> musicPojoList = musicService.list(like);
         Set<Long> albumIds = musicPojoList.stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
         Map<Long, TbAlbumPojo> albumPojoMap = albumPojoList.stream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
-    
+        
         HashMap<Long, TbAlbumPojo> map = new HashMap<>();
         musicPojoList.parallelStream().forEach(tbMusicPojo -> {
             if (albumPojoMap.get(tbMusicPojo.getAlbumId()) != null) {
@@ -119,7 +132,10 @@ public class PlayListApi {
     
             playListMusicRes.add(e1);
         }
-        return playListMusicRes;
+        Page<PlayListMusicRes> resPage = new Page<>();
+        BeanUtils.copyProperties(playListMusicResPage, resPage);
+        resPage.setRecords(playListMusicRes);
+        return resPage;
     }
     
     /**
@@ -263,7 +279,7 @@ public class PlayListApi {
      * @return 歌曲ID
      */
     private List<Long> getMusicIDBySingerName(MusicPageReq req) {
-        List<TbMusicPojo> musicListBySingerName = qukuService.getMusicListBySingerName(req.getSingerName());
+        List<TbMusicPojo> musicListBySingerName = qukuService.getMusicListByArtistName(req.getSingerName());
         if (CollUtil.isEmpty(musicListBySingerName)) {
             return musicListBySingerName.stream().map(TbMusicPojo::getId).collect(Collectors.toList());
         }
@@ -281,7 +297,7 @@ public class PlayListApi {
         // 标题icon
         Meta meta = new Meta();
         meta.setTitle("menus.playList");
-        meta.setIcon("ep:menu");
+        meta.setIcon("solar:playlist-minimalistic-2-linear");
         meta.setRank(3);
         // 标题路由
         RouterVo routerVo = new RouterVo();
@@ -305,7 +321,7 @@ public class PlayListApi {
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
-            playListMeta.setIcon("ep:headset");
+            playListMeta.setIcon("solar:playlist-minimalistic-2-linear");
             
             e.setMeta(playListMeta);
             children.add(e);

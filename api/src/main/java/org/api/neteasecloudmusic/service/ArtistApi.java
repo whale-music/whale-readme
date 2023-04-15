@@ -117,7 +117,7 @@ public class ArtistApi {
     public ArtistRes artists(Long id) {
         ArtistRes artistRes = new ArtistRes();
         TbArtistPojo singerPojo = singerService.getById(id);
-        List<TbMusicPojo> musicPojoList = qukuService.getMusicListBySingerId(id);
+        List<TbMusicPojo> musicPojoList = qukuService.getMusicListByArtistId(id);
         org.api.neteasecloudmusic.model.vo.artist.artist.Artist artist = new org.api.neteasecloudmusic.model.vo.artist.artist.Artist();
         artist.setName(singerPojo.getArtistName());
         artist.setId(singerPojo.getId());

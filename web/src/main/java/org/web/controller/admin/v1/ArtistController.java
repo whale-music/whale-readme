@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
@@ -39,5 +40,11 @@ public class ArtistController {
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
         List<TbArtistPojo> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
+    }
+    
+    @GetMapping("/{id}")
+    public R getArtistById(@PathVariable("id") Long id) {
+        ArtistInfoRes artist = artistApi.getArtistById(id);
+        return R.success(artist);
     }
 }

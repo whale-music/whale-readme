@@ -325,35 +325,14 @@ public class CollectApi {
     public NeteaseResult addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         checkUserAuth(userID, tbCollectPojo);
-        
-        if (flag) {
-            // 查询歌单内歌曲是否存在
-            long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                           .eq(TbCollectMusicPojo::getCollectId, collectId)
-                                                           .in(TbCollectMusicPojo::getMusicId, songIds));
-            if (count > 0) {
+        try {
+            qukuService.addMusicToCollect(userID, tbCollectPojo, songIds, flag);
+        } catch (BaseException e) {
+            if (StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 NeteaseResult r = new NeteaseResult();
                 return r.error("502", "歌单内歌曲重复");
             }
-            
-            // 添加
-            List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
-            List<TbCollectMusicPojo> collect = tbMusicPojo.stream()
-                                                          .map(tbMusicPojo1 -> new TbCollectMusicPojo().setCollectId(collectId)
-                                                                                                       .setMusicId(tbMusicPojo1.getId()))
-                                                          .collect(Collectors.toList());
-            collectMusicService.saveBatch(collect);
-            Long songId = songIds.get(songIds.size() - 1);
-            TbMusicPojo musicPojo = musicService.getById(songId);
-            if (musicPojo != null) {
-                tbCollectPojo.setPic(musicPojo.getPic());
-            }
-            collectService.updateById(tbCollectPojo);
-        } else {
-            // 删除歌曲
-            collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                               .eq(TbCollectMusicPojo::getCollectId, collectId)
-                                               .in(TbCollectMusicPojo::getMusicId, songIds));
+            throw new BaseException();
         }
         long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, collectId));
         NeteaseResult map = new NeteaseResult();

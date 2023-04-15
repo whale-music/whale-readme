@@ -322,14 +322,18 @@ public class PlayListApi {
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
             playListMeta.setIcon("solar:playlist-minimalistic-2-linear");
-            
+    
             e.setMeta(playListMeta);
             children.add(e);
         }
-        
+    
         routerVo.setChildren(children);
-        
+    
         routerVos.add(routerVo);
         return routerVos;
+    }
+    
+    public TbCollectPojo getPlayListInfo(Long id) {
+        return collectService.getById(id);
     }
 }

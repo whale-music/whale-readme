@@ -31,6 +31,11 @@ public class PlayListController {
         return R.success(playList.getMusicPage(req));
     }
     
+    @GetMapping("/info/{id}")
+    public R getPlayListInfo(@PathVariable("id") Long id) {
+        return R.success(playList.getPlayListInfo(id));
+    }
+    
     /**
      * 获取歌单音乐
      *

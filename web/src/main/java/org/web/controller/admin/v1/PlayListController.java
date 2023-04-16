@@ -47,9 +47,21 @@ public class PlayListController {
         return R.success(playList.getPlaylist(playId, page));
     }
     
+    /**
+     * 创建歌单
+     *
+     * @param name 歌单名
+     * @return 歌单创建信息
+     */
     @PutMapping(value = "/{name}")
     public R createPlayList(@PathVariable("name") String name) {
         return R.success(playList.createPlayList(name));
+    }
+    
+    @DeleteMapping("/{id}")
+    public R deletePlayList(@PathVariable("id") Long id) {
+        playList.deletePlayList(UserUtil.getUser().getId(), id);
+        return R.success();
     }
     
     /**

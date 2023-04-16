@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service("MusicService")
+@Slf4j
 public class QukuServiceImpl implements QukuService {
     
     @Autowired
@@ -51,6 +53,9 @@ public class QukuServiceImpl implements QukuService {
     
     @Autowired
     private TbCollectService collectService;
+    
+    @Autowired
+    private TbCollectTagService collectTagService;
     
     /**
      * 获取专辑信息
@@ -451,5 +456,43 @@ public class QukuServiceImpl implements QukuService {
         collectPojo.setType(type);
         collectService.save(collectPojo);
         return collectPojo;
+    }
+    
+    /**
+     * 检查用户是否有权限操作歌单
+     *
+     * @param userId        用户ID
+     * @param tbCollectPojo 歌单信息
+     */
+    private static void checkUserAuth(Long userId, TbCollectPojo tbCollectPojo) {
+        // 检查是否有该歌单
+        if (tbCollectPojo == null || tbCollectPojo.getUserId() == null) {
+            throw new BaseException(ResultCode.SONG_LIST_DOES_NOT_EXIST);
+        }
+        // 检查用户是否有权限
+        if (!userId.equals(tbCollectPojo.getUserId())) {
+            log.warn(ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
+            throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
+        }
+    }
+    
+    /**
+     * 删除歌单
+     *
+     * @param userId      用户ID
+     * @param collectList 删除歌单ID
+     */
+    @Override
+    public void removePlayList(Long userId, Collection<Long> collectList) {
+        List<TbCollectPojo> tbCollectPojos = collectService.listByIds(collectList);
+        for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
+            checkUserAuth(userId, tbCollectPojo);
+        }
+        // 删除歌单关联ID
+        collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, collectList));
+        // 删除歌单ID
+        collectService.removeByIds(collectList);
+        // 删除歌单关联tag
+        collectTagService.remove(Wrappers.<TbCollectTagPojo>lambdaQuery().in(TbCollectTagPojo::getCollectId, collectList));
     }
 }

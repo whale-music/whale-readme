@@ -341,4 +341,8 @@ public class PlayListApi {
     public TbCollectPojo createPlayList(String name) {
         return qukuService.createPlayList(UserUtil.getUser().getId(), name, Short.parseShort("1"));
     }
+    
+    public void deletePlayList(Long userId, Long id) {
+        qukuService.removePlayList(userId, Collections.singletonList(id));
+    }
 }

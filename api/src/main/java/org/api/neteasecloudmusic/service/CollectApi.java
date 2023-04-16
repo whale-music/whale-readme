@@ -219,17 +219,8 @@ public class CollectApi {
      * @param userId     用户ID
      * @param collectIds 歌单ID
      */
-    public void removePlayList(Long userId, String[] collectIds) {
-        List<String> collectList = Arrays.asList(collectIds);
-        List<TbCollectPojo> tbCollectPojos = collectService.listByIds(collectList);
-        for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
-            checkUserAuth(userId, tbCollectPojo);
-        }
-        
-        // 删除歌单ID
-        collectService.removeByIds(collectList);
-        // 删除歌单关联tag
-        collectTagService.remove(Wrappers.<TbCollectTagPojo>lambdaQuery().in(TbCollectTagPojo::getCollectId, collectList));
+    public void removePlayList(Long userId, List<Long> collectIds) {
+        qukuService.removePlayList(userId, collectIds);
     }
     
     /**
@@ -239,7 +230,7 @@ public class CollectApi {
      * @param collectId 歌单ID
      * @param flag      取消/收藏 1:收藏,2:取消收藏
      */
-    public void subscribePlayList(Long userId, String collectId, Integer flag) {
+    public void subscribePlayList(Long userId, Long collectId, Integer flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         // 需要收藏歌单存在，并且用户不一样（防止重复收藏）
         if (tbCollectPojo != null && !Objects.equals(tbCollectPojo.getUserId(), userId) && flag == 1) {
@@ -257,7 +248,7 @@ public class CollectApi {
                                                                                             .eq(TbCollectMusicPojo::getCollectId, collectId));
             Set<TbCollectMusicPojo> batch = tbCollectMusicPojos.stream().map(tbCollectMusicPojo -> {
                 TbCollectMusicPojo tbCollectMusicPojo1 = new TbCollectMusicPojo();
-                tbCollectMusicPojo1.setCollectId(Long.valueOf(collectId));
+                tbCollectMusicPojo1.setCollectId(collectId);
                 tbCollectMusicPojo1.setMusicId(tbCollectMusicPojo.getMusicId());
                 return tbCollectMusicPojo1;
             }).collect(Collectors.toSet());
@@ -266,7 +257,7 @@ public class CollectApi {
         } else if (Boolean.TRUE.equals(tbCollectPojo != null && tbCollectPojo.getSubscribed()) && flag == 2) {
             // 歌单存在并且是收藏状态
             // 删除歌单
-            removePlayList(userId, new String[]{collectId});
+            removePlayList(userId, Collections.singletonList(collectId));
         }
     }
     

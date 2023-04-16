@@ -178,4 +178,12 @@ public interface QukuService {
      * @return 歌单创建信息
      */
     TbCollectPojo createPlayList(Long userId, String name, short type);
+    
+    /**
+     * 删除歌单
+     *
+     * @param userId      用户ID
+     * @param collectList 删除歌单ID
+     */
+    void removePlayList(Long userId, Collection<Long> collectList);
 }

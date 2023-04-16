@@ -119,9 +119,9 @@ public class PlayListController {
      * 删除歌单
      */
     @GetMapping("/playlist/delete")
-    public NeteaseResult removePlayList(@RequestParam("id") String collectIds) {
+    public NeteaseResult removePlayList(@RequestParam("id") List<Long> collectIds) {
         SysUserPojo user = UserUtil.getUser();
-        collect.removePlayList(user.getId(), collectIds.split(","));
+        collect.removePlayList(user.getId(), collectIds);
         return new NeteaseResult().success();
     }
     
@@ -131,7 +131,7 @@ public class PlayListController {
      * @param collectId 歌单ID
      */
     @GetMapping("/playlist/subscribe")
-    public NeteaseResult subscribePlayList(@RequestParam("id") String collectId, @RequestParam("t") Integer flag) {
+    public NeteaseResult subscribePlayList(@RequestParam("id") Long collectId, @RequestParam("t") Integer flag) {
         SysUserPojo user = UserUtil.getUser();
         collect.subscribePlayList(user.getId(), collectId, flag);
         return new NeteaseResult().success();

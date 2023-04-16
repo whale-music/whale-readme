@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.config.PlayListTypeConfig;
 import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.model.res.PlayListMusicRes;
+import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.Children;
 import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
@@ -20,7 +22,7 @@ import org.core.common.result.ResultCode;
 import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.QukuService;
-import org.core.utils.CollectSortUtil;
+import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,7 +253,7 @@ public class PlayListApi {
             list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                   .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
                                                   .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getAliasName, req.getMusicName())));
-        
+    
             return list.stream().map(TbMusicPojo::getId).distinct().collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -304,13 +306,9 @@ public class PlayListApi {
         RouterVo routerVo = new RouterVo();
         routerVo.setPath("/playlist");
         routerVo.setMeta(meta);
-        
-        
-        LambdaQueryWrapper<TbCollectPojo> queryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                 .eq(TbCollectPojo::getUserId, uid);
-        List<TbCollectPojo> list = collectService.list(queryWrapper);
-        list = CollectSortUtil.userLikeUserSort(uid, list);
-        
+    
+        Collection<TbCollectPojo> list = qukuService.getUserPlayList(uid, Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
+    
         // 子页面路由，(歌单)
         List<Children> children = new ArrayList<>();
         for (TbCollectPojo tbCollectPojo : list) {
@@ -318,7 +316,7 @@ public class PlayListApi {
             e.setName(String.valueOf(tbCollectPojo.getId()));
             e.setPath("/playlist/" + tbCollectPojo.getId());
             e.setComponent("() => import('@/views/playlist/index')");
-            
+        
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
@@ -344,5 +342,32 @@ public class PlayListApi {
     
     public void deletePlayList(Long userId, Long id) {
         qukuService.removePlayList(userId, Collections.singletonList(id));
+    }
+    
+    public List<PlayListRes> getUserPlayList(Long userId) {
+        List<TbCollectPojo> userPlayList = qukuService.getUserPlayList(userId, Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
+        List<PlayListRes> playListRes = new ArrayList<>();
+        for (TbCollectPojo collectPojo : userPlayList) {
+            PlayListRes e = new PlayListRes();
+            Integer collectMusicCount = qukuService.getCollectMusicCount(collectPojo.getId());
+            BeanUtils.copyProperties(collectPojo, e);
+            e.setCount(collectMusicCount);
+            playListRes.add(e);
+        }
+        return playListRes;
+    }
+    
+    /**
+     * 添加音乐到歌单
+     *
+     * @param userId 用户ID
+     * @param pid    歌单ID
+     * @param id     音乐ID
+     * @param flag   添加或删除 true 添加 false 删除
+     */
+    public void addMusicToPlayList(Long userId, Long pid, List<Long> id, Boolean flag) {
+        TbCollectPojo byId = collectService.getById(pid);
+        ExceptionUtil.isNull(byId == null, ResultCode.PLAT_LIST_EXIST);
+        qukuService.addMusicToCollect(userId, byId, id, flag);
     }
 }

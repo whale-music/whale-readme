@@ -9,4 +9,5 @@ import org.core.pojo.TbCollectPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PlayListRes extends TbCollectPojo {
+    private Integer count;
 }

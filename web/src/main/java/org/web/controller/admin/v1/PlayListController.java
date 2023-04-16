@@ -3,6 +3,7 @@ package org.web.controller.admin.v1;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.MusicPageReq;
+import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController(AdminConfig.ADMIN + "PlayListController")
 @RequestMapping("/admin/playlist")
@@ -61,6 +63,18 @@ public class PlayListController {
     @DeleteMapping("/{id}")
     public R deletePlayList(@PathVariable("id") Long id) {
         playList.deletePlayList(UserUtil.getUser().getId(), id);
+        return R.success();
+    }
+    
+    @GetMapping("/user/{userId}")
+    public R getUserPlayList(@PathVariable("userId") Long userId) {
+        List<PlayListRes> collectPojoList = playList.getUserPlayList(userId);
+        return R.success(collectPojoList);
+    }
+    
+    @GetMapping("/tracks")
+    public R addMusicToPlayList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam("pid") Long pid, @RequestParam("musicIds") List<Long> musicIds, @RequestParam(value = "flag", required = false, defaultValue = "true") Boolean flag) {
+        playList.addMusicToPlayList(Optional.ofNullable(userId).orElse(UserUtil.getUser().getId()), pid, musicIds, flag);
         return R.success();
     }
     

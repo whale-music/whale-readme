@@ -186,4 +186,21 @@ public interface QukuService {
      * @param collectList 删除歌单ID
      */
     void removePlayList(Long userId, Collection<Long> collectList);
+    
+    /**
+     * 获取用户所有音乐，包括喜爱歌单
+     *
+     * @param uid  用户ID
+     * @param type 歌单类型
+     * @return 返回用户创建歌单
+     */
+    List<TbCollectPojo> getUserPlayList(Long uid, Collection<Short> type);
+    
+    /**
+     * 获取歌单音乐数量
+     *
+     * @param id 歌单ID
+     * @return 音乐数量
+     */
+    Integer getCollectMusicCount(Long id);
 }

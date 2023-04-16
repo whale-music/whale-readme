@@ -13,6 +13,8 @@ import org.core.common.result.ResultCode;
 import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.QukuService;
+import org.core.utils.CollectSortUtil;
+import org.core.utils.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -404,9 +406,7 @@ public class QukuServiceImpl implements QukuService {
             long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                            .eq(TbCollectMusicPojo::getCollectId, tbCollectPojo.getId())
                                                            .in(TbCollectMusicPojo::getMusicId, songIds));
-            if (count > 0) {
-                throw new BaseException(ResultCode.SONG_NOT_EXIST);
-            }
+            ExceptionUtil.isNull(count > 0, ResultCode.PLAT_LIST_MUSIC_EXIST);
             
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
@@ -420,6 +420,7 @@ public class QukuServiceImpl implements QukuService {
                 tbCollectMusicPojo.setMusicId(musicPojo.getId());
                 allCount++;
                 tbCollectMusicPojo.setSort(allCount);
+                collect.add(tbCollectMusicPojo);
             }
             collectMusicService.saveBatch(collect);
             Long songId = songIds.get(songIds.size() - 1);
@@ -494,5 +495,32 @@ public class QukuServiceImpl implements QukuService {
         collectService.removeByIds(collectList);
         // 删除歌单关联tag
         collectTagService.remove(Wrappers.<TbCollectTagPojo>lambdaQuery().in(TbCollectTagPojo::getCollectId, collectList));
+    }
+    
+    /**
+     * 获取用户所有音乐，包括喜爱歌单
+     *
+     * @param uid  用户ID
+     * @param type 歌单类型
+     * @return 返回用户创建歌单
+     */
+    @Override
+    public List<TbCollectPojo> getUserPlayList(Long uid, Collection<Short> type) {
+        LambdaQueryWrapper<TbCollectPojo> queryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
+                                                                 .eq(TbCollectPojo::getUserId, uid);
+        List<TbCollectPojo> list = collectService.list(queryWrapper);
+        return CollectSortUtil.userLikeUserSort(uid, list);
+    }
+    
+    /**
+     * 获取歌单音乐数量
+     *
+     * @param id 歌单ID
+     * @return Long 歌单ID Integer 音乐数量
+     */
+    @Override
+    public Integer getCollectMusicCount(Long id) {
+        long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, id));
+        return Math.toIntExact(count);
     }
 }

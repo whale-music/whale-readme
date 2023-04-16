@@ -24,6 +24,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     SAVE_NAME_INVALID("10007", "存储名称无效"),
     PLUGIN_EXISTED("10008", "插件不存在"),
     FILENAME_EXIST("10009", "文件名不存在"),
+    PLAT_LIST_EXIST("10010", "歌单不存在"),
+    PLAT_LIST_MUSIC_EXIST("10011", "歌单中已存在歌曲"),
     
     
     /* 用户错误：20001-29999*/

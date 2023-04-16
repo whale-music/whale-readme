@@ -216,12 +216,12 @@ public class PlayListApi {
                                                    .filter(tbAlbumSingerPojo -> tbAlbumSingerPojo.getAlbumId().equals(tbAlbumPojo.getId()))
                                                    .map(TbAlbumArtistPojo::getArtistId)
                                                    .collect(Collectors.toSet());
-            e.setSingerIds(new ArrayList<>());
-            e.setSingerName(new ArrayList<>());
+            e.setArtistIds(new ArrayList<>());
+            e.setArtistNames(new ArrayList<>());
             for (Long aLong : collect) {
                 TbArtistPojo tbArtistPojo = singerMap.get(aLong);
-                e.getSingerIds().add(tbArtistPojo.getId());
-                e.getSingerName().add(tbArtistPojo.getArtistName());
+                e.getArtistIds().add(tbArtistPojo.getId());
+                e.getArtistNames().add(tbArtistPojo.getArtistName());
             }
             e.setTimeLength(musicPojo.getTimeLength());
             e.setCreateTime(musicPojo.getCreateTime());

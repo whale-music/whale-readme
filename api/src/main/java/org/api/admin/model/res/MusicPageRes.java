@@ -28,10 +28,10 @@ public class MusicPageRes implements Serializable {
     private String pic;
     
     @ApiModelProperty("歌手名ID")
-    private List<Long> singerIds;
+    private List<Long> artistIds;
     
     @ApiModelProperty("歌手名")
-    private List<String> singerName;
+    private List<String> artistNames;
     
     @ApiModelProperty("专辑")
     private Long albumId;

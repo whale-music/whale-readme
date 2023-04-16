@@ -128,15 +128,7 @@ public class CollectApi {
      * @return 歌单信息
      */
     public TbCollectPojo createPlayList(Long userId, String name) {
-        TbCollectPojo collectPojo = new TbCollectPojo();
-        collectPojo.setUserId(userId);
-        collectPojo.setPlayListName(name);
-        collectPojo.setSort(collectService.count() + 1);
-        collectPojo.setPic("https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg");
-        collectPojo.setSubscribed(false);
-        collectPojo.setType(Short.valueOf("0"));
-        collectService.save(collectPojo);
-        return collectPojo;
+        return qukuService.createPlayList(userId, name, Short.parseShort("0"));
     }
     
     /**

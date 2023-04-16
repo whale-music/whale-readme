@@ -431,4 +431,25 @@ public class QukuServiceImpl implements QukuService {
                                                .in(TbCollectMusicPojo::getMusicId, songIds));
         }
     }
+    
+    /**
+     * 添加歌单
+     *
+     * @param userId 用户ID
+     * @param name   歌单名
+     * @param type   歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单
+     * @return 歌单创建信息
+     */
+    @Override
+    public TbCollectPojo createPlayList(Long userId, String name, short type) {
+        TbCollectPojo collectPojo = new TbCollectPojo();
+        collectPojo.setUserId(userId);
+        collectPojo.setPlayListName(name);
+        collectPojo.setSort(collectService.count() + 1);
+        collectPojo.setPic("https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg");
+        collectPojo.setSubscribed(false);
+        collectPojo.setType(type);
+        collectService.save(collectPojo);
+        return collectPojo;
+    }
 }

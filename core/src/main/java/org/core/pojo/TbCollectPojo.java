@@ -39,7 +39,7 @@ public class TbCollectPojo implements Serializable {
     @TableField("pic")
     private String pic;
     
-    @ApiModelProperty("歌单类型，0为普通歌单，1为用户喜爱歌单，")
+    @ApiModelProperty("歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单")
     @TableField("type")
     private Short type;
     

@@ -169,4 +169,13 @@ public interface QukuService {
      */
     void addMusicToCollect(Long userID, TbCollectPojo tbCollectPojo, List<Long> songIds, boolean flag);
     
+    /**
+     * 添加歌单
+     *
+     * @param userId 用户ID
+     * @param name   歌单名
+     * @param type   歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单
+     * @return 歌单创建信息
+     */
+    TbCollectPojo createPlayList(Long userId, String name, short type);
 }

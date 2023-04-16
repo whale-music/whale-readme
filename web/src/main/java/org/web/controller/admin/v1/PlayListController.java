@@ -47,6 +47,11 @@ public class PlayListController {
         return R.success(playList.getPlaylist(playId, page));
     }
     
+    @PutMapping(value = "/{name}")
+    public R createPlayList(@PathVariable("name") String name) {
+        return R.success(playList.createPlayList(name));
+    }
+    
     /**
      * 获取歌单动态路由（歌单数据）
      *

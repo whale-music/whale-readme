@@ -21,6 +21,7 @@ import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.QukuService;
 import org.core.utils.CollectSortUtil;
+import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -297,7 +298,7 @@ public class PlayListApi {
         // 标题icon
         Meta meta = new Meta();
         meta.setTitle("menus.playList");
-        meta.setIcon("solar:playlist-minimalistic-2-linear");
+        meta.setIcon("solar:playlist-2-bold");
         meta.setRank(3);
         // 标题路由
         RouterVo routerVo = new RouterVo();
@@ -321,7 +322,7 @@ public class PlayListApi {
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
-            playListMeta.setIcon("solar:playlist-minimalistic-2-linear");
+            playListMeta.setIcon("solar:playlist-2-bold");
     
             e.setMeta(playListMeta);
             children.add(e);
@@ -335,5 +336,9 @@ public class PlayListApi {
     
     public TbCollectPojo getPlayListInfo(Long id) {
         return collectService.getById(id);
+    }
+    
+    public TbCollectPojo createPlayList(String name) {
+        return qukuService.createPlayList(UserUtil.getUser().getId(), name, Short.parseShort("1"));
     }
 }

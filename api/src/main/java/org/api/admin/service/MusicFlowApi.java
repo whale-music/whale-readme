@@ -22,6 +22,7 @@ import org.core.config.SaveConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.AccountService;
+import org.core.service.QukuService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -101,6 +102,9 @@ public class MusicFlowApi {
     String pathTemp = FileUtil.getTmpDirPath() + FileUtil.FILE_SEPARATOR + "musicTemp";
     @Autowired
     private MusicCommonApi musicCommonApi;
+    
+    @Autowired
+    private QukuService qukuService;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -237,27 +241,36 @@ public class MusicFlowApi {
         
         List<TbLyricPojo> list = new ArrayList<>();
         if (StringUtils.isNotBlank(dto.getLyric())) {
-            TbLyricPojo entity = new TbLyricPojo();
+            TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getType, LyricConfig.LYRIC)
+                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+            TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.LYRIC);
             entity.setLyric(dto.getLyric());
             list.add(entity);
         }
         if (StringUtils.isNotBlank(dto.getTLyric())) {
-            TbLyricPojo entity = new TbLyricPojo();
+            TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getType, LyricConfig.T_LYRIC)
+                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+            TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.T_LYRIC);
             entity.setLyric(dto.getTLyric());
             list.add(entity);
         }
         if (StringUtils.isNotBlank(dto.getKLyric())) {
-            TbLyricPojo entity = new TbLyricPojo();
+            TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getType, LyricConfig.K_LYRIC)
+                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+            TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.K_LYRIC);
             entity.setLyric(dto.getKLyric());
             list.add(entity);
         }
-        lyricService.saveBatch(list);
+        lyricService.saveOrUpdateBatch(list);
         return list;
     }
     
@@ -575,7 +588,8 @@ public class MusicFlowApi {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
                 TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
-                musicFileRes.setId(String.valueOf(tbMusicUrlPojo.getMusicId()));
+                BeanUtils.copyProperties(url, musicFileRes);
+                musicFileRes.setId(tbMusicUrlPojo.getMusicId());
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
@@ -594,5 +608,9 @@ public class MusicFlowApi {
             files.add(musicFileRes);
         }
         return files;
+    }
+    
+    public List<TbLyricPojo> getMusicLyric(Long musicId) {
+        return qukuService.getMusicLyric(musicId);
     }
 }

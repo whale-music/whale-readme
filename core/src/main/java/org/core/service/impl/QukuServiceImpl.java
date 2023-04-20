@@ -59,6 +59,9 @@ public class QukuServiceImpl implements QukuService {
     @Autowired
     private TbCollectTagService collectTagService;
     
+    @Autowired
+    private TbLyricService lyricService;
+    
     /**
      * 获取专辑信息
      */
@@ -522,5 +525,16 @@ public class QukuServiceImpl implements QukuService {
     public Integer getCollectMusicCount(Long id) {
         long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, id));
         return Math.toIntExact(count);
+    }
+    
+    /**
+     * 获取歌曲歌词
+     *
+     * @param musicId 歌词ID
+     * @return 歌词列表
+     */
+    @Override
+    public List<TbLyricPojo> getMusicLyric(Long musicId) {
+        return lyricService.list(Wrappers.<TbLyricPojo>lambdaQuery().eq(TbLyricPojo::getMusicId, musicId));
     }
 }

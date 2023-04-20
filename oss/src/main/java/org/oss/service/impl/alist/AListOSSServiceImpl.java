@@ -22,10 +22,13 @@ public class AListOSSServiceImpl implements OSSService {
     private static final String SERVICE_NAME = "AList";
     
     private static final String LOGIN_KEY = "loginKey";
-    // 创建缓存
+    
+    // 音乐地址创建缓存
     public static final TimedCache<String, ContentItem> musicUrltimedCache = CacheUtil.newTimedCache(1000L * 60L * 60L);
-    // 创建缓存
+    // 创建登录缓存
     public static final TimedCache<String, String> loginTimeCache = CacheUtil.newTimedCache(1000L * 60L * 60L);
+    // 第一次获取所有歌曲量, 对比缓存，如果不相同则自动刷新
+    private Integer initMusicAllCount = 0;
     
     private SaveConfig config;
     
@@ -73,7 +76,7 @@ public class AListOSSServiceImpl implements OSSService {
             ContentItem item = musicUrltimedCache.get(name);
             // 没有地址便刷新缓存,获取所有文件保存到缓存中
             // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
-            if ((item == null && refresh) || musicUrltimedCache.isEmpty()) {
+            if ((item == null && refresh) || musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
                 Headers headers = new Headers();
                 headers.put("Authorization", Collections.singletonList(loginCacheStr));
                 for (String s : config.getObjectSave()) {
@@ -83,6 +86,8 @@ public class AListOSSServiceImpl implements OSSService {
                         musicUrltimedCache.put(contentItem.getName(), contentItem);
                     });
                 }
+                // 更新初始化音乐数量
+                this.initMusicAllCount = musicUrltimedCache.size();
                 item = musicUrltimedCache.get(name);
             }
             // 没有找到文件直接抛出异常

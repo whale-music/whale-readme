@@ -3,24 +3,15 @@ package org.api.admin.model.res;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.core.pojo.TbMusicUrlPojo;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class MusicFileRes {
-    
-    @ApiModelProperty("音乐ID")
-    private String id;
-    
-    @ApiModelProperty("音乐文件大小")
-    private Long size;
-    
-    @ApiModelProperty("音质")
-    private String level;
-    
-    @ApiModelProperty("文件md5")
-    private String md5;
+public class MusicFileRes extends TbMusicUrlPojo {
     
     @ApiModelProperty("文件下载地址")
     private String rawUrl;

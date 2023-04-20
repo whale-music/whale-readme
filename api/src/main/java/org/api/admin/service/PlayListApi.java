@@ -145,7 +145,7 @@ public class PlayListApi {
      * 获取音乐基本信息
      */
     public Page<MusicPageRes> getMusicPage(MusicPageReq req) {
-        req.setPage(MyPageUtil.checkPage(Optional.ofNullable(req.getPage()).orElse(new PageCommon())));
+        req.setPage(MyPageUtil.checkPage(req.getPage()));
         List<Long> musicIdList = new LinkedList<>();
         
         // 查询歌手表
@@ -172,8 +172,11 @@ public class PlayListApi {
         }
     
         // 歌手信息
-        List<TbAlbumArtistPojo> albumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                                      .in(TbAlbumArtistPojo::getAlbumId, albumIds));
+        List<TbAlbumArtistPojo> albumSingerPojoList = new ArrayList<>();
+        if (CollUtil.isNotEmpty(albumIds)) {
+            albumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                  .in(TbAlbumArtistPojo::getAlbumId, albumIds));
+        }
         // 歌手ID
         Set<Long> singerLongIds = albumSingerPojoList.stream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
         Map<Long, TbArtistPojo> singerMap = new HashMap<>();

@@ -203,4 +203,12 @@ public interface QukuService {
      * @return 音乐数量
      */
     Integer getCollectMusicCount(Long id);
+    
+    /**
+     * 获取歌曲歌词
+     *
+     * @param musicId 歌词ID
+     * @return 歌词列表
+     */
+    List<TbLyricPojo> getMusicLyric(Long musicId);
 }

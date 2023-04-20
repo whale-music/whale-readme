@@ -40,6 +40,9 @@ public class MusicCommonApi {
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds, boolean refresh) {
+        if (CollUtil.isEmpty(musicIds)) {
+            return Collections.emptyList();
+        }
         List<TbMusicUrlPojo> list = qukuService.getMusicUrl(musicIds);
         return getMusicUrlByMusicUrlList(list, refresh);
     }

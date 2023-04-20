@@ -72,4 +72,9 @@ public class MusicController {
     public R getMusicUrl(@PathVariable("musicId") Set<String> musicId, @RequestParam(value = "refresh", required = false, defaultValue = "false") Boolean refresh) {
         return R.success(uploadMusic.getMusicUrl(musicId, refresh));
     }
+    
+    @GetMapping("/lyric/{musicId}")
+    public R getMusicLyric(@PathVariable("musicId") Long musicId) {
+        return R.success(uploadMusic.getMusicLyric(musicId));
+    }
 }

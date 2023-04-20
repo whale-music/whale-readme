@@ -11,6 +11,7 @@ public class MyPageUtil {
     public static PageCommon checkPage(PageCommon page) {
         page.setPageIndex(Optional.ofNullable(page.getPageIndex()).orElse(0));
         page.setPageNum(Optional.ofNullable(page.getPageNum()).orElse(20));
+        page.setPageNum(page.getPageNum() == 0 ? 20 : page.getPageNum());
         return page;
     }
     

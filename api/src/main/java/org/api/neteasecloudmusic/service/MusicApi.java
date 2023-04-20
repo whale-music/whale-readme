@@ -15,7 +15,10 @@ import org.api.neteasecloudmusic.model.vo.songdetail.*;
 import org.api.neteasecloudmusic.model.vo.songurl.DataItem;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.core.config.LyricConfig;
-import org.core.iservice.*;
+import org.core.iservice.TbAlbumService;
+import org.core.iservice.TbCollectService;
+import org.core.iservice.TbMusicService;
+import org.core.iservice.TbRankService;
 import org.core.pojo.*;
 import org.core.service.QukuService;
 import org.core.utils.UserUtil;
@@ -47,8 +50,6 @@ public class MusicApi {
     @Autowired
     private TbCollectService collectService;
     
-    @Autowired
-    private TbLyricService lyricService;
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
         List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(Set.copyOf(id), false);
@@ -133,7 +134,7 @@ public class MusicApi {
     
     public SongLyricRes lyric(Long id) {
         SongLyricRes songLyricRes = new SongLyricRes();
-        List<TbLyricPojo> tbLyricPojos = Optional.ofNullable(lyricService.list(Wrappers.<TbLyricPojo>lambdaQuery().eq(TbLyricPojo::getMusicId, id)))
+        List<TbLyricPojo> tbLyricPojos = Optional.ofNullable(qukuService.getMusicLyric(id))
                                                  .orElse(new ArrayList<>());
         TbLyricPojo lyricPojo = tbLyricPojos.stream()
                                             .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.LYRIC))

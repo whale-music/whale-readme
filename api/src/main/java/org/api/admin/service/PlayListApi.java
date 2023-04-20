@@ -100,7 +100,7 @@ public class PlayListApi {
         Page<TbCollectMusicPojo> playListMusicResPage = new Page<>(page.getPage().getPageIndex(), page.getPage().getPageNum());
         ArrayList<PlayListMusicRes> playListMusicRes = new ArrayList<>();
         collectMusicService.page(playListMusicResPage,
-                Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, playId).orderByAsc(TbCollectMusicPojo::getSort));
+                Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, playId).orderByDesc(TbCollectMusicPojo::getSort));
         if (CollUtil.isEmpty(playListMusicResPage.getRecords())) {
             return new Page<>();
         }

@@ -242,6 +242,7 @@ public class MusicFlowApi {
         List<TbLyricPojo> list = new ArrayList<>();
         if (StringUtils.isNotBlank(dto.getLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.LYRIC)
                                                           .eq(TbLyricPojo::getLyric, dto.getKLyric()));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
@@ -252,6 +253,7 @@ public class MusicFlowApi {
         }
         if (StringUtils.isNotBlank(dto.getTLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.T_LYRIC)
                                                           .eq(TbLyricPojo::getLyric, dto.getKLyric()));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
@@ -262,6 +264,7 @@ public class MusicFlowApi {
         }
         if (StringUtils.isNotBlank(dto.getKLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                          .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.K_LYRIC)
                                                           .eq(TbLyricPojo::getLyric, dto.getKLyric()));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());

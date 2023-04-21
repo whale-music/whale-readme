@@ -348,7 +348,7 @@ public class CollectApi {
         }
         TbMusicPojo byId = musicService.getById(id);
         if (byId == null) {
-            log.debug("添加歌曲不存在");
+            log.debug("添加歌曲不存在: {}", id);
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
     
@@ -437,7 +437,7 @@ public class CollectApi {
                 ArItem e1 = new ArItem();
                 e1.setId(tbArtistPojo.getId());
                 e1.setName(tbArtistPojo.getArtistName());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("").split(",")));
+                e1.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
                 ar.add(e1);
             }
             e.setAr(ar);

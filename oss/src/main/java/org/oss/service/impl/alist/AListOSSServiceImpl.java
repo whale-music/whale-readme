@@ -92,7 +92,7 @@ public class AListOSSServiceImpl implements OSSService {
             }
             // 没有找到文件直接抛出异常
             if (item == null) {
-                throw new BaseException(ResultCode.DATA_NONE);
+                throw new BaseException(ResultCode.DATA_NONE.getCode(), ResultCode.DATA_NONE.getResultMsg() + ": " + name);
             }
             String musicAddress = String.format("%s/d/%s/%s?sign=%s", config.getHost(), item.getPath(), name, item.getSign());
             if (StringUtils.isBlank(musicAddress)) {
@@ -100,8 +100,8 @@ public class AListOSSServiceImpl implements OSSService {
             } else {
                 return musicAddress;
             }
-        } catch (Exception e) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
+        } catch (BaseException e) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
         }
     }
     

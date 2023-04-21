@@ -1,6 +1,7 @@
 package org.api.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.admin.config.AdminConfig;
@@ -78,8 +79,19 @@ public class HoneApi {
         e.setValue(musicEffectiveCount);
         e.setName("effectiveMusic");
         res.add(e);
-        
-        // 无效音源
+        // 无音源
+        long noSoundSourceCount = musicList.parallelStream().filter(tbMusicUrlPojo1 ->
+                musicUrlByMusicUrlList.parallelStream()
+                                      .anyMatch(musicUrlPojo2 ->
+                                              StringUtils.isNotBlank(musicUrlPojo2.getUrl()) &&
+                                                      Objects.equals(tbMusicUrlPojo1.getId(), musicUrlPojo2.getMusicId()))
+        ).count();
+        MusicStatisticsRes e11 = new MusicStatisticsRes();
+        e11.setValue(musicList.size() - noSoundSourceCount);
+        e11.setName("noSoundSourceCount");
+        res.add(e11);
+    
+        // 失效音源
         // 查询音乐地址数据在音乐存储地址中是否存在
         long invalidMusicOriginCount = musicUrlList.parallelStream().filter(tbMusicUrlPojo1 ->
                 musicUrlByMusicUrlList.parallelStream().anyMatch(musicUrlPojo2 -> Objects.equals(tbMusicUrlPojo1.getMusicId(), musicUrlPojo2.getMusicId()))

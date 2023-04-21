@@ -3,6 +3,7 @@ package org.oss.service;
 import org.core.config.SaveConfig;
 
 import java.io.File;
+import java.util.Collection;
 
 public interface OSSService {
     
@@ -25,6 +26,19 @@ public interface OSSService {
      * @return 音乐地址
      */
     String getMusicAddresses(String name, boolean refresh);
+    
+    /**
+     * 获取音乐MD5值，为null获取所有md5
+     *
+     * @param md5     音乐的md5值
+     * @param refresh 是否刷新缓存
+     * @return MD5值
+     */
+    Collection<String> getMusicAllMD5(String md5, boolean refresh);
+    
+    default Collection<String> getMusicAllMD5(boolean refresh) {
+        return this.getMusicAllMD5(null, refresh);
+    }
     
     // 上传文件返回地址
     String upload(File srcFile);

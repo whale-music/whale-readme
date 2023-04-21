@@ -14,8 +14,7 @@ import org.oss.service.impl.alist.model.list.ContentItem;
 import org.oss.service.impl.alist.util.RequestUtils;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class AListOSSServiceImpl implements OSSService {
     
@@ -77,15 +76,7 @@ public class AListOSSServiceImpl implements OSSService {
             // 没有地址便刷新缓存,获取所有文件保存到缓存中
             // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
             if ((item == null && refresh) || musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
-                Headers headers = new Headers();
-                headers.put("Authorization", Collections.singletonList(loginCacheStr));
-                for (String s : config.getObjectSave()) {
-                    List<ContentItem> list = RequestUtils.list(config.getHost(), s, headers);
-                    list.parallelStream().forEach(contentItem -> {
-                        contentItem.setPath(s);
-                        musicUrltimedCache.put(contentItem.getName(), contentItem);
-                    });
-                }
+                refreshMusicCache(loginCacheStr);
                 // 更新初始化音乐数量
                 this.initMusicAllCount = musicUrltimedCache.size();
                 item = musicUrltimedCache.get(name);
@@ -102,6 +93,18 @@ public class AListOSSServiceImpl implements OSSService {
             }
         } catch (BaseException e) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+        }
+    }
+    
+    private void refreshMusicCache(String loginCacheStr) {
+        Headers headers = new Headers();
+        headers.put("Authorization", Collections.singletonList(loginCacheStr));
+        for (String s : config.getObjectSave()) {
+            List<ContentItem> list = RequestUtils.list(config.getHost(), s, headers);
+            list.parallelStream().forEach(contentItem -> {
+                contentItem.setPath(s);
+                musicUrltimedCache.put(contentItem.getName(), contentItem);
+            });
         }
     }
     
@@ -157,6 +160,45 @@ public class AListOSSServiceImpl implements OSSService {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
         return upload;
+    }
+    
+    /**
+     * 获取所有音乐下载地址
+     *
+     * @param md5     音乐的md5值
+     * @param refresh 是否刷新缓存
+     * @return 音乐下载地址
+     */
+    @Override
+    public Collection<String> getMusicAllMD5(String md5, boolean refresh) {
+        try {
+            String loginCacheStr = getLoginJwtCache(config);
+            // 音乐地址URL缓存
+            // 没有地址便刷新缓存,获取所有文件保存到缓存中
+            // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+            int size = musicUrltimedCache.size();
+            if (refresh || musicUrltimedCache.isEmpty() || size != initMusicAllCount) {
+                refreshMusicCache(loginCacheStr);
+                // 更新初始化音乐数量
+                this.initMusicAllCount = size;
+            }
+            // 没有找到文件直接抛出异常
+            ArrayList<String> res = new ArrayList<>(size);
+            if (StringUtils.isNotBlank(md5)) {
+                for (ContentItem next : musicUrltimedCache) {
+                    String cs1 = StringUtils.split(next.getName(), ',')[0];
+                    if (StringUtils.equals(cs1, md5)) {
+                        return Collections.singletonList(cs1);
+                    }
+                }
+            }
+            
+            musicUrltimedCache.forEach(contentItem -> res.add(Optional.ofNullable(StringUtils.split(contentItem.getName(), "."))
+                                                                      .orElse(new String[]{""})[0]));
+            return res;
+        } catch (BaseException e) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+        }
     }
     
     @Override

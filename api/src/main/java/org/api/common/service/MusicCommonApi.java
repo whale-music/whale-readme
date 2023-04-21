@@ -11,10 +11,7 @@ import org.oss.factory.OSSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service("MusicCommonApi")
@@ -70,5 +67,13 @@ public class MusicCommonApi {
             }
         }
         return list;
+    }
+    
+    public Collection<String> getMusicMD5(boolean refresh) {
+        return OSSFactory.ossFactory(config).getMusicAllMD5(refresh);
+    }
+    
+    public Collection<String> getMusicMD5(String md5, boolean refresh) {
+        return OSSFactory.ossFactory(config).getMusicAllMD5(md5, refresh);
     }
 }

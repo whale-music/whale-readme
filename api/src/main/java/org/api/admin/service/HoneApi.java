@@ -7,15 +7,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.common.service.MusicCommonApi;
-import org.core.iservice.TbAlbumService;
-import org.core.iservice.TbArtistService;
-import org.core.iservice.TbMusicService;
-import org.core.iservice.TbMusicUrlService;
+import org.core.iservice.*;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.pojo.TbPluginTaskPojo;
-import org.core.service.TbPluginTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

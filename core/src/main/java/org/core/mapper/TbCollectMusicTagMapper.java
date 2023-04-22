@@ -2,7 +2,7 @@ package org.core.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.core.pojo.TbCollectTagPojo;
+import org.core.pojo.TbCollectMusicTagPojo;
 
 /**
  * <p>
@@ -13,6 +13,6 @@ import org.core.pojo.TbCollectTagPojo;
  * @since 2022-12-02
  */
 @Mapper
-public interface TbCollectTagMapper extends BaseMapper<TbCollectTagPojo> {
+public interface TbCollectMusicTagMapper extends BaseMapper<TbCollectMusicTagPojo> {
 
 }

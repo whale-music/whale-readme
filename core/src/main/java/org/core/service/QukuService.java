@@ -1,6 +1,7 @@
 package org.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.core.config.TargetTagConfig;
 import org.core.pojo.*;
 
 import java.util.Collection;
@@ -211,4 +212,46 @@ public interface QukuService {
      * @return 歌词列表
      */
     List<TbLyricPojo> getMusicLyric(Long musicId);
+    
+    /**
+     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param label  标签名
+     */
+    void addLabel(Short target, Long id, String label);
+    
+    /**
+     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 标签ID
+     */
+    void addLabel(Short target, Long id, Long labelId);
+    
+    default void addCollectLabel(Long id, Long labelId) {
+        this.addLabel(TargetTagConfig.TARGET_COLLECT_TAG, id, labelId);
+    }
+    
+    default void addCollectLabel(Long id, String label) {
+        this.addLabel(TargetTagConfig.TARGET_COLLECT_TAG, id, label);
+    }
+    
+    default void addMusicLabel(Long id, String label) {
+        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, label);
+    }
+    
+    default void addMusicLabel(Long id, Long labelId) {
+        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, Long labelId) {
+        this.addLabel(TargetTagConfig.TARGET_GENRE, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, String label) {
+        this.addLabel(TargetTagConfig.TARGET_GENRE, id, label);
+    }
 }

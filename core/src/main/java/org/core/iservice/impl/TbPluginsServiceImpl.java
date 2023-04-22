@@ -1,9 +1,9 @@
-package org.core.service.impl;
+package org.core.iservice.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.core.iservice.TbPluginService;
 import org.core.mapper.TbPluginMapper;
 import org.core.pojo.TbPluginPojo;
-import org.core.service.TbPluginService;
 import org.springframework.stereotype.Service;
 
 /**

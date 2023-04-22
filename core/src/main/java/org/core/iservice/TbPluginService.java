@@ -1,7 +1,7 @@
-package org.core.service;
+package org.core.iservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.core.pojo.TbPluginMsgPojo;
+import org.core.pojo.TbPluginPojo;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import org.core.pojo.TbPluginMsgPojo;
  * @author Sakura
  * @since 2023-03-29
  */
-public interface TbPluginMsgService extends IService<TbPluginMsgPojo> {
+public interface TbPluginService extends IService<TbPluginPojo> {
 
 }

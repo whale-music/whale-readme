@@ -37,7 +37,7 @@ public class CollectApi {
     private TbTagService tagService;
     
     @Autowired
-    private TbCollectTagService collectTagService;
+    private TbCollectMusicTagService collectMusicTagService;
     
     @Autowired
     private TbCollectMusicService collectMusicService;
@@ -112,12 +112,13 @@ public class CollectApi {
      * @param collectId 歌单ID
      * @return 返回中间表tag id列表
      */
-    public List<TbCollectTagPojo> getCollectTagIdList(List<Long> collectId) {
+    public List<TbCollectMusicTagPojo> getCollectTagIdList(List<Long> collectId) {
         if (collectId == null || collectId.isEmpty()) {
             return Collections.emptyList();
         }
-        LambdaQueryWrapper<TbCollectTagPojo> lambdaQueryWrapper = Wrappers.<TbCollectTagPojo>lambdaQuery().in(TbCollectTagPojo::getCollectId, collectId);
-        return collectTagService.list(lambdaQueryWrapper);
+        LambdaQueryWrapper<TbCollectMusicTagPojo> lambdaQueryWrapper = Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
+                                                                               .in(TbCollectMusicTagPojo::getId, collectId);
+        return collectMusicTagService.list(lambdaQueryWrapper);
     }
     
     /**
@@ -156,27 +157,27 @@ public class CollectApi {
         collectPojo.setId(collectId);
         collectPojo.setUserId(userId);
         checkUserAuth(userId, collectPojo);
-        
-        
+    
+    
         // 如果为0则直接不需要保存操作
         if (split.length == 0) {
             return;
         }
-        
+    
         // 先删除歌单的关联tag然后在重新添加
-        LambdaQueryWrapper<TbCollectTagPojo> collectLambdaQueryWrapper = Wrappers.<TbCollectTagPojo>lambdaQuery()
-                                                                                 .eq(TbCollectTagPojo::getCollectId, collectId);
-        collectTagService.remove(collectLambdaQueryWrapper);
-        
+        LambdaQueryWrapper<TbCollectMusicTagPojo> collectLambdaQueryWrapper = Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
+                                                                                      .eq(TbCollectMusicTagPojo::getId, collectId);
+        collectMusicTagService.remove(collectLambdaQueryWrapper);
+    
         // tag为空字符串跳过
         if (split.length == 1 && StringUtils.isBlank(split[0])) {
             return;
         }
-        
+    
         List<String> splitList = Arrays.asList(split);
-        
+    
         // 需要存入的tag list
-        List<TbCollectTagPojo> saveCollectTagPojoList = new ArrayList<>(split.length);
+        List<TbCollectMusicTagPojo> saveCollectTagPojoList = new ArrayList<>(split.length);
         // 用来批量存放tb tag
         List<TbTagPojo> saveTbTagList = new ArrayList<>();
     
@@ -194,15 +195,15 @@ public class CollectApi {
                 tbTagPojo.setTagName(tagName);
                 saveTbTagList.add(tbTagPojo);
                 // 添加到中间表
-                TbCollectTagPojo e = new TbCollectTagPojo();
+                TbCollectMusicTagPojo e = new TbCollectMusicTagPojo();
                 e.setTagId(tbTagPojo.getId());
-                e.setCollectId(collectId);
+                e.setId(collectId);
                 saveCollectTagPojoList.add(e);
             } else {
                 // 已有tag信息, 直接使用tag id
-                TbCollectTagPojo e = new TbCollectTagPojo();
+                TbCollectMusicTagPojo e = new TbCollectMusicTagPojo();
                 e.setTagId(tagPojo.getId());
-                e.setCollectId(collectId);
+                e.setId(collectId);
                 saveCollectTagPojoList.add(e);
             }
         }
@@ -210,7 +211,7 @@ public class CollectApi {
         // 保存tag表
         tagService.saveBatch(saveTbTagList);
         // 保存tag and 歌单中间表
-        collectTagService.saveBatch(saveCollectTagPojoList);
+        collectMusicTagService.saveBatch(saveCollectTagPojoList);
     }
     
     /**

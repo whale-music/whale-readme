@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.TargetTagConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
 import org.core.service.QukuService;
@@ -57,10 +58,13 @@ public class QukuServiceImpl implements QukuService {
     private TbCollectService collectService;
     
     @Autowired
-    private TbCollectTagService collectTagService;
+    private TbCollectMusicTagService collectMusicTagService;
     
     @Autowired
     private TbLyricService lyricService;
+    
+    @Autowired
+    private TbTagService tagService;
     
     /**
      * 获取专辑信息
@@ -497,7 +501,9 @@ public class QukuServiceImpl implements QukuService {
         // 删除歌单ID
         collectService.removeByIds(collectList);
         // 删除歌单关联tag
-        collectTagService.remove(Wrappers.<TbCollectTagPojo>lambdaQuery().in(TbCollectTagPojo::getCollectId, collectList));
+        collectMusicTagService.remove(Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
+                                              .eq(TbCollectMusicTagPojo::getType, TargetTagConfig.TARGET_COLLECT_TAG)
+                                              .in(TbCollectMusicTagPojo::getId, collectList));
     }
     
     /**
@@ -536,5 +542,44 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<TbLyricPojo> getMusicLyric(Long musicId) {
         return lyricService.list(Wrappers.<TbLyricPojo>lambdaQuery().eq(TbLyricPojo::getMusicId, musicId));
+    }
+    
+    /**
+     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param label  标签名
+     */
+    @Override
+    public void addLabel(Short target, Long id, String label) {
+        TbTagPojo tagPojo = tagService.getOne(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, label));
+        Optional<TbTagPojo> pojo = Optional.ofNullable(tagPojo);
+        tagPojo = pojo.orElse(new TbTagPojo());
+        if (pojo.isPresent()) {
+            tagPojo.setTagName(label);
+            tagService.saveOrUpdate(tagPojo);
+        }
+        addLabel(target, id, tagPojo.getId());
+    }
+    
+    /**
+     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 标签ID
+     */
+    @Override
+    public void addLabel(Short target, Long id, Long labelId) {
+        LambdaQueryWrapper<TbCollectMusicTagPojo> eq = Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
+                                                               .eq(TbCollectMusicTagPojo::getType, target)
+                                                               .eq(TbCollectMusicTagPojo::getId, id);
+        TbCollectMusicTagPojo one = collectMusicTagService.getOne(eq);
+        one = Optional.ofNullable(one).orElse(new TbCollectMusicTagPojo());
+        one.setId(id);
+        one.setTagId(labelId);
+        one.setType(target);
+        collectMusicTagService.save(one);
     }
 }

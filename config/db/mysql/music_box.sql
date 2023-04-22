@@ -106,19 +106,36 @@ create table if not exists tb_album_artist
 
 create table if not exists tb_collect
 (
-    id             bigint               not null comment '歌单表ID'
-    primary key,
-    play_list_name varchar(256)         not null comment '歌单名（包括用户喜爱歌单）',
-    pic            varchar(512)         null comment '封面地址',
-    type           tinyint              not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，',
-    subscribed     tinyint(1) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
-    description    varchar(512)         null comment '简介',
-    user_id        bigint               null comment '创建人ID',
+    id
+    bigint
+    not
+    null
+    comment
+    '歌单表ID'
+    primary
+    key,
+    play_list_name
+    varchar
+(
+    256
+) not null comment '歌单名（包括用户喜爱歌单）',
+    pic varchar
+(
+    512
+) null comment '封面地址',
+    type tinyint not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单',
+    subscribed tinyint
+(
+    1
+) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
+    description varchar
+(
+    512
+) null comment '简介',
+    user_id bigint null comment '创建人ID',
     sort           bigint               null comment '排序字段',
     create_time    datetime             null comment '创建时间',
     update_time    datetime             null comment '修改时间',
-    constraint sort
-    unique (sort),
     constraint tb_collect_sys_user_id_fk
     foreign key (user_id) references sys_user (id)
     on update cascade on delete set null
@@ -150,14 +167,45 @@ create table if not exists tb_music
 
 create table if not exists tb_collect_music
 (
-    collect_id bigint not null comment '歌单ID',
-    music_id   bigint not null comment '音乐ID',
-    primary key (collect_id, music_id),
+    collect_id
+    bigint
+    not
+    null
+    comment
+    '歌单ID',
+    music_id
+    bigint
+    not
+    null
+    comment
+    '音乐ID',
+    sort
+    bigint
+    not
+    null
+    comment
+    '添加顺序',
+    primary
+    key
+(
+    collect_id,
+    music_id
+),
     constraint tb_collect_music_tb_collect_id_fk
-    foreign key (collect_id) references tb_collect (id)
-    on update cascade on delete cascade,
+    foreign key
+(
+    collect_id
+) references tb_collect
+(
+    id
+)
+    on update cascade
+    on delete cascade,
     constraint tb_collect_music_tb_music_id_fk
-    foreign key (music_id) references tb_music (id)
+    foreign key
+(
+    music_id
+) references tb_music (id)
     on update cascade on delete cascade
     )
     comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐';

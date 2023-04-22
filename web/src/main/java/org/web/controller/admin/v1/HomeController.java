@@ -6,12 +6,15 @@ import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbMusicPojo;
+import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController(AdminConfig.ADMIN + "HomeController")
 @RequestMapping("/admin/home")
@@ -51,5 +54,11 @@ public class HomeController {
     @GetMapping("/music/statistics")
     public R getMusicStatistics() {
         return R.success(honeApi.getMusicStatistics());
+    }
+    
+    @GetMapping("/music/task")
+    public R getPluginTask(@RequestParam(value = "id", required = false) Long id) {
+        id = Optional.ofNullable(id).orElse(UserUtil.getUser().getId());
+        return R.success(honeApi.getPluginTask(id));
     }
 }

@@ -14,6 +14,8 @@ import org.core.iservice.TbMusicUrlService;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
+import org.core.pojo.TbPluginTaskPojo;
+import org.core.service.TbPluginTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,9 @@ public class HoneApi {
     
     @Autowired
     private TbMusicUrlService musicUrlService;
+    
+    @Autowired
+    private TbPluginTaskService pluginTaskService;
     
     public List<TbMusicPojo> getMusicTop() {
         LambdaQueryWrapper<TbMusicPojo> queryWrapper = Wrappers.<TbMusicPojo>lambdaQuery().orderByDesc(TbMusicPojo::getCreateTime);
@@ -110,7 +115,14 @@ public class HoneApi {
         e2.setValue(musicMD5.size() - discardMusicOriginCount);
         e2.setName("discardMusicOrigin");
         res.add(e2);
-        
+    
         return res;
+    }
+    
+    public List<TbPluginTaskPojo> getPluginTask(Long id) {
+        LambdaQueryWrapper<TbPluginTaskPojo> eq = Wrappers.<TbPluginTaskPojo>lambdaQuery()
+                                                          .eq(TbPluginTaskPojo::getUserId, id);
+        Page<TbPluginTaskPojo> page = pluginTaskService.page(new Page<>(0, 15), eq);
+        return page.getRecords();
     }
 }

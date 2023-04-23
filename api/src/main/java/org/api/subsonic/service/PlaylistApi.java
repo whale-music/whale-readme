@@ -73,46 +73,58 @@ public class PlaylistApi {
         List<TbMusicPojo> playListAllMusic = playListService.getPlayListAllMusic(id);
         
         ArrayList<EntryItem> entry = new ArrayList<>();
+        int duration = 0;
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
             List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(Set.of(musicPojo.getId()));
             e.setId(String.valueOf(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
             TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
             e.setBitRate(tbMusicUrlPojo.getRate());
-            // 流派
-            e.setGenre("");
-            e.setDuration(musicPojo.getTimeLength());
-            e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
-            e.setSuffix(tbMusicUrlPojo.getEncodeType());
-            e.setType("music");
-            e.setContentType("audio/mpeg");
-            
+            e.setDir(false);
+            e.setCoverArt(String.valueOf(musicPojo.getId()));
+            e.setPlayed(musicPojo.getCreateTime().toString());
+    
             TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             e.setAlbum(albumByAlbumId.getAlbumName());
             e.setAlbumId(String.valueOf(albumByAlbumId.getId()));
             e.setParent(String.valueOf(albumByAlbumId.getId()));
-            
+    
+            // 流派
+            e.setGenre("");
+            e.setTrack(0);
+            e.setYear(albumByAlbumId.getPublishTime().getYear());
+            e.setDuration(musicPojo.getTimeLength() / 1000);
+            e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
+            e.setSuffix(tbMusicUrlPojo.getEncodeType());
+            e.setType("music");
+            e.setContentType("audio/mpeg");
+            e.setParent(tbMusicUrlPojo.getUrl());
+            e.setPlayCount(0);
+    
             List<TbArtistPojo> artistByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
             TbArtistPojo artistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
             e.setArtist(artistPojo.getArtistName());
             e.setArtistId(String.valueOf(artistPojo.getId()));
-            
+    
+            e.setVideo(false);
             entry.add(e);
+            duration += e.getDuration();
         }
-        
+    
         TbCollectPojo byId = collectService.getById(id);
         PlayList playlistRes = new PlayList();
+        playlistRes.setId(String.valueOf(byId.getId()));
         playlistRes.setName(byId.getPlayListName());
+        playlistRes.setSongCount(qukuService.getCollectMusicCount(byId.getId()));
+        playlistRes.setDuration(duration / 1000);
         playlistRes.setJsonMemberPublic(true);
+        SysUserPojo byId1 = accountService.getById(byId.getUserId());
+        playlistRes.setOwner(Optional.ofNullable(byId1).orElse(new SysUserPojo()).getUsername());
         playlistRes.setCreated(byId.getCreateTime().toString());
         playlistRes.setChanged(byId.getUpdateTime().toString());
-        SysUserPojo byId1 = accountService.getById(byId.getUserId());
-        playlistRes.setOwner(byId1.getUsername());
-        playlistRes.setSongCount(qukuService.getCollectMusicCount(byId.getId()));
-        playlistRes.setId(String.valueOf(byId.getId()));
-        
+        playlistRes.setCoverArt(byId.getPic());
+    
         playlistRes.setEntry(entry);
         PlaylistRes playlistRes1 = new PlaylistRes();
         playlistRes1.setPlaylist(playlistRes);

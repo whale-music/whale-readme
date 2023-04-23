@@ -37,19 +37,35 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
     /**
      * 用户登录
      *
-     * @param phone    账号
+     * @param username    账号
      * @param password 密码
      * @return 返回用户信息
      */
-    public SysUserPojo login(String phone, String password) {
+    public SysUserPojo login(String username, String password) {
         LambdaQueryWrapper<SysUserPojo> lambdaQuery = new LambdaQueryWrapper<>();
-        lambdaQuery.eq(SysUserPojo::getUsername, phone);
+        lambdaQuery.eq(SysUserPojo::getUsername, username);
         lambdaQuery.eq(SysUserPojo::getPassword, password);
         SysUserPojo one = this.getOne(lambdaQuery);
         if (one == null) {
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
         one.setPassword(null);
+        return one;
+    }
+    
+    
+    /**
+     * 查询用户信息
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    @Override
+    public SysUserPojo getUser(String username) {
+        SysUserPojo one = this.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, username));
+        if (one == null) {
+            throw new BaseException(ResultCode.USER_NOT_EXIST);
+        }
         return one;
     }
 }

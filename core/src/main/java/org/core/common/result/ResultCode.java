@@ -41,7 +41,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     SONG_UPLOADED("20011", "歌曲已上传!"),
     MULTIPLE_SONGS("20012", "数据库中有多个相似歌曲请手动添加!"),
     ALBUM_NOT_EXIST("20013", "专辑已存在!"),
-    ALBUM_ERROR("20014", "专辑专辑错误!"),
+    ALBUM_ERROR("20014", "专辑错误!"),
+    PASSWORD_ERROR("20015", "密码错误!"),
     
     
     /* 业务错误：30001-39999 */
@@ -66,6 +67,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_LOGIN_ERROR("50007", "OSS登录错误"),
     OSS_UPLOAD_ERROR("50008", "OSS上传错误"),
     DOWNLOAD_ERROR("50009", "下载错误"),
+    SERIALIZATION_ERROR("50009","序列化错误"),
     
     
     /* 接口错误：60001-69999 */

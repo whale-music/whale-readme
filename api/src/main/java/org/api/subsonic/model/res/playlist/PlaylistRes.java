@@ -12,5 +12,5 @@ import org.api.subsonic.common.SubsonicResult;
 @NoArgsConstructor
 public class PlaylistRes extends SubsonicResult {
     
-    private Playlist playlist;
+    private PlayList playlist;
 }

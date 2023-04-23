@@ -1,4 +1,4 @@
-package org.api.subsonic.model.res.album.albumlist2;
+package org.api.subsonic.model.res.album;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,9 +8,9 @@ import org.api.subsonic.common.SubsonicResult;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class AlbumRes extends SubsonicResult {
     
-    private AlbumList2 albumList2;
+    private Album album;
 }

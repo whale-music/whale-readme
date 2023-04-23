@@ -29,7 +29,7 @@ public class PlaylistController {
     @GetMapping("/getPlaylist.view")
     @ManualSerialize
     public Object getPlaylist(SubsonicCommonReq req,@RequestParam("id") Long id) {
-        PlaylistRes playlists = playlistApi.getPlaylist(req, id);
+        PlaylistRes playlists = playlistApi.getPlaylist(id);
         return playlists.success();
     }
 }

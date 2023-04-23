@@ -54,9 +54,17 @@ public interface QukuService {
     List<TbArtistPojo> getArtistByMusicId(Long musicId);
     
     /**
-     * 批量获取歌曲下载地址
+     * 查询数据歌曲下载地址
      */
     List<TbMusicUrlPojo> getMusicUrl(Set<Long> musicId);
+    
+    /**
+     * 查询数据歌曲下载地址
+     * key music value url
+     *
+     * @param musicId 音乐ID
+     */
+    Map<Long, List<TbMusicUrlPojo>> getMusicMapUrl(Collection<Long> musicId);
     
     /**
      * 随即获取曲库中的一条数据
@@ -94,6 +102,16 @@ public interface QukuService {
      * 获取专辑歌手列表
      */
     List<TbArtistPojo> getArtistListByAlbumIds(List<Long> albumIds);
+    
+    /**
+     * 获取专辑歌手列表
+     * Map
+     * key to Album ID
+     * value to Artist List
+     *
+     * @param albumIds 专辑ID
+     */
+    Map<Long, List<TbArtistPojo>> getArtistMapByAlbumIds(Collection<Long> albumIds);
     
     /**
      * 通过歌手ID获取专辑列表

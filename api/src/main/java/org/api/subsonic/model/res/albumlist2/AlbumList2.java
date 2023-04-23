@@ -1,5 +1,6 @@
-package org.api.subsonic.model.res.album.albumlist2;
+package org.api.subsonic.model.res.albumlist2;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class AlbumList2 {
     
-    private List<Album> album;
+    @JsonProperty("album")
+    private List<AlbumItem> album;
 }

@@ -1,5 +1,6 @@
 package org.api.subsonic.model.res.playlist;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,79 +10,104 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EntryItem {
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String parent;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String artist;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer year;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String album;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String created;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String albumId;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Boolean isVideo;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String artistId;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String coverArt;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String title;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String suffix;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String type;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String played;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer duration;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String path;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer playCount;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer size;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer bitRate;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String genre;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String id;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer track;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String contentType;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Boolean isDir;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private Integer userRating;
-    
-    @JacksonXmlProperty(isAttribute = true)
-    private String starred;
+	
+	@JsonProperty("parent")
+	@JacksonXmlProperty(isAttribute = true)
+	private String parent;
+	
+	@JsonProperty("artist")
+	@JacksonXmlProperty(isAttribute = true)
+	private String artist;
+	
+	@JsonProperty("year")
+	@JacksonXmlProperty(isAttribute = true)
+	private int year;
+	
+	@JsonProperty("album")
+	@JacksonXmlProperty(isAttribute = true)
+	private String album;
+	
+	@JsonProperty("created")
+	@JacksonXmlProperty(isAttribute = true)
+	private String created;
+	
+	@JsonProperty("albumId")
+	@JacksonXmlProperty(isAttribute = true)
+	private String albumId;
+	
+	@JsonProperty("isVideo")
+	@JacksonXmlProperty(isAttribute = true)
+	private boolean isVideo;
+	
+	@JsonProperty("artistId")
+	@JacksonXmlProperty(isAttribute = true)
+	private String artistId;
+	
+	@JsonProperty("coverArt")
+	@JacksonXmlProperty(isAttribute = true)
+	private String coverArt;
+	
+	@JsonProperty("title")
+	@JacksonXmlProperty(isAttribute = true)
+	private String title;
+	
+	@JsonProperty("suffix")
+	@JacksonXmlProperty(isAttribute = true)
+	private String suffix;
+	
+	@JsonProperty("type")
+	@JacksonXmlProperty(isAttribute = true)
+	private String type;
+	
+	@JsonProperty("played")
+	@JacksonXmlProperty(isAttribute = true)
+	private String played;
+	
+	@JsonProperty("duration")
+	@JacksonXmlProperty(isAttribute = true)
+	private int duration;
+	
+	@JsonProperty("path")
+	@JacksonXmlProperty(isAttribute = true)
+	private String path;
+	
+	@JsonProperty("playCount")
+	@JacksonXmlProperty(isAttribute = true)
+	private int playCount;
+	
+	@JsonProperty("size")
+	@JacksonXmlProperty(isAttribute = true)
+	private int size;
+	
+	@JsonProperty("bitRate")
+	@JacksonXmlProperty(isAttribute = true)
+	private int bitRate;
+	
+	@JsonProperty("genre")
+	@JacksonXmlProperty(isAttribute = true)
+	private String genre;
+	
+	@JsonProperty("id")
+	@JacksonXmlProperty(isAttribute = true)
+	private String id;
+	
+	@JsonProperty("track")
+	@JacksonXmlProperty(isAttribute = true)
+	private int track;
+	
+	@JsonProperty("contentType")
+	@JacksonXmlProperty(isAttribute = true)
+	private String contentType;
+	
+	@JsonProperty("isDir")
+	@JacksonXmlProperty(isAttribute = true)
+	private boolean isDir;
+	
+	@JsonProperty("userRating")
+	@JacksonXmlProperty(isAttribute = true)
+	private int userRating;
+	
+	@JsonProperty("starred")
+	@JacksonXmlProperty(isAttribute = true)
+	private String starred;
 }

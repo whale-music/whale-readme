@@ -8,9 +8,10 @@ import org.api.admin.config.PlayListTypeConfig;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.playlist.EntryItem;
-import org.api.subsonic.model.res.playlist.Playlist;
+import org.api.subsonic.model.res.playlist.PlayList;
 import org.api.subsonic.model.res.playlist.PlaylistRes;
-import org.api.subsonic.model.res.playlists.Playlists;
+import org.api.subsonic.model.res.playlists.PlayLists;
+import org.api.subsonic.model.res.playlists.PlaylistItem;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
 import org.core.iservice.TbCollectService;
 import org.core.pojo.*;
@@ -42,10 +43,10 @@ public class PlaylistApi {
         SysUserPojo user = accountService.getUser(username);
         List<TbCollectPojo> userPlayList = qukuService.getUserPlayList(user.getId(),
                 Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
-        
-        ArrayList<org.api.subsonic.model.res.playlists.Playlist> playlist = new ArrayList<>();
+    
+        List<PlaylistItem> playlist = new ArrayList<>();
         for (TbCollectPojo collectPojo : userPlayList) {
-            org.api.subsonic.model.res.playlists.Playlist e = new org.api.subsonic.model.res.playlists.Playlist();
+            PlaylistItem e = new PlaylistItem();
             e.setId(String.valueOf(collectPojo.getId()));
             e.setName(collectPojo.getPlayListName());
             e.setChanged(LocalDateTimeUtil.format(collectPojo.getUpdateTime(), DatePattern.NORM_DATETIME_FORMATTER));
@@ -55,7 +56,7 @@ public class PlaylistApi {
             e.setOwner(user.getUsername());
             playlist.add(e);
         }
-        Playlists playlists = new Playlists();
+        PlayLists playlists = new PlayLists();
         playlists.setPlaylist(playlist);
         PlaylistsRes playlistRes = new PlaylistsRes();
         playlistRes.setPlaylists(playlists);
@@ -64,13 +65,13 @@ public class PlaylistApi {
     
     /**
      * 获取歌单数据
-     * @param req 访问用户信息
+     *
      * @param id 歌单ID
      * @return 返回歌单信息
      */
-    public PlaylistRes getPlaylist(SubsonicCommonReq req, Long id) {
+    public PlaylistRes getPlaylist(Long id) {
         List<TbMusicPojo> playListAllMusic = playListService.getPlayListAllMusic(id);
-    
+        
         ArrayList<EntryItem> entry = new ArrayList<>();
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
@@ -100,11 +101,11 @@ public class PlaylistApi {
             
             entry.add(e);
         }
-    
+        
         TbCollectPojo byId = collectService.getById(id);
-        Playlist playlistRes = new Playlist();
+        PlayList playlistRes = new PlayList();
         playlistRes.setName(byId.getPlayListName());
-        playlistRes.setPublicStr(true);
+        playlistRes.setJsonMemberPublic(true);
         playlistRes.setCreated(byId.getCreateTime().toString());
         playlistRes.setChanged(byId.getUpdateTime().toString());
         SysUserPojo byId1 = accountService.getById(byId.getUserId());

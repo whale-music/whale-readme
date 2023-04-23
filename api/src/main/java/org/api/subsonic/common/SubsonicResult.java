@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @JsonRootName("subsonic-response")
 public class SubsonicResult {
     
-    @JacksonXmlProperty(isAttribute = true)
-    private String xmlns = "http://subsonic.org/restapi";
+    // @JacksonXmlProperty(isAttribute = true)
+    // private String xmlns = "http://subsonic.org/restapi";
     
     @JacksonXmlProperty(isAttribute = true)
     private String status = "ok";
@@ -30,12 +30,12 @@ public class SubsonicResult {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Error error;
     
-    public  SubsonicResult success() {
+    public SubsonicResult success() {
         this.status = "ok";
         return this;
     }
     
-    public  SubsonicResult error(ErrorEnum error) {
+    public SubsonicResult error(ErrorEnum error) {
         this.status = "failed";
         this.error = error.error();
         return this;

@@ -1,4 +1,4 @@
-package org.api.subsonic.model.res;
+package org.api.subsonic.model.res.license;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;

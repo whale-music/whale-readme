@@ -5,7 +5,8 @@ import org.api.subsonic.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
-import org.api.subsonic.model.res.LicenseRes;
+import org.api.subsonic.model.res.license.LicenseRes;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController(SubsonicConfig.SUBSONIC + "AlbumController")
 @RequestMapping("/rest")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class SystemController {
     
     @GetMapping(value = "/ping.view")

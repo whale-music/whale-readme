@@ -1,0 +1,26 @@
+package org.web.controller.subsonic.v1;
+
+import lombok.extern.slf4j.Slf4j;
+import org.api.subsonic.common.SubsonicCommonReq;
+import org.api.subsonic.config.SubsonicConfig;
+import org.api.subsonic.service.MediaRetrievalApi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
+
+@RestController(SubsonicConfig.SUBSONIC + "MediaRetrievalController")
+@RequestMapping("/rest")
+@Slf4j
+@CrossOrigin(origins = "*")
+public class MediaRetrievalController {
+    
+    @Autowired
+    private MediaRetrievalApi mediaRetrievalApi;
+    
+    @GetMapping("/getCoverArt.view")
+    // @ManualSerialize
+    public RedirectView getCoverArt(SubsonicCommonReq req, @RequestParam(value = "id") String id) {
+        String picUrl = mediaRetrievalApi.getCoverArt(req, id);
+        return new RedirectView(picUrl);
+    }
+}

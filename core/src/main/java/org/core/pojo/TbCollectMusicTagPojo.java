@@ -23,13 +23,13 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Accessors(chain = true)
-@TableName("tb_collect_music_tag")
+@TableName("tb_middle_tag")
 @ApiModel(value = "TbCollectTagPojo对象", description = "歌单风格中间表")
 public class TbCollectMusicTagPojo implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    @ApiModelProperty("中间ID, 包括歌曲，歌单")
+    @ApiModelProperty("中间ID, 包括歌曲，歌单，专辑")
     @TableId(value = "id", type = IdType.NONE)
     private Long id;
     

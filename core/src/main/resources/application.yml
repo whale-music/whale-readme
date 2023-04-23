@@ -15,11 +15,17 @@ logging:
     org.oss: debug
     org.web: debug
   pattern:
-    # 时间；日志级别；类；方法；行(行不能使用圆括号)
-    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %C.%M[%line] - %msg%n"
+    # 控制输出的格式
+    #格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} %clr(%5p) %clr(%C.%M[%line]){cyan} [%thread] %msg%n"
+    # 文件输出的格式
+    file: "[file]===%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger - %msg%n"
 
 #spring
 spring:
+  output:
+    ansi:
+      enabled: always
   datasource:
     #引用项目中的数据库文件
     driver-class-name: com.mysql.cj.jdbc.Driver

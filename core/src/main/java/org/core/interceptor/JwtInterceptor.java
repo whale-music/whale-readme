@@ -8,6 +8,7 @@ import org.core.config.CookieConfig;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
+import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -19,7 +20,7 @@ import java.util.Arrays;
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         log.debug("请求路径: {}", request.getServletPath());
         log.debug("请求参数: {}", request.getQueryString());
         log.debug("请求信息: {}", request.getPathInfo());
@@ -73,8 +74,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             JwtUtil.checkSign(token);
         } catch (JWTVerificationException e) {
-            // response.setHeader("content-type", "application/json; charset=utf-8");
-            // response.getWriter().println(R.error(ResultCode.COOKIE_INVALID.getCode(), ResultCode.COOKIE_INVALID.getResultMsg()));
             log.warn("Cookie失效");
             return true;
         }

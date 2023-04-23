@@ -18,9 +18,14 @@ public class MediaRetrievalController {
     private MediaRetrievalApi mediaRetrievalApi;
     
     @GetMapping("/getCoverArt.view")
-    // @ManualSerialize
-    public RedirectView getCoverArt(SubsonicCommonReq req, @RequestParam(value = "id") String id) {
+    public RedirectView getCoverArt(SubsonicCommonReq req, @RequestParam(value = "id") Long id) {
         String picUrl = mediaRetrievalApi.getCoverArt(req, id);
         return new RedirectView(picUrl);
+    }
+    
+    @GetMapping("/stream.view")
+    public RedirectView stream(SubsonicCommonReq req, @RequestParam(value = "id") Long id) {
+        String musicUrl = mediaRetrievalApi.stream(req, id);
+        return new RedirectView(musicUrl);
     }
 }

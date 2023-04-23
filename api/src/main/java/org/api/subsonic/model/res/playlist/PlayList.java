@@ -15,7 +15,7 @@ public class PlayList {
 	
 	@JsonProperty("duration")
 	@JacksonXmlProperty(isAttribute = true)
-	private int duration;
+	private Integer duration;
 	
 	@JsonProperty("owner")
 	@JacksonXmlProperty(isAttribute = true)
@@ -27,7 +27,7 @@ public class PlayList {
 	
 	@JsonProperty("public")
 	@JacksonXmlProperty(isAttribute = true)
-	private boolean jsonMemberPublic;
+	private Boolean jsonMemberPublic;
 	
 	@JsonProperty("created")
 	@JacksonXmlProperty(isAttribute = true)
@@ -47,7 +47,7 @@ public class PlayList {
 	
 	@JsonProperty("songCount")
 	@JacksonXmlProperty(isAttribute = true)
-	private int songCount;
+	private Integer songCount;
 	
 	@JsonProperty("changed")
 	@JacksonXmlProperty(isAttribute = true)

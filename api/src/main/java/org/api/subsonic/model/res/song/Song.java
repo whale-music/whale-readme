@@ -1,4 +1,4 @@
-package org.api.subsonic.model.res.playlist;
+package org.api.subsonic.model.res.song;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EntryItem {
+public class Song {
 	
 	@JsonProperty("parent")
 	@JacksonXmlProperty(isAttribute = true)
@@ -37,7 +37,7 @@ public class EntryItem {
 	
 	@JsonProperty("isVideo")
 	@JacksonXmlProperty(isAttribute = true)
-	private boolean isVideo;
+	private Boolean isVideo;
 	
 	@JsonProperty("artistId")
 	@JacksonXmlProperty(isAttribute = true)
@@ -63,9 +63,13 @@ public class EntryItem {
 	@JacksonXmlProperty(isAttribute = true)
 	private String played;
 	
+	@JsonProperty("userRating")
+	@JacksonXmlProperty(isAttribute = true)
+	private Integer userRating;
+	
 	@JsonProperty("duration")
 	@JacksonXmlProperty(isAttribute = true)
-	private int duration;
+	private Integer duration;
 	
 	@JsonProperty("path")
 	@JacksonXmlProperty(isAttribute = true)
@@ -79,13 +83,13 @@ public class EntryItem {
 	@JacksonXmlProperty(isAttribute = true)
 	private Integer size;
 	
+	@JsonProperty("starred")
+	@JacksonXmlProperty(isAttribute = true)
+	private String starred;
+	
 	@JsonProperty("bitRate")
 	@JacksonXmlProperty(isAttribute = true)
 	private Integer bitRate;
-	
-	@JsonProperty("genre")
-	@JacksonXmlProperty(isAttribute = true)
-	private String genre;
 	
 	@JsonProperty("id")
 	@JacksonXmlProperty(isAttribute = true)
@@ -102,12 +106,4 @@ public class EntryItem {
 	@JsonProperty("isDir")
 	@JacksonXmlProperty(isAttribute = true)
 	private Boolean isDir;
-	
-	@JsonProperty("userRating")
-	@JacksonXmlProperty(isAttribute = true)
-	private Integer userRating;
-	
-	@JsonProperty("starred")
-	@JacksonXmlProperty(isAttribute = true)
-	private String starred;
 }

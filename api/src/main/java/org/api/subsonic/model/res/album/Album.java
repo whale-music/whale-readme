@@ -23,7 +23,7 @@ public class Album {
     
     @JsonProperty("year")
     @JacksonXmlProperty(isAttribute = true)
-    private int year;
+    private Integer year;
     
     @JsonProperty("created")
     @JacksonXmlProperty(isAttribute = true)
@@ -43,15 +43,15 @@ public class Album {
     
     @JsonProperty("songCount")
     @JacksonXmlProperty(isAttribute = true)
-    private int songCount;
+    private Integer songCount;
     
     @JsonProperty("duration")
     @JacksonXmlProperty(isAttribute = true)
-    private int duration;
+    private Integer duration;
     
     @JsonProperty("playCount")
     @JacksonXmlProperty(isAttribute = true)
-    private int playCount;
+    private Integer playCount;
     
     @JsonProperty("starred")
     @JacksonXmlProperty(isAttribute = true)

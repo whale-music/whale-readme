@@ -6,7 +6,10 @@ import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.album.Album;
 import org.api.subsonic.model.res.album.AlbumRes;
 import org.api.subsonic.model.res.album.SongItem;
+import org.api.subsonic.model.res.song.Song;
+import org.api.subsonic.model.res.song.SongRes;
 import org.core.iservice.TbAlbumService;
+import org.core.iservice.TbMusicService;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
@@ -15,10 +18,7 @@ import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +30,9 @@ public class BrowsingApi {
     
     @Autowired
     private TbAlbumService albumService;
+    
+    @Autowired
+    private TbMusicService musicService;
     
     
     public AlbumRes getAlbum(Long id) {
@@ -61,7 +64,7 @@ public class BrowsingApi {
             SongItem e = new SongItem();
             e.setId(String.valueOf(musicPojo.getId()));
             e.setParent(String.valueOf(albumPojo.getId()));
-            e.setDir(false);
+            e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
             e.setAlbum(albumPojo.getAlbumName());
             e.setAlbumId(String.valueOf(albumPojo.getId()));
@@ -69,7 +72,7 @@ public class BrowsingApi {
             e.setArtistId(String.valueOf(tbArtistPojo.getId()));
             e.setTrack(1);
             e.setYear(albumPojo.getPublishTime().getYear());
-            e.setCoverArt(musicPojo.getPic());
+            e.setCoverArt(String.valueOf(musicPojo.getId()));
             List<TbMusicUrlPojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
@@ -82,7 +85,7 @@ public class BrowsingApi {
             e.setPlayCount(0);
             e.setPlayed(musicPojo.getCreateTime().toString());
             e.setType("music");
-            e.setVideo(false);
+            e.setIsVideo(false);
             e.setCreated(albumPojo.getPublishTime().toString());
             song.add(e);
             duration += musicPojo.getTimeLength();
@@ -94,5 +97,41 @@ public class BrowsingApi {
         AlbumRes albumRes = new AlbumRes();
         albumRes.setAlbum(album);
         return albumRes;
+    }
+    
+    public SongRes getSong(Long id) {
+        TbMusicPojo musicPojo = musicService.getById(id);
+        TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
+        List<TbArtistPojo> artistByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
+        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(Set.of(musicPojo.getId()));
+        TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
+        TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
+        Song song = new Song();
+        song.setId(String.valueOf(musicPojo.getId()));
+        song.setIsDir(false);
+        song.setTitle(musicPojo.getMusicName());
+        song.setAlbum(albumByAlbumId.getAlbumName());
+        song.setArtist(tbArtistPojo.getArtistName());
+        song.setArtistId(String.valueOf(tbArtistPojo.getId()));
+        song.setTrack(0);
+        song.setYear(albumByAlbumId.getPublishTime().getYear());
+        song.setCoverArt(String.valueOf(musicPojo.getId()));
+        song.setSize(Math.toIntExact((tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize())));
+        song.setContentType("audio/mpeg");
+        song.setSuffix(tbMusicUrlPojo.getEncodeType());
+        song.setStarred(musicPojo.getUpdateTime().toString());
+        song.setDuration(musicPojo.getTimeLength() / 1000);
+        song.setBitRate(tbMusicUrlPojo.getRate());
+        song.setPath(tbMusicUrlPojo.getUrl());
+        song.setPlayCount(0);
+        song.setPlayed(musicPojo.getUpdateTime().toString());
+        song.setCreated(musicPojo.getCreateTime().toString());
+        song.setType("music");
+        song.setUserRating(1);
+        song.setIsVideo(false);
+        
+        SongRes songRes = new SongRes();
+        songRes.setSong(song);
+        return songRes;
     }
 }

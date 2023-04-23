@@ -5,6 +5,7 @@ import org.api.subsonic.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.album.AlbumRes;
+import org.api.subsonic.model.res.song.SongRes;
 import org.api.subsonic.service.BrowsingApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,4 +26,10 @@ public class BrowsingController {
         return res.success();
     }
     
+    @GetMapping("/getSong.view")
+    @ManualSerialize
+    public Object getSong(SubsonicCommonReq req, @RequestParam("id") Long id) {
+        SongRes res = browsingApi.getSong(id);
+        return res.success();
+    }
 }

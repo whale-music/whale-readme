@@ -21,6 +21,7 @@ import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service(SubsonicConfig.SUBSONIC + "PlaylistApi")
@@ -80,8 +81,8 @@ public class PlaylistApi {
             e.setId(String.valueOf(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
             TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
-            e.setBitRate(tbMusicUrlPojo.getRate());
-            e.setDir(false);
+            e.setBitRate(tbMusicUrlPojo.getRate() == null ? 0 : tbMusicUrlPojo.getRate());
+            e.setIsDir(false);
             e.setCoverArt(String.valueOf(musicPojo.getId()));
             e.setPlayed(musicPojo.getCreateTime().toString());
     
@@ -93,7 +94,8 @@ public class PlaylistApi {
             // 流派
             e.setGenre("");
             e.setTrack(0);
-            e.setYear(albumByAlbumId.getPublishTime().getYear());
+            LocalDateTime publishTime = albumByAlbumId.getPublishTime();
+            e.setYear(publishTime == null ? null : publishTime.getYear());
             e.setDuration(musicPojo.getTimeLength() / 1000);
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
@@ -123,7 +125,7 @@ public class PlaylistApi {
         playlistRes.setOwner(Optional.ofNullable(byId1).orElse(new SysUserPojo()).getUsername());
         playlistRes.setCreated(byId.getCreateTime().toString());
         playlistRes.setChanged(byId.getUpdateTime().toString());
-        playlistRes.setCoverArt(byId.getPic());
+        playlistRes.setCoverArt(String.valueOf(byId.getId()));
     
         playlistRes.setEntry(entry);
         PlaylistRes playlistRes1 = new PlaylistRes();

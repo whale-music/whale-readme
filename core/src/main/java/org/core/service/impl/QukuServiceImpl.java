@@ -199,7 +199,7 @@ public class QukuServiceImpl implements QukuService {
         LambdaQueryWrapper<TbMusicUrlPojo> in = Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicId);
         List<TbMusicUrlPojo> list = musicUrlService.list(in);
         return list.parallelStream()
-                   .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId, Arrays::asList, (objects, objects2) -> {
+                   .collect(Collectors.toConcurrentMap(TbMusicUrlPojo::getMusicId, ListUtil::toList, (objects, objects2) -> {
                        objects2.addAll(objects);
                        return objects2;
                    }));

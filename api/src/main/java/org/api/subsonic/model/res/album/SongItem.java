@@ -21,7 +21,7 @@ public class SongItem {
     
     @JsonProperty("year")
     @JacksonXmlProperty(isAttribute = true)
-    private int year;
+    private Integer year;
     
     @JsonProperty("album")
     @JacksonXmlProperty(isAttribute = true)
@@ -37,7 +37,7 @@ public class SongItem {
     
     @JsonProperty("isVideo")
     @JacksonXmlProperty(isAttribute = true)
-    private boolean isVideo;
+    private Boolean isVideo;
     
     @JsonProperty("artistId")
     @JacksonXmlProperty(isAttribute = true)
@@ -65,7 +65,7 @@ public class SongItem {
     
     @JsonProperty("duration")
     @JacksonXmlProperty(isAttribute = true)
-    private int duration;
+    private Integer duration;
     
     @JsonProperty("path")
     @JacksonXmlProperty(isAttribute = true)
@@ -73,15 +73,15 @@ public class SongItem {
     
     @JsonProperty("playCount")
     @JacksonXmlProperty(isAttribute = true)
-    private int playCount;
+    private Integer playCount;
     
     @JsonProperty("size")
     @JacksonXmlProperty(isAttribute = true)
-    private int size;
+    private Integer size;
     
     @JsonProperty("bitRate")
     @JacksonXmlProperty(isAttribute = true)
-    private int bitRate;
+    private Integer bitRate;
     
     @JsonProperty("genre")
     @JacksonXmlProperty(isAttribute = true)
@@ -93,7 +93,7 @@ public class SongItem {
     
     @JsonProperty("track")
     @JacksonXmlProperty(isAttribute = true)
-    private int track;
+    private Integer track;
     
     @JsonProperty("contentType")
     @JacksonXmlProperty(isAttribute = true)
@@ -101,7 +101,7 @@ public class SongItem {
     
     @JsonProperty("isDir")
     @JacksonXmlProperty(isAttribute = true)
-    private boolean isDir;
+    private Boolean isDir;
     
     @JsonProperty("starred")
     @JacksonXmlProperty(isAttribute = true)
@@ -109,5 +109,5 @@ public class SongItem {
     
     @JsonProperty("userRating")
     @JacksonXmlProperty(isAttribute = true)
-    private int userRating;
+    private Integer userRating;
 }

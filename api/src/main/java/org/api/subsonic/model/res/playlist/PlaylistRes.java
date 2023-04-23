@@ -1,4 +1,4 @@
-package org.api.subsonic.model.res.playlists;
+package org.api.subsonic.model.res.playlist;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +11,6 @@ import org.api.subsonic.common.SubsonicResult;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PlaylistRes extends SubsonicResult {
-    private Playlists playlists;
+    
+    private Playlist playlist;
 }

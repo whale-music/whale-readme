@@ -60,7 +60,7 @@ public class MusicCommonApi {
             } catch (BaseException e) {
                 if (Objects.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                     tbMusicUrlPojo.setUrl("");
-                    log.error("获取下载地址出错: {}", e.getMessage());
+                    log.warn("获取下载地址出错: {}", e.getMessage());
                     continue;
                 }
                 throw new BaseException(e.getErrorCode(), e.getErrorCode());

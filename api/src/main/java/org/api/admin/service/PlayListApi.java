@@ -104,7 +104,7 @@ public class PlayListApi {
         if (CollUtil.isEmpty(playListMusicResPage.getRecords())) {
             return new Page<>();
         }
-        List<Long> musicIds = playListMusicResPage.getRecords().stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        List<Long> musicIds = playListMusicResPage.getRecords().stream().map(TbCollectMusicPojo::getMusicId).toList();
         
         LambdaQueryWrapper<TbMusicPojo> like = Wrappers.<TbMusicPojo>lambdaQuery()
                                                        .in(CollUtil.isNotEmpty(musicIds), TbMusicPojo::getId, musicIds)
@@ -149,7 +149,7 @@ public class PlayListApi {
         List<Long> musicIdList = new LinkedList<>();
         
         // 查询歌手表
-        musicIdList.addAll(getMusicIDBySingerName(req));
+        musicIdList.addAll(getMusicIDByArtistName(req));
         // 查询专辑表
         musicIdList.addAll(getMusicIDByAlbumName(req));
         // 查询歌曲名
@@ -163,7 +163,7 @@ public class PlayListApi {
     
     
         // 专辑信息
-        List<Long> albumIds = page.getRecords().stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toList());
+        List<Long> albumIds = page.getRecords().stream().map(TbMusicPojo::getAlbumId).toList();
         Map<Long, TbAlbumPojo> albumMap = new HashMap<>();
         if (CollUtil.isNotEmpty(albumIds)) {
             albumMap = albumService.listByIds(albumIds)
@@ -246,37 +246,37 @@ public class PlayListApi {
      * @return 歌曲ID
      */
     private List<Long> getMusicIdByMusicName(MusicPageReq req) {
-        if (StringUtils.isNotBlank(req.getMusicName()) || CollUtil.isNotEmpty(req.getMusicIds())) {
-            List<TbMusicPojo> list = new ArrayList<>();
-            // 音乐名
-            list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
-                                                  .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
-                                                  .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())));
-            // 别名
-            list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
-                                                  .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
-                                                  .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getAliasName, req.getMusicName())));
-    
-            return list.stream().map(TbMusicPojo::getId).distinct().collect(Collectors.toList());
+        if (StringUtils.isBlank(req.getMusicName()) && CollUtil.isEmpty(req.getMusicIds())) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        List<TbMusicPojo> list = new ArrayList<>();
+        // 音乐名
+        list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
+                                              .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
+                                              .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())));
+        // 别名
+        list.addAll(musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
+                                              .in(CollUtil.isNotEmpty(req.getMusicIds()), TbMusicPojo::getId, req.getMusicIds())
+                                              .like(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getAliasName, req.getMusicName())));
+    
+        return list.stream().map(TbMusicPojo::getId).distinct().toList();
     }
     
     private List<Long> getMusicIDByAlbumName(MusicPageReq req) {
-        if (StringUtils.isNotBlank(req.getAlbumName())) {
-            // 获取专辑ID
-            LambdaQueryWrapper<TbAlbumPojo> like = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                           .like(TbAlbumPojo::getAlbumName, req.getAlbumName())
-                                                           .like(TbAlbumPojo::getAlbumName, req.getAlbumName());
-            List<TbAlbumPojo> albumList = albumService.list(like);
-            List<Long> collect = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
-            
-            // 获取歌曲ID
-            List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
-                                                               .in(CollUtil.isNotEmpty(collect), TbMusicPojo::getAlbumId, collect));
-            return list.stream().map(TbMusicPojo::getId).collect(Collectors.toList());
+        if (StringUtils.isBlank(req.getAlbumName())) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        // 获取专辑ID
+        LambdaQueryWrapper<TbAlbumPojo> like = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                       .like(TbAlbumPojo::getAlbumName, req.getAlbumName())
+                                                       .like(TbAlbumPojo::getAlbumName, req.getAlbumName());
+        List<TbAlbumPojo> albumList = albumService.list(like);
+        List<Long> collect = albumList.stream().map(TbAlbumPojo::getId).toList();
+    
+        // 获取歌曲ID
+        List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
+                                                           .in(CollUtil.isNotEmpty(collect), TbMusicPojo::getAlbumId, collect));
+        return list.stream().map(TbMusicPojo::getId).toList();
     }
     
     /**
@@ -284,12 +284,12 @@ public class PlayListApi {
      *
      * @return 歌曲ID
      */
-    private List<Long> getMusicIDBySingerName(MusicPageReq req) {
-        List<TbMusicPojo> musicListBySingerName = qukuService.getMusicListByArtistName(req.getSingerName());
+    private List<Long> getMusicIDByArtistName(MusicPageReq req) {
+        List<TbMusicPojo> musicListBySingerName = qukuService.getMusicListByArtistName(req.getArtistName());
         if (CollUtil.isEmpty(musicListBySingerName)) {
-            return musicListBySingerName.stream().map(TbMusicPojo::getId).collect(Collectors.toList());
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        return musicListBySingerName.stream().map(TbMusicPojo::getId).toList();
     }
     
     /**

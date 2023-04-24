@@ -21,7 +21,7 @@ public class MusicPageReq implements Serializable {
     private String musicName;
     
     @ApiModelProperty("歌手")
-    private String singerName;
+    private String artistName;
     
     @ApiModelProperty("专辑")
     private String albumName;

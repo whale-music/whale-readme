@@ -399,7 +399,7 @@ public class QukuServiceImpl implements QukuService {
             List<TbArtistPojo> singerList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, name));
             List<Long> singerIdsList = singerList.stream().map(TbArtistPojo::getId).collect(Collectors.toList());
             List<TbAlbumArtistPojo> albumIds = albumArtistService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                               .eq(TbAlbumArtistPojo::getArtistId, singerIdsList));
+                                                                               .in(TbAlbumArtistPojo::getArtistId, singerIdsList));
             if (IterUtil.isNotEmpty(albumIds)) {
                 return getMusicListByAlbumId(albumIds.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toSet()));
             }

@@ -398,6 +398,9 @@ public class QukuServiceImpl implements QukuService {
         if (StringUtils.isNotBlank(name)) {
             List<TbArtistPojo> singerList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, name));
             List<Long> singerIdsList = singerList.stream().map(TbArtistPojo::getId).collect(Collectors.toList());
+            if (CollUtil.isEmpty(singerList)) {
+                return Collections.emptyList();
+            }
             List<TbAlbumArtistPojo> albumIds = albumArtistService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
                                                                                .in(TbAlbumArtistPojo::getArtistId, singerIdsList));
             if (IterUtil.isNotEmpty(albumIds)) {

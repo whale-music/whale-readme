@@ -77,7 +77,7 @@ public class PlaylistApi {
         int duration = 0;
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
-            List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(Set.of(musicPojo.getId()));
+            List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(CollUtil.newHashSet(musicPojo.getId()));
             e.setId(String.valueOf(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
             TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);

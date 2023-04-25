@@ -19,6 +19,7 @@ import org.oss.service.impl.alist.model.list.MusicListRes;
 import org.oss.service.impl.alist.model.login.req.LoginReq;
 import org.oss.service.impl.alist.model.login.res.DataRes;
 import org.oss.service.impl.alist.model.login.res.LoginRes;
+import org.springframework.cglib.beans.BeanMap;
 
 import java.io.File;
 import java.util.HashMap;
@@ -118,7 +119,7 @@ public class RequestUtils {
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
         
         String resJson = req(host + "/api/fs/form", srcFile, headers);
-        Map<String, String> map = JSON.parseObject(resJson, Map.class);
+        BeanMap map = BeanMap.create(resJson);
         if (!StringUtils.equals(String.valueOf(map.get("code")), String.valueOf(200))) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }

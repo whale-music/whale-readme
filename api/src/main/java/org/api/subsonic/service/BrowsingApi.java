@@ -103,7 +103,7 @@ public class BrowsingApi {
         TbMusicPojo musicPojo = musicService.getById(id);
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
         List<TbArtistPojo> artistByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
-        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(Set.of(musicPojo.getId()));
+        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(CollUtil.newHashSet(musicPojo.getId()));
         TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
         TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
         Song song = new Song();

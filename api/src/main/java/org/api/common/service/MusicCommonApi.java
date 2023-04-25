@@ -33,7 +33,7 @@ public class MusicCommonApi {
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {
-        return getMusicUrlByMusicId(Set.of(musicId), refresh);
+        return getMusicUrlByMusicId(CollUtil.newHashSet(musicId), refresh);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds, boolean refresh) {

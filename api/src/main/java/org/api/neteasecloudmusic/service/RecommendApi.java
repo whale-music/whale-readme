@@ -67,7 +67,7 @@ public class RecommendApi {
             // 歌曲信息
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
-            e.setAlias(List.of(tbMusicPojo.getAliasName().split(",")));
+            e.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             // 歌曲下载地址
             List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(tbMusicPojo.getId(), false);
             if (CollUtil.isNotEmpty(musicUrlByMusicId)) {

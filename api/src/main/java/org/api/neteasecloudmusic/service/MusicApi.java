@@ -52,7 +52,7 @@ public class MusicApi {
     
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
-        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(Set.copyOf(id), false);
+        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(new HashSet<>(id), false);
         List<TbMusicPojo> musicPojos = musicService.listByIds(id);
         Map<Long, TbMusicPojo> musicPojoMap = musicPojos.stream().collect(Collectors.toMap(TbMusicPojo::getId, tbMusicPojo -> tbMusicPojo));
         SongUrlRes songUrlRes = new SongUrlRes();

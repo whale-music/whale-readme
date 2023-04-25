@@ -63,7 +63,7 @@ class TestSaveMusicList {
         Long musicId = 2033902938L;
         SongUrl songUrl = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
         Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
-        SongDetail songDetail = RequestMusic163.getSongDetail(List.of(musicId), cookie);
+        SongDetail songDetail = RequestMusic163.getSongDetail(Collections.singletonList(musicId), cookie);
         for (SongsItem song : songDetail.getSongs()) {
             MusicDetails musicDetails = TestUploadMusicApi.saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, localUserId);
             log.info(musicDetails.toString());

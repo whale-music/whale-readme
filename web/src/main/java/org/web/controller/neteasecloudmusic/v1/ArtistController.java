@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collections;
 
 @RestController(NeteaseCloudConfig.NETEASECLOUD + "ArtistController")
 @RequestMapping("/")
@@ -75,7 +75,7 @@ public class ArtistController {
         res.setImgurl("http://p1.music.126.net/cIlOngB4p_RjvnTvNX0CiQ==/18821440045984320.jpg");
         res.setArtistName("周杰伦");
         NeteaseResult r = new NeteaseResult();
-        r.put("mvs", List.of(res));
+        r.put("mvs", Collections.singleton(res));
         return r.success();
     }
     

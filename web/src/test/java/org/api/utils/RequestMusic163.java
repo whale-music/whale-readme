@@ -1,23 +1,22 @@
 package org.api.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.log.Log;
-import com.alibaba.fastjson2.JSON;
-import org.api.model.LikePlay;
-import org.api.model.album.AlbumRes;
-import org.api.model.lyric.Lyric;
-import org.api.model.playlist.PlayList;
-import org.api.model.playlistdetail.PlayListDetailRes;
-import org.api.model.singer.SingerRes;
-import org.api.model.song.SongDetail;
-import org.api.model.url.SongUrl;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cglib.beans.BeanMap;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RequestMusic163 {
     private static final Log log = Log.get();
@@ -38,9 +37,10 @@ public class RequestMusic163 {
         }
     }
     
-    public static LikePlay like(String playId, String cookie) {
+    public static List<Long> like(String playId, String cookie) {
         String request = req(host + "/likelist?uid=" + playId, cookie);
-        return JSON.parseObject(request, LikePlay.class);
+        List<Long> read = JsonPath.read(request, "$.ids");
+        return CollUtil.isEmpty(read) ? Collections.emptyList() : read;
     }
     
     /**
@@ -48,36 +48,55 @@ public class RequestMusic163 {
      *
      * @param playId 歌单名
      */
-    public static PlayListDetailRes getPlayDetail(String playId, String cookie) {
+    public static List<Long> getPlayDetail(String playId, String cookie) {
         String request = req(host + "/playlist/detail?id=" + playId, cookie);
-        return JSON.parseObject(request, PlayListDetailRes.class);
-    }
-    
-    public static PlayList getPlayList(String playId, String cookie) {
-        String request = req(host + "/playlist/track/all?id=" + playId, cookie);
-        return JSON.parseObject(request, PlayList.class);
+        List<Long> read = null;
+        try {
+            read = JsonPath.read(request, "$.playlist.trackIds[*].id");
+        } catch (PathNotFoundException e) {
+            log.warn("歌曲详情: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+        return CollUtil.isEmpty(read) ? Collections.emptyList() : read;
     }
     
     /**
      * 获取歌曲详情
      */
-    public static SongDetail getSongDetail(List<Long> musicIds, String cookie) {
+    public static List<Map<String, Object>> getSongDetail(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/detail?ids=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
-        return JSON.parseObject(request, SongDetail.class);
+        List<Map<String, Object>> list = null;
+        try {
+            list = JsonPath.read(request, "$.songs");
+        }catch (PathNotFoundException e) {
+            log.warn("歌曲详情: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+        return CollUtil.isEmpty(list) ? Collections.emptyList() : list;
     }
     
     /**
      * 获取专辑信息
      */
-    public static AlbumRes getAlbumDto(Integer albumId, String cookie) {
+    public static Map<String, Object> getAlbumDto(Integer albumId, String cookie) {
         String request = req(host + "/album?id=" + albumId, cookie);
-        return JSON.parseObject(request, AlbumRes.class);
+        Map<String, Object> map = null;
+        try {
+            map = JsonPath.read(request, "$.album");
+        } catch (PathNotFoundException e) {
+            log.warn("无专辑信息: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+        return map != null ? map : new HashMap<>();
     }
     
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrl(List<Long> musicIds, String cookie, int flag) {
+    public static List<Map<String,Object>> getSongUrl(List<Long> musicIds, String cookie, int flag) {
         if (flag == 0) {
             return getSongUrlV1(musicIds, cookie);
         }
@@ -90,33 +109,55 @@ public class RequestMusic163 {
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrlV1(List<Long> musicIds, String cookie) {
+    public static List<Map<String,Object>> getSongUrlV1(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
-        return JSON.parseObject(request, SongUrl.class);
+        List<Map<String,Object>> map = JsonPath.read(request, "$.data");
+        return CollUtil.isEmpty(map) ? Collections.emptyList() : map;
     }
     
     /**
      * 获取歌曲下载地址
      */
-    public static SongUrl getSongUrlV2(List<Long> musicIds, String cookie) {
+    public static List<Map<String,Object>> getSongUrlV2(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=hires", cookie);
-        return JSON.parseObject(request, SongUrl.class);
+        List<Map<String,Object>> map = JsonPath.read(request, "$.data");
+        return CollUtil.isEmpty(map) ? Collections.emptyList() : map;
     }
     
     /**
      * 获取歌词
      */
-    public static Lyric getLyric(Integer musicId, String cookie) {
-        String request = req(host + "/lyric/url?id=" + musicId, cookie);
-        return JSON.parseObject(request, Lyric.class);
+    public static Map<String, String> getLyric(Long musicId, String cookie) {
+        String request = req(host + "/lyric?id=" + musicId, cookie);
+        BeanMap beanMap = BeanMap.create(request);
+        BeanMap lrcMap = MapUtil.get(beanMap, "lrc", BeanMap.class);
+        String lyric = MapUtil.getStr(lrcMap, "lyric");
+        
+        BeanMap klyricMap = MapUtil.get(beanMap, "klyric", BeanMap.class);
+        String klyric = MapUtil.getStr(klyricMap, "lyric");
+    
+        // String lrc = JsonPath.read(request, "$.lrc.lyric");
+        // String klyric = JsonPath.read(request, "$.klyric.lyric");
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("lrc", lyric);
+        stringStringHashMap.put("klyric", klyric);
+        return stringStringHashMap;
     }
     
     /**
      * 获取歌曲作者信息
      */
-    public static SingerRes getSingerInfo(int singerId, String cookie) {
+    public static Map<String, Object> getSingerInfo(Long singerId, String cookie) {
         String request = req(host + "/artist/detail?id=" + singerId, cookie);
-        return JSON.parseObject(request, SingerRes.class);
+        Map<String, Object> map = null;
+        try {
+            map = JsonPath.read(request, "$.data");
+        } catch (PathNotFoundException e) {
+            log.warn("无作者信息: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+        return map != null ? map : new HashMap<>();
     }
     
     

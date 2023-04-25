@@ -1,16 +1,10 @@
 package org.api.test;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.service.MusicFlowApi;
-import org.api.model.LikePlay;
-import org.api.model.playlistdetail.PlayListDetailRes;
-import org.api.model.playlistdetail.TrackIdsItem;
-import org.api.model.song.SongDetail;
-import org.api.model.song.SongsItem;
-import org.api.model.url.DataItem;
-import org.api.model.url.SongUrl;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
 import org.core.pojo.*;
@@ -35,22 +29,22 @@ class TestSaveMusicList {
     private CollectApi collectApi;
     
     /**
-     * 添加音乐到歌单
+     * 添加歌单到数据库
      */
     @Test
     void testUploadUserPlayListMusic() {
         // 第三方用户音乐
-        Long playId = 7234346265L;
+        String playId = "7234346265";
         saveUserPlayListMusicList(playId, localUserId);
     }
     
     /**
-     * 添加音乐到用户喜欢表
+     * 添加喜欢歌单到数据库(无顺序)
      */
     @Test
     void testUploadUserLikeMusic() {
-        // 第三方用户音乐
-        String playId = "6389917304";
+        // 第三方用户ID
+        String playId = "1815109509";
         saveUserLikeMusicList(playId, localUserId);
     }
     
@@ -60,12 +54,14 @@ class TestSaveMusicList {
     @Test
     void testUploadMusic() {
         // 第三方音乐ID
-        Long musicId = 2033902938L;
-        SongUrl songUrl = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
-        Map<Integer, DataItem> songUrlMap = songUrl.getData().stream().collect(Collectors.toMap(DataItem::getId, dataItem -> dataItem));
-        SongDetail songDetail = RequestMusic163.getSongDetail(Collections.singletonList(musicId), cookie);
-        for (SongsItem song : songDetail.getSongs()) {
-            MusicDetails musicDetails = TestUploadMusicApi.saveMusicInfo(songUrlMap, song, cookie, musicFlowApi, localUserId);
+        Long musicId = 190072L;
+        List<Map<String, Object>> songUrlMap = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
+        Map<Long, Map<String, Object>> musicUrl = songUrlMap.parallelStream()
+                                                         .collect(Collectors.toMap(stringObjectMap -> MapUtil.getLong(stringObjectMap, "id"),
+                                                                 stringObjectMap -> stringObjectMap));
+        List<Map<String, Object>> songDetail = RequestMusic163.getSongDetail(Collections.singletonList(musicId), cookie);
+        for (Map<String, Object> song : songDetail) {
+            MusicDetails musicDetails = TestUploadMusicApi.saveMusicInfo(musicUrl, song, cookie, musicFlowApi, localUserId);
             log.info(musicDetails.toString());
         }
     }
@@ -76,13 +72,12 @@ class TestSaveMusicList {
      *
      * @param playListId 用户ID
      */
-    private void saveUserPlayListMusicList(Long playListId, Long localUserId) {
-        PlayListDetailRes playDetail = RequestMusic163.getPlayDetail(String.valueOf(playListId), cookie);
-        List<Long> collect = playDetail.getPlaylist().getTrackIds().stream().map(TrackIdsItem::getId).collect(Collectors.toList());
+    private void saveUserPlayListMusicList(String playListId, Long localUserId) {
+        List<Long> playDetail = RequestMusic163.getPlayDetail(playListId, cookie);
         // 反转歌曲ID顺序，保持添加歌曲顺序
-        Collections.reverse(collect);
+        Collections.reverse(playDetail);
         // 保存音乐到本地数据库，并返回保存的音乐信息
-        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(collect, cookie, musicFlowApi, localUserId);
+        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(playDetail, cookie, musicFlowApi, localUserId);
         // 创建歌单
         TbCollectPojo collectApiPlayList = collectApi.createPlayList(localUserId, "导入歌单");
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
@@ -113,8 +108,8 @@ class TestSaveMusicList {
      * @param userID 用户ID
      */
     private void saveUserLikeMusicList(String userID, Long localUserId) {
-        LikePlay like = RequestMusic163.like(userID, cookie);
-        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(like.getIds(), cookie, musicFlowApi, localUserId);
+        List<Long> like = RequestMusic163.like(userID, cookie);
+        List<MusicDetails> musicPojoList = TestUploadMusicApi.saveMusicInfoList(like, cookie, musicFlowApi, localUserId);
         for (MusicDetails tbMusicPojo : musicPojoList) {
             if (tbMusicPojo.getMusicUrl() != null && tbMusicPojo.getMusic().getId() != null) {
                 try {
@@ -133,7 +128,7 @@ class TestSaveMusicList {
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
             tbMusicPojo.setMusicUrl(Optional.ofNullable(tbMusicPojo.getMusicUrl()).orElse(new TbMusicUrlPojo()));
-    
+            
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
             log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());

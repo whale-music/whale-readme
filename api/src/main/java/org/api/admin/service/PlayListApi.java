@@ -147,14 +147,22 @@ public class PlayListApi {
     public Page<MusicPageRes> getMusicPage(MusicPageReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
         List<Long> musicIdList = new LinkedList<>();
-        
+    
         // 查询歌手表
         musicIdList.addAll(getMusicIDByArtistName(req));
         // 查询专辑表
         musicIdList.addAll(getMusicIDByAlbumName(req));
         // 查询歌曲名
         musicIdList.addAll(getMusicIdByMusicName(req));
-        
+    
+        // 如果前端传入搜索参数，并且没有查询到数据则直接返回空数据库。防止搜索结果混乱
+        if ((StringUtils.isNotBlank(req.getMusicName())
+                || StringUtils.isNotBlank(req.getAlbumName())
+                || StringUtils.isNotBlank(req.getArtistName()))
+                && CollUtil.isEmpty(musicIdList)) {
+            return new Page<>(0, 50, 0);
+        }
+    
         Page<TbMusicPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
                                                           .in(CollUtil.isNotEmpty(musicIdList), TbMusicPojo::getId, musicIdList);
@@ -268,14 +276,14 @@ public class PlayListApi {
         }
         // 获取专辑ID
         LambdaQueryWrapper<TbAlbumPojo> like = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                       .like(TbAlbumPojo::getAlbumName, req.getAlbumName())
                                                        .like(TbAlbumPojo::getAlbumName, req.getAlbumName());
         List<TbAlbumPojo> albumList = albumService.list(like);
+        if (CollUtil.isEmpty(albumList)) {
+            return Collections.emptyList();
+        }
         List<Long> collect = albumList.stream().map(TbAlbumPojo::getId).toList();
-    
         // 获取歌曲ID
-        List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
-                                                           .in(CollUtil.isNotEmpty(collect), TbMusicPojo::getAlbumId, collect));
+        List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, collect));
         return list.stream().map(TbMusicPojo::getId).toList();
     }
     

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@ToString
 @Accessors(chain = true)
 @TableName("tb_album_artist")
 @ApiModel(value = "TbAlbumArtistPojo对象", description = "歌手和专辑中间表")

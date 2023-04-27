@@ -205,24 +205,6 @@ class TestSaveMusicList {
     }
     
     /**
-     * 添加音乐曲库
-     */
-    @Test
-    void testUploadMusic() {
-        // 第三方音乐ID
-        Long musicId = 190072L;
-        List<Map<String, Object>> songUrlMap = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
-        Map<Long, Map<String, Object>> musicUrl = songUrlMap.parallelStream()
-                                                            .collect(Collectors.toMap(stringObjectMap -> MapUtil.getLong(stringObjectMap, "id"),
-                                                                 stringObjectMap -> stringObjectMap));
-        List<Map<String, Object>> songDetail = RequestMusic163.getSongDetail(Collections.singletonList(musicId), cookie);
-        for (Map<String, Object> song : songDetail) {
-            MusicDetails musicDetails = TestSaveMusicList.saveMusicInfo(musicUrl, song, cookie, musicFlowApi, localUserId);
-            log.info(musicDetails.toString());
-        }
-    }
-    
-    /**
      * 添加音乐到歌单
      *
      * @param playListId 用户ID
@@ -283,7 +265,7 @@ class TestSaveMusicList {
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
             tbMusicPojo.setMusicUrl(Optional.ofNullable(tbMusicPojo.getMusicUrl()).orElse(new TbMusicUrlPojo()));
-            
+    
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
             log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
@@ -293,5 +275,23 @@ class TestSaveMusicList {
         }
         log.info("一共存储{}个音乐信息以下是音乐名", musicPojoList.size());
         musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getMusicName).forEach(System.out::println);
+    }
+    
+    /**
+     * 添加音乐曲库
+     */
+    @Test
+    void testUploadMusic() {
+        // 第三方音乐ID
+        Long musicId = 190072L;
+        List<Map<String, Object>> songUrlMap = RequestMusic163.getSongUrl(Collections.singletonList(musicId), cookie, 1);
+        Map<Long, Map<String, Object>> musicUrl = songUrlMap.parallelStream()
+                                                            .collect(Collectors.toMap(stringObjectMap -> MapUtil.getLong(stringObjectMap, "id"),
+                                                                    stringObjectMap -> stringObjectMap));
+        List<Map<String, Object>> songDetail = RequestMusic163.getSongDetail(Collections.singletonList(musicId), cookie);
+        for (Map<String, Object> song : songDetail) {
+            MusicDetails musicDetails = TestSaveMusicList.saveMusicInfo(musicUrl, song, cookie, musicFlowApi, localUserId);
+            log.info(musicDetails.toString());
+        }
     }
 }

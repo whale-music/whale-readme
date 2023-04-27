@@ -181,12 +181,12 @@ public interface QukuService {
     /**
      * 添加音乐到歌单
      *
-     * @param userID        用户ID
-     * @param tbCollectPojo 歌单数据
-     * @param songIds       歌曲列表
-     * @param flag          删除还是添加
+     * @param userID    用户ID
+     * @param collectId 歌单数据
+     * @param songIds   歌曲列表
+     * @param flag      删除还是添加
      */
-    void addMusicToCollect(Long userID, TbCollectPojo tbCollectPojo, List<Long> songIds, boolean flag);
+    void addMusicToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag);
     
     /**
      * 添加歌单
@@ -272,4 +272,13 @@ public interface QukuService {
     default void addMusicGenreLabel(Long id, String label) {
         this.addLabel(TargetTagConfig.TARGET_GENRE, id, label);
     }
+    
+    /**
+     * 添加喜欢歌单
+     *
+     * @param userId          用户
+     * @param id              歌单ID
+     * @param isAddAndDelLike true添加 false删除
+     */
+    void collectLike(Long userId, Long id, Boolean isAddAndDelLike);
 }

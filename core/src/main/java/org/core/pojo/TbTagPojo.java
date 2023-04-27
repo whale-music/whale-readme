@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@ToString
 @Accessors(chain = true)
 @TableName("tb_tag")
 @ApiModel(value = "TbTagPojo对象", description = "标签表（风格）")

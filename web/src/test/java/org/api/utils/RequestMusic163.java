@@ -39,7 +39,14 @@ public class RequestMusic163 {
     
     public static List<Long> like(String playId, String cookie) {
         String request = req(host + "/likelist?uid=" + playId, cookie);
-        List<Long> read = JsonPath.read(request, "$.ids");
+        List<Long> read = null;
+        try {
+            read = JsonPath.read(request, "$.ids");
+        } catch (PathNotFoundException e) {
+            log.warn("喜欢音乐: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
         return CollUtil.isEmpty(read) ? Collections.emptyList() : read;
     }
     
@@ -111,7 +118,14 @@ public class RequestMusic163 {
      */
     public static List<Map<String,Object>> getSongUrlV1(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
-        List<Map<String,Object>> map = JsonPath.read(request, "$.data");
+        List<Map<String, Object>> map = null;
+        try {
+            map = JsonPath.read(request, "$.data");
+        } catch (PathNotFoundException e) {
+            log.warn("获取音乐失败: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
         return CollUtil.isEmpty(map) ? Collections.emptyList() : map;
     }
     
@@ -120,7 +134,14 @@ public class RequestMusic163 {
      */
     public static List<Map<String,Object>> getSongUrlV2(List<Long> musicIds, String cookie) {
         String request = req(host + "/song/url/v1?id=" + ArrayUtil.join(musicIds.toArray(), ",") + "&level=hires", cookie);
-        List<Map<String,Object>> map = JsonPath.read(request, "$.data");
+        List<Map<String, Object>> map = null;
+        try {
+            map = JsonPath.read(request, "$.data");
+        } catch (PathNotFoundException e) {
+            log.warn("获取音乐失败: {}", request);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
         return CollUtil.isEmpty(map) ? Collections.emptyList() : map;
     }
     

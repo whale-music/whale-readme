@@ -60,10 +60,10 @@ public class PluginController {
     public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
         TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
         if (Boolean.TRUE.equals(onLine)) {
-            List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo.getId());
+            List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo);
             return R.success(tbPluginMsgPojos);
         } else {
-            pluginService.execPluginTask(pluginLabelValue, pluginId, onLine, pojo.getId());
+            pluginService.execPluginTask(pluginLabelValue, pluginId, onLine, pojo);
             return R.success(pojo.getId());
         }
     }

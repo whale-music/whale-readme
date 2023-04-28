@@ -35,11 +35,11 @@ public interface PluginService {
      * @param onLine           是否在线运行
      * @param taskId           任务ID
      */
-    void execPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Boolean onLine, Long taskId);
+    void execPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Boolean onLine, TbPluginTaskPojo taskId);
     
     List<PluginMsgRes> getPluginRuntimeMessages(Long runtimeId);
     
-    List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, Long id);
+    List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, TbPluginTaskPojo id);
     
     TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId);
     

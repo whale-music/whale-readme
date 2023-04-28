@@ -149,30 +149,30 @@ public class PluginServiceImpl implements PluginService {
      * @param req      插件入参
      * @param pluginId 插件ID
      * @param onLine   是否在线运行
-     * @param taskId   任务ID
+     * @param task     任务ID
      */
     @Async
     @Override
-    public void execPluginTask(List<PluginLabelValue> req, Long pluginId, Boolean onLine, Long taskId) {
+    public void execPluginTask(List<PluginLabelValue> req, Long pluginId, Boolean onLine, TbPluginTaskPojo task) {
         try {
-            onLineExecPluginTask(req, pluginId, taskId);
+            onLineExecPluginTask(req, pluginId, task);
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
-            entity.setId(taskId);
+            entity.setId(task.getId());
             entity.setStatus(TaskStatus.RUN_STATUS);
             pluginTaskService.updateById(entity);
         } catch (Exception e) {
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
-            entity.setId(taskId);
+            entity.setId(task.getId());
             entity.setStatus(TaskStatus.ERROR_STATUS);
             pluginTaskService.updateById(entity);
             PluginPackage pluginPackage = new PluginPackage(musicFlowApi,
                     pluginMsgService,
                     pluginTaskService,
                     qukuService,
-                    taskId,
-                    UserUtil.getUser().getId(),
+                    task.getId(),
+                    task.getUserId(),
                     null);
-            pluginPackage.log(taskId.toString(), String.valueOf(entity.getUserId()), e.getMessage());
+            pluginPackage.log(task.toString(), String.valueOf(entity.getUserId()), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
@@ -196,10 +196,10 @@ public class PluginServiceImpl implements PluginService {
     /**
      * @param req      插件入参
      * @param pluginId 插件ID
-     * @param taskId   任务ID
+     * @param task     任务ID
      */
     @Override
-    public List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> req, Long pluginId, Long taskId) {
+    public List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> req, Long pluginId, TbPluginTaskPojo task) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
@@ -209,12 +209,12 @@ public class PluginServiceImpl implements PluginService {
                 pluginMsgService,
                 pluginTaskService,
                 qukuService,
-                taskId,
-                UserUtil.getUser().getId(),
+                task.getId(),
+                task.getUserId(),
                 null);
         func.apply(req, pluginPackage);
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
-        entity.setId(taskId);
+        entity.setId(task.getId());
         entity.setStatus(TaskStatus.STOP_STATUS);
         pluginTaskService.updateById(entity);
         return pluginPackage.getLogs();

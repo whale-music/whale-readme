@@ -43,5 +43,5 @@ public interface PluginService {
     
     TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId);
     
-    List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo);
+    List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo);
 }

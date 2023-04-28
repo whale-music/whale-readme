@@ -232,11 +232,18 @@ public class PluginServiceImpl implements PluginService {
     }
     
     /**
+     * @param id       用户ID
      * @param taskPojo 任务运行信息
      * @return 返回运行信息
      */
     @Override
-    public List<TbPluginTaskPojo> getPluginRuntimeTask(TbPluginTaskPojo taskPojo) {
+    public List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo) {
+        if (taskPojo == null || taskPojo.getId() == null || taskPojo.getStatus() == null) {
+            LambdaQueryWrapper<TbPluginTaskPojo> wrappers = Wrappers.lambdaQuery();
+            wrappers.eq(TbPluginTaskPojo::getUserId, id);
+            wrappers.orderByDesc(TbPluginTaskPojo::getCreateTime);
+            return pluginTaskService.list(wrappers);
+        }
         if (taskPojo.getId() != null) {
             TbPluginTaskPojo byId = pluginTaskService.getById(taskPojo.getId());
             return Collections.singletonList(byId);

@@ -68,9 +68,9 @@ public class PluginController {
         }
     }
     
-    @PostMapping("/getPluginRuntimeTask")
-    public R getPluginRuntimeTask(@RequestBody TbPluginTaskPojo taskPojo) {
-        List<TbPluginTaskPojo> list = pluginService.getPluginRuntimeTask(taskPojo);
+    @PostMapping("/getTask")
+    public R getTask(@RequestBody TbPluginTaskPojo taskPojo) {
+        List<TbPluginTaskPojo> list = pluginService.getTask(UserUtil.getUser().getId(), taskPojo);
         return R.success(list);
     }
     

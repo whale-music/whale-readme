@@ -70,7 +70,7 @@ save-config:
   # 没有实现随机存储和自动选择最少对象的地址存储，因为存储的上传接口极其不稳定。最后放弃
   assignObjectSave: 0
   # 请求地址(必须)
-  host: http://43.139.22.243:5244
+  host: https://alist.opopop.fun
   # 账户(必须)
   access-key: admin
   # 密码(必须)

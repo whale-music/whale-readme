@@ -44,4 +44,12 @@ public interface PluginService {
     TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId);
     
     List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo);
+    
+    /**
+     * 删除插件任务
+     * 注意： 目前只能删除已完成或错误停止的任务
+     *
+     * @param id 任务ID
+     */
+    void deleteTask(Long id);
 }

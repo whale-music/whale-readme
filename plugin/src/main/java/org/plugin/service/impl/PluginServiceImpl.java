@@ -257,4 +257,25 @@ public class PluginServiceImpl implements PluginService {
         }
         return Collections.emptyList();
     }
+    
+    
+    /**
+     * 删除插件任务
+     * 注意： 目前只能删除已完成或错误停止的任务
+     *
+     * @param id 任务ID
+     */
+    @Override
+    public void deleteTask(Long id) {
+        boolean b = pluginTaskService.removeById(id);
+        if (!b) {
+            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK);
+        }
+        LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(TbPluginMsgPojo::getTaskId, id);
+        b = pluginMsgService.remove(queryWrapper);
+        if (!b) {
+            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK);
+        }
+    }
 }

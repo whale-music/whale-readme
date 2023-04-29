@@ -79,4 +79,10 @@ public class PluginController {
         List<PluginMsgRes> list = pluginService.getPluginRuntimeMessages(runtimeId);
         return R.success(list);
     }
+    
+    @GetMapping("/deleteTask/{id}")
+    public R deleteTask(@PathVariable("id") Long id) {
+        pluginService.deleteTask(id);
+        return R.success();
+    }
 }

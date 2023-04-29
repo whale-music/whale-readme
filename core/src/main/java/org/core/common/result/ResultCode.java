@@ -48,6 +48,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     /* 业务错误：30001-39999 */
     SPECIFIED_QUESTIONED_USER_NOT_EXIST("30001", "业务逻辑出现问题"),
     NULL_POINTER_EXCEPTION("30002", "空指针错误"),
+    PLUGIN_DELETE_TASK("30003", "插件删除任务错误"),
     
     
     /* 系统错误：40001-49999 */

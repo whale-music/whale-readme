@@ -32,9 +32,9 @@ public class PluginPackage {
     private final QukuService qukuService;
     
     private final List<TbPluginMsgPojo> msgPackages = new ArrayList<>();
-    private Long taskId;
-    private Long userId;
-    private CommonPlugin func;
+    private final Long taskId;
+    private final Long userId;
+    private final CommonPlugin func;
     
     public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, QukuService qukuService, Long taskId, Long userId, CommonPlugin func) {
         this.musicFlowApi = musicFlowApi;
@@ -58,7 +58,7 @@ public class PluginPackage {
         return musicFlowApi.saveMusicInfo(dto);
     }
     
-    public void log(String format, Object... arguments) {
+    public void log(short level, String format, Object... arguments) {
         log.info(format, arguments);
         TbPluginMsgPojo entity = new TbPluginMsgPojo();
         TbPluginTaskPojo taskServiceById = pluginTaskService.getById(taskId);
@@ -66,8 +66,25 @@ public class PluginPackage {
         entity.setTaskId(taskId);
         entity.setMsg(CharSequenceUtil.format(format, arguments));
         entity.setUserId(userId);
+        entity.setLevel(level);
         
         msgPackages.add(entity);
         pluginMsgService.save(entity);
+    }
+    
+    public void logInfo(String format, Object... arguments) {
+        log((short) 0, format, arguments);
+    }
+    
+    public void logDebug(String format, Object... arguments) {
+        log((short) 1, format, arguments);
+    }
+    
+    public void logWarn(String format, Object... arguments) {
+        log((short) 2, format, arguments);
+    }
+    
+    public void logError(String format, Object... arguments) {
+        log((short) 3, format, arguments);
     }
 }

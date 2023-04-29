@@ -1,11 +1,9 @@
 package org.plugin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.PageUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -107,7 +105,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         assert host != null;
         assert userId != null;
         List<Long> musicIds = Collections.singletonList(Long.valueOf(musicId));
-        List<Map<String, Object>> songUrlMap = getSongUrlV1(musicIds, cookie);
+        List<Map<String, Object>> songUrlMap = getSongUrlV2(musicIds, cookie);
         Map<Long, Map<String, Object>> musicUrl = songUrlMap.parallelStream()
                                                             .collect(Collectors.toMap(stringObjectMap -> MapUtil.getLong(stringObjectMap, "id"),
                                                                     stringObjectMap -> stringObjectMap));
@@ -224,45 +222,13 @@ class SyncOneMusicPlugin implements CommonPlugin {
         // false: 读取本地数据或网络数据上传到数据库
         try {
             MusicDetails musicDetails = pluginPackage.saveMusic(dto);
-            pluginPackage.log("上传成功{}:{}", musicId, dto.getMusicName());
+            pluginPackage.logInfo("上传成功{}:{}", musicId, dto.getMusicName());
             return musicDetails;
         } catch (IOException e) {
-            pluginPackage.log(e.getMessage(), e);
+            pluginPackage.logError(e.getMessage(), e);
         }
         throw new NullPointerException();
     }
-    
-    /**
-     * 保存音乐List
-     *
-     * @param musicIds 音乐ID
-     */
-    public List<MusicDetails> saveMusicInfoList(List<Long> musicIds, String cookie, Long userId) {
-        int allPageIndex = PageUtil.totalPage(musicIds.size(), 20);
-        List<MusicDetails> tbMusicPojos = new ArrayList<>();
-        for (int i = 0; i < allPageIndex; i++) {
-            List<Long> page = ListUtil.page(i, 20, musicIds);
-            // 获取分页后的音乐数据
-            List<Map<String, Object>> songDetail = getSongDetail(page, cookie);
-            // 获取歌曲下载地址数据
-            List<Map<String, Object>> songUrl = getSongUrlV2(page, cookie);
-            Map<Long, Map<String, Object>> musicUrlMaps = new HashMap<>();
-            for (Map<String, Object> stringObjectMap : songUrl) {
-                if (CollUtil.isNotEmpty(stringObjectMap)) {
-                    Long id = MapUtil.get(stringObjectMap, "id", Long.class);
-                    musicUrlMaps.put(id, stringObjectMap);
-                }
-            }
-            
-            // 歌曲下载地址信息
-            for (Map<String, Object> song : songDetail) {
-                MusicDetails musicDetails = saveMusicInfo(musicUrlMaps, song, cookie, userId);
-                tbMusicPojos.add(musicDetails);
-            }
-        }
-        return tbMusicPojos;
-    }
-    
     
     /**
      * 通用请求
@@ -276,37 +242,6 @@ class SyncOneMusicPlugin implements CommonPlugin {
         }
     }
     
-    public List<Long> like(String playId, String cookie) {
-        String request = req(host + "/likelist?uid=" + playId, cookie);
-        List<Long> read = null;
-        try {
-            read = JsonPath.read(request, "$.ids");
-        } catch (PathNotFoundException e) {
-            pluginPackage.log("喜欢音乐: {}", request);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-        return CollUtil.isEmpty(read) ? Collections.emptyList() : read;
-    }
-    
-    /**
-     * 歌单详情（获取歌单内所有数据）
-     *
-     * @param playId 歌单名
-     */
-    public List<Long> getPlayDetail(String playId, String cookie) {
-        String request = req(host + "/playlist/detail?id=" + playId, cookie);
-        List<Long> read = null;
-        try {
-            read = JsonPath.read(request, "$.playlist.trackIds[*].id");
-        } catch (PathNotFoundException e) {
-            pluginPackage.log("歌曲详情: {}", request);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-        return CollUtil.isEmpty(read) ? Collections.emptyList() : read;
-    }
-    
     /**
      * 获取歌曲详情
      */
@@ -316,7 +251,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         try {
             list = JsonPath.read(request, "$.songs");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("歌曲详情: {}", request);
+            pluginPackage.logError("歌曲详情: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -332,27 +267,11 @@ class SyncOneMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.album");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("无专辑信息: {}", request);
+            pluginPackage.logError("无专辑信息: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
         return map != null ? map : new HashMap<>();
-    }
-    
-    /**
-     * 获取歌曲下载地址
-     */
-    public List<Map<String, Object>> getSongUrlV1(List<Long> musicIds, String cookie) {
-        String request = req(host + "/song/url?id=" + ArrayUtil.join(musicIds.toArray(), ","), cookie);
-        List<Map<String, Object>> map = null;
-        try {
-            map = JsonPath.read(request, "$.data");
-        } catch (PathNotFoundException e) {
-            pluginPackage.log("获取音乐失败: {}", request);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-        return CollUtil.isEmpty(map) ? Collections.emptyList() : map;
     }
     
     /**
@@ -364,7 +283,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.data");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("获取音乐失败: {}", request);
+            pluginPackage.logError("获取音乐失败: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -400,7 +319,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.data");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("无作者信息: {}", request);
+            pluginPackage.logError("无作者信息: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }

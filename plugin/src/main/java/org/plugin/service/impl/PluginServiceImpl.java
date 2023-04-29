@@ -172,7 +172,7 @@ public class PluginServiceImpl implements PluginService {
                     task.getId(),
                     task.getUserId(),
                     null);
-            pluginPackage.log(task.toString(), String.valueOf(entity.getUserId()), e.getMessage());
+            pluginPackage.log((short) 3, task.toString(), String.valueOf(entity.getUserId()), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }

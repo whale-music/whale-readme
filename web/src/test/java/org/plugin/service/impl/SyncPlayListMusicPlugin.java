@@ -127,11 +127,11 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         List<MusicDetails> musicPojoList = saveMusicInfoList(playDetail, cookie, localUserId);
         // 创建歌单
         TbCollectPojo collectApiPlayList = pluginPackage.getQukuService().createPlayList(localUserId, playName, PlayListTypeConfig.ORDINARY);
-        pluginPackage.log("创建歌单成功: {}", playName);
+        pluginPackage.logInfo("创建歌单成功: {}", playName);
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(musicIds)) {
             pluginPackage.getQukuService().addMusicToCollect(localUserId, collectApiPlayList.getId(), musicIds, true);
-            pluginPackage.log("添加到用户歌单成功");
+            pluginPackage.logInfo("添加到用户歌单成功");
         }
         for (MusicDetails tbMusicPojo : musicPojoList) {
             // 防止空指针
@@ -139,15 +139,15 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
             tbMusicPojo.setMusicUrl(Optional.ofNullable(tbMusicPojo.getMusicUrl()).orElse(new TbMusicUrlPojo()));
-            
-            pluginPackage.log("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
-            pluginPackage.log("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
-            pluginPackage.log("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
+    
+            pluginPackage.logInfo("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
+            pluginPackage.logInfo("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
+            pluginPackage.logInfo("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
             for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
-                pluginPackage.log("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
+                pluginPackage.logInfo("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }
         }
-        pluginPackage.log("一共存储{}个音乐信息", musicPojoList.size());
+        pluginPackage.logInfo("一共存储{}个音乐信息", musicPojoList.size());
     }
     
     /**
@@ -289,10 +289,10 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         // false: 读取本地数据或网络数据上传到数据库
         try {
             MusicDetails musicDetails = pluginPackage.saveMusic(dto);
-            pluginPackage.log("上传成功{}:{}", musicId, dto.getMusicName());
+            pluginPackage.logInfo("上传成功{}:{}", musicId, dto.getMusicName());
             return musicDetails;
         } catch (IOException e) {
-            pluginPackage.log(e.getMessage(), e);
+            pluginPackage.logError(e.getMessage(), e);
         }
         throw new NullPointerException();
     }
@@ -322,7 +322,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         try {
             return JsonPath.read(json, jsonPath);
         } catch (PathNotFoundException e) {
-            pluginPackage.log("json解析{}错误: {}", jsonPath, e.getMessage());
+            pluginPackage.logError("json解析{}错误: {}", jsonPath, e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -338,7 +338,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         try {
             list = JsonPath.read(request, "$.songs");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("歌曲详情: {}", request);
+            pluginPackage.logError("歌曲详情: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -354,7 +354,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.album");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("无专辑信息: {}", request);
+            pluginPackage.logError("无专辑信息: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -370,7 +370,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.data");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("获取音乐失败: {}", request);
+            pluginPackage.logError("获取音乐失败: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -406,7 +406,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         try {
             map = JsonPath.read(request, "$.data");
         } catch (PathNotFoundException e) {
-            pluginPackage.log("无作者信息: {}", request);
+            pluginPackage.logError("无作者信息: {}", request);
         } catch (Exception e) {
             throw new RuntimeException();
         }

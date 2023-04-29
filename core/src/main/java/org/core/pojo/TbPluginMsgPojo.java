@@ -45,6 +45,10 @@ public class TbPluginMsgPojo implements Serializable {
     @TableField("user_id")
     private Long userId;
     
+    @ApiModelProperty("插件消息等级,0 info 1 debug 2 warn 3 error")
+    @TableField("level")
+    private Short level;
+    
     @ApiModelProperty("插件运行消息")
     @TableField("msg")
     private String msg;

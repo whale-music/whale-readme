@@ -35,8 +35,9 @@ create table if not exists sys_dict_type
 create table if not exists sys_user
 (
     id              bigint       not null comment '系统用户ID'
-    primary key,
-    username        varchar(128) not null comment '登录用户名',
+        primary key,
+    username
+                    varchar(128) not null comment '登录用户名',
     nickname        varchar(128) not null comment '登录显示昵称',
     password        varchar(20)  null comment '用户密码',
     avatar_url      varchar(256) null comment '头像URL',
@@ -46,8 +47,13 @@ create table if not exists sys_user
     last_login_ip   varchar(20)  null comment '最后登录IP',
     last_login_time datetime     null comment '最后登录时间',
     create_time     datetime     null comment '创建时间',
-    update_time     datetime     null comment '修改时间'
-    )
+    update_time     datetime     null comment '修改时间',
+    constraint username
+        unique
+        (
+         username
+            )
+)
     comment '系统用户表';
 
 create index sys_user_nickname_index
@@ -255,16 +261,37 @@ create table if not exists tb_plugin
 create table if not exists tb_plugin_msg
 (
     id          bigint   not null comment '插件消息ID'
-    primary key,
+        primary key,
     plugin_id   bigint   not null comment '插件ID',
-    task_id     bigint   not null comment '任务ID',
-    user_id     bigint   not null comment '用户ID',
-    msg         text     null comment '插件运行消息',
-    create_time datetime not null comment '创建时间',
+    task_id     bigint   not null
+        comment
+            '任务ID',
+    user_id
+                bigint
+                         not
+                             null
+        comment
+            '用户ID',
+    level
+                tinyint
+                         null
+        comment
+            '消息等级',
+    msg
+                text
+                         null
+        comment
+            '插件运行消息',
+    create_time
+                datetime
+                         not
+                             null
+        comment
+            '创建时间',
     update_time datetime not null comment '更新时间',
     constraint id
-    unique (id)
-    )
+        unique (id)
+)
     comment '插件消息表';
 
 create index tb_plugin_msg_task_id_user_id_index
@@ -314,16 +341,43 @@ create table if not exists tb_tag
     )
     comment '标签表（风格）';
 
-create table if not exists tb_collect_music_tag
+create table if not exists tb_middle_tag
 (
-    id     bigint  not null comment '中间ID, 包括歌曲，歌单',
-    tag_id bigint  not null comment 'tag ID',
-    type   tinyint not null comment '0流派, 1歌曲tag, 2歌单tag',
-    primary key (id, tag_id),
+    id
+        bigint
+        not
+            null
+        comment
+            '中间ID, 包括歌曲，歌单，专辑',
+    tag_id
+        bigint
+        not
+            null
+        comment
+            'tag ID',
+    type
+        tinyint
+        not
+            null
+        comment
+            '0流派, 1歌曲tag, 2歌单tag',
+    primary
+        key
+        (
+         id,
+         tag_id
+            ),
     constraint tb_collect_tag_tb_tag_id_fk
-    foreign key (tag_id) references tb_tag (id)
-    on update cascade on delete cascade
-    )
+        foreign key
+            (
+             tag_id
+                ) references tb_tag
+            (
+             id
+                )
+            on update cascade
+            on delete cascade
+)
     comment '歌单风格中间表';
 
 create table if not exists tb_user_album

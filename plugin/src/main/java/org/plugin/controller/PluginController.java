@@ -85,4 +85,10 @@ public class PluginController {
         pluginService.deleteTask(id);
         return R.success();
     }
+    
+    @GetMapping("/deletePlugin/{id}")
+    public R deletePlugin(@PathVariable("id") Long id) {
+        pluginService.deletePlugin(id);
+        return R.success();
+    }
 }

@@ -52,4 +52,11 @@ public interface PluginService {
      * @param id 任务ID
      */
     void deleteTask(Long id);
+    
+    /**
+     * 删除插件
+     *
+     * @param id 插件ID
+     */
+    void deletePlugin(Long id);
 }

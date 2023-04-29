@@ -156,11 +156,13 @@ public class PluginServiceImpl implements PluginService {
     public void execPluginTask(List<PluginLabelValue> req, Long pluginId, Boolean onLine, TbPluginTaskPojo task) {
         try {
             onLineExecPluginTask(req, pluginId, task);
+            // 运行完成
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
             entity.setId(task.getId());
-            entity.setStatus(TaskStatus.RUN_STATUS);
+            entity.setStatus(TaskStatus.STOP_STATUS);
             pluginTaskService.updateById(entity);
         } catch (Exception e) {
+            // 运行错误
             TbPluginTaskPojo entity = new TbPluginTaskPojo();
             entity.setId(task.getId());
             entity.setStatus(TaskStatus.ERROR_STATUS);
@@ -238,15 +240,15 @@ public class PluginServiceImpl implements PluginService {
      */
     @Override
     public List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo) {
+        if (taskPojo != null && taskPojo.getId() != null) {
+            TbPluginTaskPojo byId = pluginTaskService.getById(taskPojo.getId());
+            return Collections.singletonList(byId);
+        }
         if (taskPojo == null || taskPojo.getId() == null || taskPojo.getStatus() == null) {
             LambdaQueryWrapper<TbPluginTaskPojo> wrappers = Wrappers.lambdaQuery();
             wrappers.eq(TbPluginTaskPojo::getUserId, id);
             wrappers.orderByDesc(TbPluginTaskPojo::getCreateTime);
             return pluginTaskService.list(wrappers);
-        }
-        if (taskPojo.getId() != null) {
-            TbPluginTaskPojo byId = pluginTaskService.getById(taskPojo.getId());
-            return Collections.singletonList(byId);
         }
         if (taskPojo.getUserId() != null) {
             LambdaQueryWrapper<TbPluginTaskPojo> wrapper = Wrappers.lambdaQuery();
@@ -269,13 +271,26 @@ public class PluginServiceImpl implements PluginService {
     public void deleteTask(Long id) {
         boolean b = pluginTaskService.removeById(id);
         if (!b) {
-            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK);
+            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK_ERROR);
         }
         LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(TbPluginMsgPojo::getTaskId, id);
         b = pluginMsgService.remove(queryWrapper);
         if (!b) {
-            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK);
+            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK_ERROR);
+        }
+    }
+    
+    /**
+     * 删除插件
+     *
+     * @param id 插件ID
+     */
+    @Override
+    public void deletePlugin(Long id) {
+        boolean b = pluginService.removeById(id);
+        if (!b) {
+            throw new BaseException(ResultCode.PLUGIN_DELETE_ERROR);
         }
     }
 }

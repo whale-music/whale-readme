@@ -96,9 +96,9 @@ public class PluginServiceImpl implements PluginService {
     }
     
     @Override
-    public List<PluginRes> getAllPlugin(Long userId, Long pluginId) {
+    public List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId) {
         LambdaQueryWrapper<TbPluginPojo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(pluginId != null, TbPluginPojo::getId, pluginId);
+        wrapper.in(CollUtil.isNotEmpty(pluginId), TbPluginPojo::getId, pluginId);
         wrapper.eq(TbPluginPojo::getUserId, userId);
         List<TbPluginPojo> list = pluginService.list(wrapper);
         ArrayList<PluginRes> pluginRes = new ArrayList<>();

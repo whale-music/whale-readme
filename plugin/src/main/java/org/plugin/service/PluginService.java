@@ -10,7 +10,7 @@ import org.plugin.converter.PluginRes;
 import java.util.List;
 
 public interface PluginService {
-    List<PluginRes> getAllPlugin(Long userId, Long pluginId);
+    List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId);
     
     /**
      * 添加插件代码

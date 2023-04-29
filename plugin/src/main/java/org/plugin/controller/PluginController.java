@@ -34,7 +34,7 @@ public class PluginController {
      * @return 插件信息
      */
     @GetMapping("/getAllPlugins")
-    public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "id", required = false) Long id) {
+    public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "id", required = false) List<Long> id) {
         List<PluginRes> list = pluginService.getAllPlugin(userId == null ? UserUtil.getUser().getId() : userId, id);
         return R.success(list);
     }

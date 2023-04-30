@@ -43,4 +43,10 @@ public class AlbumController {
         List<Map<String, Object>> albums = albumApi.getSelectAlbumList(name);
         return R.success(albums);
     }
+    
+    @DeleteMapping("/{id}")
+    public R deleteAlbum(@PathVariable List<Long> id, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
+        albumApi.deleteAlbum(id, compel);
+        return R.success();
+    }
 }

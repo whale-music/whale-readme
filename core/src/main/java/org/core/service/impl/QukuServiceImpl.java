@@ -742,7 +742,7 @@ public class QukuServiceImpl implements QukuService {
         } else {
             throw new BaseException(ResultCode.COLLECT_MUSIC_ERROR);
         }
-        
+    
         // 删除专辑
         // 删除歌曲
         musicService.removeBatchByIds(musicId);
@@ -752,5 +752,35 @@ public class QukuServiceImpl implements QukuService {
         musicUrlService.remove(queryWrapper);
         // 删除Tag中间表
         middleTagService.removeBatchByIds(musicId);
+    }
+    
+    
+    /**
+     * 删除专辑
+     * 强制删除会删除歌曲表
+     *
+     * @param id     专辑ID 列表
+     * @param compel 是否强制删除
+     */
+    @Override
+    public void deleteAlbum(List<Long> id, Boolean compel) {
+        // 检测是否存在专辑
+        long count = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().in(TbAlbumPojo::getId, id));
+        if (count == 0) {
+            throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
+        }
+        // 检测专辑是否包括音乐
+        List<TbMusicPojo> musicListByAlbumId = getMusicListByAlbumId(id);
+        if (CollUtil.isEmpty(musicListByAlbumId) || Boolean.TRUE.equals(compel)) {
+            albumService.removeByIds(id);
+        } else {
+            throw new BaseException(ResultCode.ALBUM_MUSIC_EXIST_ERROR);
+        }
+        // 强制删除音乐
+        if (CollUtil.isNotEmpty(musicListByAlbumId) && Boolean.TRUE.equals(compel)) {
+            List<Long> collect = musicListByAlbumId.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
+            deleteMusic(collect, true);
+        }
+        
     }
 }

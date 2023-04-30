@@ -624,4 +624,6 @@ public class MusicFlowApi {
     public void deleteMusic(List<Long> musicId, Boolean compel) {
         qukuService.deleteMusic(musicId, compel);
     }
+    
+    
 }

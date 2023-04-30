@@ -26,6 +26,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     FILENAME_EXIST("10009", "文件名不存在"),
     PLAT_LIST_EXIST("10010", "歌单不存在"),
     PLAT_LIST_MUSIC_EXIST("10011", "歌单中已存在歌曲"),
+    ALBUM_NO_EXIST_ERROR("10012", "专辑不存在"),
     
     
     /* 用户错误：20001-29999*/
@@ -44,6 +45,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     ALBUM_ERROR("20014", "专辑错误!"),
     PASSWORD_ERROR("20015", "密码错误!"),
     COLLECT_MUSIC_ERROR("20016", "歌单包括音乐"),
+    ALBUM_MUSIC_EXIST_ERROR("20017", "专辑有关联音乐!"),
     
     
     /* 业务错误：30001-39999 */

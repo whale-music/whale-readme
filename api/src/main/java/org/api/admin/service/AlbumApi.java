@@ -185,12 +185,16 @@ public class AlbumApi {
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
         List<TbMusicPojo> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<TbArtistPojo> artistListByAlbumIds = qukuService.getArtistListByAlbumIds(albumId);
-        
+    
         AlbumRes albumRes = new AlbumRes();
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
+    }
+    
+    public void deleteAlbum(List<Long> id, Boolean compel) {
+        qukuService.deleteAlbum(id, compel);
     }
 }

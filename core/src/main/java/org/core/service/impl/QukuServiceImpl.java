@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,6 +21,7 @@ import org.core.utils.CollectSortUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -455,6 +457,7 @@ public class QukuServiceImpl implements QukuService {
      * @param flag      删除还是添加
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addMusicToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         if (flag) {
             // 查询歌单内歌曲是否存在
@@ -504,6 +507,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 歌单创建信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public TbCollectPojo createPlayList(Long userId, String name, short type) {
         TbCollectPojo collectPojo = new TbCollectPojo();
         collectPojo.setUserId(userId);
@@ -541,6 +545,7 @@ public class QukuServiceImpl implements QukuService {
      * @param collectList 删除歌单ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removePlayList(Long userId, Collection<Long> collectList) {
         List<TbCollectPojo> tbCollectPojos = collectService.listByIds(collectList);
         for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
@@ -602,6 +607,7 @@ public class QukuServiceImpl implements QukuService {
      * @param label  标签名
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addLabel(Short target, Long id, String label) {
         TbTagPojo tagPojo = tagService.getOne(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, label));
         Optional<TbTagPojo> pojo = Optional.ofNullable(tagPojo);
@@ -621,6 +627,7 @@ public class QukuServiceImpl implements QukuService {
      * @param labelId 标签ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addLabel(Short target, Long id, Long labelId) {
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
@@ -641,6 +648,7 @@ public class QukuServiceImpl implements QukuService {
      * @param labelBatchId 需要删除的label ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removeLabelById(Short target, Long id, Collection<Long> labelBatchId) {
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
@@ -657,6 +665,7 @@ public class QukuServiceImpl implements QukuService {
      * @param labelBatchName 需要删除的label ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void removeLabelByName(Short target, Long id, Collection<Long> labelBatchName) {
         LambdaQueryWrapper<TbTagPojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(TbTagPojo::getTagName, labelBatchName);
@@ -673,6 +682,7 @@ public class QukuServiceImpl implements QukuService {
      * @param isAddAndDelLike true添加 false删除
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void collectLike(Long userId, Long id, Boolean isAddAndDelLike) {
         TbCollectPojo collectServiceById = collectService.getById(userId);
         if (collectServiceById == null) {
@@ -727,6 +737,7 @@ public class QukuServiceImpl implements QukuService {
      * @param compel  是否强制删除
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteMusic(List<Long> musicId, Boolean compel) {
         long count = musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicId));
         if (count == 0) {
@@ -763,6 +774,7 @@ public class QukuServiceImpl implements QukuService {
      * @param compel 是否强制删除
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteAlbum(List<Long> id, Boolean compel) {
         // 检测是否存在专辑
         long count = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().in(TbAlbumPojo::getId, id));
@@ -781,6 +793,24 @@ public class QukuServiceImpl implements QukuService {
             List<Long> collect = musicListByAlbumId.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
             deleteMusic(collect, true);
         }
-        
+    
+    }
+    
+    /**
+     * 删除歌手
+     *
+     * @param id 歌手ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteArtist(List<Long> id) {
+        Wrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, id);
+        long count = artistService.count(wrapper);
+        if (count == 0) {
+            throw new BaseException(ResultCode.ARTIST_NO_EXIST_ERROR);
+        }
+        LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, id);
+        albumArtistService.remove(in);
+        artistService.remove(wrapper);
     }
 }

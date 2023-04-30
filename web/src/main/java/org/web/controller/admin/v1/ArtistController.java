@@ -47,4 +47,10 @@ public class ArtistController {
         ArtistInfoRes artist = artistApi.getArtistById(id);
         return R.success(artist);
     }
+    
+    @DeleteMapping("/{id}")
+    public R deleteArtist(@PathVariable("id") List<Long> id) {
+        artistApi.deleteArtist(id);
+        return R.success();
+    }
 }

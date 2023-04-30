@@ -346,4 +346,11 @@ public interface QukuService {
      * @param compel 是否强制删除
      */
     void deleteAlbum(List<Long> id, Boolean compel);
+    
+    /**
+     * 删除歌手
+     *
+     * @param id 歌手ID
+     */
+    void deleteArtist(List<Long> id);
 }

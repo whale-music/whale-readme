@@ -102,15 +102,19 @@ public class ArtistApi {
     
     public ArtistInfoRes getArtistById(Long id) {
         ArtistInfoRes artistInfoRes = new ArtistInfoRes();
-        
+    
         TbArtistPojo pojo = artistService.getById(id);
         BeanUtils.copyProperties(pojo, artistInfoRes);
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
-        
+    
         List<TbAlbumPojo> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
         List<TbMusicPojo> musicListByArtistId = qukuService.getMusicListByArtistId(id);
         artistInfoRes.setAlbumList(albumListByArtistIds);
         artistInfoRes.setMusicList(musicListByArtistId);
         return artistInfoRes;
+    }
+    
+    public void deleteArtist(List<Long> id) {
+        qukuService.deleteArtist(id);
     }
 }

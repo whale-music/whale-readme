@@ -46,6 +46,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PASSWORD_ERROR("20015", "密码错误!"),
     COLLECT_MUSIC_ERROR("20016", "歌单包括音乐"),
     ALBUM_MUSIC_EXIST_ERROR("20017", "专辑有关联音乐!"),
+    ARTIST_NO_EXIST_ERROR("20018", "艺术家不存在"),
     
     
     /* 业务错误：30001-39999 */

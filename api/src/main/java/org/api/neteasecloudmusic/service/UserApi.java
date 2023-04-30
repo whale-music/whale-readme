@@ -145,10 +145,10 @@ public class UserApi {
         // 导出歌单id
         List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
         // 根据歌单和tag的中间表来获取tag id列表
-        List<TbCollectMusicTagPojo> collectIdAndTagsIdList = collectApi.getCollectTagIdList(collectIds);
+        List<TbMiddleTagPojo> collectIdAndTagsIdList = collectApi.getCollectTagIdList(collectIds);
         // 根据tag id 列表获取tag Name列表
         List<Long> tagIdList = collectIdAndTagsIdList.stream()
-                                                     .map(TbCollectMusicTagPojo::getTagId)
+                                                     .map(TbMiddleTagPojo::getTagId)
                                                      .collect(Collectors.toList());
         List<TbTagPojo> collectTagList = collectApi.getTagPojoList(tagIdList);
         

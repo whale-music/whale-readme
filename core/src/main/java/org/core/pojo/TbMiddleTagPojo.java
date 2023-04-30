@@ -27,7 +27,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("tb_middle_tag")
 @ApiModel(value = "TbCollectTagPojo对象", description = "歌单风格中间表")
-public class TbCollectMusicTagPojo implements Serializable {
+public class TbMiddleTagPojo implements Serializable {
     
     private static final long serialVersionUID = 1L;
     

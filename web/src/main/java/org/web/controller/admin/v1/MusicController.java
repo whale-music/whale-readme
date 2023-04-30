@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @RestController(AdminConfig.ADMIN + "MusicController")
@@ -76,5 +77,12 @@ public class MusicController {
     @GetMapping("/lyric/{musicId}")
     public R getMusicLyric(@PathVariable("musicId") Long musicId) {
         return R.success(uploadMusic.getMusicLyric(musicId));
+    }
+    
+    
+    @DeleteMapping("/{id}")
+    public R deleteMusic(@PathVariable("id") List<Long> musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
+        uploadMusic.deleteMusic(musicId, compel);
+        return R.success();
     }
 }

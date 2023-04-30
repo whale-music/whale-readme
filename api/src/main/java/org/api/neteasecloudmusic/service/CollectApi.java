@@ -37,7 +37,7 @@ public class CollectApi {
     private TbTagService tagService;
     
     @Autowired
-    private TbCollectMusicTagService collectMusicTagService;
+    private TbMiddleTagService collectMusicTagService;
     
     @Autowired
     private TbCollectMusicService collectMusicService;
@@ -112,12 +112,12 @@ public class CollectApi {
      * @param collectId 歌单ID
      * @return 返回中间表tag id列表
      */
-    public List<TbCollectMusicTagPojo> getCollectTagIdList(List<Long> collectId) {
+    public List<TbMiddleTagPojo> getCollectTagIdList(List<Long> collectId) {
         if (collectId == null || collectId.isEmpty()) {
             return Collections.emptyList();
         }
-        LambdaQueryWrapper<TbCollectMusicTagPojo> lambdaQueryWrapper = Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
-                                                                               .in(TbCollectMusicTagPojo::getId, collectId);
+        LambdaQueryWrapper<TbMiddleTagPojo> lambdaQueryWrapper = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                                         .in(TbMiddleTagPojo::getId, collectId);
         return collectMusicTagService.list(lambdaQueryWrapper);
     }
     
@@ -165,8 +165,8 @@ public class CollectApi {
         }
     
         // 先删除歌单的关联tag然后在重新添加
-        LambdaQueryWrapper<TbCollectMusicTagPojo> collectLambdaQueryWrapper = Wrappers.<TbCollectMusicTagPojo>lambdaQuery()
-                                                                                      .eq(TbCollectMusicTagPojo::getId, collectId);
+        LambdaQueryWrapper<TbMiddleTagPojo> collectLambdaQueryWrapper = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                                                .eq(TbMiddleTagPojo::getId, collectId);
         collectMusicTagService.remove(collectLambdaQueryWrapper);
     
         // tag为空字符串跳过
@@ -177,7 +177,7 @@ public class CollectApi {
         List<String> splitList = Arrays.asList(split);
     
         // 需要存入的tag list
-        List<TbCollectMusicTagPojo> saveCollectTagPojoList = new ArrayList<>(split.length);
+        List<TbMiddleTagPojo> saveCollectTagPojoList = new ArrayList<>(split.length);
         // 用来批量存放tb tag
         List<TbTagPojo> saveTbTagList = new ArrayList<>();
     
@@ -195,13 +195,13 @@ public class CollectApi {
                 tbTagPojo.setTagName(tagName);
                 saveTbTagList.add(tbTagPojo);
                 // 添加到中间表
-                TbCollectMusicTagPojo e = new TbCollectMusicTagPojo();
+                TbMiddleTagPojo e = new TbMiddleTagPojo();
                 e.setTagId(tbTagPojo.getId());
                 e.setId(collectId);
                 saveCollectTagPojoList.add(e);
             } else {
                 // 已有tag信息, 直接使用tag id
-                TbCollectMusicTagPojo e = new TbCollectMusicTagPojo();
+                TbMiddleTagPojo e = new TbMiddleTagPojo();
                 e.setTagId(tagPojo.getId());
                 e.setId(collectId);
                 saveCollectTagPojoList.add(e);

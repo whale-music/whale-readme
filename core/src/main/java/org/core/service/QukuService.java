@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.config.TargetTagConfig;
 import org.core.pojo.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface QukuService {
     
@@ -232,7 +229,7 @@ public interface QukuService {
     List<TbLyricPojo> getMusicLyric(Long musicId);
     
     /**
-     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     * 对歌单tag，音乐添加tag Name， 或者指定音乐流派
      *
      * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
      * @param id     歌单或歌曲前ID
@@ -241,13 +238,64 @@ public interface QukuService {
     void addLabel(Short target, Long id, String label);
     
     /**
-     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
      *
      * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
      * @param id      歌单或歌曲前ID
      * @param labelId 标签ID
      */
     void addLabel(Short target, Long id, Long labelId);
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target       指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id           歌单或歌曲前ID
+     * @param labelBatchId 需要删除的label ID
+     */
+    void removeLabelById(Short target, Long id, Collection<Long> labelBatchId);
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target         指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id             歌单或歌曲前ID
+     * @param labelBatchName 需要删除的label ID
+     */
+    void removeLabelByName(Short target, Long id, Collection<Long> labelBatchName);
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 需要删除的label ID
+     */
+    default void removeLabelById(Short target, Long id, Long labelId) {
+        removeLabelById(target, id, Collections.singletonList(labelId));
+    }
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target    指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id        歌单或歌曲前ID
+     * @param labelName 需要删除的label ID
+     */
+    default void removeLabelByName(Short target, Long id, Long labelName) {
+        removeLabelByName(target, id, Collections.singletonList(labelName));
+    }
+    
+    /**
+     * 删除歌单的tag
+     *
+     * @param id        歌单或歌曲前ID
+     * @param labelName 需要删除的label ID
+     */
+    default void removeCollectLabelByName(Long id, Long labelName) {
+        removeLabelByName(TargetTagConfig.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
+    }
+    
     
     default void addCollectLabel(Long id, Long labelId) {
         this.addLabel(TargetTagConfig.TARGET_COLLECT_TAG, id, labelId);
@@ -281,4 +329,12 @@ public interface QukuService {
      * @param isAddAndDelLike true添加 false删除
      */
     void collectLike(Long userId, Long id, Boolean isAddAndDelLike);
+    
+    /**
+     * 删除音乐
+     *
+     * @param musicId 音乐ID
+     * @param compel  是否强制删除
+     */
+    void deleteMusic(List<Long> musicId, Boolean compel);
 }

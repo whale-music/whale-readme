@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
@@ -428,8 +429,11 @@ public class MusicFlowApi {
     private TbMusicPojo saveMusicInfoTable(AudioInfoReq dto, TbAlbumPojo albumPojo, TbMusicPojo musicPojo, String aliaNames) {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
         synchronized (lock) {
-            long sort = musicService.count() + 1;
             if (tbMusicPojo.getSort() == null) {
+                Page<TbMusicPojo> page = new Page<>(musicService.count(), 1);
+                musicService.page(page, Wrappers.<TbMusicPojo>lambdaQuery().orderByAsc(TbMusicPojo::getSort));
+                Long value = CollUtil.isEmpty(page.getRecords()) ? 0 : Optional.ofNullable(page.getRecords().get(0)).orElse(new TbMusicPojo()).getSort();
+                long sort = Optional.of(value).orElse(0L) + 1;
                 tbMusicPojo.setSort(sort);
             }
         }
@@ -615,5 +619,9 @@ public class MusicFlowApi {
     
     public List<TbLyricPojo> getMusicLyric(Long musicId) {
         return qukuService.getMusicLyric(musicId);
+    }
+    
+    public void deleteMusic(List<Long> musicId, Boolean compel) {
+        qukuService.deleteMusic(musicId, compel);
     }
 }

@@ -1,7 +1,7 @@
 package org.core.iservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.core.pojo.TbCollectMusicTagPojo;
+import org.core.pojo.TbMiddleTagPojo;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import org.core.pojo.TbCollectMusicTagPojo;
  * @author Sakura
  * @since 2022-12-02
  */
-public interface TbCollectMusicTagService extends IService<TbCollectMusicTagPojo> {
+public interface TbMiddleTagService extends IService<TbMiddleTagPojo> {
 
 }

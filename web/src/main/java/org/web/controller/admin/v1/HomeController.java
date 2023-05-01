@@ -5,6 +5,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
 import org.core.pojo.TbAlbumPojo;
+import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,12 @@ public class HomeController {
     @GetMapping("/albumTop")
     public R getAlbumTop() {
         List<TbAlbumPojo> hone = honeApi.getAlbumTop();
+        return R.success(hone);
+    }
+    
+    @GetMapping("/artistTop")
+    public R getArtist() {
+        List<TbArtistPojo> hone = honeApi.getArtist();
         return R.success(hone);
     }
     

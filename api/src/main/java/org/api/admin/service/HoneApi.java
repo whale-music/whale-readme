@@ -8,10 +8,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.common.service.MusicCommonApi;
 import org.core.iservice.*;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
-import org.core.pojo.TbPluginTaskPojo;
+import org.core.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -119,6 +116,11 @@ public class HoneApi {
         LambdaQueryWrapper<TbPluginTaskPojo> eq = Wrappers.<TbPluginTaskPojo>lambdaQuery()
                                                           .eq(TbPluginTaskPojo::getUserId, id);
         Page<TbPluginTaskPojo> page = pluginTaskService.page(new Page<>(0, 15), eq);
+        return page.getRecords();
+    }
+    
+    public List<TbArtistPojo> getArtist() {
+        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15));
         return page.getRecords();
     }
 }

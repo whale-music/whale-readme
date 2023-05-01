@@ -40,6 +40,11 @@ public class PlayListController {
         return R.success(playList.getPlayListInfo(id));
     }
     
+    @PostMapping("/info")
+    public R updatePlayListInfo(@RequestBody PlayListReq req) {
+        return R.success(playList.updatePlayListInfo(req));
+    }
+    
     /**
      * 获取歌单中音乐
      *

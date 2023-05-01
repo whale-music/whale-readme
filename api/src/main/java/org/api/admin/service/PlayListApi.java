@@ -396,10 +396,18 @@ public class PlayListApi {
         Page<TbCollectPojo> playList = playListService.getPlayList(req, req.getPage().getPageIndex().longValue(), req.getPage().getPageNum().longValue());
         List<PlayListRes> playListRes = new ArrayList<>();
         collectFillUpCount(playList.getRecords(), playListRes);
-        
+    
         Page<PlayListRes> playListResPage = new Page<>();
         BeanUtils.copyProperties(playList, playListResPage);
         playListResPage.setRecords(playListRes);
         return playListResPage;
+    }
+    
+    public TbCollectPojo updatePlayListInfo(PlayListReq req) {
+        if (req.getId() == null) {
+            throw new BaseException(ResultCode.PARAM_IS_INVALID);
+        }
+        collectService.saveOrUpdate(req);
+        return collectService.getById(req.getId());
     }
 }

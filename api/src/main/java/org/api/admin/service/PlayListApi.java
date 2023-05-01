@@ -9,6 +9,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.config.PlayListTypeConfig;
 import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicPageReq;
+import org.api.admin.model.req.PlayListReq;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.model.res.PlayListMusicRes;
 import org.api.admin.model.res.PlayListRes;
@@ -21,6 +22,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.iservice.*;
 import org.core.pojo.*;
+import org.core.service.PlayListService;
 import org.core.service.QukuService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
@@ -71,6 +73,9 @@ public class PlayListApi {
     @Autowired
     private MusicCommonApi musicCommonApi;
     
+    @Autowired
+    private PlayListService playListService;
+    
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
         switch (Optional.ofNullable(orderBy).orElse("")) {
@@ -90,7 +95,7 @@ public class PlayListApi {
     }
     
     
-    public Page<PlayListMusicRes> getPlaylist(String playId, MusicPageReq page) {
+    public Page<PlayListMusicRes> getAllMusic(String playId, MusicPageReq page) {
         page = Optional.ofNullable(page).orElse(new MusicPageReq());
         PageCommon other = new PageCommon();
         other.setPageIndex(0);
@@ -351,13 +356,18 @@ public class PlayListApi {
         return qukuService.createPlayList(UserUtil.getUser().getId(), name, Short.parseShort("1"));
     }
     
-    public void deletePlayList(Long userId, Long id) {
-        qukuService.removePlayList(userId, Collections.singletonList(id));
+    public void deletePlayList(Long userId, List<Long> id) {
+        qukuService.removePlayList(userId, id);
     }
     
     public List<PlayListRes> getUserPlayList(Long userId) {
         List<TbCollectPojo> userPlayList = qukuService.getUserPlayList(userId, Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
         List<PlayListRes> playListRes = new ArrayList<>();
+        collectFillUpCount(userPlayList, playListRes);
+        return playListRes;
+    }
+    
+    private void collectFillUpCount(List<TbCollectPojo> userPlayList, List<PlayListRes> playListRes) {
         for (TbCollectPojo collectPojo : userPlayList) {
             PlayListRes e = new PlayListRes();
             Integer collectMusicCount = qukuService.getCollectMusicCount(collectPojo.getId());
@@ -365,7 +375,6 @@ public class PlayListApi {
             e.setCount(collectMusicCount);
             playListRes.add(e);
         }
-        return playListRes;
     }
     
     /**
@@ -380,5 +389,17 @@ public class PlayListApi {
         TbCollectPojo byId = collectService.getById(pid);
         ExceptionUtil.isNull(byId == null, ResultCode.PLAT_LIST_EXIST);
         qukuService.addMusicToCollect(userId, byId.getId(), id, flag);
+    }
+    
+    public Page<PlayListRes> getPlayListPage(PlayListReq req) {
+        req.setPage(MyPageUtil.checkPage(req.getPage()));
+        Page<TbCollectPojo> playList = playListService.getPlayList(req, req.getPage().getPageIndex().longValue(), req.getPage().getPageNum().longValue());
+        List<PlayListRes> playListRes = new ArrayList<>();
+        collectFillUpCount(playList.getRecords(), playListRes);
+        
+        Page<PlayListRes> playListResPage = new Page<>();
+        BeanUtils.copyProperties(playList, playListResPage);
+        playListResPage.setRecords(playListRes);
+        return playListResPage;
     }
 }

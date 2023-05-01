@@ -1,8 +1,10 @@
 package org.web.controller.admin.v1;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.MusicPageReq;
+import org.api.admin.model.req.PlayListReq;
 import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
@@ -28,7 +30,7 @@ public class PlayListController {
      * @param req 条件参数
      * @return 返回数据
      */
-    @PostMapping("/page")
+    @PostMapping("/music/page")
     public R getMusicPage(@RequestBody MusicPageReq req) {
         return R.success(playList.getMusicPage(req));
     }
@@ -39,14 +41,14 @@ public class PlayListController {
     }
     
     /**
-     * 获取歌单音乐
+     * 获取歌单中音乐
      *
      * @param playId 歌单ID
      * @return 返回数据
      */
     @RequestMapping(value = "/{playId}", method = {RequestMethod.GET, RequestMethod.POST})
-    public R getPlaylist(@PathVariable("playId") String playId, @RequestBody(required = false) MusicPageReq page) {
-        return R.success(playList.getPlaylist(playId, page));
+    public R getAllMusic(@PathVariable("playId") String playId, @RequestBody(required = false) MusicPageReq page) {
+        return R.success(playList.getAllMusic(playId, page));
     }
     
     /**
@@ -61,7 +63,7 @@ public class PlayListController {
     }
     
     @DeleteMapping("/{id}")
-    public R deletePlayList(@PathVariable("id") Long id) {
+    public R deletePlayList(@PathVariable("id") List<Long> id) {
         playList.deletePlayList(UserUtil.getUser().getId(), id);
         return R.success();
     }
@@ -89,5 +91,11 @@ public class PlayListController {
         uid = uid == null ? UserUtil.getUser().getId() : uid;
         List<RouterVo> playListRouters = playList.getAsyncPlayListRoutes(uid);
         return R.success(playListRouters);
+    }
+    
+    @PostMapping("/page")
+    public R getPlayListPage(@RequestBody PlayListReq req) {
+        Page<PlayListRes> playListPage = playList.getPlayListPage(req);
+        return R.success(playListPage);
     }
 }

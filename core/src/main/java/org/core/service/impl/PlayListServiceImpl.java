@@ -31,14 +31,14 @@ public class PlayListServiceImpl implements PlayListService {
     @Autowired
     private TbMusicService musicService;
     
-    public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size) {
+    public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Short type) {
         collectPojo = Optional.ofNullable(collectPojo).orElse(new TbCollectPojo());
         Page<TbCollectPojo> page = new Page<>(current, size);
         LambdaQueryWrapper<TbCollectPojo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(collectPojo.getId() != null, TbCollectPojo::getId, collectPojo.getId());
         queryWrapper.like(StringUtils.isNotBlank(collectPojo.getPlayListName()), TbCollectPojo::getPlayListName, collectPojo.getPlayListName());
         // 只查询普通歌单
-        queryWrapper.eq(TbCollectPojo::getType, Short.valueOf("0"));
+        queryWrapper.eq(type != null, TbCollectPojo::getType, type);
         collectService.page(page, queryWrapper);
         return page;
     }
@@ -51,7 +51,7 @@ public class PlayListServiceImpl implements PlayListService {
         }
         for (int i = 0; i < limit; i++) {
             long randomNum = RandomUtil.randomLong(count);
-            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L);
+            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L, Short.valueOf("0"));
             tbCollectPojos.addAll(playList.getRecords());
         }
         Set<TbCollectPojo> playerSet = new TreeSet<>(Comparator.comparing(TbCollectPojo::getId));

@@ -6,16 +6,16 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.res.MusicStatisticsRes;
+import org.api.admin.model.res.PluginTaskRes;
 import org.api.common.service.MusicCommonApi;
 import org.core.iservice.*;
 import org.core.pojo.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service(AdminConfig.ADMIN + "HoneApi")
 public class HoneApi {
@@ -37,6 +37,9 @@ public class HoneApi {
     
     @Autowired
     private TbPluginTaskService pluginTaskService;
+    
+    @Autowired
+    private TbPluginService pluginService;
     
     public List<TbMusicPojo> getMusicTop() {
         LambdaQueryWrapper<TbMusicPojo> queryWrapper = Wrappers.<TbMusicPojo>lambdaQuery().orderByDesc(TbMusicPojo::getCreateTime);
@@ -112,11 +115,23 @@ public class HoneApi {
         return res;
     }
     
-    public List<TbPluginTaskPojo> getPluginTask(Long id) {
+    public List<PluginTaskRes> getPluginTask(Long id) {
         LambdaQueryWrapper<TbPluginTaskPojo> eq = Wrappers.<TbPluginTaskPojo>lambdaQuery()
                                                           .eq(TbPluginTaskPojo::getUserId, id);
         Page<TbPluginTaskPojo> page = pluginTaskService.page(new Page<>(0, 15), eq);
-        return page.getRecords();
+        
+        Set<Long> collect = page.getRecords().parallelStream().map(TbPluginTaskPojo::getPluginId).collect(Collectors.toSet());
+        List<TbPluginPojo> pluginPojoList = pluginService.listByIds(collect);
+        Map<Long, TbPluginPojo> map = pluginPojoList.parallelStream().collect(Collectors.toMap(TbPluginPojo::getId, o -> o));
+        ArrayList<PluginTaskRes> res = new ArrayList<>();
+        for (TbPluginTaskPojo taskPojo : page.getRecords()) {
+            TbPluginPojo tbPluginPojo = map.get(taskPojo.getPluginId());
+            PluginTaskRes e = new PluginTaskRes();
+            BeanUtils.copyProperties(taskPojo, e);
+            e.setPluginName(tbPluginPojo.getPluginName());
+            res.add(e);
+        }
+        return res;
     }
     
     public List<TbArtistPojo> getArtist() {

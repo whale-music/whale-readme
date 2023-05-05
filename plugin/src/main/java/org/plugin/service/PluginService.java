@@ -6,6 +6,8 @@ import org.plugin.converter.PluginLabelValue;
 import org.plugin.converter.PluginMsgRes;
 import org.plugin.converter.PluginReq;
 import org.plugin.converter.PluginRes;
+import org.plugin.model.PluginRunParamsRes;
+import org.plugin.model.PluginTaskLogRes;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public interface PluginService {
      * @param pluginId 插件ID
      * @return 插件入参
      */
-    List<PluginLabelValue> getPluginParams(Long pluginId);
+    PluginRunParamsRes getPluginParams(Long pluginId);
     
     /**
      * 运行插件任务
@@ -59,4 +61,26 @@ public interface PluginService {
      * @param id 插件ID
      */
     void deletePlugin(Long id);
+    
+    /**
+     * 聚合插件搜索
+     *
+     * @param pluginLabelValue 程序启动插件
+     * @param pluginId         插件ID
+     * @param name             搜索参数
+     * @return 搜索返回数据
+     */
+    List<PluginLabelValue> getInteractiveSearch(List<PluginLabelValue> pluginLabelValue, Long pluginId, String name);
+    
+    /**
+     * 运行聚合插件
+     *
+     * @param pluginLabelValue 插件启动入参
+     * @param pluginId         插件ID
+     * @param type             传入ID类型 Music ID Album ID Artist ID
+     * @param id               ID
+     * @param pojo             任务ID
+     * @return 运行完成同步返回信息
+     */
+    PluginTaskLogRes execInteractivePluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, String type, Long id, TbPluginTaskPojo pojo);
 }

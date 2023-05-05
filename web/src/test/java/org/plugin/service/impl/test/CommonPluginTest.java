@@ -1,30 +1,17 @@
-package org.plugin.service.impl;
+package org.plugin.service.impl.test;
 
-import org.core.config.PluginType;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;
+import org.plugin.service.impl.PluginPackage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PluginTest implements CommonPlugin {
+public class CommonPluginTest implements CommonPlugin {
     
     private final static String COUNT = "count";
     
     private final static String SLEEP = "sleep";
-    
-    /**
-     * 获取插件类型
-     * 普通插件
-     * 交互插件
-     * 聚合插件
-     *
-     * @return 插件类型
-     */
-    @Override
-    public String getType() {
-        return PluginType.COMMON;
-    }
     
     /**
      * 获取插件调用参数

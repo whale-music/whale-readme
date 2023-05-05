@@ -4,10 +4,13 @@ import org.core.common.result.R;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
 import org.core.utils.UserUtil;
+import org.plugin.common.TaskStatus;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.converter.PluginMsgRes;
 import org.plugin.converter.PluginReq;
 import org.plugin.converter.PluginRes;
+import org.plugin.model.PluginRunParamsRes;
+import org.plugin.model.PluginTaskLogRes;
 import org.plugin.service.PluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -47,17 +50,24 @@ public class PluginController {
      */
     @GetMapping("/getPluginParams")
     public R getPluginParams(@RequestParam("pluginId") Long pluginId) {
-        List<PluginLabelValue> list = pluginService.getPluginParams(pluginId);
+        PluginRunParamsRes pluginParams = pluginService.getPluginParams(pluginId);
+        return R.success(pluginParams);
+    }
+    
+    
+    @PostMapping("/interactive/search")
+    public R getInteractiveSearch(@RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam("pluginId") Long pluginId, @RequestParam("name") String name) {
+        List<PluginLabelValue> list = pluginService.getInteractiveSearch(pluginLabelValue, pluginId, name);
         return R.success(list);
     }
     
     /**
-     * 运行插件任务
+     * 运行普通插件任务
      *
      * @param pluginId 插件ID
      */
-    @PostMapping("/execPluginTask")
-    public R execPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
+    @PostMapping("/execPluginTask/common")
+    public R execCommonPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
         TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
         if (Boolean.TRUE.equals(onLine)) {
             List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo);
@@ -66,6 +76,19 @@ public class PluginController {
             pluginService.execPluginTask(pluginLabelValue, pluginId, onLine, pojo);
             return R.success(pojo.getId());
         }
+    }
+    
+    /**
+     * 运行聚合插件
+     *
+     * @param pluginId 插件ID
+     */
+    @PostMapping("/execPluginTask/interactive")
+    public R execInteractivePluginTask(@RequestParam("pluginId") Long pluginId, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "id", required = false) Long id, @RequestBody List<PluginLabelValue> pluginLabelValue) {
+        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
+        pojo.setStatus(TaskStatus.STOP_STATUS);
+        PluginTaskLogRes res = pluginService.execInteractivePluginTask(pluginLabelValue, pluginId, type, id, pojo);
+        return R.success(res);
     }
     
     @PostMapping("/getTask")
@@ -91,4 +114,6 @@ public class PluginController {
         pluginService.deletePlugin(id);
         return R.success();
     }
+    
+    
 }

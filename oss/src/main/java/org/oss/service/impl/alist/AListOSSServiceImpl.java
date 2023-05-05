@@ -144,7 +144,7 @@ public class AListOSSServiceImpl implements OSSService {
         try {
             String musicAddresses = getMusicAddresses(srcFile.getName(), false);
             if (StringUtils.isNotBlank(musicAddresses)) {
-                return musicAddresses;
+                return srcFile.getName();
             }
         } catch (BaseException e) {
             if (!StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {

@@ -18,7 +18,7 @@ import java.util.List;
 
 @SpringBootTest(classes = MusicBoxSpringBoot.class)
 @Slf4j
-class SyncPlayListMusicPluginTest {
+class SyncPlayListMusicCommonPluginTest {
     
     @Autowired
     private MusicFlowApi musicFlowApi;

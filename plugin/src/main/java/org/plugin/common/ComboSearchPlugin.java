@@ -19,7 +19,9 @@ public interface ComboSearchPlugin extends PluginType {
      * @return 插件类型
      */
     @Override
-    String getType();
+    default String getType() {
+        return org.core.config.PluginType.INTERACTIVE;
+    }
     
     /**
      * 获取插件调用参数
@@ -41,7 +43,6 @@ public interface ComboSearchPlugin extends PluginType {
     /**
      * 需要同步的数据
      * 返回结果以html解析
-     * 可以使用默认返回ok和error前端会自动解析
      *
      * @param data          数据
      * @param type          ID类型 可能没有。需要自行判断,类型可能是Music ID Album ID Artist ID

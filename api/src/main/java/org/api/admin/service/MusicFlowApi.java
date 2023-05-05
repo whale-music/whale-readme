@@ -47,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -214,7 +215,9 @@ public class MusicFlowApi {
         // 检测本地是否有已上传的数据
         if (FileUtil.isFile(path)) {
             File file = new File(path);
-            String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+            BufferedInputStream inputStream = FileUtil.getInputStream(file);
+            String md5 = DigestUtils.md5DigestAsHex(inputStream);
+            inputStream.close();
             if (StringUtils.equals(md5, dto.getMd5())) {
                 return file;
             }
@@ -350,10 +353,25 @@ public class MusicFlowApi {
             urlPojo.setUrl(dto.getMusicTemp());
         } else {
             File file;
+            String md5 = "";
             if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
-                String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
-                file = getMusicFile(dto, pathname);
-                FileUtil.rename(file, dto.getMd5() + "." + dto.getType(), true);
+                // 没有md5，取文件的md5
+                if (StringUtils.isBlank(dto.getMd5())) {
+                    File file1 = new File(pathTemp);
+                    HttpUtil.downloadFile(dto.getMusicTemp(), file1, 600000);
+                    File[] files = Objects.requireNonNull(file1.listFiles());
+                    File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
+                    ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
+                    BufferedInputStream inputStream = FileUtil.getInputStream(lastFile);
+                    md5 = DigestUtils.md5DigestAsHex(inputStream);
+                    inputStream.close();
+                    file = FileUtil.rename(lastFile, md5, true, true);
+                } else {
+                    String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
+                    file = getMusicFile(dto, pathname);
+                    FileUtil.rename(file, dto.getMd5() + "." + dto.getType(), true);
+                    md5 = dto.getMd5();
+                }
             } else {
                 // 读取本地文件
                 file = new File(pathTemp, dto.getMusicTemp());
@@ -365,10 +383,12 @@ public class MusicFlowApi {
             urlPojo.setSize(size);
             urlPojo.setRate(dto.getRate());
             urlPojo.setLevel(dto.getLevel());
-            urlPojo.setMd5(dto.getMd5());
+            urlPojo.setMd5(md5);
             urlPojo.setEncodeType(FileUtil.extName(file));
             urlPojo.setUrl(uploadPath);
         }
+        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, urlPojo.getMd5()));
+        ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
         musicUrlService.saveOrUpdate(urlPojo);
         return urlPojo;
     }

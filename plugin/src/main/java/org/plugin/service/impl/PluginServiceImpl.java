@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.PluginType;
 import org.core.iservice.TbPluginMsgService;
 import org.core.iservice.TbPluginService;
 import org.core.iservice.TbPluginTaskService;
@@ -19,12 +20,15 @@ import org.core.pojo.TbPluginTaskPojo;
 import org.core.service.QukuService;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
+import org.plugin.common.ComboSearchPlugin;
 import org.plugin.common.CommonPlugin;
 import org.plugin.common.TaskStatus;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.converter.PluginMsgRes;
 import org.plugin.converter.PluginReq;
 import org.plugin.converter.PluginRes;
+import org.plugin.model.PluginRunParamsRes;
+import org.plugin.model.PluginTaskLogRes;
 import org.plugin.service.PluginService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +58,7 @@ public class PluginServiceImpl implements PluginService {
     @Autowired
     private QukuService qukuService;
     
-    private static CommonPlugin runCode(String script, String allClassName) {
+    private static CommonPlugin runCommonCode(String script, String allClassName) {
         try {
             final ClassLoader classLoader = CompilerUtil.getCompiler(null)
                                                         // 被编译的源码字符串
@@ -66,6 +70,28 @@ public class PluginServiceImpl implements PluginService {
             Object obj = ReflectUtil.newInstance(clazz);
             if (obj instanceof CommonPlugin) {
                 return (CommonPlugin) obj;
+            }
+        } catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new BaseException(e.getMessage());
+        }
+        log.error("全类名: {}", allClassName);
+        log.error("script: {}", script);
+        throw new BaseException(ResultCode.PLUGIN_CODE);
+    }
+    
+    private static ComboSearchPlugin runInteractiveCode(String script, String allClassName) {
+        try {
+            final ClassLoader classLoader = CompilerUtil.getCompiler(null)
+                                                        // 被编译的源码字符串
+                                                        .addSource(allClassName, script)
+                                                        .compile();
+            final Class<?> clazz = classLoader.loadClass(allClassName);
+            log.info("clazz: {}", clazz);
+            // 实例化对象c
+            Object obj = ReflectUtil.newInstance(clazz);
+            if (obj instanceof ComboSearchPlugin) {
+                return (ComboSearchPlugin) obj;
             }
         } catch (ClassNotFoundException e) {
             log.error(e.getMessage(), e);
@@ -132,15 +158,25 @@ public class PluginServiceImpl implements PluginService {
      * @return 插件入参
      */
     @Override
-    public List<PluginLabelValue> getPluginParams(Long pluginId) {
+    public PluginRunParamsRes getPluginParams(Long pluginId) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
         }
         String script = byId.getCode();
+        if (org.apache.commons.lang3.StringUtils.isBlank(script)) {
+            throw new BaseException(ResultCode.PLUGIN_CODE);
+        }
         String allClassName = getClassName(script);
-        CommonPlugin func = runCode(script, allClassName);
-        return func.getParams();
+        switch (byId.getType()) {
+            case PluginType.COMMON:
+                CommonPlugin func = runCommonCode(script, allClassName);
+                return new PluginRunParamsRes(func.getType(), func.getParams());
+            case PluginType.INTERACTIVE:
+                ComboSearchPlugin comboSearchPlugin = runInteractiveCode(script, allClassName);
+                return new PluginRunParamsRes(comboSearchPlugin.getType(), comboSearchPlugin.getParams());
+        }
+        throw new BaseException(ResultCode.PLUGIN_NO_EXIST_EXISTED);
     }
     
     /**
@@ -206,7 +242,7 @@ public class PluginServiceImpl implements PluginService {
         if (byId == null) {
             throw new BaseException(ResultCode.PLUGIN_EXISTED);
         }
-        CommonPlugin func = runCode(byId.getCode(), getClassName(byId.getCode()));
+        CommonPlugin func = runCommonCode(byId.getCode(), getClassName(byId.getCode()));
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi,
                 pluginMsgService,
                 pluginTaskService,
@@ -269,16 +305,10 @@ public class PluginServiceImpl implements PluginService {
      */
     @Override
     public void deleteTask(Long id) {
-        boolean b = pluginTaskService.removeById(id);
-        if (!b) {
-            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK_ERROR);
-        }
+        pluginTaskService.removeById(id);
         LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(TbPluginMsgPojo::getTaskId, id);
-        b = pluginMsgService.remove(queryWrapper);
-        if (!b) {
-            throw new BaseException(ResultCode.PLUGIN_DELETE_TASK_ERROR);
-        }
+        pluginMsgService.remove(queryWrapper);
     }
     
     /**
@@ -291,6 +321,58 @@ public class PluginServiceImpl implements PluginService {
         boolean b = pluginService.removeById(id);
         if (!b) {
             throw new BaseException(ResultCode.PLUGIN_DELETE_ERROR);
+        }
+    }
+    
+    /**
+     * 聚合插件搜索
+     *
+     * @param pluginLabelValue 程序启动插件
+     * @param pluginId         插件ID
+     * @param name             搜索参数
+     * @return 搜索返回数据
+     */
+    @Override
+    public List<PluginLabelValue> getInteractiveSearch(List<PluginLabelValue> pluginLabelValue, Long pluginId, String name) {
+        TbPluginPojo byId = pluginService.getById(pluginId);
+        String code = byId.getCode();
+        ComboSearchPlugin comboSearchPlugin = runInteractiveCode(code, getClassName(byId.getCode()));
+        return comboSearchPlugin.search(pluginLabelValue, name);
+    }
+    
+    /**
+     * 运行聚合插件
+     *
+     * @param pluginLabelValue 插件启动入参
+     * @param pluginId         插件ID
+     * @param type             传入ID类型 Music ID Album ID Artist ID
+     * @param id               ID
+     * @param pojo             任务ID
+     * @return 运行完成同步返回信息
+     */
+    @Override
+    public PluginTaskLogRes execInteractivePluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, String type, Long id, TbPluginTaskPojo pojo) {
+        try {
+            TbPluginPojo byId = pluginService.getById(pluginId);
+            String code = byId.getCode();
+            ComboSearchPlugin comboSearchPlugin = runInteractiveCode(code, getClassName(byId.getCode()));
+            PluginPackage pluginPackage = new PluginPackage(musicFlowApi,
+                    pluginMsgService,
+                    pluginTaskService,
+                    qukuService,
+                    pojo.getId(),
+                    pojo.getUserId(),
+                    null);
+            String sync = comboSearchPlugin.sync(pluginLabelValue, type, id, pluginPackage);
+            List<TbPluginMsgPojo> logs = pluginPackage.getLogs();
+            PluginTaskLogRes pluginTaskLogRes = new PluginTaskLogRes();
+            pluginTaskLogRes.setPluginMsg(logs);
+            pluginTaskLogRes.setHtml(sync);
+            return pluginTaskLogRes;
+        } catch (Exception e) {
+            PluginTaskLogRes pluginTaskLogRes = new PluginTaskLogRes();
+            pluginTaskLogRes.setHtml(e.getMessage());
+            return pluginTaskLogRes;
         }
     }
 }

@@ -27,6 +27,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLAT_LIST_EXIST("10010", "歌单不存在"),
     PLAT_LIST_MUSIC_EXIST("10011", "歌单中已存在歌曲"),
     ALBUM_NO_EXIST_ERROR("10012", "专辑不存在"),
+    PLUGIN_NO_EXIST_EXISTED("10013", "插件类型不存在"),
     
     
     /* 用户错误：20001-29999*/
@@ -73,7 +74,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_LOGIN_ERROR("50007", "OSS登录错误"),
     OSS_UPLOAD_ERROR("50008", "OSS上传错误"),
     DOWNLOAD_ERROR("50009", "下载错误"),
-    SERIALIZATION_ERROR("50009","序列化错误"),
+    SERIALIZATION_ERROR("50009", "序列化错误"),
+    OSS_MD5_REPEAT("50011", "上传音乐MD5重复"),
     
     
     /* 接口错误：60001-69999 */

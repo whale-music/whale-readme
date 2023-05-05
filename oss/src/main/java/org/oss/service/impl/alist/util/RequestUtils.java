@@ -6,6 +6,7 @@ import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.*;
 import cn.hutool.log.Log;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -19,7 +20,6 @@ import org.oss.service.impl.alist.model.list.MusicListRes;
 import org.oss.service.impl.alist.model.login.req.LoginReq;
 import org.oss.service.impl.alist.model.login.res.DataRes;
 import org.oss.service.impl.alist.model.login.res.LoginRes;
-import org.springframework.cglib.beans.BeanMap;
 
 import java.io.File;
 import java.util.HashMap;
@@ -117,13 +117,13 @@ public class RequestUtils {
         headers.put("Password", "");
         headers.put("Referer", host + objectSaveConfig);
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
-        
+    
         String resJson = req(host + "/api/fs/form", srcFile, headers);
-        BeanMap map = BeanMap.create(resJson);
-        if (!StringUtils.equals(String.valueOf(map.get("code")), String.valueOf(200))) {
+        JSONObject parseObject = JSON.parseObject(resJson);
+        if (!StringUtils.equals(String.valueOf(parseObject.get("code")), String.valueOf(200))) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
         log.debug("上传成功: {},地址: {}", srcFile.getName(), url);
-        return FileUtil.mainName(srcFile.getName());
+        return FileUtil.getName(srcFile.getName());
     }
 }

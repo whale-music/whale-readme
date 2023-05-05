@@ -17,7 +17,9 @@ public interface CommonPlugin extends PluginType {
      * @return 插件类型
      */
     @Override
-    String getType();
+    default String getType() {
+        return org.core.config.PluginType.COMMON;
+    }
     
     /**
      * 获取插件调用参数

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service(AdminConfig.ADMIN + "ArtistApi")
 public class ArtistApi {
@@ -108,6 +109,9 @@ public class ArtistApi {
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
     
         List<TbAlbumPojo> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
+        albumListByArtistIds = albumListByArtistIds.parallelStream()
+                                                   .filter(tbAlbumPojo -> StringUtils.isNotBlank(tbAlbumPojo.getAlbumName()))
+                                                   .collect(Collectors.toList());
         List<TbMusicPojo> musicListByArtistId = qukuService.getMusicListByArtistId(id);
         artistInfoRes.setAlbumList(albumListByArtistIds);
         artistInfoRes.setMusicList(musicListByArtistId);

@@ -421,6 +421,28 @@ public class MusicFlowApi {
             TbMusicPojo musicPojo = musicService.getOne(Wrappers.<TbMusicPojo>lambdaQuery()
                                                                 .eq(TbMusicPojo::getAlbumId, albumPojo.getId())
                                                                 .eq(TbMusicPojo::getMusicName, dto.getMusicName()));
+            // 如果不相等则查询数据库相同音乐中关联的歌手，一样则覆盖
+            if (musicPojo == null) {
+                List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
+                                                                   .eq(TbMusicPojo::getMusicName, dto.getMusicName()));
+                Set<Long> albumSets = list.parallelStream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
+                Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
+                                                               .parallelStream()
+                                                               .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
+                for (Long albumSet : albumSets) {
+                    List<TbAlbumArtistPojo> list1 = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                                    .eq(TbAlbumArtistPojo::getAlbumId, albumSet));
+                    Set<Long> tempArtistList = list1.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
+                    if (CollUtil.isEqualList(tempArtistList, singerIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
+                        Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
+                                StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(), albumSet)
+                        ).findFirst();
+                        if (first.isPresent()) {
+                            return saveMusicInfoTable(dto, albumPojo, first.get(), aliaNames);
+                        }
+                    }
+                }
+            }
             // 通过专辑查询出来音乐数据ID存在歌手中间中，直接返回
             if (musicPojo != null) {
                 return saveMusicInfoTable(dto, albumPojo, musicPojo, aliaNames);
@@ -482,9 +504,18 @@ public class MusicFlowApi {
      * @return 专辑表
      */
     private TbAlbumPojo saveAndReturnAlbumPojo(AudioInfoReq dto, Set<Long> singerIds) {
-        // 专辑没有值直接返回
+        // 专辑没有值新建一个空的专辑
         if (dto.getAlbum() == null || StringUtils.isBlank(dto.getAlbum().getAlbumName())) {
-            return new TbAlbumPojo();
+            TbAlbumPojo entity = new TbAlbumPojo();
+            albumService.save(entity);
+            Set<TbAlbumArtistPojo> collect = singerIds.parallelStream().map(aLong -> {
+                TbAlbumArtistPojo tbAlbumArtistPojo = new TbAlbumArtistPojo();
+                tbAlbumArtistPojo.setAlbumId(entity.getId());
+                tbAlbumArtistPojo.setArtistId(aLong);
+                return tbAlbumArtistPojo;
+            }).collect(Collectors.toSet());
+            albumSingerService.saveBatch(collect);
+            return entity;
         }
         // 如果是数据库中已有数据，直接更新
         Long albumId = dto.getAlbum().getId();

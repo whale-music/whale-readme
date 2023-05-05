@@ -43,9 +43,9 @@ public interface PluginService {
     
     List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, TbPluginTaskPojo id);
     
-    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId);
+    TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, List<PluginLabelValue> pluginLabelValue, Long userId);
     
-    List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo);
+    List<TbPluginTaskPojo> getTask(Long id, String type, TbPluginTaskPojo taskPojo);
     
     /**
      * 删除插件任务
@@ -53,7 +53,7 @@ public interface PluginService {
      *
      * @param id 任务ID
      */
-    void deleteTask(Long id);
+    void deleteTask(List<Long> id);
     
     /**
      * 删除插件

@@ -55,6 +55,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     NULL_POINTER_EXCEPTION("30002", "空指针错误"),
     PLUGIN_DELETE_TASK_ERROR("30003", "插件删除任务错误"),
     PLUGIN_DELETE_ERROR("30004", "插件删除错误"),
+    PLUGIN_CANNOT_DELETE_RUNNING("30005", "不能删除正在运行的插件"),
     
     
     /* 系统错误：40001-49999 */

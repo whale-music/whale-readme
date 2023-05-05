@@ -63,7 +63,7 @@ class InteractivePluginTestTest {
               .orElseThrow(RuntimeException::new)
               .setValue(page);
         
-        TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(405408338284677L, 403648304906373L);
+        TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(405408338284677L, params, 403648304906373L);
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService,
                 qukuService, taskPojo.getId(), taskPojo.getUserId(), null);
         List<PluginLabelValue> search = plugin.search(params, input);

@@ -387,8 +387,11 @@ public class MusicFlowApi {
             urlPojo.setEncodeType(FileUtil.extName(file));
             urlPojo.setUrl(uploadPath);
         }
-        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, urlPojo.getMd5()));
-        ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
+        // 检测是否重复上传相同的MD5音乐文件
+        if (urlPojo.getId() == null) {
+            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, urlPojo.getMd5()));
+            ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
+        }
         musicUrlService.saveOrUpdate(urlPojo);
         return urlPojo;
     }
@@ -426,19 +429,22 @@ public class MusicFlowApi {
                 List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                                    .eq(TbMusicPojo::getMusicName, dto.getMusicName()));
                 Set<Long> albumSets = list.parallelStream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
-                Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
-                                                               .parallelStream()
-                                                               .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
-                for (Long albumSet : albumSets) {
-                    List<TbAlbumArtistPojo> list1 = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                                    .eq(TbAlbumArtistPojo::getAlbumId, albumSet));
-                    Set<Long> tempArtistList = list1.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
-                    if (CollUtil.isEqualList(tempArtistList, singerIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
-                        Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
-                                StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(), albumSet)
-                        ).findFirst();
-                        if (first.isPresent()) {
-                            return saveMusicInfoTable(dto, albumPojo, first.get(), aliaNames);
+                if (CollUtil.isNotEmpty(albumSets)) {
+                    Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
+                                                                   .parallelStream()
+                                                                   .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
+                    for (Long albumSet : albumSets) {
+                        List<TbAlbumArtistPojo> list1 = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                                        .eq(TbAlbumArtistPojo::getAlbumId, albumSet));
+                        Set<Long> tempArtistList = list1.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
+                        if (CollUtil.isEqualList(tempArtistList, singerIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
+                            Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
+                                    StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(),
+                                            albumSet)
+                            ).findFirst();
+                            if (first.isPresent()) {
+                                return saveMusicInfoTable(dto, albumPojo, first.get(), aliaNames);
+                            }
                         }
                     }
                 }

@@ -45,6 +45,10 @@ public class TbPluginTaskPojo implements Serializable {
     @TableField("user_id")
     private Long userId;
     
+    @ApiModelProperty("插件入参")
+    @TableField("params")
+    private String params;
+    
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

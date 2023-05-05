@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.compiler.CompilerUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,8 +64,7 @@ public class PluginServiceImpl implements PluginService {
         try {
             final ClassLoader classLoader = CompilerUtil.getCompiler(null)
                                                         // 被编译的源码字符串
-                                                        .addSource(allClassName, script)
-                                                        .compile();
+                                                        .addSource(allClassName, script).compile();
             final Class<?> clazz = classLoader.loadClass(allClassName);
             log.info("clazz: {}", clazz);
             // 实例化对象c
@@ -84,8 +85,7 @@ public class PluginServiceImpl implements PluginService {
         try {
             final ClassLoader classLoader = CompilerUtil.getCompiler(null)
                                                         // 被编译的源码字符串
-                                                        .addSource(allClassName, script)
-                                                        .compile();
+                                                        .addSource(allClassName, script).compile();
             final Class<?> clazz = classLoader.loadClass(allClassName);
             log.info("clazz: {}", clazz);
             // 实例化对象c
@@ -210,7 +210,7 @@ public class PluginServiceImpl implements PluginService {
                     task.getId(),
                     task.getUserId(),
                     null);
-            pluginPackage.log((short) 3, task.toString(), String.valueOf(entity.getUserId()), e.getMessage());
+            pluginPackage.log((short) 3, "error错误: {}: {}", e.getClass().getName(), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }
@@ -260,10 +260,11 @@ public class PluginServiceImpl implements PluginService {
     
     
     @Override
-    public TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, Long userId) {
+    public TbPluginTaskPojo getTbPluginTaskPojo(Long pluginId, List<PluginLabelValue> pluginLabelValue, Long userId) {
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
         entity.setPluginId(pluginId);
         entity.setUserId(userId);
+        entity.setParams(JSON.toJSONString(pluginLabelValue));
         entity.setStatus(TaskStatus.RUN_STATUS);
         pluginTaskService.save(entity);
         return entity;
@@ -271,29 +272,26 @@ public class PluginServiceImpl implements PluginService {
     
     /**
      * @param id       用户ID
+     * @param type     插件类型
      * @param taskPojo 任务运行信息
      * @return 返回运行信息
      */
     @Override
-    public List<TbPluginTaskPojo> getTask(Long id, TbPluginTaskPojo taskPojo) {
-        if (taskPojo != null && taskPojo.getId() != null) {
-            TbPluginTaskPojo byId = pluginTaskService.getById(taskPojo.getId());
-            return Collections.singletonList(byId);
+    public List<TbPluginTaskPojo> getTask(Long id, String type, TbPluginTaskPojo taskPojo) {
+        Collection<Long> pluginIds = null;
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(type)) {
+            List<TbPluginPojo> list = pluginService.list(Wrappers.<TbPluginPojo>lambdaQuery().in(TbPluginPojo::getType, type));
+            pluginIds = list.parallelStream().map(TbPluginPojo::getId).collect(Collectors.toSet());
         }
-        if (taskPojo == null || taskPojo.getId() == null || taskPojo.getStatus() == null) {
-            LambdaQueryWrapper<TbPluginTaskPojo> wrappers = Wrappers.lambdaQuery();
-            wrappers.eq(TbPluginTaskPojo::getUserId, id);
-            wrappers.orderByDesc(TbPluginTaskPojo::getCreateTime);
-            return pluginTaskService.list(wrappers);
-        }
-        if (taskPojo.getUserId() != null) {
-            LambdaQueryWrapper<TbPluginTaskPojo> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(TbPluginTaskPojo::getUserId, taskPojo.getUserId());
-            wrapper.eq(taskPojo.getStatus() != null, TbPluginTaskPojo::getStatus, taskPojo.getStatus());
-            wrapper.eq(taskPojo.getPluginId() != null, TbPluginTaskPojo::getPluginId, taskPojo.getPluginId());
-            return pluginTaskService.list(wrapper);
-        }
-        return Collections.emptyList();
+        taskPojo = taskPojo == null ? new TbPluginTaskPojo() : taskPojo;
+        LambdaQueryWrapper<TbPluginTaskPojo> wrappers = Wrappers.lambdaQuery();
+        wrappers.eq(taskPojo.getId() != null, TbPluginTaskPojo::getId, taskPojo.getId());
+        wrappers.eq(taskPojo.getStatus() != null, TbPluginTaskPojo::getStatus, taskPojo.getStatus());
+        wrappers.eq(taskPojo.getPluginId() != null, TbPluginTaskPojo::getPluginId, taskPojo.getPluginId());
+        wrappers.eq(taskPojo.getUserId() != null, TbPluginTaskPojo::getUserId, taskPojo.getUserId());
+        wrappers.in(CollUtil.isNotEmpty(pluginIds), TbPluginTaskPojo::getPluginId, pluginIds);
+        wrappers.orderByDesc(TbPluginTaskPojo::getCreateTime);
+        return pluginTaskService.list(wrappers);
     }
     
     
@@ -304,10 +302,16 @@ public class PluginServiceImpl implements PluginService {
      * @param id 任务ID
      */
     @Override
-    public void deleteTask(Long id) {
-        pluginTaskService.removeById(id);
+    public void deleteTask(List<Long> id) {
+        List<TbPluginTaskPojo> tbPluginTaskPojos = pluginTaskService.listByIds(id);
+        for (TbPluginTaskPojo tbPluginTaskPojo : tbPluginTaskPojos) {
+            if (tbPluginTaskPojo.getStatus() == TaskStatus.RUN_STATUS) {
+                throw new BaseException(ResultCode.PLUGIN_CANNOT_DELETE_RUNNING);
+            }
+        }
+        pluginTaskService.removeBatchByIds(id);
         LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(TbPluginMsgPojo::getTaskId, id);
+        queryWrapper.in(TbPluginMsgPojo::getTaskId, id);
         pluginMsgService.remove(queryWrapper);
     }
     

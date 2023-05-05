@@ -68,7 +68,7 @@ public class PluginController {
      */
     @PostMapping("/execPluginTask/common")
     public R execCommonPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
-        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
+        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, pluginLabelValue, UserUtil.getUser().getId());
         if (Boolean.TRUE.equals(onLine)) {
             List<TbPluginMsgPojo> tbPluginMsgPojos = pluginService.onLineExecPluginTask(pluginLabelValue, pluginId, pojo);
             return R.success(tbPluginMsgPojos);
@@ -85,15 +85,15 @@ public class PluginController {
      */
     @PostMapping("/execPluginTask/interactive")
     public R execInteractivePluginTask(@RequestParam("pluginId") Long pluginId, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "id", required = false) Long id, @RequestBody List<PluginLabelValue> pluginLabelValue) {
-        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, UserUtil.getUser().getId());
+        TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, pluginLabelValue, UserUtil.getUser().getId());
         pojo.setStatus(TaskStatus.STOP_STATUS);
         PluginTaskLogRes res = pluginService.execInteractivePluginTask(pluginLabelValue, pluginId, type, id, pojo);
         return R.success(res);
     }
     
     @PostMapping("/getTask")
-    public R getTask(@RequestBody TbPluginTaskPojo taskPojo) {
-        List<TbPluginTaskPojo> list = pluginService.getTask(UserUtil.getUser().getId(), taskPojo);
+    public R getTask(@RequestParam(value = "type", required = false) String type, @RequestBody TbPluginTaskPojo taskPojo) {
+        List<TbPluginTaskPojo> list = pluginService.getTask(UserUtil.getUser().getId(), type, taskPojo);
         return R.success(list);
     }
     
@@ -103,8 +103,8 @@ public class PluginController {
         return R.success(list);
     }
     
-    @GetMapping("/deleteTask/{id}")
-    public R deleteTask(@PathVariable("id") Long id) {
+    @GetMapping("/deleteTask")
+    public R deleteTask(@RequestParam("id") List<Long> id) {
         pluginService.deleteTask(id);
         return R.success();
     }

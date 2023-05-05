@@ -62,7 +62,7 @@ create table if not exists tb_album
 (
     id           bigint       not null comment '专辑表ID'
         primary key,
-    album_name   varchar(512) not null comment '专辑名',
+    album_name   varchar(512) null comment '专辑名',
     sub_type     varchar(128) null comment '专辑版本（比如录音室版，现场版）',
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
@@ -213,7 +213,7 @@ create table if not exists tb_music_url
     music_id    bigint        not null comment '音乐ID',
     rate        int           null comment '比特率，音频文件的信息',
     url         varchar(512)  null comment '音乐地址',
-    md5         char(32)      null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
+    md5         char(32)      not null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
     level       char(8)       null comment '音乐质量',
     encode_type char(10)      null comment '文件格式类型',
     size        bigint        null comment '文件大小',
@@ -223,6 +223,8 @@ create table if not exists tb_music_url
     update_time datetime      null comment '修改时间',
     constraint id
         unique (id),
+    constraint md5
+        unique (md5),
     constraint tb_music_url_tb_music_id_fk
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
@@ -244,9 +246,10 @@ create table if not exists tb_plugin
         primary key,
     plugin_name varchar(255) not null comment '插件名称',
     create_name varchar(255) null comment '插件创建者',
+    type        varchar(255) not null comment '插件类型',
     code        longtext     null comment '插件代码',
-    description text         null comment '插件描述',
     user_id     bigint       not null comment '插件创建者',
+    description text         null comment '插件描述',
     create_time datetime     not null comment '创建时间',
     update_time datetime     not null comment '更新时间',
     constraint id
@@ -279,6 +282,7 @@ create table if not exists tb_plugin_task
         primary key,
     plugin_id   bigint   not null comment '插件ID',
     status      tinyint  not null comment '当前任务执行状态,0: stop, 1: run, 2: error',
+    params      text     null comment '插件入参',
     user_id     bigint   not null comment '用户创建ID',
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',

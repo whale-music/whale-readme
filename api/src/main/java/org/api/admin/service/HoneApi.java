@@ -1,5 +1,6 @@
 package org.api.admin.service;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -48,7 +49,9 @@ public class HoneApi {
     }
     
     public List<TbAlbumPojo> getAlbumTop() {
-        LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery().orderByDesc(TbAlbumPojo::getCreateTime);
+        LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                          .isNotNull(TbAlbumPojo::getAlbumName)
+                                                          .orderByDesc(TbAlbumPojo::getCreateTime);
         Page<TbAlbumPojo> objectPage = new Page<>(0, 15);
         return albumService.page(objectPage, wrapper).getRecords();
     }
@@ -56,6 +59,7 @@ public class HoneApi {
     public int getMusicCount() {
         return Math.toIntExact(musicService.count());
     }
+    
     
     public int getAlbumCount() {
         return Math.toIntExact(albumService.count());
@@ -119,7 +123,9 @@ public class HoneApi {
         LambdaQueryWrapper<TbPluginTaskPojo> eq = Wrappers.<TbPluginTaskPojo>lambdaQuery()
                                                           .eq(TbPluginTaskPojo::getUserId, id);
         Page<TbPluginTaskPojo> page = pluginTaskService.page(new Page<>(0, 15), eq);
-        
+        if (CollUtil.isEmpty(page.getRecords())) {
+            return Collections.emptyList();
+        }
         Set<Long> collect = page.getRecords().parallelStream().map(TbPluginTaskPojo::getPluginId).collect(Collectors.toSet());
         List<TbPluginPojo> pluginPojoList = pluginService.listByIds(collect);
         Map<Long, TbPluginPojo> map = pluginPojoList.parallelStream().collect(Collectors.toMap(TbPluginPojo::getId, o -> o));

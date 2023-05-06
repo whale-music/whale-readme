@@ -81,6 +81,7 @@ public class AlbumApi {
         
         LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         pageOrderBy(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
+        lambdaQueryWrapper.isNotNull(TbAlbumPojo::getAlbumName);
         lambdaQueryWrapper.in(CollUtil.isNotEmpty(albumListId), TbAlbumPojo::getId, albumListId);
         
         // 查询全部专辑数据

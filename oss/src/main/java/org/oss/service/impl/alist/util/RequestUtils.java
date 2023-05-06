@@ -51,7 +51,7 @@ public class RequestUtils {
      */
     @NotNull
     private static String req(String host, File formFile, Map<String, String> headers) {
-        int milliseconds = 1000 * 600;
+        int milliseconds = 60 * 60 * 1000;
         HttpRequest request = HttpUtil.createRequest(Method.PUT, host);
         request.form("file", formFile);
         request.addHeaders(headers);

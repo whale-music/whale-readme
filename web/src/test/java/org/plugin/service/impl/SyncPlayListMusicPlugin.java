@@ -11,6 +11,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,6 @@ import org.core.pojo.*;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;
-import org.springframework.cglib.beans.BeanMap;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,9 +36,13 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
     public static final String USER_ID_KEY = "userId";
     public static final String COOKIE_KEY = "cookie";
     
+    public static final String IS_DOWNLOAD_UPLOAD = "is_download_upload";
+    
     private PluginPackage pluginPackage;
     
     private String host = "";
+    
+    private boolean downloadUpload = false;
     
     /**
      * 获取插件类型
@@ -78,13 +82,18 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         e3.setKey(USER_ID_KEY);
         e3.setValue("");
         pluginLabelValues.add(e3);
-        
+    
         PluginLabelValue e1 = new PluginLabelValue();
         e1.setLabel("歌单ID");
         e1.setKey(PlAY_LIST_ID_KEY);
         e1.setValue("");
         pluginLabelValues.add(e1);
-        
+    
+        PluginLabelValue e4 = new PluginLabelValue();
+        e4.setLabel("是否自动下载歌曲并上传(0: 否 1: 是)");
+        e4.setKey(IS_DOWNLOAD_UPLOAD);
+        e4.setValue("");
+        pluginLabelValues.add(e4);
         return pluginLabelValues;
     }
     
@@ -101,12 +110,14 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         String cookie = getValue(values, COOKIE_KEY);
         String playList = getValue(values, PlAY_LIST_ID_KEY);
         String userId = getValue(values, USER_ID_KEY);
-        
+        downloadUpload = StringUtils.equals(getValue(values, IS_DOWNLOAD_UPLOAD), "0");
+    
+    
         assert playList != null;
         assert cookie != null;
         assert host != null;
         assert userId != null;
-        
+    
         saveUserPlayListMusicList(pluginPackage, playList, cookie, Long.valueOf(userId));
     }
     
@@ -273,7 +284,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         // 获取歌曲md5值
         Map<String, Object> musicUrlMap = songUrlMap.get(musicId);
         String url = MapUtil.getStr(musicUrlMap, "url");
-        dto.setUploadFlag(true);
+        dto.setUploadFlag(downloadUpload);
         if (musicUrlMap != null && StringUtils.isNotBlank(url)) {
             dto.setRate(MapUtil.getInt(musicUrlMap, "br"));
             String md5 = MapUtil.getStr(musicUrlMap, "md5");
@@ -282,7 +293,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
             dto.setMd5(md5);
             dto.setLevel(MapUtil.getStr(musicUrlMap, "level"));
             // 上传md5值，或音乐文件
-            dto.setMusicTemp(dto.getUploadFlag() ? md5 + "." + type : MapUtil.getStr(musicUrlMap, "url"));
+            dto.setMusicTemp(dto.getUploadFlag() ? md5 + "." + type : url);
             dto.setSize(MapUtil.getLong(musicUrlMap, "size"));
         }
         // true: 只存储到数据库，不上传
@@ -382,18 +393,18 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
      */
     public Map<String, String> getLyric(Long musicId, String cookie) {
         String request = req(host + "/lyric?id=" + musicId, cookie);
-        BeanMap beanMap = BeanMap.create(request);
-        BeanMap lrcMap = MapUtil.get(beanMap, "lrc", BeanMap.class);
-        String lyric = MapUtil.getStr(lrcMap, "lyric");
-        
-        BeanMap klyricMap = MapUtil.get(beanMap, "klyric", BeanMap.class);
-        String klyric = MapUtil.getStr(klyricMap, "lyric");
-        
+        com.alibaba.fastjson2.JSONObject jsonObject = JSON.parseObject(request);
+        com.alibaba.fastjson2.JSONObject lrc = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("lrc"));
+        String lyricStr = lrc.getString("lyric");
+    
+        com.alibaba.fastjson2.JSONObject klyric = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("klyric"));
+        String klyricStr = klyric.getString("lyric");
+    
         // String lrc = JsonPath.read(request, "$.lrc.lyric");
         // String klyric = JsonPath.read(request, "$.klyric.lyric");
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("lrc", lyric);
-        stringStringHashMap.put("klyric", klyric);
+        stringStringHashMap.put("lrc", lyricStr);
+        stringStringHashMap.put("klyric", klyricStr);
         return stringStringHashMap;
     }
     

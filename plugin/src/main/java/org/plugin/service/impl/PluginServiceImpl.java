@@ -303,10 +303,12 @@ public class PluginServiceImpl implements PluginService {
      */
     @Override
     public void deleteTask(List<Long> id) {
-        List<TbPluginTaskPojo> tbPluginTaskPojos = pluginTaskService.listByIds(id);
-        for (TbPluginTaskPojo tbPluginTaskPojo : tbPluginTaskPojos) {
-            if (tbPluginTaskPojo.getStatus() == TaskStatus.RUN_STATUS) {
-                throw new BaseException(ResultCode.PLUGIN_CANNOT_DELETE_RUNNING);
+        if (CollUtil.isNotEmpty(id) && id.size() > 1) {
+            List<TbPluginTaskPojo> tbPluginTaskPojos = pluginTaskService.listByIds(id);
+            for (TbPluginTaskPojo tbPluginTaskPojo : tbPluginTaskPojos) {
+                if (tbPluginTaskPojo.getStatus() == TaskStatus.RUN_STATUS) {
+                    throw new BaseException(ResultCode.PLUGIN_CANNOT_DELETE_RUNNING);
+                }
             }
         }
         pluginTaskService.removeBatchByIds(id);

@@ -34,10 +34,14 @@ class SyncOneMusicPlugin implements CommonPlugin {
     public static final String HOST_KEY = "host";
     public static final String USER_ID_KEY = "userId";
     public static final String COOKIE_KEY = "cookie";
+    public static final String IS_DOWNLOAD_UPLOAD = "is_download_upload";
+    
     
     private PluginPackage pluginPackage;
     
     private String host = "";
+    
+    private boolean downloadUpload = false;
     
     /**
      * 获取插件类型
@@ -77,12 +81,18 @@ class SyncOneMusicPlugin implements CommonPlugin {
         e2.setKey(HOST_KEY);
         e2.setValue("");
         pluginLabelValues.add(e2);
-        
+    
         PluginLabelValue e3 = new PluginLabelValue();
         e3.setLabel("本地用户ID");
         e3.setKey(USER_ID_KEY);
         e3.setValue("");
         pluginLabelValues.add(e3);
+    
+        PluginLabelValue e4 = new PluginLabelValue();
+        e4.setLabel("是否自动下载歌曲并上传(0: 否 1: 是)");
+        e4.setKey(IS_DOWNLOAD_UPLOAD);
+        e4.setValue("");
+        pluginLabelValues.add(e4);
         return pluginLabelValues;
     }
     
@@ -99,7 +109,8 @@ class SyncOneMusicPlugin implements CommonPlugin {
         host = getValue(values, HOST_KEY);
         String musicId = getValue(values, MUSIC_ID_KEY);
         String userId = getValue(values, USER_ID_KEY);
-        
+        downloadUpload = StringUtils.equals(getValue(values, IS_DOWNLOAD_UPLOAD), "0");
+    
         assert musicId != null;
         assert cookie != null;
         assert host != null;
@@ -206,7 +217,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         // 获取歌曲md5值
         Map<String, Object> musicUrlMap = songUrlMap.get(musicId);
         String url = MapUtil.getStr(musicUrlMap, "url");
-        dto.setUploadFlag(true);
+        dto.setUploadFlag(downloadUpload);
         if (musicUrlMap != null && StringUtils.isNotBlank(url)) {
             dto.setRate(MapUtil.getInt(musicUrlMap, "br"));
             String md5 = MapUtil.getStr(musicUrlMap, "md5");

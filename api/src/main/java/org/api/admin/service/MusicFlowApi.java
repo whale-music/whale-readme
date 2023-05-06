@@ -223,8 +223,10 @@ public class MusicFlowApi {
             }
         }
         File file = new File(path);
-        HttpUtil.downloadFile(dto.getMusicTemp(), file, 60000);
-        String md5 = DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file));
+        HttpUtil.downloadFile(dto.getMusicTemp(), file, 600000);
+        BufferedInputStream inputStream = FileUtil.getInputStream(file);
+        String md5 = DigestUtils.md5DigestAsHex(inputStream);
+        inputStream.close();
         if (StringUtils.equals(md5, dto.getMd5())) {
             return file;
         }
@@ -369,7 +371,7 @@ public class MusicFlowApi {
                 } else {
                     String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
                     file = getMusicFile(dto, pathname);
-                    FileUtil.rename(file, dto.getMd5() + "." + dto.getType(), true);
+                    FileUtil.rename(file, dto.getMd5(), false, true);
                     md5 = dto.getMd5();
                 }
             } else {

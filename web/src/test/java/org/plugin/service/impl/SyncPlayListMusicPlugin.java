@@ -395,10 +395,10 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         String request = req(host + "/lyric?id=" + musicId, cookie);
         com.alibaba.fastjson2.JSONObject jsonObject = JSON.parseObject(request);
         com.alibaba.fastjson2.JSONObject lrc = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("lrc"));
-        String lyricStr = lrc.getString("lyric");
+        String lyricStr = MapUtil.get(lrc, "lyric", String.class);
     
         com.alibaba.fastjson2.JSONObject klyric = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("klyric"));
-        String klyricStr = klyric.getString("lyric");
+        String klyricStr = MapUtil.get(klyric, "lyric", String.class);
     
         // String lrc = JsonPath.read(request, "$.lrc.lyric");
         // String klyric = JsonPath.read(request, "$.klyric.lyric");

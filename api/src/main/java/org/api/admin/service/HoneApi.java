@@ -141,7 +141,9 @@ public class HoneApi {
     }
     
     public List<TbArtistPojo> getArtist() {
-        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15));
+        LambdaQueryWrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery()
+                                                           .orderByDesc(TbArtistPojo::getCreateTime);
+        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15), wrapper);
         return page.getRecords();
     }
 }

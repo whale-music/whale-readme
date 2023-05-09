@@ -122,10 +122,11 @@ public class PluginServiceImpl implements PluginService {
     }
     
     @Override
-    public List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId) {
+    public List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId, String name) {
         LambdaQueryWrapper<TbPluginPojo> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(CollUtil.isNotEmpty(pluginId), TbPluginPojo::getId, pluginId);
         wrapper.eq(TbPluginPojo::getUserId, userId);
+        wrapper.like(org.apache.commons.lang3.StringUtils.isNotBlank(name), TbPluginPojo::getPluginName, name);
         List<TbPluginPojo> list = pluginService.list(wrapper);
         ArrayList<PluginRes> pluginRes = new ArrayList<>();
         for (TbPluginPojo tbPluginPojo : list) {

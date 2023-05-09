@@ -37,8 +37,8 @@ public class PluginController {
      * @return 插件信息
      */
     @GetMapping("/getAllPlugins")
-    public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "id", required = false) List<Long> id) {
-        List<PluginRes> list = pluginService.getAllPlugin(userId == null ? UserUtil.getUser().getId() : userId, id);
+    public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "name", required = false) String name, @RequestParam(value = "id", required = false) List<Long> id) {
+        List<PluginRes> list = pluginService.getAllPlugin(userId == null ? UserUtil.getUser().getId() : userId, id, name);
         return R.success(list);
     }
     

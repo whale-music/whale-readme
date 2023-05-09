@@ -223,7 +223,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         dto.setAlbum(album);
         
         dto.setMusicName(MapUtil.getStr(song, "name"));
-        JSONArray alia = MapUtil.get(song, "alias", JSONArray.class, new JSONArray());
+        JSONArray alia = MapUtil.get(song, "alia", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
         dto.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));

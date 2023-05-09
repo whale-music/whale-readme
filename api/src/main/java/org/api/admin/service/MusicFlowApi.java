@@ -371,7 +371,7 @@ public class MusicFlowApi {
                 } else {
                     String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
                     file = getMusicFile(dto, pathname);
-                    FileUtil.rename(file, dto.getMd5(), false, true);
+                    file = FileUtil.rename(file, dto.getMd5(), true, true);
                     md5 = dto.getMd5();
                 }
             } else {

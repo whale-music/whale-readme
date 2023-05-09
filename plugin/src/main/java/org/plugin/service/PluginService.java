@@ -12,7 +12,7 @@ import org.plugin.model.PluginTaskLogRes;
 import java.util.List;
 
 public interface PluginService {
-    List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId);
+    List<PluginRes> getAllPlugin(Long userId, List<Long> pluginId, String name);
     
     /**
      * 添加插件代码

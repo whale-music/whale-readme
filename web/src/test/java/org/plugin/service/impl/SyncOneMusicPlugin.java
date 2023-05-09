@@ -9,6 +9,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,6 @@ import org.core.pojo.MusicDetails;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;
-import org.springframework.cglib.beans.BeanMap;
 
 import java.io.IOException;
 import java.util.*;
@@ -156,7 +156,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         dto.setAlbum(album);
         
         dto.setMusicName(MapUtil.getStr(song, "name"));
-        JSONArray alia = MapUtil.get(song, "alias", JSONArray.class, new JSONArray());
+        JSONArray alia = MapUtil.get(song, "alia", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
         dto.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));
@@ -306,18 +306,18 @@ class SyncOneMusicPlugin implements CommonPlugin {
      */
     public Map<String, String> getLyric(Long musicId, String cookie) {
         String request = req(host + "/lyric?id=" + musicId, cookie);
-        BeanMap beanMap = BeanMap.create(request);
-        BeanMap lrcMap = MapUtil.get(beanMap, "lrc", BeanMap.class);
-        String lyric = MapUtil.getStr(lrcMap, "lyric");
-        
-        BeanMap klyricMap = MapUtil.get(beanMap, "klyric", BeanMap.class);
-        String klyric = MapUtil.getStr(klyricMap, "lyric");
-        
+        com.alibaba.fastjson2.JSONObject jsonObject = JSON.parseObject(request);
+        com.alibaba.fastjson2.JSONObject lrc = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("lrc"));
+        String lyricStr = lrc.getString("lyric");
+    
+        com.alibaba.fastjson2.JSONObject klyric = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("klyric"));
+        String klyricStr = klyric.getString("lyric");
+    
         // String lrc = JsonPath.read(request, "$.lrc.lyric");
         // String klyric = JsonPath.read(request, "$.klyric.lyric");
         HashMap<String, String> stringStringHashMap = new HashMap<>();
-        stringStringHashMap.put("lrc", lyric);
-        stringStringHashMap.put("klyric", klyric);
+        stringStringHashMap.put("lrc", lyricStr);
+        stringStringHashMap.put("klyric", klyricStr);
         return stringStringHashMap;
     }
     

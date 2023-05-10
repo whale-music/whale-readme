@@ -173,7 +173,15 @@ public class AlbumApi {
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("value", albumPojo.getAlbumName());
+            List<String> artistName = qukuService.getArtistListByAlbumIds(albumPojo.getId())
+                                                 .parallelStream()
+                                                 .map(TbArtistPojo::getArtistName)
+                                                 .collect(Collectors.toList());
+            String join = CollUtil.join(artistName, ",");
+            String albumName = albumPojo.getAlbumName();
+            String format = String.format("%s <b style='color: var(--el-color-primary);'>#%s#</b>", albumName, join);
+            map.put("display", format);
+            map.put("value", albumName);
             map.put("link", String.valueOf(albumPojo.getId()));
             map.putAll(BeanUtil.beanToMap(albumPojo));
             maps.add(map);

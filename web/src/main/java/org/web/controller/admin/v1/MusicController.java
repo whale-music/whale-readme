@@ -1,5 +1,6 @@
 package org.web.controller.admin.v1;
 
+import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController(AdminConfig.ADMIN + "MusicController")
@@ -83,6 +85,12 @@ public class MusicController {
     @DeleteMapping("/{id}")
     public R deleteMusic(@PathVariable("id") List<Long> musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
         uploadMusic.deleteMusic(musicId, compel);
+        return R.success();
+    }
+    
+    @PostMapping("/lyric/{musicId}")
+    public R saveOrUpdateLyric(@PathVariable("musicId") Long musicId, @RequestParam("type") String type, @RequestBody Map<String, String> lyric) {
+        uploadMusic.saveOrUpdateLyric(musicId, type, MapUtil.get(lyric, "lyric", String.class));
         return R.success();
     }
 }

@@ -249,8 +249,7 @@ public class MusicFlowApi {
         if (StringUtils.isNotBlank(dto.getLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
-                                                          .eq(TbLyricPojo::getType, LyricConfig.LYRIC)
-                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+                                                          .eq(TbLyricPojo::getType, LyricConfig.LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.LYRIC);
@@ -260,8 +259,7 @@ public class MusicFlowApi {
         if (StringUtils.isNotBlank(dto.getTLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
-                                                          .eq(TbLyricPojo::getType, LyricConfig.T_LYRIC)
-                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+                                                          .eq(TbLyricPojo::getType, LyricConfig.T_LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.T_LYRIC);
@@ -271,8 +269,7 @@ public class MusicFlowApi {
         if (StringUtils.isNotBlank(dto.getKLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
-                                                          .eq(TbLyricPojo::getType, LyricConfig.K_LYRIC)
-                                                          .eq(TbLyricPojo::getLyric, dto.getKLyric()));
+                                                          .eq(TbLyricPojo::getType, LyricConfig.K_LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.K_LYRIC);
@@ -685,4 +682,14 @@ public class MusicFlowApi {
     }
     
     
+    /**
+     * 保存或更新歌词
+     *
+     * @param musicId 音乐ID
+     * @param type    歌词类型
+     * @param lyric   歌词
+     */
+    public void saveOrUpdateLyric(Long musicId, String type, String lyric) {
+        qukuService.saveOrUpdateLyric(musicId, type, lyric);
+    }
 }

@@ -353,4 +353,13 @@ public interface QukuService {
      * @param id 歌手ID
      */
     void deleteArtist(List<Long> id);
+    
+    /**
+     * 保存或更新歌词
+     *
+     * @param musicId 音乐ID
+     * @param type    歌词类型
+     * @param lyric   歌词
+     */
+    void saveOrUpdateLyric(Long musicId, String type, String lyric);
 }

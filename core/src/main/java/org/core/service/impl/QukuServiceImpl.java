@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.LyricConfig;
 import org.core.config.TargetTagConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
@@ -812,5 +813,30 @@ public class QukuServiceImpl implements QukuService {
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, id);
         albumArtistService.remove(in);
         artistService.remove(wrapper);
+    }
+    
+    /**
+     * 保存或更新歌词
+     *
+     * @param musicId 音乐ID
+     * @param type    歌词类型
+     * @param lyric   歌词
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateLyric(Long musicId, String type, String lyric) {
+        if (!(StringUtils.equals(type, LyricConfig.LYRIC) ||
+                StringUtils.equals(type, LyricConfig.K_LYRIC) ||
+                StringUtils.equals(type, LyricConfig.T_LYRIC))) {
+            throw new BaseException(ResultCode.LYRIC_NO_EXIST_EXISTED);
+        }
+        TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
+                                                      .eq(TbLyricPojo::getMusicId, musicId)
+                                                      .eq(TbLyricPojo::getType, LyricConfig.LYRIC));
+        TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
+        entity.setMusicId(musicId);
+        entity.setType(LyricConfig.LYRIC);
+        entity.setLyric(lyric);
+        lyricService.saveOrUpdate(entity);
     }
 }

@@ -126,7 +126,7 @@ public class PlayListApi {
                 map.put(tbMusicPojo.getId(), albumPojoMap.get(tbMusicPojo.getAlbumId()));
             }
         });
-        Map<Long, List<TbArtistPojo>> artistMaps = qukuService.getArtistListByMusicIdToMap(map);
+        Map<Long, List<TbArtistPojo>> artistMaps = qukuService.getAlbumArtistListByMusicIdToMap(map);
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             PlayListMusicRes e1 = new PlayListMusicRes();
             BeanUtils.copyProperties(tbMusicPojo, e1, "lyric");

@@ -98,7 +98,7 @@ public class ArtistApi {
     }
     
     public List<TbArtistPojo> getSingerListByAlbumId(Long albumId) {
-        return qukuService.getArtistListByAlbumIds(albumId);
+        return qukuService.getAlbumArtistListByAlbumIds(albumId);
     }
     
     public ArtistInfoRes getArtistById(Long id) {

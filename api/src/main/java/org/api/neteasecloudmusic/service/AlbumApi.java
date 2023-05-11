@@ -54,7 +54,7 @@ public class AlbumApi {
             e.setSize(albumSize);
             e.setPicUrl(tbAlbumPojo.getPic());
             ArrayList<ArtistsItem> artists = new ArrayList<>();
-            List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(tbAlbumPojo.getId());
+            List<TbArtistPojo> singerListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(tbAlbumPojo.getId());
             for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
                 ArtistsItem e1 = new ArtistsItem();
                 // 艺术家下专辑数量专辑
@@ -83,7 +83,7 @@ public class AlbumApi {
         album.setCoverUrl(albumByAlbumId.getPic());
         album.setBlurImgUrl(albumByAlbumId.getPic());
     
-        List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(id);
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(id);
         TbArtistPojo tbArtistPojo = CollUtil.isEmpty(singerListByAlbumIds) ? new TbArtistPojo() : singerListByAlbumIds.get(0);
         album.setArtistId(tbArtistPojo.getId());
         album.setArtistName(tbArtistPojo.getArtistName());
@@ -119,7 +119,7 @@ public class AlbumApi {
             e.setAl(al);
     
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
             for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
                 e1.setAlia(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
@@ -147,7 +147,7 @@ public class AlbumApi {
         album.setSize(albumMusicCountByAlbumId);
     
     
-        List<TbArtistPojo> singerListByAlbumIds = qukuService.getArtistListByAlbumIds(id);
+        List<TbArtistPojo> singerListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(id);
         ArrayList<org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem> artists = new ArrayList<>();
         for (TbArtistPojo singerListByAlbumId : singerListByAlbumIds) {
             org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem e = new org.api.neteasecloudmusic.model.vo.album.album.ArtistsItem();

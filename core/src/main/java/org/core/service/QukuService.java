@@ -34,7 +34,7 @@ public interface QukuService {
      * 批量获取歌手信息
      * Long -> music ID
      */
-    List<TbArtistPojo> getArtistListByMusicId(List<Long> musicIds);
+    List<TbArtistPojo> getAlbumArtistListByMusicId(List<Long> musicIds);
     
     /**
      * (此接口用于优化歌单请求过慢)
@@ -43,12 +43,12 @@ public interface QukuService {
      * value 为歌手
      * 并且查询时增加缓存查找，防止多次访问数据库，造成qps过高
      */
-    Map<Long, List<TbArtistPojo>> getArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
+    Map<Long, List<TbArtistPojo>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
     
     /**
-     * 获取歌手信息
+     * 获取专辑歌手信息
      */
-    List<TbArtistPojo> getArtistByMusicId(Long musicId);
+    List<TbArtistPojo> getAlbumArtistByMusicId(Long musicId);
     
     /**
      * 查询数据歌曲下载地址
@@ -93,12 +93,12 @@ public interface QukuService {
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getArtistListByAlbumIds(Long albumIds);
+    List<TbArtistPojo> getAlbumArtistListByAlbumIds(Long albumIds);
     
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getArtistListByAlbumIds(List<Long> albumIds);
+    List<TbArtistPojo> getAlbumArtistListByAlbumIds(List<Long> albumIds);
     
     /**
      * 获取专辑歌手列表
@@ -108,7 +108,25 @@ public interface QukuService {
      *
      * @param albumIds 专辑ID
      */
-    Map<Long, List<TbArtistPojo>> getArtistMapByAlbumIds(Collection<Long> albumIds);
+    Map<Long, List<TbArtistPojo>> getAlbumArtistMapByAlbumIds(Collection<Long> albumIds);
+    
+    /**
+     * 获取歌曲歌手列表
+     *
+     * @param musicId 歌手ID
+     * @return 歌手列表
+     */
+    default List<TbArtistPojo> getMusicArtistByMusicId(Long musicId) {
+        return getMusicArtistByMusicId(Collections.singletonList(musicId));
+    }
+    
+    /**
+     * 获取歌曲歌手列表
+     *
+     * @param musicId 歌手ID
+     * @return 歌手列表
+     */
+    List<TbArtistPojo> getMusicArtistByMusicId(Collection<Long> musicId);
     
     /**
      * 通过歌手ID获取专辑列表

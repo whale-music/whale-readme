@@ -32,11 +32,11 @@ public class SongListsApi {
         Page<TbAlbumPojo> page = new Page<>(albumReq.getOffset(), albumReq.getSize());
         albumService.page(page);
         ArrayList<AlbumItem> albumArrayList = new ArrayList<>();
-        
-        Map<Long, List<TbArtistPojo>> artistMapByAlbumIds = qukuService.getArtistMapByAlbumIds(page.getRecords()
-                                                                                                   .stream()
-                                                                                                   .map(TbAlbumPojo::getId)
-                                                                                                   .collect(Collectors.toSet()));
+    
+        Map<Long, List<TbArtistPojo>> artistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(page.getRecords()
+                                                                                                        .stream()
+                                                                                                        .map(TbAlbumPojo::getId)
+                                                                                                        .collect(Collectors.toSet()));
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             AlbumItem e = new AlbumItem();
             e.setId(String.valueOf(albumPojo.getId()));

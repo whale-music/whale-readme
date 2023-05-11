@@ -95,6 +95,11 @@ public class MusicController {
         return R.success();
     }
     
+    @GetMapping("/musicInfo/{id}")
+    public R getMusicInfo(@PathVariable("id") Long id) {
+        return R.success(uploadMusic.getMusicInfo(id));
+    }
+    
     @PostMapping
     public R updateMusic(@RequestBody MusicInfoReq req) {
         uploadMusic.updateMusic(req);

@@ -173,7 +173,7 @@ public class AlbumApi {
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
-            List<String> artistName = qukuService.getArtistListByAlbumIds(albumPojo.getId())
+            List<String> artistName = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId())
                                                  .parallelStream()
                                                  .map(TbArtistPojo::getArtistName)
                                                  .collect(Collectors.toList());
@@ -193,7 +193,7 @@ public class AlbumApi {
         TbAlbumPojo byId = albumService.getById(albumId);
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
         List<TbMusicPojo> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
-        List<TbArtistPojo> artistListByAlbumIds = qukuService.getArtistListByAlbumIds(albumId);
+        List<TbArtistPojo> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
     
         AlbumRes albumRes = new AlbumRes();
         albumRes.setArtistList(artistListByAlbumIds);

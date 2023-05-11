@@ -18,7 +18,10 @@ import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,7 +43,7 @@ public class BrowsingApi {
         Album album = new Album();
         album.setId(String.valueOf(albumPojo.getId()));
         album.setName(albumPojo.getAlbumName());
-        List<TbArtistPojo> artistListByAlbumIds = qukuService.getArtistListByAlbumIds(albumPojo.getId());
+        List<TbArtistPojo> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
         TbArtistPojo artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new TbArtistPojo() : artistListByAlbumIds.get(0);
         album.setArtist(artistPojo.getArtistName());
         album.setArtistId(String.valueOf(artistPojo.getId()));
@@ -54,7 +57,7 @@ public class BrowsingApi {
         
         ArrayList<SongItem> song = new ArrayList<>();
         List<TbMusicPojo> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
-        List<TbArtistPojo> artistListByAlbumIds1 = qukuService.getArtistListByAlbumIds(id);
+        List<TbArtistPojo> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
         TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new TbArtistPojo() : artistListByAlbumIds1.get(0);
         Map<Long, List<TbMusicUrlPojo>> musicMapUrl = qukuService.getMusicMapUrl(musicListByAlbumId.stream()
                                                                                                    .map(TbMusicPojo::getId)
@@ -102,7 +105,7 @@ public class BrowsingApi {
     public SongRes getSong(Long id) {
         TbMusicPojo musicPojo = musicService.getById(id);
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
-        List<TbArtistPojo> artistByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
+        List<TbArtistPojo> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
         List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(CollUtil.newHashSet(musicPojo.getId()));
         TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
         TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);

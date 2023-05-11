@@ -1,4 +1,4 @@
-package org.api.admin.model.req;
+package org.api.admin.model.res;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class MusicInfoReq implements Serializable {
+public class MusicInfoRes implements Serializable {
     
     @ApiModelProperty("音乐ID")
     private Long id;

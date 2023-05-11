@@ -22,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Service(SubsonicConfig.SUBSONIC + "PlaylistApi")
 public class PlaylistApi {
@@ -104,7 +107,7 @@ public class PlaylistApi {
             e.setParent(tbMusicUrlPojo.getUrl());
             e.setPlayCount(0);
     
-            List<TbArtistPojo> artistByMusicId = qukuService.getArtistByMusicId(musicPojo.getId());
+            List<TbArtistPojo> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
             TbArtistPojo artistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
             e.setArtist(artistPojo.getArtistName());
             e.setArtistId(String.valueOf(artistPojo.getId()));

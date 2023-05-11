@@ -145,7 +145,7 @@ public class ArtistApi {
             hotSongs.add(hotSongsItem);
     
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getArtistByMusicId(tbMusicPojo.getId());
+            List<TbArtistPojo> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
             for (TbArtistPojo tbArtistPojo : singerByMusicId) {
                 ArItem arItem = new ArItem();
                 arItem.setId(tbArtistPojo.getId());

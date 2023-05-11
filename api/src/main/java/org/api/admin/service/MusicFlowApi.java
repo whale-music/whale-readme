@@ -15,6 +15,7 @@ import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.MusicInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
+import org.api.admin.model.res.MusicInfoRes;
 import org.api.common.service.MusicCommonApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -742,21 +743,34 @@ public class MusicFlowApi {
         entity.setPic(req.getPic());
         entity.setAlbumId(req.getAlbumId());
         entity.setTimeLength(req.getTimeLength());
-        
+    
         TbMusicPojo musicPojo = musicService.getById(req.getId());
-        // 删除原来关联的歌手
+        // 删除歌曲关联歌手
+        musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().eq(TbMusicArtistPojo::getMusicId, musicPojo.getId()));
+        ArrayList<TbMusicArtistPojo> musicArtistList = new ArrayList<>();
+        for (TbArtistPojo tbArtistPojo : req.getMusicArtist()) {
+            TbMusicArtistPojo e = new TbMusicArtistPojo();
+            e.setArtistId(tbArtistPojo.getId());
+            e.setMusicId(req.getId());
+            musicArtistList.add(e);
+        }
+        // 重新保存
+        musicArtistService.saveBatch(musicArtistList);
+    
+        // 删除专辑原来关联的歌手
         albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
                                           .eq(TbAlbumArtistPojo::getAlbumId, musicPojo.getAlbumId()));
         // 重新添加关联歌手
         ArrayList<TbAlbumArtistPojo> entityList = new ArrayList<>();
-        for (Long artistId : req.getArtistIds()) {
+        for (TbArtistPojo tbArtistPojo : req.getAlbumArtist()) {
             TbAlbumArtistPojo tbAlbumArtistPojo = new TbAlbumArtistPojo();
             tbAlbumArtistPojo.setAlbumId(req.getAlbumId());
-            tbAlbumArtistPojo.setArtistId(artistId);
+            tbAlbumArtistPojo.setArtistId(tbArtistPojo.getId());
             entityList.add(tbAlbumArtistPojo);
         }
+        // 重新保存
         albumSingerService.saveBatch(entityList);
-        
+    
         // 更新专辑
         TbAlbumPojo entity1 = new TbAlbumPojo();
         entity1.setId(req.getAlbumId());
@@ -764,5 +778,25 @@ public class MusicFlowApi {
         albumService.updateById(entity1);
         // 音乐
         musicService.updateById(entity);
+    }
+    
+    public MusicInfoRes getMusicInfo(Long id) {
+        // 音乐
+        TbMusicPojo byId = musicService.getById(id);
+        // 专辑艺术家
+        List<TbArtistPojo> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
+        // 歌曲艺术家
+        List<TbArtistPojo> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
+        // 专辑
+        TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
+        
+        MusicInfoRes musicInfoRes = new MusicInfoRes();
+        musicInfoRes.setMusicArtist(musicArtistByMusicId);
+        musicInfoRes.setAlbumArtist(artistListByAlbumIds);
+        musicInfoRes.setAlbumName(albumPojo.getAlbumName());
+        musicInfoRes.setAlbumId(albumPojo.getId());
+        BeanUtils.copyProperties(byId, musicInfoRes);
+        musicInfoRes.setPublishTime(albumPojo.getPublishTime());
+        return musicInfoRes;
     }
 }

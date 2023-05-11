@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.MusicInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
 import org.api.common.service.MusicCommonApi;
@@ -691,5 +692,43 @@ public class MusicFlowApi {
      */
     public void saveOrUpdateLyric(Long musicId, String type, String lyric) {
         qukuService.saveOrUpdateLyric(musicId, type, lyric);
+    }
+    
+    /**
+     * 更新音乐信息
+     *
+     * @param req 信息
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMusic(MusicInfoReq req) {
+        TbMusicPojo entity = new TbMusicPojo();
+        entity.setId(req.getId());
+        entity.setMusicName(req.getMusicName());
+        entity.setAliasName(req.getMusicNameAlias());
+        entity.setPic(req.getPic());
+        entity.setAlbumId(req.getAlbumId());
+        entity.setTimeLength(req.getTimeLength());
+        
+        TbMusicPojo musicPojo = musicService.getById(req.getId());
+        // 删除原来关联的歌手
+        albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                          .eq(TbAlbumArtistPojo::getAlbumId, musicPojo.getAlbumId()));
+        // 重新添加关联歌手
+        ArrayList<TbAlbumArtistPojo> entityList = new ArrayList<>();
+        for (Long artistId : req.getArtistIds()) {
+            TbAlbumArtistPojo tbAlbumArtistPojo = new TbAlbumArtistPojo();
+            tbAlbumArtistPojo.setAlbumId(req.getAlbumId());
+            tbAlbumArtistPojo.setArtistId(artistId);
+            entityList.add(tbAlbumArtistPojo);
+        }
+        albumSingerService.saveBatch(entityList);
+        
+        // 更新专辑
+        TbAlbumPojo entity1 = new TbAlbumPojo();
+        entity1.setId(req.getAlbumId());
+        entity1.setPublishTime(req.getPublishTime());
+        albumService.updateById(entity1);
+        // 音乐
+        musicService.updateById(entity);
     }
 }

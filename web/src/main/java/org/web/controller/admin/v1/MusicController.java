@@ -4,6 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.MusicInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.pojo.MusicDetails;
@@ -91,6 +92,12 @@ public class MusicController {
     @PostMapping("/lyric/{musicId}")
     public R saveOrUpdateLyric(@PathVariable("musicId") Long musicId, @RequestParam("type") String type, @RequestBody Map<String, String> lyric) {
         uploadMusic.saveOrUpdateLyric(musicId, type, MapUtil.get(lyric, "lyric", String.class));
+        return R.success();
+    }
+    
+    @PostMapping
+    public R updateMusic(@RequestBody MusicInfoReq req) {
+        uploadMusic.updateMusic(req);
         return R.success();
     }
 }

@@ -129,6 +129,14 @@ public interface QukuService {
     List<TbArtistPojo> getMusicArtistByMusicId(Collection<Long> musicId);
     
     /**
+     * 获取歌曲歌手列表
+     *
+     * @param musicId 歌手ID
+     * @return 歌手列表
+     */
+    Map<Long, List<TbArtistPojo>> getMusicArtistByMusicIdToMap(Collection<Long> musicId);
+    
+    /**
      * 通过歌手ID获取专辑列表
      *
      * @param ids 歌手ID

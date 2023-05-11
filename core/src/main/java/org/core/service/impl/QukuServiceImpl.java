@@ -281,6 +281,9 @@ public class QukuServiceImpl implements QukuService {
     
     @Override
     public List<TbAlbumPojo> getAlbumListByArtistIds(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, ids);
         List<TbAlbumArtistPojo> list = albumArtistService.list(in);
         if (CollUtil.isEmpty(list)) {
@@ -332,10 +335,48 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public List<TbArtistPojo> getMusicArtistByMusicId(Collection<Long> musicId) {
+        if (CollUtil.isEmpty(musicId)) {
+            return Collections.emptyList();
+        }
         LambdaQueryWrapper<TbMusicArtistPojo> eq = Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicId);
         List<TbMusicArtistPojo> list = musicArtistService.list(eq);
         Collection<Long> collect = list.parallelStream().map(TbMusicArtistPojo::getArtistId).collect(Collectors.toSet());
+        if (CollUtil.isEmpty(collect)) {
+            return Collections.emptyList();
+        }
         return artistService.listByIds(collect);
+    }
+    
+    /**
+     * 获取歌曲歌手列表
+     *
+     * @param musicId 歌手ID
+     * @return 歌手列表
+     */
+    @Override
+    public Map<Long, List<TbArtistPojo>> getMusicArtistByMusicIdToMap(Collection<Long> musicId) {
+        if (CollUtil.isEmpty(musicId)) {
+            return new HashMap<>();
+        }
+        List<TbMusicArtistPojo> list = musicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicId));
+        List<Long> artistIds = list.parallelStream().map(TbMusicArtistPojo::getArtistId).collect(Collectors.toList());
+        List<TbArtistPojo> tbArtistPojos = artistService.listByIds(artistIds);
+        Map<Long, TbArtistPojo> artistMap = tbArtistPojos.parallelStream().collect(Collectors.toMap(TbArtistPojo::getId, tbArtistPojo -> tbArtistPojo));
+        
+        HashMap<Long, List<TbArtistPojo>> longListHashMap = new HashMap<>();
+        for (TbMusicArtistPojo tbMusicArtistPojo : list) {
+            Long artistId = tbMusicArtistPojo.getArtistId();
+            TbArtistPojo tbArtistPojo = artistMap.get(artistId);
+            List<TbArtistPojo> tbArtistPojos1 = longListHashMap.get(tbMusicArtistPojo.getMusicId());
+            if (CollUtil.isEmpty(tbArtistPojos1)) {
+                longListHashMap.put(tbMusicArtistPojo.getMusicId(), CollUtil.newArrayList(tbArtistPojo));
+            } else {
+                tbArtistPojos1.add(tbArtistPojo);
+                longListHashMap.put(tbMusicArtistPojo.getMusicId(), tbArtistPojos1);
+            }
+        }
+        
+        return longListHashMap;
     }
     
     /**

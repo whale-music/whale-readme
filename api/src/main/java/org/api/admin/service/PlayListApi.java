@@ -76,6 +76,9 @@ public class PlayListApi {
     @Autowired
     private PlayListService playListService;
     
+    @Autowired
+    private TbMusicArtistService musicArtistService;
+    
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
         switch (Optional.ofNullable(orderBy).orElse("")) {
@@ -184,20 +187,9 @@ public class PlayListApi {
                                    .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
         }
     
+        List<Long> musicIds = page.getRecords().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
         // 歌手信息
-        List<TbAlbumArtistPojo> albumSingerPojoList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(albumIds)) {
-            albumSingerPojoList = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                  .in(TbAlbumArtistPojo::getAlbumId, albumIds));
-        }
-        // 歌手ID
-        Set<Long> singerLongIds = albumSingerPojoList.stream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
-        Map<Long, TbArtistPojo> singerMap = new HashMap<>();
-        if (CollUtil.isNotEmpty(singerLongIds)) {
-            singerMap = artistService.listByIds(singerLongIds)
-                                     .stream()
-                                     .collect(Collectors.toMap(TbArtistPojo::getId, tbSingerPojo -> tbSingerPojo));
-        }
+        Map<Long, List<TbArtistPojo>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
         // 填充信息
         Map<Long, TbMusicUrlPojo> urlPojoMap = new HashMap<>();
         // 获取音乐地址
@@ -230,15 +222,10 @@ public class PlayListApi {
             e.setPublishTime(tbAlbumPojo.getPublishTime());
     
             // 歌手
-            // 获取歌手ID
-            Set<Long> collect = albumSingerPojoList.stream()
-                                                   .filter(tbAlbumSingerPojo -> tbAlbumSingerPojo.getAlbumId().equals(tbAlbumPojo.getId()))
-                                                   .map(TbAlbumArtistPojo::getArtistId)
-                                                   .collect(Collectors.toSet());
+            List<TbArtistPojo> tbArtistPojos = musicArtistByMusicIdToMap.get(musicPojo.getId());
             e.setArtistIds(new ArrayList<>());
             e.setArtistNames(new ArrayList<>());
-            for (Long aLong : collect) {
-                TbArtistPojo tbArtistPojo = singerMap.get(aLong);
+            for (TbArtistPojo tbArtistPojo : tbArtistPojos) {
                 e.getArtistIds().add(tbArtistPojo.getId());
                 e.getArtistNames().add(tbArtistPojo.getArtistName());
             }

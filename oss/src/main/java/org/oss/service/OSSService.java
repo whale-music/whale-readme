@@ -41,7 +41,7 @@ public interface OSSService {
     }
     
     // 上传文件返回地址
-    String upload(File srcFile);
+    String upload(File srcFile, String md5);
     
     // 删除文件
     boolean delete(String name);

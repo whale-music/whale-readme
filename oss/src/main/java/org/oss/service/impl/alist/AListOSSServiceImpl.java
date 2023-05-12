@@ -2,6 +2,7 @@ package org.oss.service.impl.alist;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
+import cn.hutool.core.io.FileUtil;
 import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -12,8 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import org.oss.service.OSSService;
 import org.oss.service.impl.alist.model.list.ContentItem;
 import org.oss.service.impl.alist.util.RequestUtils;
+import org.springframework.util.DigestUtils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class AListOSSServiceImpl implements OSSService {
@@ -140,9 +144,17 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public String upload(File srcFile) {
+    public String upload(File srcFile, String md5) {
         try {
-            String musicAddresses = getMusicAddresses(srcFile.getName(), false);
+            String musicAddresses;
+            if (StringUtils.isEmpty(md5)) {
+                BufferedInputStream inputStream = FileUtil.getInputStream(srcFile);
+                String tempMd5 = DigestUtils.md5DigestAsHex(inputStream);
+                inputStream.close();
+                musicAddresses = getMusicAddresses(tempMd5, false);
+            } else {
+                musicAddresses = getMusicAddresses(md5, false);
+            }
             if (StringUtils.isNotBlank(musicAddresses)) {
                 return srcFile.getName();
             }
@@ -150,6 +162,8 @@ public class AListOSSServiceImpl implements OSSService {
             if (!StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 throw new BaseException(e.getErrorCode(), e.getErrorMsg());
             }
+        } catch (IOException e) {
+            throw new BaseException(e.getMessage());
         }
         String loginJwtCache = getLoginJwtCache(config);
         String upload = RequestUtils.upload(config.getHost(), config.getObjectSave().get(0), srcFile, loginJwtCache);

@@ -60,7 +60,7 @@ public class MusicController {
      * @return 返回成功信息
      */
     @PostMapping("/upload/info")
-    public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) throws IOException {
+    public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) {
         MusicDetails musicDetails = uploadMusic.saveMusicInfo(dto);
         return R.success(musicDetails);
     }
@@ -103,6 +103,12 @@ public class MusicController {
     @PostMapping
     public R updateMusic(@RequestBody MusicInfoReq req) {
         uploadMusic.updateMusic(req);
+        return R.success();
+    }
+    
+    @PostMapping("/auto/upload")
+    public R uploadAutoMusic(@RequestParam("type") Boolean type, @RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId, String name, String md5, Long size) {
+        uploadMusic.uploadAutoMusic(type, userId, uploadFile, musicId, name, md5, size);
         return R.success();
     }
 }

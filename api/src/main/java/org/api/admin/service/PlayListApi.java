@@ -222,7 +222,7 @@ public class PlayListApi {
             e.setPublishTime(tbAlbumPojo.getPublishTime());
     
             // 歌手
-            List<TbArtistPojo> tbArtistPojos = musicArtistByMusicIdToMap.get(musicPojo.getId());
+            List<TbArtistPojo> tbArtistPojos = Optional.ofNullable(musicArtistByMusicIdToMap.get(musicPojo.getId())).orElse(new ArrayList<>());
             e.setArtistIds(new ArrayList<>());
             e.setArtistNames(new ArrayList<>());
             for (TbArtistPojo tbArtistPojo : tbArtistPojos) {

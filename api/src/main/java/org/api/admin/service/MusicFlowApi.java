@@ -396,7 +396,7 @@ public class MusicFlowApi {
                     // 读取本地文件
                     file = new File(pathTemp, dto.getMusicTemp());
                 }
-                uploadPath = OSSFactory.ossFactory(config).upload(file);
+                uploadPath = OSSFactory.ossFactory(config).upload(file, md5);
                 size = FileUtil.size(file);
                 FileUtil.del(file);
             } catch (Exception e) {
@@ -795,7 +795,7 @@ public class MusicFlowApi {
         List<TbArtistPojo> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
         // 专辑
         TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
-        
+    
         MusicInfoRes musicInfoRes = new MusicInfoRes();
         musicInfoRes.setMusicArtist(musicArtistByMusicId);
         musicInfoRes.setAlbumArtist(artistListByAlbumIds);
@@ -804,5 +804,58 @@ public class MusicFlowApi {
         BeanUtils.copyProperties(byId, musicInfoRes);
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
+    }
+    
+    public void uploadAutoMusic(Boolean type, Long userId, MultipartFile uploadFile, Long musicId, String name, String md5, Long size) {
+        TbMusicUrlPojo entity = new TbMusicUrlPojo();
+        entity.setMusicId(musicId);
+        userId = userId == null ? UserUtil.getUser().getId() : userId;
+        if (Boolean.TRUE.equals(type)) {
+            try {
+                String tempMd5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
+                String[] nameArr = StringUtils.split(uploadFile.getOriginalFilename(), ".");
+                if (nameArr == null || nameArr.length < 1) {
+                    throw new BaseException(ResultCode.FILENAME_INVALID);
+                }
+                File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
+                FileUtil.writeBytes(uploadFile.getBytes(), dest);
+                String upload = OSSFactory.ossFactory(config).upload(dest, tempMd5);
+                TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
+                if (one == null) {
+                    entity.setUserId(userId);
+                    entity.setEncodeType(nameArr[1]);
+                    entity.setOrigin("auto");
+                    entity.setSize(FileUtil.size(dest));
+                    entity.setMd5(tempMd5);
+                    entity.setUrl(upload);
+                    musicUrlService.save(entity);
+                } else {
+                    one.setUrl(upload);
+                    entity.setSize(FileUtil.size(dest));
+                    entity.setEncodeType(nameArr[1]);
+                    musicUrlService.updateById(one);
+                }
+                FileUtil.del(dest);
+            } catch (IOException e) {
+                throw new BaseException(ResultCode.UPLOAD_ERROR);
+            }
+        } else {
+            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, md5));
+            String[] nameArr = StringUtils.split(name, ".");
+            if (nameArr.length == 1) {
+                throw new BaseException(ResultCode.FILENAME_INVALID);
+            }
+            if (one == null) {
+                entity.setUserId(userId);
+                entity.setEncodeType(nameArr[1]);
+                entity.setOrigin("manual");
+                entity.setMd5(md5);
+                entity.setSize(size);
+                entity.setUrl(name);
+                musicUrlService.save(entity);
+            } else {
+                throw new BaseException(ResultCode.SONG_UPLOADED);
+            }
+        }
     }
 }

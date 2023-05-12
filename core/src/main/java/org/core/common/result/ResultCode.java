@@ -79,6 +79,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     SERIALIZATION_ERROR("50009", "序列化错误"),
     OSS_MD5_REPEAT("50011", "上传音乐MD5重复"),
     
+    UPLOAD_ERROR("50012", "上传错误"),
+    
     
     /* 接口错误：60001-69999 */
     INTERFACE_INNER_INVOKE_ERROR("60001", "内部系统接口调用异常"),

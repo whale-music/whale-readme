@@ -318,7 +318,7 @@ public class PlayListApi {
             Children e = new Children();
             e.setName(String.valueOf(tbCollectPojo.getId()));
             e.setPath("/playlist/" + tbCollectPojo.getId());
-            e.setComponent("() => import('@/views/playlist/index')");
+            e.setComponent("/src/views/playlist/index.vue");
         
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名

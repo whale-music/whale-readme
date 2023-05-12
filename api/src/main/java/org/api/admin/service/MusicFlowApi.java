@@ -699,7 +699,7 @@ public class MusicFlowApi {
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
                 musicFileRes.setRawUrl(url.getUrl());
-                musicFileRes.setExists(StringUtils.isBlank(url.getUrl()));
+                musicFileRes.setExists(StringUtils.isNotBlank(url.getUrl()));
             } catch (BaseException e) {
                 if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
                     throw new BaseException(ResultCode.OSS_LOGIN_ERROR);

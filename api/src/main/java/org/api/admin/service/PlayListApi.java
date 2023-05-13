@@ -43,12 +43,6 @@ public class PlayListApi {
     @Autowired
     private TbMusicService musicService;
     
-    /**
-     * 歌手表
-     */
-    @Autowired
-    private TbArtistService artistService;
-    
     @Autowired
     private QukuService qukuService;
     
@@ -57,9 +51,6 @@ public class PlayListApi {
      */
     @Autowired
     private TbAlbumService albumService;
-    
-    @Autowired
-    private TbAlbumArtistService albumSingerService;
     
     @Autowired
     private TbCollectService collectService;
@@ -77,7 +68,7 @@ public class PlayListApi {
     private PlayListService playListService;
     
     @Autowired
-    private TbMusicArtistService musicArtistService;
+    private TbMusicUrlService musicUrlService;
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
@@ -172,8 +163,32 @@ public class PlayListApi {
         }
     
         Page<TbMusicPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
-        LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
-                                                          .in(CollUtil.isNotEmpty(musicIdList), TbMusicPojo::getId, musicIdList);
+        LambdaQueryWrapper<TbMusicPojo> wrapper;
+        if (Boolean.TRUE.equals(req.getIsShowNoExist())) {
+            // 无音源音乐
+            Collection<Long> union;
+            List<Long> collect = musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
+            List<TbMusicUrlPojo> musicUrlPojos = musicUrlService.list();
+            List<Long> collect1 = musicUrlPojos.parallelStream().map(TbMusicUrlPojo::getMusicId).collect(Collectors.toList());
+            // 数据库中没有音源数据
+            collect.removeAll(collect1);
+            // 确认OSS音源存在
+            List<TbMusicUrlPojo> urls = musicCommonApi.getMusicUrlByMusicUrlList(musicUrlPojos, false);
+            List<Long> noMusicSource = urls.parallelStream()
+                                           .filter(musicUrlPojo -> StringUtils.isEmpty(musicUrlPojo.getUrl()))
+                                           .map(TbMusicUrlPojo::getMusicId)
+                                           .collect(Collectors.toList());
+            // 无音源音乐ID
+            union = CollUtil.union(noMusicSource, collect);
+            if (CollUtil.isEmpty(union)) {
+                return new Page<>(0, 50, 0);
+            }
+            wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
+                              .in(TbMusicPojo::getId, union);
+        } else {
+            wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
+                              .in(CollUtil.isNotEmpty(musicIdList), TbMusicPojo::getId, musicIdList);
+        }
         pageOrderBy(req.getOrder(), req.getOrderBy(), wrapper);
         musicService.page(page, wrapper);
     

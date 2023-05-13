@@ -41,6 +41,9 @@ public class MusicPageReq implements Serializable {
     @ApiModelProperty("是否刷新缓存")
     private Boolean refresh;
     
+    @ApiModelProperty("是否只显示无音源")
+    private Boolean isShowNoExist;
+    
     @ApiModelProperty("分页数据")
     private PageCommon page;
 }

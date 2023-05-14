@@ -9,6 +9,7 @@ import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.pojo.MusicDetails;
+import org.core.pojo.TbMusicUrlPojo;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
@@ -116,6 +117,12 @@ public class MusicController {
     @PostMapping("/manual/upload")
     public R uploadManualMusic(@RequestBody UploadMusicReq musicSource) {
         uploadMusic.uploadManualMusic(musicSource);
+        return R.success();
+    }
+    
+    @PostMapping("/update/source")
+    public R updateSource(@RequestBody TbMusicUrlPojo source) {
+        uploadMusic.updateSource(source);
         return R.success();
     }
 }

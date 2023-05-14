@@ -305,10 +305,7 @@ public class MusicFlowApi {
         }
         // 无损
         entity.setLevel("lossless");
-        // hires
-        // if (rate < 1411_000) {
-        //     entity.setLevel("hires");
-        // }
+        // hires rate < 1411_000
     }
     
     private void saveRandReturnArtistList(Set<Long> artistIds, TbMusicPojo musicPojo) {
@@ -679,9 +676,10 @@ public class MusicFlowApi {
         for (TbMusicUrlPojo tbMusicUrlPojo : list) {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
+                String address = tbMusicUrlPojo.getUrl();
                 TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
                 BeanUtils.copyProperties(url, musicFileRes);
-                musicFileRes.setId(tbMusicUrlPojo.getMusicId());
+                musicFileRes.setUrl(address);
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
@@ -912,5 +910,9 @@ public class MusicFlowApi {
         } else {
             throw new BaseException(ResultCode.SONG_UPLOADED);
         }
+    }
+    
+    public void updateSource(TbMusicUrlPojo source) {
+        musicUrlService.updateById(source);
     }
 }

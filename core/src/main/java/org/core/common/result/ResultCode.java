@@ -81,6 +81,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_MD5_REPEAT("50011", "上传音乐MD5重复"),
     
     UPLOAD_ERROR("50012", "上传错误"),
+    USER_LOVE_ERROR("50013", "只允许用户同时拥有一个歌单"),
     
     
     /* 接口错误：60001-69999 */

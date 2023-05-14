@@ -334,11 +334,22 @@ public class PlayListApi {
             e.setName(String.valueOf(tbCollectPojo.getId()));
             e.setPath("/playlist/" + tbCollectPojo.getId());
             e.setComponent("/src/views/playlist/index.vue");
-        
+    
             Meta playListMeta = new Meta();
             // 歌单icon，包括歌单名
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
-            playListMeta.setIcon("solar:playlist-2-bold");
+            // 普通歌单
+            if (tbCollectPojo.getType() == 0) {
+                playListMeta.setIcon("playlist2Bold");
+            }
+            // 喜爱歌单
+            if (tbCollectPojo.getType() == 1) {
+                playListMeta.setIcon("heartBold");
+            }
+            // 推荐歌单
+            if (tbCollectPojo.getType() == 2) {
+                playListMeta.setIcon("plainBoldDuotone");
+            }
     
             e.setMeta(playListMeta);
             children.add(e);
@@ -409,6 +420,20 @@ public class PlayListApi {
         if (req.getId() == null) {
             throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
+        Short type = req.getType();
+        // 只允许用户只有一个喜爱歌单
+        if (type == 1) {
+            Long userId = UserUtil.getUser().getId();
+            LambdaQueryWrapper<TbCollectPojo> eq = Wrappers.<TbCollectPojo>lambdaQuery()
+                                                           .eq(TbCollectPojo::getUserId, userId)
+                                                           .eq(TbCollectPojo::getType, type);
+            TbCollectPojo one = collectService.getOne(eq);
+            // 如果不是相同歌单，则不允许修改
+            if (one != null && !Objects.equals(one.getId(), req.getId())) {
+                throw new BaseException(ResultCode.USER_LOVE_ERROR);
+            }
+        }
+    
         collectService.saveOrUpdate(req);
         return collectService.getById(req.getId());
     }

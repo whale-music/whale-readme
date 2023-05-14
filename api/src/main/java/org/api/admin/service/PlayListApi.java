@@ -406,7 +406,10 @@ public class PlayListApi {
     
     public Page<PlayListRes> getPlayListPage(PlayListReq req) {
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-        Page<TbCollectPojo> playList = playListService.getPlayList(req, req.getPage().getPageIndex().longValue(), req.getPage().getPageNum().longValue());
+        Page<TbCollectPojo> playList = playListService.getPlayList(req,
+                req.getPage().getPageIndex().longValue(),
+                req.getPage().getPageNum().longValue(),
+                req.getType());
         List<PlayListRes> playListRes = new ArrayList<>();
         collectFillUpCount(playList.getRecords(), playListRes);
     

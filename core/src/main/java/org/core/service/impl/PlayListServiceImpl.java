@@ -38,7 +38,7 @@ public class PlayListServiceImpl implements PlayListService {
         queryWrapper.eq(collectPojo.getId() != null, TbCollectPojo::getId, collectPojo.getId());
         queryWrapper.like(StringUtils.isNotBlank(collectPojo.getPlayListName()), TbCollectPojo::getPlayListName, collectPojo.getPlayListName());
         // 只查询普通歌单
-        queryWrapper.eq(type != null, TbCollectPojo::getType, type);
+        queryWrapper.eq(type != null && type != -1, TbCollectPojo::getType, type);
         collectService.page(page, queryWrapper);
         return page;
     }

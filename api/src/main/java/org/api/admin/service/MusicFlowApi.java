@@ -353,47 +353,7 @@ public class MusicFlowApi {
             urlPojo.setEncodeType(dto.getType());
             urlPojo.setUrl(dto.getMusicTemp());
         } else {
-            File file = null;
-            String md5 = "";
-            String uploadPath;
-            long size;
-            try {
-                if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
-                    // 没有md5，取文件的md5
-                    if (StringUtils.isBlank(dto.getMd5())) {
-                        File file1 = new File(pathTemp);
-                        HttpUtil.downloadFile(dto.getMusicTemp(), file1, 600000);
-                        File[] files = Objects.requireNonNull(file1.listFiles());
-                        File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
-                        ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
-                        BufferedInputStream inputStream = FileUtil.getInputStream(lastFile);
-                        md5 = DigestUtils.md5DigestAsHex(inputStream);
-                        inputStream.close();
-                        file = FileUtil.rename(lastFile, md5, true, true);
-                    } else {
-                        String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
-                        file = getMusicFile(dto, pathname);
-                        file = FileUtil.rename(file, dto.getMd5(), true, true);
-                        md5 = dto.getMd5();
-                    }
-                } else {
-                    // 读取本地文件
-                    file = new File(pathTemp, dto.getMusicTemp());
-                }
-                uploadPath = OSSFactory.ossFactory(config).upload(file, md5);
-                size = FileUtil.size(file);
-                FileUtil.del(file);
-            } catch (Exception e) {
-                FileUtil.del(file);
-                throw new BaseException(null, e.getMessage(), e.getCause());
-            }
-            // music URL 地址表
-            urlPojo.setSize(size);
-            urlPojo.setRate(dto.getRate());
-            urlPojo.setLevel(dto.getLevel());
-            urlPojo.setMd5(md5);
-            urlPojo.setEncodeType(FileUtil.extName(file));
-            urlPojo.setUrl(uploadPath);
+            uploadLocalFile(dto, urlPojo);
         }
         // 检测是否重复上传相同的MD5音乐文件
         if (urlPojo.getId() == null) {
@@ -402,6 +362,50 @@ public class MusicFlowApi {
         }
         musicUrlService.saveOrUpdate(urlPojo);
         return urlPojo;
+    }
+    
+    private void uploadLocalFile(AudioInfoReq dto, TbMusicUrlPojo urlPojo) {
+        File file = null;
+        String md5 = "";
+        String uploadPath;
+        long size;
+        try {
+            if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
+                // 没有md5，取文件的md5
+                if (StringUtils.isBlank(dto.getMd5())) {
+                    File file1 = new File(pathTemp);
+                    HttpUtil.downloadFile(dto.getMusicTemp(), file1, 600000);
+                    File[] files = Objects.requireNonNull(file1.listFiles());
+                    File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
+                    ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
+                    BufferedInputStream inputStream = FileUtil.getInputStream(lastFile);
+                    md5 = DigestUtils.md5DigestAsHex(inputStream);
+                    inputStream.close();
+                    file = FileUtil.rename(lastFile, md5, true, true);
+                } else {
+                    String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
+                    file = getMusicFile(dto, pathname);
+                    file = FileUtil.rename(file, dto.getMd5(), true, true);
+                    md5 = dto.getMd5();
+                }
+            } else {
+                // 读取本地文件
+                file = new File(pathTemp, dto.getMusicTemp());
+            }
+            uploadPath = OSSFactory.ossFactory(config).upload(file, md5);
+            size = FileUtil.size(file);
+            FileUtil.del(file);
+        } catch (Exception e) {
+            FileUtil.del(file);
+            throw new BaseException(null, e.getMessage(), e.getCause());
+        }
+        // music URL 地址表
+        urlPojo.setSize(size);
+        urlPojo.setRate(dto.getRate());
+        urlPojo.setLevel(dto.getLevel());
+        urlPojo.setMd5(md5);
+        urlPojo.setEncodeType(FileUtil.extName(file));
+        urlPojo.setUrl(uploadPath);
     }
     
     /**

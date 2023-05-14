@@ -207,7 +207,7 @@ public interface QukuService {
      * @param userID    用户ID
      * @param collectId 歌单数据
      * @param songIds   歌曲列表
-     * @param flag      删除还是添加
+     * @param flag      删除还是添加 true add, false remove
      */
     void addMusicToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag);
     

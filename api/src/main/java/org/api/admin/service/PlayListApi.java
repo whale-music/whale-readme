@@ -391,7 +391,7 @@ public class PlayListApi {
     }
     
     /**
-     * 添加音乐到歌单
+     * 添加或删除音乐到歌单
      *
      * @param userId 用户ID
      * @param pid    歌单ID

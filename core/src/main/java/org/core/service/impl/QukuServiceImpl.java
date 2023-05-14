@@ -540,8 +540,9 @@ public class QukuServiceImpl implements QukuService {
                 collect.add(tbCollectMusicPojo);
             }
             collectMusicService.saveBatch(collect);
-            Long songId = songIds.get(songIds.size() - 1);
+            log.info("add collect music: {}, music list{}", collectId, CollUtil.join(songIds, ","));
             // 更新封面
+            Long songId = songIds.get(songIds.size() - 1);
             TbMusicPojo musicPojo = musicService.getById(songId);
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(collectId);
@@ -554,6 +555,7 @@ public class QukuServiceImpl implements QukuService {
             collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                .in(TbCollectMusicPojo::getMusicId, songIds));
+            log.debug("remove playlist: {}, music list: {}", collectId, CollUtil.join(songIds, ","));
         }
     }
     

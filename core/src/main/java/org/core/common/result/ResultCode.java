@@ -49,6 +49,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     COLLECT_MUSIC_ERROR("20016", "歌单包括音乐"),
     ALBUM_MUSIC_EXIST_ERROR("20017", "专辑有关联音乐!"),
     ARTIST_NO_EXIST_ERROR("20018", "艺术家不存在"),
+    UPLOAD_MUSIC_ID_NOT_MATCH("20019", "上传歌曲文件存在于其他歌曲中"),
     
     
     /* 业务错误：30001-39999 */

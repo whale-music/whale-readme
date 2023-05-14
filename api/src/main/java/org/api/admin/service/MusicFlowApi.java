@@ -13,6 +13,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.MusicInfoReq;
+import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
 import org.api.admin.model.res.MusicInfoRes;
@@ -286,42 +287,28 @@ public class MusicFlowApi {
         return list;
     }
     
-    /**
-     * 保存音乐
-     * 更新表: 音乐信息表  歌手表 专辑表
-     * 如果上传文件更新: 音乐地址表
-     *
-     * @param dto 音乐信息
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public MusicDetails saveMusicInfo(AudioInfoReq dto) {
-        // 检测是读取本地缓存文件， 并且是本地地址
-        if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
-            // 检查文件目录是否合法
-            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+    private static void getLevel(TbMusicUrlPojo entity, int rate) {
+        // 标准
+        if (128000 >= rate) {
+            entity.setLevel("standard");
+            return;
         }
-        // 保存专辑歌手中间表
-        List<TbArtistPojo> albumArtist = saveAndReturnMusicAndSingList(dto);
-        Set<Long> artistIds = albumArtist.stream().map(TbArtistPojo::getId).collect(Collectors.toSet());
-    
-        // 保存专辑表，如果没有则新建。
-        TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, artistIds);
-        // 保存音乐表
-        TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, artistIds, albumPojo);
-        // 保存歌手表
-        saveRandReturnArtistList(artistIds, musicPojo);
-        // 保存歌词
-        List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
-        // 上传文件
-        TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
-    
-        MusicDetails musicDetails = new MusicDetails();
-        musicDetails.setMusic(musicPojo);
-        musicDetails.setMusicUrl(tbMusicUrlPojo);
-        musicDetails.setAlbum(albumPojo);
-        musicDetails.setSinger(albumArtist);
-        musicDetails.setLyrics(lyricPojoList);
-        return musicDetails;
+        // 较高
+        if (192000 == rate) {
+            entity.setLevel("higher");
+            return;
+        }
+        // 极高
+        if (320_000 >= rate) {
+            entity.setLevel("exhigh");
+            return;
+        }
+        // 无损
+        entity.setLevel("lossless");
+        // hires
+        // if (rate < 1411_000) {
+        //     entity.setLevel("hires");
+        // }
     }
     
     private void saveRandReturnArtistList(Set<Long> artistIds, TbMusicPojo musicPojo) {
@@ -806,56 +793,124 @@ public class MusicFlowApi {
         return musicInfoRes;
     }
     
-    public void uploadAutoMusic(Boolean type, Long userId, MultipartFile uploadFile, Long musicId, String name, String md5, Long size) {
+    /**
+     * 保存音乐
+     * 更新表: 音乐信息表  歌手表 专辑表
+     * 如果上传文件更新: 音乐地址表
+     *
+     * @param dto 音乐信息
+     */
+    // @Transactional(rollbackFor = Exception.class)
+    public MusicDetails saveMusicInfo(AudioInfoReq dto) {
+        // 检测是读取本地缓存文件， 并且是本地地址
+        if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
+            // 检查文件目录是否合法
+            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+        }
+        // 保存专辑歌手中间表
+        List<TbArtistPojo> albumArtist = saveAndReturnMusicAndSingList(dto);
+        Set<Long> artistIds = albumArtist.stream().map(TbArtistPojo::getId).collect(Collectors.toSet());
+        
+        // 保存专辑表，如果没有则新建。
+        TbAlbumPojo albumPojo = saveAndReturnAlbumPojo(dto, artistIds);
+        // 保存音乐表
+        TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, artistIds, albumPojo);
+        // 保存歌手表
+        saveRandReturnArtistList(artistIds, musicPojo);
+        // 保存歌词
+        List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
+        // 上传文件
+        TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
+        
+        MusicDetails musicDetails = new MusicDetails();
+        musicDetails.setMusic(musicPojo);
+        musicDetails.setMusicUrl(tbMusicUrlPojo);
+        musicDetails.setAlbum(albumPojo);
+        musicDetails.setSinger(albumArtist);
+        musicDetails.setLyrics(lyricPojoList);
+        return musicDetails;
+    }
+    
+    public void uploadAutoMusic(Long userId, MultipartFile uploadFile, Long musicId) {
         TbMusicUrlPojo entity = new TbMusicUrlPojo();
         entity.setMusicId(musicId);
         userId = userId == null ? UserUtil.getUser().getId() : userId;
-        if (Boolean.TRUE.equals(type)) {
-            try {
-                String tempMd5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
-                String[] nameArr = StringUtils.split(uploadFile.getOriginalFilename(), ".");
-                if (nameArr == null || nameArr.length < 1) {
-                    throw new BaseException(ResultCode.FILENAME_INVALID);
-                }
-                File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
-                FileUtil.writeBytes(uploadFile.getBytes(), dest);
-                String upload = OSSFactory.ossFactory(config).upload(dest, tempMd5);
-                TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
-                if (one == null) {
-                    entity.setUserId(userId);
-                    entity.setEncodeType(nameArr[1]);
-                    entity.setOrigin("auto");
-                    entity.setSize(FileUtil.size(dest));
-                    entity.setMd5(tempMd5);
-                    entity.setUrl(upload);
-                    musicUrlService.save(entity);
-                } else {
-                    one.setUrl(upload);
-                    entity.setSize(FileUtil.size(dest));
-                    entity.setEncodeType(nameArr[1]);
-                    musicUrlService.updateById(one);
-                }
-                FileUtil.del(dest);
-            } catch (IOException e) {
-                throw new BaseException(ResultCode.UPLOAD_ERROR);
+        try {
+            String tempMd5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
+            TbMusicUrlPojo tempOne = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
+            // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
+            if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
+                throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
+                        ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲ID: " + tempOne.getMusicId());
             }
-        } else {
-            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, md5));
-            String[] nameArr = StringUtils.split(name, ".");
-            if (nameArr.length == 1) {
+            String[] nameArr = StringUtils.split(uploadFile.getOriginalFilename(), ".");
+            if (nameArr == null || nameArr.length < 1) {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
+            File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
+            FileUtil.writeBytes(uploadFile.getBytes(), dest);
+            AudioFile audioInfo = getAudioInfo(dest);
+            String upload = OSSFactory.ossFactory(config).upload(dest, tempMd5);
+            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
+            int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
+            rate = rate * 1000;
             if (one == null) {
+                entity.setRate(rate);
+                getLevel(entity, rate);
+                entity.setUrl(upload);
                 entity.setUserId(userId);
                 entity.setEncodeType(nameArr[1]);
-                entity.setOrigin("manual");
-                entity.setMd5(md5);
-                entity.setSize(size);
-                entity.setUrl(name);
+                entity.setOrigin("auto");
+                entity.setSize(FileUtil.size(dest));
+                entity.setMd5(tempMd5);
                 musicUrlService.save(entity);
+                log.info("文件保存到数据库{}", entity);
             } else {
-                throw new BaseException(ResultCode.SONG_UPLOADED);
+                one.setRate(rate);
+                getLevel(one, rate);
+                one.setUrl(upload);
+                one.setSize(FileUtil.size(dest));
+                one.setEncodeType(nameArr[1]);
+                musicUrlService.updateById(one);
+                log.info("更新成功{}", entity);
             }
+            FileUtil.del(dest);
+        } catch (IOException e) {
+            throw new BaseException(ResultCode.UPLOAD_ERROR);
+        }
+    }
+    
+    private AudioFile getAudioInfo(File path) {
+        AudioFile read = new AudioFile();
+        try {
+            read = AudioFileIO.read(path);
+        } catch (InvalidAudioFrameException | CannotReadException | TagException | ReadOnlyFileException | IOException e) {
+            log.info(e.getMessage(), e.getCause());
+        }
+        return read;
+    }
+    
+    public void uploadManualMusic(UploadMusicReq musicSource) {
+        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, musicSource.getMd5()));
+        String[] nameArr = StringUtils.split(musicSource.getName(), ".");
+        if (nameArr.length == 1) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        if (one == null) {
+            TbMusicUrlPojo entity = new TbMusicUrlPojo();
+            getLevel(entity, musicSource.getRate());
+            entity.setRate(musicSource.getRate());
+            entity.setUserId(musicSource.getUserId());
+            entity.setEncodeType(nameArr[1]);
+            entity.setOrigin("manual");
+            entity.setMd5(musicSource.getMd5());
+            entity.setSize(musicSource.getSize());
+            entity.setUrl(musicSource.getName());
+            entity.setMusicId(musicSource.getMusicId());
+            musicUrlService.save(entity);
+            musicCommonApi.getMusicUrlByMusicId(entity.getMusicId(), true);
+        } else {
+            throw new BaseException(ResultCode.SONG_UPLOADED);
         }
     }
 }

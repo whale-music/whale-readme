@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.web.MusicBoxSpringBoot;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -198,7 +197,7 @@ class TestSaveMusicList {
             MusicDetails musicDetails = musicFlowApi.saveMusicInfo(dto);
             log.info("上传成功{}:{}", musicId, dto.getMusicName());
             return musicDetails;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
         throw new NullPointerException();

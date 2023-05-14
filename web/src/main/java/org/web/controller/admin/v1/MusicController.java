@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.model.req.MusicInfoReq;
+import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.pojo.MusicDetails;
@@ -107,8 +108,14 @@ public class MusicController {
     }
     
     @PostMapping("/auto/upload")
-    public R uploadAutoMusic(@RequestParam("type") Boolean type, @RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId, String name, String md5, Long size) {
-        uploadMusic.uploadAutoMusic(type, userId, uploadFile, musicId, name, md5, size);
+    public R uploadAutoMusic(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) {
+        uploadMusic.uploadAutoMusic(userId, uploadFile, musicId);
+        return R.success();
+    }
+    
+    @PostMapping("/manual/upload")
+    public R uploadManualMusic(@RequestBody UploadMusicReq musicSource) {
+        uploadMusic.uploadManualMusic(musicSource);
         return R.success();
     }
 }

@@ -1,6 +1,7 @@
 package org.core.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,7 +29,7 @@ public class TbMusicArtistPojo implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("音乐ID")
-    @TableField("music_id")
+    @TableId("music_id")
     private Long musicId;
     
     @ApiModelProperty("艺术家ID")

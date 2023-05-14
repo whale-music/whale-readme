@@ -919,4 +919,8 @@ public class MusicFlowApi {
     public void updateSource(TbMusicUrlPojo source) {
         musicUrlService.updateById(source);
     }
+    
+    public void deleteSource(Long id) {
+        musicUrlService.removeById(id);
+    }
 }

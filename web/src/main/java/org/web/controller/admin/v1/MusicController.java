@@ -125,4 +125,10 @@ public class MusicController {
         uploadMusic.updateSource(source);
         return R.success();
     }
+    
+    @DeleteMapping("/delete/source/{id}")
+    public R deleteSource(@PathVariable("id") Long id) {
+        uploadMusic.deleteSource(id);
+        return R.success();
+    }
 }

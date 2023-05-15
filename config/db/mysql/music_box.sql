@@ -62,7 +62,7 @@ create table if not exists tb_album
 (
     id           bigint       not null comment '专辑表ID'
         primary key,
-    album_name   varchar(512) null comment '专辑名',
+    album_name   varchar(512) not null comment '专辑名',
     sub_type     varchar(128) null comment '专辑版本（比如录音室版，现场版）',
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
@@ -205,6 +205,20 @@ create index tb_music_alia_name_index
 
 create index tb_music_music_name_index
     on tb_music (music_name);
+
+create table if not exists tb_music_artist
+(
+    music_id  bigint not null comment '音乐ID',
+    artist_id bigint not null comment '艺术家ID',
+    primary key (music_id, artist_id),
+    constraint tb_music_artist_tb_artist_id_fk
+        foreign key (artist_id) references tb_artist (id)
+            on update cascade on delete cascade,
+    constraint tb_music_artist_tb_music_id_fk
+        foreign key (music_id) references tb_music (id)
+            on update cascade on delete cascade
+)
+    comment '音乐与歌手中间表';
 
 create table if not exists tb_music_url
 (

@@ -7,9 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.iservice.TbArtistService;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
@@ -120,5 +123,12 @@ public class ArtistApi {
     
     public void deleteArtist(List<Long> id) {
         qukuService.deleteArtist(id);
+    }
+    
+    public void saveOrUpdateArtist(SaveOrUpdateArtistReq req) {
+        if (req.getId() == null && StringUtils.isEmpty(req.getArtistName())) {
+            throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
+        }
+        artistService.saveOrUpdate(req);
     }
 }

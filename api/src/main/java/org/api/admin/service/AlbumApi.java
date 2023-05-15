@@ -210,7 +210,7 @@ public class AlbumApi {
     }
     
     public void saveOrUpdateAlbum(SaveOrUpdateAlbumReq req) {
-        if (req.getId() == null) {
+        if (req.getId() == null && org.apache.commons.lang3.StringUtils.isEmpty(req.getAlbumName())) {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         albumService.saveOrUpdate(req);

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
@@ -51,6 +52,12 @@ public class ArtistController {
     @DeleteMapping("/{id}")
     public R deleteArtist(@PathVariable("id") List<Long> id) {
         artistApi.deleteArtist(id);
+        return R.success();
+    }
+    
+    @PostMapping("/")
+    public R saveOrUpdateArtist(@RequestBody SaveOrUpdateArtistReq req) {
+        artistApi.saveOrUpdateArtist(req);
         return R.success();
     }
 }

@@ -539,18 +539,9 @@ public class MusicFlowApi {
      * @return 专辑表
      */
     private TbAlbumPojo saveAndReturnAlbumPojo(AudioInfoReq dto, Set<Long> singerIds) {
-        // 专辑没有值新建一个空的专辑
+        // 专辑没有值直接返回
         if (dto.getAlbum() == null || StringUtils.isBlank(dto.getAlbum().getAlbumName())) {
-            TbAlbumPojo entity = new TbAlbumPojo();
-            albumService.save(entity);
-            Set<TbAlbumArtistPojo> collect = singerIds.parallelStream().map(aLong -> {
-                TbAlbumArtistPojo tbAlbumArtistPojo = new TbAlbumArtistPojo();
-                tbAlbumArtistPojo.setAlbumId(entity.getId());
-                tbAlbumArtistPojo.setArtistId(aLong);
-                return tbAlbumArtistPojo;
-            }).collect(Collectors.toSet());
-            albumSingerService.saveBatch(collect);
-            return entity;
+            return new TbAlbumPojo();
         }
         // 如果是数据库中已有数据，直接更新
         Long albumId = dto.getAlbum().getId();

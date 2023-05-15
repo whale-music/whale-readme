@@ -9,8 +9,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumRes;
 import org.api.admin.utils.MyPageUtil;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.iservice.TbAlbumArtistService;
 import org.core.iservice.TbAlbumService;
 import org.core.iservice.TbArtistService;
@@ -205,5 +208,12 @@ public class AlbumApi {
     
     public void deleteAlbum(List<Long> id, Boolean compel) {
         qukuService.deleteAlbum(id, compel);
+    }
+    
+    public void saveOrUpdateAlbum(SaveOrUpdateAlbumReq req) {
+        if (req.getId() == null) {
+            throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
+        }
+        albumService.saveOrUpdate(req);
     }
 }

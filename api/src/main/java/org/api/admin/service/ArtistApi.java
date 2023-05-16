@@ -56,14 +56,17 @@ public class ArtistApi {
     }
     
     public Page<ArtistRes> getAllSingerList(AlbumReq req) {
+        req.setArtistName(StringUtils.trim(req.getArtistName()));
+        req.setAlbumName(StringUtils.trim(req.getAlbumName()));
+    
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-        
+    
         Page<TbArtistPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(req.getArtistName()), TbArtistPojo::getArtistName, req.getArtistName());
         pageOrderBy(req.getOrder(), req.getOrderBy(), queryWrapper);
         artistService.page(page, queryWrapper);
-        
+    
         Page<ArtistRes> singerResPage = new Page<>();
         BeanUtils.copyProperties(page, singerResPage);
         singerResPage.setRecords(new ArrayList<>());

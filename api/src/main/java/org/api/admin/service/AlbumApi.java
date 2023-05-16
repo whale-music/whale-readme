@@ -59,8 +59,11 @@ public class AlbumApi {
     
     
     public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
+        req.setAlbumName(org.apache.commons.lang3.StringUtils.trim(req.getAlbumName()));
+        req.setArtistName(org.apache.commons.lang3.StringUtils.trim(req.getArtistName()));
+    
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-        
+    
         List<TbAlbumPojo> albumList = new ArrayList<>();
         if (StringUtils.isNotBlank(req.getAlbumName())) {
             LambdaQueryWrapper<TbAlbumPojo> albumWrapper = Wrappers.<TbAlbumPojo>lambdaQuery().like(TbAlbumPojo::getAlbumName, req.getAlbumName());

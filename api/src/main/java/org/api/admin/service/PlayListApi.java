@@ -144,6 +144,10 @@ public class PlayListApi {
      * 获取音乐基本信息
      */
     public Page<MusicPageRes> getMusicPage(MusicPageReq req) {
+        req.setMusicName(StringUtils.trim(req.getMusicName()));
+        req.setAlbumName(StringUtils.trim(req.getAlbumName()));
+        req.setArtistName(StringUtils.trim(req.getArtistName()));
+    
         req.setPage(MyPageUtil.checkPage(req.getPage()));
         List<Long> musicIdList = new LinkedList<>();
     
@@ -405,6 +409,8 @@ public class PlayListApi {
     }
     
     public Page<PlayListRes> getPlayListPage(PlayListReq req) {
+        req.setPlayListName(StringUtils.trim(req.getPlayListName()));
+    
         req.setPage(MyPageUtil.checkPage(req.getPage()));
         Page<TbCollectPojo> playList = playListService.getPlayList(req,
                 req.getPage().getPageIndex().longValue(),

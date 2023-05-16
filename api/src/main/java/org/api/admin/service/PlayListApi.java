@@ -182,7 +182,7 @@ public class PlayListApi {
                                            .filter(musicUrlPojo -> StringUtils.isEmpty(musicUrlPojo.getUrl()))
                                            .map(TbMusicUrlPojo::getMusicId)
                                            .collect(Collectors.toList());
-            // 无音源音乐ID
+            // 是否都是无音源音乐
             union = CollUtil.union(noMusicSource, collect);
             if (CollUtil.isEmpty(union)) {
                 return new Page<>(0, 50, 0);

@@ -809,7 +809,7 @@ public class QukuServiceImpl implements QukuService {
         queryWrapper1.in(TbCollectMusicPojo::getMusicId, musicId);
         List<TbCollectMusicPojo> list = collectMusicService.list(queryWrapper1);
         // 是否强制删除歌单中的音乐
-        if (CollUtil.isNotEmpty(list) || Boolean.TRUE.equals(compel)) {
+        if (CollUtil.isEmpty(list) || Boolean.TRUE.equals(compel)) {
             collectMusicService.remove(queryWrapper1);
         } else {
             throw new BaseException(ResultCode.COLLECT_MUSIC_ERROR);

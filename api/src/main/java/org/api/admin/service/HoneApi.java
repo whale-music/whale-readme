@@ -208,7 +208,8 @@ public class HoneApi {
     
     public List<PluginTaskRes> getPluginTask(Long id) {
         LambdaQueryWrapper<TbPluginTaskPojo> eq = Wrappers.<TbPluginTaskPojo>lambdaQuery()
-                                                          .eq(TbPluginTaskPojo::getUserId, id);
+                                                          .eq(TbPluginTaskPojo::getUserId, id)
+                                                          .orderByDesc(TbPluginTaskPojo::getCreateTime);
         Page<TbPluginTaskPojo> page = pluginTaskService.page(new Page<>(0, 15), eq);
         if (CollUtil.isEmpty(page.getRecords())) {
             return Collections.emptyList();

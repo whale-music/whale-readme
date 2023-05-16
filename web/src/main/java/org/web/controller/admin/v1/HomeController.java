@@ -2,6 +2,7 @@ package org.web.controller.admin.v1;
 
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.convert.Count;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
 import org.core.pojo.TbAlbumPojo;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,19 +27,16 @@ public class HomeController {
     @Autowired
     private HoneApi honeApi;
     
-    @GetMapping("/music/count")
-    public R getMusicCount() {
-        return R.success(honeApi.getMusicCount());
-    }
-    
-    @GetMapping("/album/count")
-    public R getAlbumCount() {
-        return R.success(honeApi.getAlbumCount());
-    }
-    
-    @GetMapping("/artist/count")
-    public R getArtistCount() {
-        return R.success(honeApi.getArtistCount());
+    @GetMapping("/count")
+    public R getCount() {
+        Count musicCount = honeApi.getMusicCount();
+        Count albumCount = honeApi.getAlbumCount();
+        Count artistCount = honeApi.getArtistCount();
+        HashMap<String, Count> map = new HashMap<>();
+        map.put("music", musicCount);
+        map.put("album", albumCount);
+        map.put("artist", artistCount);
+        return R.success(map);
     }
     
     @GetMapping("/musicTop")

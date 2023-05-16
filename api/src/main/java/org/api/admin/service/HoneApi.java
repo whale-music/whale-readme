@@ -1,11 +1,14 @@
 package org.api.admin.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.convert.Count;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.admin.model.res.PluginTaskRes;
 import org.api.common.service.MusicCommonApi;
@@ -15,6 +18,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,17 +61,99 @@ public class HoneApi {
         return albumService.page(objectPage, wrapper).getRecords();
     }
     
-    public int getMusicCount() {
-        return Math.toIntExact(musicService.count());
+    /**
+     * **计算月增长率**
+     * sameMonth 本月金额
+     * lastMonth 上月金额
+     */
+    public static Float getAnalysisData(int sameMonth, int lastMonth) {
+        int growthNum;
+        if (lastMonth > 0 && sameMonth > 0) {
+            if (lastMonth < sameMonth) {
+                // 如果下个数大于上个数，则增长率 为 正
+                growthNum = sameMonth - lastMonth;
+                return (float) growthNum / (float) lastMonth * 100;
+            } else if (lastMonth > sameMonth) {
+                // 如果下个数小于上个数，则增长率 为 负
+                growthNum = lastMonth - sameMonth;
+                float v = (float) growthNum / (float) sameMonth * 100;
+                return BigDecimal.valueOf(v).setScale(2, RoundingMode.HALF_UP).floatValue();
+            } else {
+                // 如果相等，增长率为 0
+                return 0F;
+            }
+        } else if (lastMonth > 0 && sameMonth == 0) {
+            // 如果上个数大于0，下个数为0，增长率为 0
+            return 0F;
+        } else if (lastMonth == 0 && sameMonth > 0) {
+            // 如果下个数大于0，上个数为0，增长率为 0
+            growthNum = sameMonth - lastMonth;
+            float v = (float) growthNum / (float) sameMonth * 100;
+            return BigDecimal.valueOf(v).setScale(2, RoundingMode.HALF_UP).floatValue();
+        } else {
+            // 如果相等，增长率为 0
+            return 0F;
+        }
     }
     
-    
-    public int getAlbumCount() {
-        return Math.toIntExact(albumService.count());
+    public Count getMusicCount() {
+        long count = musicService.count();
+        // 本月
+        Date date = new Date();
+        LambdaQueryWrapper<TbMusicPojo> ge = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                     .ge(TbMusicPojo::getCreateTime, DateUtil.month(date))
+                                                     .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
+        long localMonth = musicService.count(ge);
+        
+        // 上一个月
+        LambdaQueryWrapper<TbMusicPojo> last = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                       .ge(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, -2))
+                                                       .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
+        long lastMonth = musicService.count(last);
+        
+        Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
+        Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
+        return new Count(count, analysisData, fluctuate);
     }
     
-    public int getArtistCount() {
-        return Math.toIntExact(artistService.count());
+    public Count getAlbumCount() {
+        long count = albumService.count();
+        // 本月
+        Date date = new Date();
+        Wrapper<TbAlbumPojo> ge = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                          .ge(TbAlbumPojo::getCreateTime, DateUtil.month(date))
+                                          .lt(TbAlbumPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
+        long localMonth = albumService.count(ge);
+        
+        // 上一个月
+        Wrapper<TbAlbumPojo> last = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                            .ge(TbAlbumPojo::getCreateTime, DateUtil.offsetMonth(date, -2))
+                                            .lt(TbAlbumPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
+        long lastMonth = albumService.count(last);
+        
+        Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
+        Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
+        return new Count(count, analysisData, fluctuate);
+    }
+    
+    public Count getArtistCount() {
+        long count = artistService.count();
+        // 本月
+        Date date = new Date();
+        Wrapper<TbArtistPojo> ge = Wrappers.<TbArtistPojo>lambdaQuery()
+                                           .ge(TbArtistPojo::getCreateTime, DateUtil.month(date))
+                                           .lt(TbArtistPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
+        long localMonth = artistService.count(ge);
+        
+        // 上一个月
+        Wrapper<TbArtistPojo> last = Wrappers.<TbArtistPojo>lambdaQuery()
+                                             .ge(TbArtistPojo::getCreateTime, DateUtil.offsetMonth(date, -2))
+                                             .lt(TbArtistPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
+        long lastMonth = artistService.count(last);
+        
+        Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
+        Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
+        return new Count(count, analysisData, fluctuate);
     }
     
     public List<MusicStatisticsRes> getMusicStatistics() {

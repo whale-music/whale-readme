@@ -134,9 +134,17 @@ public class PlayListApi {
     
             playListMusicRes.add(e1);
         }
+        // 匹配歌单歌曲顺序
+        ArrayList<PlayListMusicRes> res = new ArrayList<>();
+        for (Long musicId : musicIds) {
+            Optional<PlayListMusicRes> first = playListMusicRes.parallelStream()
+                                                               .filter(playListMusicRes1 -> Objects.equals(playListMusicRes1.getId(), musicId))
+                                                               .findFirst();
+            first.ifPresent(res::add);
+        }
         Page<PlayListMusicRes> resPage = new Page<>();
         BeanUtils.copyProperties(playListMusicResPage, resPage);
-        resPage.setRecords(playListMusicRes);
+        resPage.setRecords(res);
         return resPage;
     }
     

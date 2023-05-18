@@ -2,10 +2,8 @@ package org.plugin.service;
 
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
-import org.plugin.converter.PluginLabelValue;
-import org.plugin.converter.PluginMsgRes;
-import org.plugin.converter.PluginReq;
-import org.plugin.converter.PluginRes;
+import org.core.pojo.TbScheduleTaskPojo;
+import org.plugin.converter.*;
 import org.plugin.model.PluginRunParamsRes;
 import org.plugin.model.PluginTaskLogRes;
 
@@ -83,4 +81,40 @@ public interface PluginService {
      * @return 运行完成同步返回信息
      */
     PluginTaskLogRes execInteractivePluginTask(List<PluginLabelValue> pluginLabelValue, Long pluginId, String type, Long id, TbPluginTaskPojo pojo);
+    
+    /**
+     * 获取任务运行状态
+     *
+     * @return 任务状态
+     */
+    List<ScheduleRes> getSchedulerTaskList(Long id, TbScheduleTaskPojo req);
+    
+    /**
+     * 添加动态定时任务
+     *
+     * @param task  定时任务信息
+     * @param isRun 是否添加或更新后运行
+     */
+    void saveOrUpdateDynamicTask(TbScheduleTaskPojo task, Boolean isRun);
+    
+    /**
+     * 删除任务队列中删除动态任务
+     *
+     * @param id 任务ID
+     */
+    void removeOrPauseDynamicTask(Long id);
+    
+    /**
+     * 开启动态任务
+     *
+     * @param id 动态任务ID
+     */
+    void startDynamicTask(Long id);
+    
+    /**
+     * 暂停动态任务, 如果任务正在执行只会等待执行完后暂停
+     *
+     * @param id 动态任务ID
+     */
+    void stopDynamicTask(Long id);
 }

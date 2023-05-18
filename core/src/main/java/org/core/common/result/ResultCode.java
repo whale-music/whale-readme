@@ -29,6 +29,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     ALBUM_NO_EXIST_ERROR("10012", "专辑不存在"),
     PLUGIN_NO_EXIST_EXISTED("10013", "插件类型不存在"),
     LYRIC_NO_EXIST_EXISTED("10014", "插件类型不存在"),
+    SCHEDULED_NO_EXIST_EXISTED("10015", "定时任务不存在"),
     
     
     /* 用户错误：20001-29999*/

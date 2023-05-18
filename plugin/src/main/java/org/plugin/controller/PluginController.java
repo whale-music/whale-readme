@@ -3,12 +3,10 @@ package org.plugin.controller;
 import org.core.common.result.R;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
+import org.core.pojo.TbScheduleTaskPojo;
 import org.core.utils.UserUtil;
 import org.plugin.common.TaskStatus;
-import org.plugin.converter.PluginLabelValue;
-import org.plugin.converter.PluginMsgRes;
-import org.plugin.converter.PluginReq;
-import org.plugin.converter.PluginRes;
+import org.plugin.converter.*;
 import org.plugin.model.PluginRunParamsRes;
 import org.plugin.model.PluginTaskLogRes;
 import org.plugin.service.PluginService;
@@ -16,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController("plugins")
 @RequestMapping("/admin")
@@ -116,4 +115,52 @@ public class PluginController {
     }
     
     
+    /**
+     * 查看动态任务
+     */
+    @PostMapping("/schedule/get/task")
+    public R getStartingDynamicTask(@RequestBody(required = false) TbScheduleTaskPojo req, @RequestParam(value = "id", required = false) Long id) {
+        TbScheduleTaskPojo pojo = Optional.ofNullable(req).orElse(new TbScheduleTaskPojo());
+        Long userId = id == null ? UserUtil.getUser().getId() : id;
+        List<ScheduleRes> list = pluginService.getSchedulerTaskList(userId, pojo);
+        return R.success(list);
+    }
+    
+    
+    /**
+     * 保存动态任务
+     *
+     * @param task 任务信息
+     */
+    @PostMapping("/schedule/task")
+    public R saveOrUpdateDynamicTask(@RequestBody TbScheduleTaskPojo task, @RequestParam("isRun") Boolean isRun) {
+        pluginService.saveOrUpdateDynamicTask(task, isRun);
+        return R.success();
+    }
+    
+    /**
+     * 开启或关闭动态任务
+     *
+     * @param id 动态任务ID
+     */
+    @GetMapping("/schedule/task/status")
+    public R modifyStateDynamicTask(@RequestParam("id") Long id, @RequestParam("status") Boolean status) {
+        if (Boolean.TRUE.equals(status)) {
+            pluginService.startDynamicTask(id);
+        } else {
+            pluginService.stopDynamicTask(id);
+        }
+        return R.success();
+    }
+    
+    /**
+     * 从任务队列中移除或在数据库中删除一个动态任务
+     *
+     * @param id 定时任务ID
+     */
+    @DeleteMapping("/schedule/task/{id}")
+    public R removeOrPauseDynamicTask(@PathVariable("id") Long id) {
+        pluginService.removeOrPauseDynamicTask(id);
+        return R.success();
+    }
 }

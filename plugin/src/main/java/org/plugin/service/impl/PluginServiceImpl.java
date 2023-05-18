@@ -15,31 +15,30 @@ import org.core.config.PluginType;
 import org.core.iservice.TbPluginMsgService;
 import org.core.iservice.TbPluginService;
 import org.core.iservice.TbPluginTaskService;
+import org.core.iservice.TbScheduleTaskService;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginPojo;
 import org.core.pojo.TbPluginTaskPojo;
+import org.core.pojo.TbScheduleTaskPojo;
 import org.core.service.QukuService;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.common.CommonPlugin;
 import org.plugin.common.TaskStatus;
-import org.plugin.converter.PluginLabelValue;
-import org.plugin.converter.PluginMsgRes;
-import org.plugin.converter.PluginReq;
-import org.plugin.converter.PluginRes;
+import org.plugin.converter.*;
 import org.plugin.model.PluginRunParamsRes;
 import org.plugin.model.PluginTaskLogRes;
+import org.plugin.scheduling.DynamicTaskService;
 import org.plugin.service.PluginService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -59,6 +58,12 @@ public class PluginServiceImpl implements PluginService {
     
     @Autowired
     private QukuService qukuService;
+    
+    @Autowired
+    private TbScheduleTaskService scheduleTaskService;
+    
+    @Autowired
+    private DynamicTaskService dynamicTaskService;
     
     private static CommonPlugin runCommonCode(String script, String allClassName) {
         try {
@@ -176,8 +181,9 @@ public class PluginServiceImpl implements PluginService {
             case PluginType.INTERACTIVE:
                 ComboSearchPlugin comboSearchPlugin = runInteractiveCode(script, allClassName);
                 return new PluginRunParamsRes(comboSearchPlugin.getType(), comboSearchPlugin.getParams());
+            default:
+                throw new BaseException(ResultCode.PLUGIN_NO_EXIST_EXISTED);
         }
-        throw new BaseException(ResultCode.PLUGIN_NO_EXIST_EXISTED);
     }
     
     /**
@@ -381,5 +387,99 @@ public class PluginServiceImpl implements PluginService {
             pluginTaskLogRes.setHtml(e.getMessage());
             return pluginTaskLogRes;
         }
+    }
+    
+    /**
+     * 获取任务运行状态
+     *
+     * @return 任务状态
+     */
+    @Override
+    public List<ScheduleRes> getSchedulerTaskList(Long id, TbScheduleTaskPojo req) {
+        LambdaQueryWrapper<TbScheduleTaskPojo> wrapper = Wrappers.<TbScheduleTaskPojo>lambdaQuery().eq(TbScheduleTaskPojo::getUserId, id);
+        wrapper.eq(req.getId() != null, TbScheduleTaskPojo::getId, req.getId());
+        wrapper.eq(req.getStatus() != null, TbScheduleTaskPojo::getStatus, req.getStatus());
+        wrapper.likeRight(org.apache.commons.lang3.StringUtils.isNotBlank(req.getName()), TbScheduleTaskPojo::getName, req.getName());
+        List<TbScheduleTaskPojo> list = scheduleTaskService.list(wrapper);
+        ArrayList<ScheduleRes> res = new ArrayList<>();
+        Set<Long> collect = list.parallelStream().map(TbScheduleTaskPojo::getPluginId).collect(Collectors.toSet());
+        Map<Long, TbPluginPojo> map = pluginService.listByIds(collect)
+                                                   .parallelStream()
+                                                   .collect(Collectors.toMap(TbPluginPojo::getId, pluginPojo -> pluginPojo));
+        
+        List<Long> dynamicTask = dynamicTaskService.getSchedulerTaskList();
+        for (TbScheduleTaskPojo tbScheduleTaskPojo : list) {
+            TbPluginPojo tbPluginPojo = map.get(tbScheduleTaskPojo.getPluginId());
+            ScheduleRes e = new ScheduleRes();
+            BeanUtils.copyProperties(tbScheduleTaskPojo, e);
+            e.setPluginName(tbPluginPojo.getPluginName());
+            e.setOnLine(CollUtil.contains(dynamicTask, tbScheduleTaskPojo.getId()));
+            res.add(e);
+        }
+        return res;
+    }
+    
+    /**
+     * 添加动态定时任务
+     *
+     * @param task  定时任务信息
+     * @param isRun 是否添加或更新后运行
+     */
+    @Override
+    public void saveOrUpdateDynamicTask(TbScheduleTaskPojo task, Boolean isRun) {
+        task.setUserId(task.getUserId() == null ? UserUtil.getUser().getId() : task.getUserId());
+        task.setStatus(isRun);
+        scheduleTaskService.saveOrUpdate(task);
+        if (Boolean.TRUE.equals(isRun)) {
+            dynamicTaskService.add(task, this);
+        }
+    }
+    
+    /**
+     * 停止或删除动态任务
+     *
+     * @param id 任务ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeOrPauseDynamicTask(Long id) {
+        TbScheduleTaskPojo service = scheduleTaskService.getById(id);
+        TbScheduleTaskPojo entity = new TbScheduleTaskPojo();
+        entity.setId(id);
+        entity.setStatus(false);
+        // 定制动态任务
+        scheduleTaskService.updateById(entity);
+        if (!dynamicTaskService.stop(service.getId())) {
+            throw new BaseException(ResultCode.SCHEDULED_NO_EXIST_EXISTED);
+        }
+        scheduleTaskService.removeById(id);
+    }
+    
+    /**
+     * 开启动态任务
+     * 如果动态任务中没有则添加动态任务
+     *
+     * @param id 动态任务ID
+     */
+    @Override
+    public void startDynamicTask(Long id) {
+        TbScheduleTaskPojo byId = scheduleTaskService.getById(id);
+        byId.setStatus(true);
+        dynamicTaskService.add(byId, this);
+        scheduleTaskService.updateById(byId);
+    }
+    
+    /**
+     * 删除动态任务, 如果任务正在执行只会等待执行完后暂停
+     *
+     * @param id 动态任务ID
+     */
+    @Override
+    public void stopDynamicTask(Long id) {
+        dynamicTaskService.stop(id);
+        TbScheduleTaskPojo entity = new TbScheduleTaskPojo();
+        entity.setId(id);
+        entity.setStatus(false);
+        scheduleTaskService.updateById(entity);
     }
 }

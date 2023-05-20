@@ -1,6 +1,5 @@
 package org.api.admin.model.res;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,11 +44,13 @@ public class MusicPageRes implements Serializable {
     @ApiModelProperty("音乐是否存在")
     private Boolean isExist;
     
+    @ApiModelProperty("音乐是否喜欢")
+    private Boolean isLike;
+    
     @ApiModelProperty("音乐地址")
     private String musicRawUrl;
     
     @ApiModelProperty("歌曲时长")
-    @TableField("time_length")
     private Integer timeLength;
     
     @ApiModelProperty("发行时间")

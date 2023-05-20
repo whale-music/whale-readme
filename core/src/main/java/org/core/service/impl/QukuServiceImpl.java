@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.LyricConfig;
+import org.core.config.PlayListTypeConfig;
 import org.core.config.TargetTagConfig;
 import org.core.iservice.*;
 import org.core.pojo.*;
@@ -193,7 +194,7 @@ public class QukuServiceImpl implements QukuService {
     }
     
     @Override
-    public List<TbMusicUrlPojo> getMusicUrl(Set<Long> musicId) {
+    public List<TbMusicUrlPojo> getMusicUrl(Collection<Long> musicId) {
         LambdaQueryWrapper<TbMusicUrlPojo> in = Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicId);
         return musicUrlService.list(in);
     }
@@ -524,12 +525,11 @@ public class QukuServiceImpl implements QukuService {
                                                            .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                            .in(TbCollectMusicPojo::getMusicId, songIds));
             ExceptionUtil.isNull(count > 0, ResultCode.PLAT_LIST_MUSIC_EXIST);
-            
+    
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
-            
-            long allCount = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                              .eq(TbCollectMusicPojo::getCollectId, collectId));
+    
+            long allCount = getCollectCount(collectId);
             List<TbCollectMusicPojo> collect = new ArrayList<>(tbMusicPojo.size());
             for (TbMusicPojo musicPojo : tbMusicPojo) {
                 TbCollectMusicPojo tbCollectMusicPojo = new TbCollectMusicPojo();
@@ -632,7 +632,8 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<TbCollectPojo> getUserPlayList(Long uid, Collection<Short> type) {
         LambdaQueryWrapper<TbCollectPojo> queryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                 .eq(TbCollectPojo::getUserId, uid);
+                                                                 .eq(TbCollectPojo::getUserId, uid)
+                                                                 .in(CollUtil.isNotEmpty(type), TbCollectPojo::getType, type);
         List<TbCollectPojo> list = collectService.list(queryWrapper);
         return CollectSortUtil.userLikeUserSort(uid, list);
     }
@@ -739,24 +740,27 @@ public class QukuServiceImpl implements QukuService {
      * 添加喜欢歌单
      *
      * @param userId          用户
-     * @param id              歌单ID
+     * @param id              音乐ID
      * @param isAddAndDelLike true添加 false删除
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void collectLike(Long userId, Long id, Boolean isAddAndDelLike) {
-        TbCollectPojo collectServiceById = collectService.getById(userId);
+        LambdaQueryWrapper<TbCollectPojo> query = Wrappers.lambdaQuery();
+        query.eq(TbCollectPojo::getUserId, userId);
+        query.eq(TbCollectPojo::getType, PlayListTypeConfig.LIKE);
+        TbCollectPojo collectServiceById = collectService.getOne(query);
         if (collectServiceById == null) {
             // 添加或用户喜爱歌单
             TbCollectPojo entity = new TbCollectPojo();
-            entity.setId(userId);
             SysUserPojo userPojo = accountService.getById(userId);
             entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
             entity.setPic(userPojo.getAvatarUrl());
             entity.setSort(collectService.count());
             entity.setUserId(userId);
-            entity.setType(Short.valueOf("1"));
+            entity.setType(PlayListTypeConfig.LIKE);
             collectService.save(entity);
+            collectServiceById = entity;
         }
         TbMusicPojo byId = musicService.getById(id);
         if (byId == null) {
@@ -766,7 +770,7 @@ public class QukuServiceImpl implements QukuService {
         
         // 效验歌单中是否有该歌曲
         LambdaQueryWrapper<TbCollectMusicPojo> wrapper = Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                                 .eq(TbCollectMusicPojo::getCollectId, userId)
+                                                                 .eq(TbCollectMusicPojo::getCollectId, collectServiceById.getId())
                                                                  .eq(TbCollectMusicPojo::getMusicId, id);
         long count = collectMusicService.count(wrapper);
         // 删除还是添加歌曲
@@ -776,19 +780,40 @@ public class QukuServiceImpl implements QukuService {
                 throw new BaseException(ResultCode.SONG_EXIST);
             }
             TbCollectMusicPojo tbLikeMusicPojo = new TbCollectMusicPojo();
-            tbLikeMusicPojo.setCollectId(userId);
+            tbLikeMusicPojo.setCollectId(collectServiceById.getId());
             tbLikeMusicPojo.setMusicId(id);
+    
+            Long sort = getCollectCount(collectServiceById.getId());
+            tbLikeMusicPojo.setSort(sort);
             collectMusicService.save(tbLikeMusicPojo);
             log.debug("歌单ID: {} 歌曲ID: {}  歌曲保存", tbLikeMusicPojo.getCollectId(), tbLikeMusicPojo.getMusicId());
+    
+            TbCollectPojo entity = new TbCollectPojo();
+            entity.setId(collectServiceById.getId());
+            entity.setPic(byId.getPic());
+            collectService.updateById(entity);
         } else {
             // 歌曲不存在
             if (count == 0) {
                 throw new BaseException(ResultCode.SONG_NOT_EXIST);
             }
             collectMusicService.remove(wrapper);
-            log.debug("歌单ID: {} 歌曲ID: {}  歌曲已删除", userId, id);
+            log.debug("歌单ID: {} 歌曲ID: {}  歌曲已删除", collectServiceById.getId(), id);
         }
-        
+    
+    }
+    
+    private Long getCollectCount(Long id) {
+        LambdaQueryWrapper<TbCollectMusicPojo> eq = Wrappers.<TbCollectMusicPojo>lambdaQuery().
+                                                            eq(TbCollectMusicPojo::getCollectId, id)
+                                                            .orderByDesc(TbCollectMusicPojo::getSort);
+        Page<TbCollectMusicPojo> page = collectMusicService.page(new Page<>(0, 1), eq);
+        Long sort = 0L;
+        if (CollUtil.isNotEmpty(page.getRecords()) && page.getRecords().size() == 1) {
+            sort = page.getRecords().get(0).getSort();
+            sort++;
+        }
+        return sort;
     }
     
     /**

@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.config.TargetTagConfig;
 import org.core.pojo.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public interface QukuService {
     
@@ -53,7 +56,7 @@ public interface QukuService {
     /**
      * 查询数据歌曲下载地址
      */
-    List<TbMusicUrlPojo> getMusicUrl(Set<Long> musicId);
+    List<TbMusicUrlPojo> getMusicUrl(Collection<Long> musicId);
     
     /**
      * 查询数据歌曲下载地址
@@ -351,7 +354,7 @@ public interface QukuService {
      * 添加喜欢歌单
      *
      * @param userId          用户
-     * @param id              歌单ID
+     * @param id              音乐ID
      * @param isAddAndDelLike true添加 false删除
      */
     void collectLike(Long userId, Long id, Boolean isAddAndDelLike);

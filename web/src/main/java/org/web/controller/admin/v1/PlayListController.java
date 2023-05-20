@@ -2,6 +2,7 @@ package org.web.controller.admin.v1;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
@@ -82,6 +83,12 @@ public class PlayListController {
     @GetMapping("/tracks")
     public R addMusicToPlayList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam("pid") Long pid, @RequestParam("musicIds") List<Long> musicIds, @RequestParam(value = "flag", required = false, defaultValue = "true") Boolean flag) {
         playList.addMusicToPlayList(Optional.ofNullable(userId).orElse(UserUtil.getUser().getId()), pid, musicIds, flag);
+        return R.success();
+    }
+    
+    @GetMapping("/like/{status}")
+    public R like(@PathVariable("status") String status, @RequestParam("id") Long id) {
+        playList.like(UserUtil.getUser().getId(), id, StringUtils.equals(status, "add"));
         return R.success();
     }
     

@@ -1,4 +1,4 @@
-package org.api.admin.config;
+package org.core.config;
 
 public class PlayListTypeConfig {
     

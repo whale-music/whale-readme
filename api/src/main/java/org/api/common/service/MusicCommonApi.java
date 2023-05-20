@@ -11,7 +11,10 @@ import org.oss.factory.OSSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service("MusicCommonApi")
@@ -36,7 +39,7 @@ public class MusicCommonApi {
         return getMusicUrlByMusicId(CollUtil.newHashSet(musicId), refresh);
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Set<Long> musicIds, boolean refresh) {
+    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Collection<Long> musicIds, boolean refresh) {
         if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }

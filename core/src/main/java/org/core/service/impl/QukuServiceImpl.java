@@ -3,6 +3,7 @@ package org.core.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -152,8 +153,11 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public Map<Long, List<TbArtistPojo>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap) {
         Set<Long> collect = albumPojoMap.values().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
+        if (CollUtil.isEmpty(collect)) {
+            return MapUtil.empty();
+        }
         List<TbAlbumArtistPojo> list = albumArtistService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, collect));
-        
+    
         Map<Long, List<TbAlbumArtistPojo>> albumArtistMap = new HashMap<>();
         for (TbAlbumArtistPojo tbAlbumArtistPojo : list) {
             List<TbAlbumArtistPojo> pojos = albumArtistMap.get(tbAlbumArtistPojo.getAlbumId());

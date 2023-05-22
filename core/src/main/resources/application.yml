@@ -59,6 +59,10 @@ mybatis-plus:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+# 查询大于有效页时，返回有效页最后一页
+pagehelper:
+  reasonable: true
+
 save-config:
   # 保存模式
   save-mode: AList

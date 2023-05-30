@@ -39,3 +39,4 @@ build/
 /web/target/
 /oss/target/
 /data/
+/config/application.yml

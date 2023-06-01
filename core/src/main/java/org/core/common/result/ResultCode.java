@@ -30,6 +30,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLUGIN_NO_EXIST_EXISTED("10013", "插件类型不存在"),
     LYRIC_NO_EXIST_EXISTED("10014", "插件类型不存在"),
     SCHEDULED_NO_EXIST_EXISTED("10015", "定时任务不存在"),
+    CRON_ERROR("10016", "Cron表达式错误, 请检查重试"),
     
     
     /* 用户错误：20001-29999*/
@@ -59,6 +60,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLUGIN_DELETE_TASK_ERROR("30003", "插件删除任务错误"),
     PLUGIN_DELETE_ERROR("30004", "插件删除错误"),
     PLUGIN_CANNOT_DELETE_RUNNING("30005", "不能使用批量删除正在运行的插件,如需要强行删除手动点击单个插件删除按钮"),
+    SQL_RUN_ERROR("30006", "数据库运行错误"),
     
     
     /* 系统错误：40001-49999 */

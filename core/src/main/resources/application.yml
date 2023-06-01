@@ -90,3 +90,8 @@ file-type:
     - mp3
     - ogg
     - flac
+
+
+web-mapping: /web/index.html
+
+

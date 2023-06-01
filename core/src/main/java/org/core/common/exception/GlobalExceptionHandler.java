@@ -3,6 +3,7 @@ package org.core.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,6 +48,16 @@ public class GlobalExceptionHandler {
     public R exceptionHandler(NullPointerException e) {
         log.error("发生空指针异常！原因是:", e);
         return R.error(ResultCode.NULL_POINTER_EXCEPTION);
+    }
+    
+    /**
+     * SQL 异常
+     */
+    @ExceptionHandler(value = BadSqlGrammarException.class)
+    @ResponseBody
+    public R exceptionHandler(BadSqlGrammarException e) {
+        log.error("SQL运行错误原因是:", e);
+        return R.error(ResultCode.SQL_RUN_ERROR);
     }
     
     /**

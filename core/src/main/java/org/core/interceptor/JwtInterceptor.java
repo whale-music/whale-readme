@@ -19,15 +19,30 @@ import java.util.Arrays;
 
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
+    private static String getToken(HttpServletRequest request, String token) {
+        // 如果token的值是空的就从cookie里面取值
+        if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
+            for (Cookie cookie : request.getCookies()) {
+                if (StringUtils.equalsIgnoreCase(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
+                        CookieConfig.COOKIE_NAME_MUSIC_U)) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return token;
+    }
+    
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
-        log.debug("请求路径: {}", request.getServletPath());
-        log.debug("请求参数: {}", request.getQueryString());
-        log.debug("请求信息: {}", request.getPathInfo());
         // 如果不是映射到方法直接通过
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        
+        log.debug("请求路径: {}", request.getServletPath());
+        log.debug("请求参数: {}", request.getQueryString());
+        log.debug("请求信息: {}", request.getPathInfo());
         // 放行路径
         String[] passPath = {
                 "/login/cellphone",
@@ -55,16 +70,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 从 http 请求头中取出 token
         String token = request.getHeader("token");
         log.debug("token值：{}", token);
-        // 如果token的值是空的就从cookie里面取值
-        if (token == null && request.getCookies() != null && !Arrays.asList(request.getCookies()).isEmpty()) {
-            for (Cookie cookie : request.getCookies()) {
-                if (StringUtils.equalsIgnoreCase(cookie.getName(), CookieConfig.COOKIE_NAME_COOKIE) || StringUtils.equals(cookie.getName(),
-                        CookieConfig.COOKIE_NAME_MUSIC_U)) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        token = getToken(request, token);
         // 判断是否携带用户信息，没有就放行
         if (token == null) {
             return true;

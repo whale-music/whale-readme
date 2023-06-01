@@ -34,6 +34,7 @@ import org.plugin.service.PluginService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -317,11 +318,11 @@ public class PluginServiceImpl implements PluginService {
                     throw new BaseException(ResultCode.PLUGIN_CANNOT_DELETE_RUNNING);
                 }
             }
+            LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.in(TbPluginMsgPojo::getTaskId, id);
+            pluginMsgService.remove(queryWrapper);
+            pluginTaskService.removeBatchByIds(id);
         }
-        pluginTaskService.removeBatchByIds(id);
-        LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.in(TbPluginMsgPojo::getTaskId, id);
-        pluginMsgService.remove(queryWrapper);
     }
     
     /**
@@ -427,6 +428,9 @@ public class PluginServiceImpl implements PluginService {
      */
     @Override
     public void saveOrUpdateDynamicTask(TbScheduleTaskPojo task, Boolean isRun) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(task.getCron()) && !CronExpression.isValidExpression(task.getCron())) {
+            throw new BaseException(ResultCode.CRON_ERROR);
+        }
         task.setUserId(task.getUserId() == null ? UserUtil.getUser().getId() : task.getUserId());
         task.setStatus(isRun);
         scheduleTaskService.saveOrUpdate(task);
@@ -449,9 +453,7 @@ public class PluginServiceImpl implements PluginService {
         entity.setStatus(false);
         // 定制动态任务
         scheduleTaskService.updateById(entity);
-        if (!dynamicTaskService.stop(service.getId())) {
-            throw new BaseException(ResultCode.SCHEDULED_NO_EXIST_EXISTED);
-        }
+        dynamicTaskService.stop(service.getId());
         scheduleTaskService.removeById(id);
     }
     

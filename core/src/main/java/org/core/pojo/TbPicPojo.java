@@ -30,16 +30,8 @@ public class TbPicPojo implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
-    @ApiModelProperty("音乐，专辑，歌单封面ID")
-    @TableField("middle_id")
-    private Long middleId;
-    
-    @ApiModelProperty(value = "音乐，专辑，歌单封面", example = "0:音乐 1:专辑 2歌单")
-    @TableField("type")
-    private Short type;
-    
     @ApiModelProperty("音乐网络地址，或路径")
-    @TableField(value = "url", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "url", fill = FieldFill.UPDATE)
     private String url;
     
     @ApiModelProperty("创建时间")

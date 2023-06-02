@@ -4,6 +4,7 @@ import org.core.config.SaveConfig;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 public interface OSSService {
     
@@ -25,7 +26,7 @@ public interface OSSService {
      * @param refresh 是否刷新缓存
      * @return 音乐地址
      */
-    String getMusicAddresses(String name, boolean refresh);
+    String getAddresses(String name, boolean refresh);
     
     /**
      * 获取音乐MD5值，为null获取所有md5
@@ -40,8 +41,16 @@ public interface OSSService {
         return this.getMusicAllMD5(null, refresh);
     }
     
-    // 上传文件返回地址
-    String upload(File srcFile, String md5);
+    /**
+     * 上传文件返回地址
+     *
+     * @param paths   路径
+     * @param index   选中上传路径
+     * @param srcFile 上传文件
+     * @param md5     上传文件md5 非必传
+     * @return 文件路径相对
+     */
+    String upload(List<String> paths, Integer index, File srcFile, String md5);
     
     // 删除文件
     boolean delete(String name);

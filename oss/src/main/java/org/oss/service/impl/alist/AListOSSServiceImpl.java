@@ -57,6 +57,10 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public boolean isConnected(SaveConfig config) {
         this.config = config;
+        config.setAssignObjectSave(config.getAssignObjectSave() == null ? 0 : config.getAssignObjectSave());
+        if (config.getObjectSave().get(config.getAssignObjectSave()) == null) {
+            throw new BaseException(ResultCode.PARAM_IS_INVALID);
+        }
         String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
         if (StringUtils.isBlank(loginCacheStr)) {
             String login = login(config.getHost(), config.getAccessKey(), config.getSecretKey());
@@ -68,11 +72,11 @@ public class AListOSSServiceImpl implements OSSService {
     
     @Override
     public void isExist(String name) {
-        getMusicAddresses(name, true);
+        getAddresses(name, true);
     }
     
     @Override
-    public String getMusicAddresses(String name, boolean refresh) {
+    public String getAddresses(String name, boolean refresh) {
         try {
             String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存
@@ -103,7 +107,10 @@ public class AListOSSServiceImpl implements OSSService {
     private void refreshMusicCache(String loginCacheStr) {
         Headers headers = new Headers();
         headers.put("Authorization", Collections.singletonList(loginCacheStr));
-        for (String s : config.getObjectSave()) {
+        ArrayList<String> col = new ArrayList<>();
+        col.addAll(config.getObjectSave());
+        col.addAll(config.getImgSave());
+        for (String s : col) {
             List<ContentItem> list = RequestUtils.list(config.getHost(), s, headers);
             list.parallelStream().forEach(contentItem -> {
                 contentItem.setPath(s);
@@ -129,31 +136,17 @@ public class AListOSSServiceImpl implements OSSService {
         return loginCacheStr;
     }
     
-    public String getMonoMusicAddress(String host, String objectSave, String path) {
-        try {
-            String sign = RequestUtils.getMusicAddress(host, objectSave, path);
-            String musicAddress = String.format("%s/d/%s/%s?sign=%s", host, objectSave, path, sign);
-            if (StringUtils.isBlank(musicAddress)) {
-                throw new BaseException();
-            } else {
-                return musicAddress;
-            }
-        } catch (Exception e) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
-        }
-    }
-    
     @Override
-    public String upload(File srcFile, String md5) {
+    public String upload(List<String> paths, Integer index, File srcFile, String md5) {
         try {
             String musicAddresses;
             if (StringUtils.isEmpty(md5)) {
                 BufferedInputStream inputStream = FileUtil.getInputStream(srcFile);
                 String tempMd5 = DigestUtils.md5DigestAsHex(inputStream);
                 inputStream.close();
-                musicAddresses = getMusicAddresses(tempMd5, false);
+                musicAddresses = getAddresses(tempMd5, false);
             } else {
-                musicAddresses = getMusicAddresses(md5, false);
+                musicAddresses = getAddresses(md5, false);
             }
             if (StringUtils.isNotBlank(musicAddresses)) {
                 return srcFile.getName();
@@ -166,10 +159,10 @@ public class AListOSSServiceImpl implements OSSService {
             throw new BaseException(e.getMessage());
         }
         String loginJwtCache = getLoginJwtCache(config);
-        String upload = RequestUtils.upload(config.getHost(), config.getObjectSave().get(0), srcFile, loginJwtCache);
+        String upload = RequestUtils.upload(config.getHost(), paths.get(index), srcFile, loginJwtCache);
         // 校验是否上传成功
         try {
-            getMusicAddresses(srcFile.getName(), true);
+            getAddresses(srcFile.getName(), true);
         } catch (Exception e) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }

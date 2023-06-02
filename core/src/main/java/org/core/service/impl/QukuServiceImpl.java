@@ -9,10 +9,12 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.DefaultInfo;
 import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
 import org.core.config.TargetTagConfig;
@@ -78,6 +80,15 @@ public class QukuServiceImpl implements QukuService {
     
     @Autowired
     private AccountService accountService;
+    
+    @Autowired
+    private TbPicService picService;
+    
+    @Autowired
+    private Cache<Long, TbPicPojo> picCache;
+    
+    @Autowired
+    private DefaultInfo defaultInfo;
     
     /**
      * 获取专辑信息
@@ -927,5 +938,79 @@ public class QukuServiceImpl implements QukuService {
         entity.setType(LyricConfig.LYRIC);
         entity.setLyric(lyric);
         lyricService.saveOrUpdate(entity);
+    }
+    
+    /**
+     * 封面
+     *
+     * @param id 封面ID
+     * @return 封面地址
+     */
+    @Override
+    public String getPicUrl(Long id) {
+        TbPicPojo pojo = picCache.get(id, picService::getById);
+        if (pojo == null || StringUtils.isEmpty(pojo.getUrl())) {
+            return defaultInfo.getDefaultPic();
+        }
+        return pojo.getUrl();
+    }
+    
+    /**
+     * 封面
+     *
+     * @param ids 封面ID
+     * @return 封面地址
+     */
+    @Override
+    public Map<Long, String> getPicUrl(Collection<Long> ids) {
+        Map<Long, TbPicPojo> map = picCache.getAll(ids, longs -> {
+            List<TbPicPojo> tbPicPojos = picService.listByIds(CollUtil.newArrayList(longs));
+            return tbPicPojos.parallelStream().map(tbPicPojo -> {
+                if (tbPicPojo == null || StringUtils.isEmpty(tbPicPojo.getUrl())) {
+                    TbPicPojo pojo = new TbPicPojo();
+                    pojo.setUrl(defaultInfo.getDefaultPic());
+                    return pojo;
+                }
+                return tbPicPojo;
+            }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
+        });
+        HashMap<Long, String> res = new HashMap<>();
+        for (Map.Entry<Long, TbPicPojo> longTbPicPojoEntry : map.entrySet()) {
+            if (longTbPicPojoEntry.getValue() != null) {
+                res.put(longTbPicPojoEntry.getKey(), longTbPicPojoEntry.getValue().getUrl());
+            }
+        }
+        return res;
+    }
+    
+    /**
+     * 保存封面
+     *
+     * @param url 封面地址
+     * @return 封面
+     */
+    @Override
+    public TbPicPojo savePic(String url) {
+        TbPicPojo entity = new TbPicPojo();
+        entity.setUrl(url);
+        picService.save(entity);
+        return entity;
+    }
+    
+    /**
+     * 保存封面列表
+     *
+     * @param url 保存封面列表
+     * @return 返回保存数据
+     */
+    @Override
+    public List<TbPicPojo> savePic(List<String> url) {
+        List<TbPicPojo> collect = url.parallelStream().map(s -> {
+            TbPicPojo pojo = new TbPicPojo();
+            pojo.setUrl(s);
+            return pojo;
+        }).collect(Collectors.toList());
+        picService.saveBatch(collect);
+        return collect;
     }
 }

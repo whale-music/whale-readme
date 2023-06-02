@@ -391,4 +391,24 @@ public interface QukuService {
      * @param lyric   歌词
      */
     void saveOrUpdateLyric(Long musicId, String type, String lyric);
+    
+    /**
+     * 查询封面地址
+     *
+     * @param id 封面ID
+     * @return 封面地址
+     */
+    String getPicUrl(Long id);
+    
+    Map<Long, String> getPicUrl(Collection<Long> ids);
+    
+    /**
+     * 保存封面
+     *
+     * @param url 封面地址
+     * @return 封面
+     */
+    TbPicPojo savePic(String url);
+    
+    List<TbPicPojo> savePic(List<String> url);
 }

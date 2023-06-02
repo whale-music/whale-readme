@@ -392,7 +392,7 @@ public class MusicFlowApi {
                 // 读取本地文件
                 file = new File(pathTemp, dto.getMusicTemp());
             }
-            uploadPath = OSSFactory.ossFactory(config).upload(file, md5);
+            uploadPath = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), file, md5);
             size = FileUtil.size(file);
             FileUtil.del(file);
         } catch (Exception e) {
@@ -843,7 +843,7 @@ public class MusicFlowApi {
             File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
             FileUtil.writeBytes(uploadFile.getBytes(), dest);
             AudioFile audioInfo = getAudioInfo(dest);
-            String upload = OSSFactory.ossFactory(config).upload(dest, tempMd5);
+            String upload = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), dest, tempMd5);
             TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
             int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
             rate = rate * 1000;

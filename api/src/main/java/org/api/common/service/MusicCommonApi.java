@@ -32,7 +32,7 @@ public class MusicCommonApi {
     
     private static String getMusicAddresses(TbMusicUrlPojo tbMusicUrlPojo, SaveConfig config, boolean refresh) {
         // 获取音乐地址
-        return OSSFactory.ossFactory(config).getMusicAddresses(tbMusicUrlPojo.getUrl(), refresh);
+        return OSSFactory.ossFactory(config).getAddresses(tbMusicUrlPojo.getUrl(), refresh);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {

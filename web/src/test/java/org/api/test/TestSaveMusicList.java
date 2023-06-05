@@ -15,6 +15,7 @@ import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
+import org.core.model.convert.PicConvert;
 import org.core.pojo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,13 +102,16 @@ class TestSaveMusicList {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
-        
+    
         // 专辑
         AlbumReq album = new AlbumReq();
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = RequestMusic163.getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-        album.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));
+    
+        PicConvert pic = new PicConvert();
+        pic.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
+        album.setPic(pic);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -116,12 +120,12 @@ class TestSaveMusicList {
         }
         album.setDescription(MapUtil.getStr(albumDto, "description"));
         dto.setAlbum(album);
-        
+    
         dto.setMusicName(MapUtil.getStr(song, "name"));
         JSONArray alia = MapUtil.get(song, "alias", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
-        dto.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));
+        dto.setPic(pic);
         
         // 歌手
         ArrayList<ArtistReq> singer = new ArrayList<>();
@@ -146,7 +150,9 @@ class TestSaveMusicList {
             alias.addAll(transNames2.stream().map(String::valueOf).collect(Collectors.toList()));
             artistPojo.setAliasName(CollUtil.join(alias, ","));
             // 歌手封面
-            artistPojo.setPic(MapUtil.getStr(artist, "avatar"));
+            PicConvert avatarPic = new PicConvert();
+            avatarPic.setUrl(MapUtil.getStr(artist, "avatar"));
+            artistPojo.setPic(avatarPic);
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");

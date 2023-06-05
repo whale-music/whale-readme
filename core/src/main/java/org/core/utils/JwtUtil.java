@@ -21,8 +21,8 @@ public class JwtUtil {
      * @return 返回token
      */
     public static String sign(String userId, String info) {
-        Date date = new Date(System.currentTimeMillis() + JwtConfig.EXPIRE_TIME);
-        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.SEED_KEY);
+        Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
         return JWT.create()
                   // 将userId保存到token里面
                   .withAudience(userId)
@@ -68,7 +68,7 @@ public class JwtUtil {
      * @param token token 数据
      */
     public static void checkSign(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.SEED_KEY);
+        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
         JWTVerifier verifier = JWT.require(algorithm)
                                   //.withClaim("username, username)
                                   .build();

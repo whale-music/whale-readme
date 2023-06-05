@@ -42,8 +42,8 @@ public class TbMusicPojo implements Serializable {
     private String aliasName;
 
     @ApiModelProperty("歌曲封面地址")
-    @TableField("pic")
-    private String pic;
+    @TableField("pic_id")
+    private Long picId;
 
     @ApiModelProperty("专辑ID")
     @TableField("album_id")

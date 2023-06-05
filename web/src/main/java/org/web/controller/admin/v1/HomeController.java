@@ -5,9 +5,9 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbMusicPojo;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,19 +41,19 @@ public class HomeController {
     
     @GetMapping("/musicTop")
     public R getMusicTop() {
-        List<TbMusicPojo> hone = honeApi.getMusicTop();
+        List<MusicConvert> hone = honeApi.getMusicTop();
         return R.success(hone);
     }
     
     @GetMapping("/albumTop")
     public R getAlbumTop() {
-        List<TbAlbumPojo> hone = honeApi.getAlbumTop();
+        List<AlbumConvert> hone = honeApi.getAlbumTop();
         return R.success(hone);
     }
     
     @GetMapping("/artistTop")
     public R getArtist() {
-        List<TbArtistPojo> hone = honeApi.getArtist();
+        List<ArtistConvert> hone = honeApi.getArtist();
         return R.success(hone);
     }
     

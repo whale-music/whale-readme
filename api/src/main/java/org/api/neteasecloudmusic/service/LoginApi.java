@@ -1,6 +1,7 @@
 package org.api.neteasecloudmusic.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.Account;
 import org.api.neteasecloudmusic.model.vo.login.status.DataJson;
@@ -16,6 +17,9 @@ public class LoginApi {
     @Autowired
     private UserApi user;
     
+    @Autowired
+    private QukuAPI qukuAPI;
+    
     public LoginStatusRes status(Long uid) {
         LoginStatusRes res = new LoginStatusRes();
         SysUserPojo account = user.getAccount(uid);
@@ -26,7 +30,7 @@ public class LoginApi {
         profile.setUserName(account.getUsername());
         profile.setNickname(account.getNickname());
         profile.setBackgroundUrl(account.getBackgroundUrl());
-        profile.setAvatarUrl(account.getAvatarUrl());
+        profile.setAvatarUrl(qukuAPI.getPicUrl(account.getAvatarId()));
         profile.setCreateTime(account.getCreateTime().getNano());
         
         dataJson.setProfile(profile);

@@ -47,8 +47,8 @@ public class TbArtistPojo implements Serializable {
     private String sex;
 
     @ApiModelProperty("封面")
-    @TableField("pic")
-    private String pic;
+    @TableField("pic_id")
+    private Long picId;
 
     @ApiModelProperty("出生年月")
     @TableField("birth")

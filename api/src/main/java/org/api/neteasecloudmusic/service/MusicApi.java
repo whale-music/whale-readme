@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.api.common.service.MusicCommonApi;
+import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.song.lyric.Klyric;
 import org.api.neteasecloudmusic.model.vo.song.lyric.Lrc;
@@ -19,8 +19,9 @@ import org.core.iservice.TbAlbumService;
 import org.core.iservice.TbCollectService;
 import org.core.iservice.TbMusicService;
 import org.core.iservice.TbRankService;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
 import org.core.pojo.*;
-import org.core.service.QukuService;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,9 @@ public class MusicApi {
     @Autowired
     private TbMusicService musicService;
     
-    @Autowired
-    private MusicCommonApi musicCommonApi;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbRankService rankService;
@@ -52,7 +51,7 @@ public class MusicApi {
     
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
-        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(new HashSet<>(id), false);
+        List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(new HashSet<>(id), false);
         List<TbMusicPojo> musicPojos = musicService.listByIds(id);
         Map<Long, TbMusicPojo> musicPojoMap = musicPojos.stream().collect(Collectors.toMap(TbMusicPojo::getId, tbMusicPojo -> tbMusicPojo));
         SongUrlRes songUrlRes = new SongUrlRes();
@@ -100,10 +99,10 @@ public class MusicApi {
             e.setPublishTime(tbMusicPojo.getCreateTime().getNano());
             e.setDt(tbMusicPojo.getTimeLength());
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<TbArtistPojo> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
             
             // 歌手
-            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
+            for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
                 e1.setName(tbArtistPojo.getArtistName());
                 e1.setId(tbArtistPojo.getId());
@@ -113,10 +112,10 @@ public class MusicApi {
             e.setAr(ar);
             
             // 专辑
-            TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
+            AlbumConvert albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
             Al al = new Al();
             al.setName(albumByAlbumId.getAlbumName());
-            al.setPicUrl(albumByAlbumId.getPic());
+            al.setPicUrl(albumByAlbumId.getPicUrl());
             al.setId(albumByAlbumId.getId());
             e.setAl(al);
             

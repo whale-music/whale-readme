@@ -53,12 +53,12 @@ mybatis-plus:
       id-type: auto
       #驼峰下划线转换
       table-underline: true
-
   configuration:
     # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
     map-underscore-to-camel-case: true
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
 # 查询大于有效页时，返回有效页最后一页
 pagehelper:
@@ -71,11 +71,13 @@ save-config:
   # 请求对象地址 (必须)
   # 可以使用多个地址，程序会自动合并成
   object-save:
+    - /test/music
     - /music
   # 保存地址，必须是对象地址中的值，顺序从0开始
   # 没有实现随机存储和自动选择最少对象的地址存储，因为存储的上传接口极其不稳定。最后放弃
   assign-object-save: 0
   img-save:
+    - /test/img
     - /img
   assign-img-save: 0
   # 请求地址(必须)
@@ -95,13 +97,19 @@ file-type:
     - ogg
     - flac
 
+http-request:
+  timeout: 6_000
+  temp-path: ./data/pic
 
-web-mapping: /web/index.html
+web-mapping:
+  path: /web/index.html
 
 default-info:
+  # http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
   default-pic: https://i.ibb.co/NLGThpw/wallhaven-9mjoy1.png
   music-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
-  play-list-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
+  # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+  play-list-pic: http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
   album-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
 
 

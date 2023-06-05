@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.model.vo.user.detail.UserDetailRes;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.result.NeteaseResult;
+import org.core.model.convert.UserConvert;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class UserController extends BaseController {
     public NeteaseResult getUser() {
         SysUserPojo userPojo = UserUtil.getUser();
         // 查找用户
-        SysUserPojo account = user.getAccount(userPojo.getId());
+        UserConvert account = user.getAccount(userPojo.getId());
         UserVo userVo = getUserVo(account);
         
         // 前端通用返回类

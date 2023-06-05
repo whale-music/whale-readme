@@ -2,15 +2,16 @@ package org.api.subsonic.service;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.api.common.service.QukuAPI;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.req.albumlist2.AlbumReq;
 import org.api.subsonic.model.res.albumlist2.AlbumItem;
 import org.api.subsonic.model.res.albumlist2.AlbumList2;
 import org.api.subsonic.model.res.albumlist2.AlbumList2Res;
 import org.core.iservice.TbAlbumService;
+import org.core.model.convert.ArtistConvert;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
-import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class SongListsApi {
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbAlbumService albumService;
@@ -33,10 +34,10 @@ public class SongListsApi {
         albumService.page(page);
         ArrayList<AlbumItem> albumArrayList = new ArrayList<>();
     
-        Map<Long, List<TbArtistPojo>> artistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(page.getRecords()
-                                                                                                        .stream()
-                                                                                                        .map(TbAlbumPojo::getId)
-                                                                                                        .collect(Collectors.toSet()));
+        Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(page.getRecords()
+                                                                                                         .stream()
+                                                                                                         .map(TbAlbumPojo::getId)
+                                                                                                         .collect(Collectors.toSet()));
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             AlbumItem e = new AlbumItem();
             e.setId(String.valueOf(albumPojo.getId()));
@@ -45,7 +46,7 @@ public class SongListsApi {
             e.setName(albumPojo.getAlbumName());
             e.setYear(albumPojo.getPublishTime().getYear());
             e.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
-            List<TbArtistPojo> artistListByAlbumIds = artistMapByAlbumIds.get(albumPojo.getId());
+            List<ArtistConvert> artistListByAlbumIds = artistMapByAlbumIds.get(albumPojo.getId());
             TbArtistPojo pojo = CollUtil.isNotEmpty(artistListByAlbumIds) ? artistListByAlbumIds.get(0) : new TbArtistPojo();
             e.setArtist(pojo.getArtistName());
             e.setArtistId(String.valueOf(pojo.getId()));

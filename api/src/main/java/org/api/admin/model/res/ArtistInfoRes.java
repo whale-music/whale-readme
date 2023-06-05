@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbMusicPojo;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class ArtistInfoRes extends TbArtistPojo {
+public class ArtistInfoRes extends ArtistConvert {
     
     private List<String> artistNames;
     
-    private List<TbMusicPojo> musicList;
+    private List<MusicConvert> musicList;
     
-    private List<TbAlbumPojo> albumList;
+    private List<AlbumConvert> albumList;
 }

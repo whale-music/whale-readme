@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.playlist.EntryItem;
@@ -14,10 +15,12 @@ import org.api.subsonic.model.res.playlists.PlaylistItem;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
 import org.core.config.PlayListTypeConfig;
 import org.core.iservice.TbCollectService;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.CollectConvert;
 import org.core.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
-import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +34,7 @@ import java.util.Optional;
 public class PlaylistApi {
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private AccountService accountService;
@@ -45,7 +48,7 @@ public class PlaylistApi {
     public PlaylistsRes getPlaylists(SubsonicCommonReq req, String username) {
         username = StringUtils.isBlank(username) ? req.getU() : username;
         SysUserPojo user = accountService.getUser(username);
-        List<TbCollectPojo> userPlayList = qukuService.getUserPlayList(user.getId(),
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(user.getId(),
                 Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
     
         List<PlaylistItem> playlist = new ArrayList<>();
@@ -80,7 +83,7 @@ public class PlaylistApi {
         int duration = 0;
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
-            List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(CollUtil.newHashSet(musicPojo.getId()));
+            List<TbMusicUrlPojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
             e.setId(String.valueOf(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
             TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
@@ -89,7 +92,7 @@ public class PlaylistApi {
             e.setCoverArt(String.valueOf(musicPojo.getId()));
             e.setPlayed(musicPojo.getCreateTime().toString());
     
-            TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
+            TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(musicPojo.getAlbumId())).orElse(new AlbumConvert());
             e.setAlbum(albumByAlbumId.getAlbumName());
             e.setAlbumId(String.valueOf(albumByAlbumId.getId()));
             e.setParent(String.valueOf(albumByAlbumId.getId()));
@@ -107,7 +110,7 @@ public class PlaylistApi {
             e.setParent(tbMusicUrlPojo.getUrl());
             e.setPlayCount(0);
     
-            List<TbArtistPojo> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
+            List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
             TbArtistPojo artistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
             e.setArtist(artistPojo.getArtistName());
             e.setArtistId(String.valueOf(artistPojo.getId()));

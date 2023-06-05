@@ -34,6 +34,10 @@ public class TbPicPojo implements Serializable {
     @TableField(value = "url", fill = FieldFill.UPDATE)
     private String url;
     
+    @ApiModelProperty("md5")
+    @TableField(value = "md5")
+    private String md5;
+    
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

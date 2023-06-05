@@ -48,6 +48,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!--模拟数据-->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>1.9.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 引入操作JWT的相关依赖 -->
         <dependency>
             <groupId>com.auth0</groupId>

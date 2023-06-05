@@ -21,6 +21,11 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
      * @param user 用户信息
      */
     public void createAccount(SysUserPojo user) {
+        user.setAccountType(1);
+        createUser(user);
+    }
+    
+    private void createUser(SysUserPojo user) {
         long count = this.count(Wrappers.<SysUserPojo>lambdaQuery()
                                         .eq(StringUtils.isNotBlank(user.getUsername()),
                                                 SysUserPojo::getUsername,
@@ -33,11 +38,19 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
         }
     }
     
+    /**
+     * @param admin 管理用户信息
+     */
+    @Override
+    public void createAdmin(SysUserPojo admin) {
+        admin.setAccountType(0);
+        createUser(admin);
+    }
     
     /**
      * 用户登录
      *
-     * @param username    账号
+     * @param username 账号
      * @param password 密码
      * @return 返回用户信息
      */

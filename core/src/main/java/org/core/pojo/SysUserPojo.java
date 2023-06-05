@@ -47,7 +47,7 @@ public class SysUserPojo implements Serializable {
 
     @ApiModelProperty("头像URL")
     @TableField("avatar_url")
-    private String avatarUrl;
+    private Long avatarId;
 
     @ApiModelProperty("背景照片URL")
     @TableField("background_url")

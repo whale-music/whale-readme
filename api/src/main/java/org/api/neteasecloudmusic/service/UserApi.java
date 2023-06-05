@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.Creator;
 import org.api.neteasecloudmusic.model.vo.playlist.PlayListVo;
@@ -20,11 +21,14 @@ import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.iservice.*;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.UserConvert;
 import org.core.pojo.*;
 import org.core.service.AccountService;
-import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +68,7 @@ public class UserApi {
     private TbMusicService musicService;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private CollectApi collectApi;
@@ -84,12 +88,15 @@ public class UserApi {
      * @param userId 用户ID
      * @return 用户信息
      */
-    public SysUserPojo getAccount(Long userId) {
+    public UserConvert getAccount(Long userId) {
         SysUserPojo userPojo = accountService.getById(userId);
         if (userPojo == null) {
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
-        return userPojo;
+        UserConvert userConvert = new UserConvert();
+        BeanUtils.copyProperties(userPojo, userConvert);
+        userConvert.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
+        return userConvert;
     }
     
     /**
@@ -99,8 +106,12 @@ public class UserApi {
      * @param password 密码
      * @return 返回用户信息
      */
-    public SysUserPojo login(String phone, String password) {
-        return accountService.login(phone, password);
+    public UserConvert login(String phone, String password) {
+        SysUserPojo login = accountService.login(phone, password);
+        UserConvert userConvert = new UserConvert();
+        BeanUtils.copyProperties(login, userConvert);
+        userConvert.setAvatarUrl(qukuService.getPicUrl(login.getAvatarId()));
+        return userConvert;
     }
     
     /**
@@ -165,13 +176,13 @@ public class UserApi {
             SysUserPojo account = Optional.ofNullable(accountService.getById(uid)).orElse(new SysUserPojo());
             creator.setNickname(account.getNickname());
             creator.setUserId(account.getId());
-            creator.setAvatarUrl(account.getAvatarUrl());
+            creator.setAvatarUrl(qukuService.getPicUrl(account.getAvatarId()));
             creator.setBackgroundUrl(account.getBackgroundUrl());
             item.setCreator(creator);
             // 用户ID
             item.setUserId(tbCollectPojo.getUserId());
             // 封面图像ID
-            item.setCoverImgUrl(tbCollectPojo.getPic());
+            item.setCoverImgUrl(qukuService.getPicUrl(tbCollectPojo.getPicId()));
             // 创建时间
             item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
             // 描述
@@ -259,6 +270,7 @@ public class UserApi {
      * @param uid  用户ID
      */
     public List<UserRecordRes> userRecord(Long uid, Long type) {
+        log.debug("type: {}", type);
         ArrayList<UserRecordRes> res = new ArrayList<>();
         List<TbRankPojo> list = rankService.list(Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, uid));
         Map<Long, TbRankPojo> rankPojoMap = list.stream().collect(Collectors.toMap(TbRankPojo::getId, tbRankPojo -> tbRankPojo));
@@ -281,9 +293,9 @@ public class UserApi {
             song.setId(tbMusicPojo.getId());
             song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
     
-            List<TbArtistPojo> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
             ArrayList<ArItem> ar = new ArrayList<>();
-            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
+            for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e = new ArItem();
                 e.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
                 e.setName(tbArtistPojo.getArtistName());
@@ -291,15 +303,15 @@ public class UserApi {
                 ar.add(e);
             }
             song.setAr(ar);
-            
-            TbAlbumPojo albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
+    
+            AlbumConvert albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
             Al al = new Al();
             al.setId(albumByMusicId.getId());
-            al.setPicUrl(albumByMusicId.getPic());
+            al.setPicUrl(albumByMusicId.getPicUrl());
             al.setName(albumByMusicId.getAlbumName());
             song.setAl(al);
             userRecordRes.setSong(song);
-            
+    
             res.add(userRecordRes);
         }
         
@@ -336,7 +348,7 @@ public class UserApi {
         
         Profile profile = new Profile();
         profile.setUserId(accUserPojo.getId());
-        profile.setAvatarUrl(accUserPojo.getAvatarUrl());
+        profile.setAvatarUrl(qukuService.getPicUrl(accUserPojo.getAvatarId()));
         profile.setBackgroundUrl(accUserPojo.getBackgroundUrl());
         profile.setEventCount(233);
         profile.setFollows(2333);
@@ -345,7 +357,7 @@ public class UserApi {
         
         ProfileVillageInfo profileVillageInfo = new ProfileVillageInfo();
         profileVillageInfo.setTitle("crown");
-        profileVillageInfo.setImageUrl(accUserPojo.getAvatarUrl());
+        profileVillageInfo.setImageUrl(qukuService.getPicUrl(accUserPojo.getAvatarId()));
         profileVillageInfo.setTargetUrl(accUserPojo.getBackgroundUrl());
         res.setProfileVillageInfo(profileVillageInfo);
         

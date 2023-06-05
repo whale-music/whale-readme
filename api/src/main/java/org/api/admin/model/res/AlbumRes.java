@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbMusicPojo;
 
 import java.util.List;
 
@@ -14,14 +14,18 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AlbumRes extends TbAlbumPojo {
+    
+    @ApiModelProperty("封面")
+    private String picUrl;
+    
     @ApiModelProperty("音乐数据")
-    private List<TbMusicPojo> musicList;
+    private List<MusicConvert> musicList;
     
     @ApiModelProperty("专辑歌曲数量")
     private Long albumSize;
     
     @ApiModelProperty("歌手信息")
-    private List<TbArtistPojo> artistList;
+    private List<ArtistConvert> artistList;
     
     @ApiModelProperty(value = "排序", example = "sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序")
     private String orderBy;

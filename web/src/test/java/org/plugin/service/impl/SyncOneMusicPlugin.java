@@ -17,12 +17,12 @@ import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
 import org.core.config.PluginType;
+import org.core.model.convert.PicConvert;
 import org.core.pojo.MusicDetails;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -145,7 +145,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-        album.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));
+        album.setPicUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -154,13 +154,16 @@ class SyncOneMusicPlugin implements CommonPlugin {
         }
         album.setDescription(MapUtil.getStr(albumDto, "description"));
         dto.setAlbum(album);
-        
+    
         dto.setMusicName(MapUtil.getStr(song, "name"));
         JSONArray alia = MapUtil.get(song, "alia", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
-        dto.setPic(MapUtil.getStr(albumDto, "blurPicUrl"));
-        
+    
+        PicConvert pic = new PicConvert();
+        pic.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
+        dto.setPic(pic);
+    
         // 歌手
         ArrayList<ArtistReq> singer = new ArrayList<>();
         JSONArray ar = MapUtil.get(song, "ar", JSONArray.class);
@@ -183,8 +186,11 @@ class SyncOneMusicPlugin implements CommonPlugin {
             alias.addAll(transNames1.stream().map(String::valueOf).collect(Collectors.toList()));
             alias.addAll(transNames2.stream().map(String::valueOf).collect(Collectors.toList()));
             artistPojo.setAliasName(CollUtil.join(alias, ","));
+        
             // 歌手封面
-            artistPojo.setPic(MapUtil.getStr(artist, "avatar"));
+            PicConvert picConvert = new PicConvert();
+            picConvert.setUrl(MapUtil.getStr(artist, "avatar"));
+            artistPojo.setPic(picConvert);
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");
@@ -235,7 +241,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
             MusicDetails musicDetails = pluginPackage.saveMusic(dto);
             pluginPackage.logInfo("上传成功{}:{}", musicId, dto.getMusicName());
             return musicDetails;
-        } catch (IOException e) {
+        } catch (Exception e) {
             pluginPackage.logError(e.getMessage(), e);
         }
         throw new NullPointerException();

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class MybatisAutoFillUpDateConfig implements MetaObjectHandler {
@@ -36,7 +37,8 @@ public class MybatisAutoFillUpDateConfig implements MetaObjectHandler {
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
     
         // 更新自动删除缓存
-        if (CollUtil.contains(Arrays.asList(metaObject.getSetterNames()), "url") && StringUtils.isNotBlank(String.valueOf(metaObject.getValue("url")))) {
+        List<String> list = Arrays.asList(metaObject.getSetterNames());
+        if (CollUtil.contains(list, "url") && StringUtils.isNotBlank(String.valueOf(metaObject.getValue("url")))) {
             picCache.invalidate(metaObject.getValue("id"));
         }
     }

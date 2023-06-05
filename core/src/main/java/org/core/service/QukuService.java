@@ -1,43 +1,49 @@
 package org.core.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.config.TargetTagConfig;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.CollectConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.*;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface QukuService {
     
     /**
      * 获取专辑信息
      */
-    TbAlbumPojo getAlbumByMusicId(Long musicId);
+    AlbumConvert getAlbumByMusicId(Long musicId);
     
     /**
      * 获取专辑数据
      */
-    TbAlbumPojo getAlbumByAlbumId(Long albumIds);
+    AlbumConvert getAlbumByAlbumId(Long albumIds);
     
     /**
      * 批量获取专辑数据
      * Long -> music ID
      */
-    List<TbAlbumPojo> getAlbumListByMusicId(List<Long> musicIds);
+    List<AlbumConvert> getAlbumListByMusicId(List<Long> musicIds);
     
     /**
      * 批量获取专辑数据
      * Long -> Album ID
      */
-    List<TbAlbumPojo> getAlbumListByAlbumId(Collection<Long> albumIds);
+    List<AlbumConvert> getAlbumListByAlbumId(Collection<Long> albumIds);
     
     /**
      * 批量获取歌手信息
      * Long -> music ID
      */
-    List<TbArtistPojo> getAlbumArtistListByMusicId(List<Long> musicIds);
+    List<ArtistConvert> getAlbumArtistListByMusicId(List<Long> musicIds);
     
     /**
      * (此接口用于优化歌单请求过慢)
@@ -46,17 +52,17 @@ public interface QukuService {
      * value 为歌手
      * 并且查询时增加缓存查找，防止多次访问数据库，造成qps过高
      */
-    Map<Long, List<TbArtistPojo>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
+    Map<Long, List<ArtistConvert>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
     
     /**
      * 获取专辑歌手信息
      */
-    List<TbArtistPojo> getAlbumArtistByMusicId(Long musicId);
+    List<ArtistConvert> getAlbumArtistByMusicId(Long musicId);
     
     /**
      * 查询数据歌曲下载地址
      */
-    List<TbMusicUrlPojo> getMusicUrl(Collection<Long> musicId);
+    List<TbMusicUrlPojo> getMusicPaths(Collection<Long> musicId);
     
     /**
      * 查询数据歌曲下载地址
@@ -69,12 +75,14 @@ public interface QukuService {
     /**
      * 随即获取曲库中的一条数据
      */
-    TbMusicPojo randomMusic();
+    MusicConvert randomMusic();
     
     /**
      * 随机获取一条专辑
      */
-    Page<TbAlbumPojo> getAlbumPage(String area, Long offset, Long limit);
+    Page<AlbumConvert> getRandomAlbum(String area, Long offset, Long limit);
+    
+    Page<AlbumConvert> getAlbumPage(Page<TbAlbumPojo> albumPojoPage, LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper);
     
     /**
      * 查询专辑下音乐数量
@@ -96,12 +104,12 @@ public interface QukuService {
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getAlbumArtistListByAlbumIds(Long albumIds);
+    List<ArtistConvert> getAlbumArtistListByAlbumIds(Long albumIds);
     
     /**
      * 获取专辑歌手列表
      */
-    List<TbArtistPojo> getAlbumArtistListByAlbumIds(List<Long> albumIds);
+    List<ArtistConvert> getAlbumArtistListByAlbumIds(List<Long> albumIds);
     
     /**
      * 获取专辑歌手列表
@@ -111,7 +119,7 @@ public interface QukuService {
      *
      * @param albumIds 专辑ID
      */
-    Map<Long, List<TbArtistPojo>> getAlbumArtistMapByAlbumIds(Collection<Long> albumIds);
+    Map<Long, List<ArtistConvert>> getAlbumArtistMapByAlbumIds(Collection<Long> albumIds);
     
     /**
      * 获取歌曲歌手列表
@@ -119,7 +127,7 @@ public interface QukuService {
      * @param musicId 歌手ID
      * @return 歌手列表
      */
-    default List<TbArtistPojo> getMusicArtistByMusicId(Long musicId) {
+    default List<ArtistConvert> getMusicArtistByMusicId(Long musicId) {
         return getMusicArtistByMusicId(Collections.singletonList(musicId));
     }
     
@@ -129,7 +137,7 @@ public interface QukuService {
      * @param musicId 歌手ID
      * @return 歌手列表
      */
-    List<TbArtistPojo> getMusicArtistByMusicId(Collection<Long> musicId);
+    List<ArtistConvert> getMusicArtistByMusicId(Collection<Long> musicId);
     
     /**
      * 获取歌曲歌手列表
@@ -137,14 +145,14 @@ public interface QukuService {
      * @param musicId 歌手ID
      * @return 歌手列表
      */
-    Map<Long, List<TbArtistPojo>> getMusicArtistByMusicIdToMap(Collection<Long> musicId);
+    Map<Long, List<ArtistConvert>> getMusicArtistByMusicIdToMap(Collection<Long> musicId);
     
     /**
      * 通过歌手ID获取专辑列表
      *
      * @param ids 歌手ID
      */
-    List<TbAlbumPojo> getAlbumListByArtistIds(List<Long> ids);
+    List<AlbumConvert> getAlbumListByArtistIds(List<Long> ids);
     
     /**
      * 获取用户收藏专辑
@@ -153,14 +161,14 @@ public interface QukuService {
      * @param current 当前页数
      * @param size    每页数量
      */
-    List<TbAlbumPojo> getUserCollectAlbum(SysUserPojo user, Long current, Long size);
+    List<AlbumConvert> getUserCollectAlbum(SysUserPojo user, Long current, Long size);
     
     /**
      * 获取用户关注歌手
      *
      * @param user 用户信息
      */
-    List<TbArtistPojo> getUserLikeSingerList(SysUserPojo user);
+    List<ArtistConvert> getUserLikeSingerList(SysUserPojo user);
     
     /**
      * 获取歌手所有专辑数量
@@ -174,35 +182,35 @@ public interface QukuService {
      *
      * @param id 专辑ID
      */
-    List<TbMusicPojo> getMusicListByAlbumId(Long id);
+    List<MusicConvert> getMusicListByAlbumId(Long id);
     
     /**
      * 根据专辑ID查找音乐
      *
      * @param ids 专辑ID
      */
-    List<TbMusicPojo> getMusicListByAlbumId(Collection<Long> ids);
+    List<MusicConvert> getMusicListByAlbumId(Collection<Long> ids);
     
     /**
      * 根据歌手名查找音乐
      *
      * @param name 歌手
      */
-    List<TbMusicPojo> getMusicListByArtistName(String name);
+    List<MusicConvert> getMusicListByArtistName(String name);
     
     /**
      * 获取歌手下音乐信息
      *
      * @param id 歌手ID
      */
-    List<TbMusicPojo> getMusicListByArtistId(Long id);
+    List<MusicConvert> getMusicListByArtistId(Long id);
     
     /**
      * 随机获取歌手
      *
      * @param count 获取数量
      */
-    List<TbArtistPojo> randomSinger(int count);
+    List<ArtistConvert> randomSinger(int count);
     
     /**
      * 添加音乐到歌单
@@ -219,10 +227,11 @@ public interface QukuService {
      *
      * @param userId 用户ID
      * @param name   歌单名
+     * @param picId  封面ID
      * @param type   歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单
      * @return 歌单创建信息
      */
-    TbCollectPojo createPlayList(Long userId, String name, short type);
+    CollectConvert createPlayList(Long userId, String name, Long picId, short type);
     
     /**
      * 删除歌单
@@ -239,7 +248,7 @@ public interface QukuService {
      * @param type 歌单类型
      * @return 返回用户创建歌单
      */
-    List<TbCollectPojo> getUserPlayList(Long uid, Collection<Short> type);
+    List<CollectConvert> getUserPlayList(Long uid, Collection<Short> type);
     
     /**
      * 获取歌单音乐数量
@@ -405,10 +414,11 @@ public interface QukuService {
     /**
      * 保存封面
      *
-     * @param url 封面地址
+     * @param pic
+     * @param consumer
      * @return 封面
      */
-    TbPicPojo savePic(String url);
+    TbPicPojo saveOrUpdatePic(TbPicPojo pic, Consumer<String> consumer);
     
-    List<TbPicPojo> savePic(List<String> url);
+    List<TbPicPojo> saveOrUpdatePic(List<TbPicPojo> pic, Consumer<String> consumer);
 }

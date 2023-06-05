@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbArtistPojo;
+import org.core.model.convert.ArtistConvert;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -28,10 +28,10 @@ public class MusicInfoRes implements Serializable {
     private String pic;
     
     @ApiModelProperty("歌手名ID")
-    private List<TbArtistPojo> musicArtist;
+    private List<ArtistConvert> musicArtist;
     
     @ApiModelProperty("歌手名ID")
-    private List<TbArtistPojo> albumArtist;
+    private List<ArtistConvert> albumArtist;
     
     @ApiModelProperty("专辑")
     private Long albumId;

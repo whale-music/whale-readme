@@ -11,8 +11,11 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.admin.model.res.PluginTaskRes;
-import org.api.common.service.MusicCommonApi;
+import org.api.common.service.QukuAPI;
 import org.core.iservice.*;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +39,6 @@ public class HoneApi {
     private TbArtistService artistService;
     
     @Autowired
-    private MusicCommonApi musicCommonApi;
-    
-    @Autowired
     private TbMusicUrlService musicUrlService;
     
     @Autowired
@@ -47,24 +47,13 @@ public class HoneApi {
     @Autowired
     private TbPluginService pluginService;
     
-    public List<TbMusicPojo> getMusicTop() {
-        LambdaQueryWrapper<TbMusicPojo> queryWrapper = Wrappers.<TbMusicPojo>lambdaQuery().orderByDesc(TbMusicPojo::getCreateTime);
-        Page<TbMusicPojo> objectPage = new Page<>(0, 15);
-        return musicService.page(objectPage, queryWrapper).getRecords();
-    }
-    
-    public List<TbAlbumPojo> getAlbumTop() {
-        LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                          .isNotNull(TbAlbumPojo::getAlbumName)
-                                                          .orderByDesc(TbAlbumPojo::getCreateTime);
-        Page<TbAlbumPojo> objectPage = new Page<>(0, 15);
-        return albumService.page(objectPage, wrapper).getRecords();
-    }
+    @Autowired
+    private QukuAPI qukuAPI;
     
     /**
      * **计算月增长率**
-     * sameMonth 本月金额
-     * lastMonth 上月金额
+     * sameMonth 本月
+     * lastMonth 上月
      */
     public static Float getAnalysisData(int sameMonth, int lastMonth) {
         int growthNum;
@@ -94,6 +83,29 @@ public class HoneApi {
             // 如果相等，增长率为 0
             return 0F;
         }
+    }
+    
+    public List<MusicConvert> getMusicTop() {
+        LambdaQueryWrapper<TbMusicPojo> queryWrapper = Wrappers.<TbMusicPojo>lambdaQuery().orderByDesc(TbMusicPojo::getCreateTime);
+        Page<TbMusicPojo> objectPage = new Page<>(0, 15);
+        List<TbMusicPojo> records = musicService.page(objectPage, queryWrapper).getRecords();
+        return qukuAPI.getPicMusicList(records);
+    }
+    
+    public List<AlbumConvert> getAlbumTop() {
+        LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                          .isNotNull(TbAlbumPojo::getAlbumName)
+                                                          .orderByDesc(TbAlbumPojo::getCreateTime);
+        Page<TbAlbumPojo> objectPage = new Page<>(0, 15);
+        List<TbAlbumPojo> records = albumService.page(objectPage, wrapper).getRecords();
+        return qukuAPI.getPicAlbumList(records);
+    }
+    
+    public List<ArtistConvert> getArtist() {
+        LambdaQueryWrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery()
+                                                           .orderByDesc(TbArtistPojo::getCreateTime);
+        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15), wrapper);
+        return qukuAPI.getPicArtistList(page.getRecords());
     }
     
     public Count getMusicCount() {
@@ -160,8 +172,8 @@ public class HoneApi {
         ArrayList<MusicStatisticsRes> res = new ArrayList<>();
         List<TbMusicUrlPojo> musicUrlList = musicUrlService.list();
         List<TbMusicPojo> musicList = musicService.list();
-        List<TbMusicUrlPojo> musicUrlByMusicUrlList = musicCommonApi.getMusicUrlByMusicUrlList(musicUrlList, false);
-        Collection<String> musicMD5 = musicCommonApi.getMusicMD5(false);
+        List<TbMusicUrlPojo> musicUrlByMusicUrlList = qukuAPI.getMusicUrlByMusicUrlList(musicUrlList, false);
+        Collection<String> musicMD5 = qukuAPI.getMD5(false);
         // 有效音乐
         // 音乐数据对比存储地址，查找对应的音乐地址是否存在
         long musicEffectiveCount = musicList.parallelStream().filter(tbMusicPojo ->
@@ -226,12 +238,5 @@ public class HoneApi {
             res.add(e);
         }
         return res;
-    }
-    
-    public List<TbArtistPojo> getArtist() {
-        LambdaQueryWrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery()
-                                                           .orderByDesc(TbArtistPojo::getCreateTime);
-        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15), wrapper);
-        return page.getRecords();
     }
 }

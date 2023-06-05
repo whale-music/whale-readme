@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.service.MusicFlowApi;
+import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.PluginType;
@@ -20,7 +21,6 @@ import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginPojo;
 import org.core.pojo.TbPluginTaskPojo;
 import org.core.pojo.TbScheduleTaskPojo;
-import org.core.service.QukuService;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.ComboSearchPlugin;
@@ -58,7 +58,7 @@ public class PluginServiceImpl implements PluginService {
     private TbPluginService pluginService;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbScheduleTaskService scheduleTaskService;
@@ -402,12 +402,15 @@ public class PluginServiceImpl implements PluginService {
         wrapper.eq(req.getStatus() != null, TbScheduleTaskPojo::getStatus, req.getStatus());
         wrapper.likeRight(org.apache.commons.lang3.StringUtils.isNotBlank(req.getName()), TbScheduleTaskPojo::getName, req.getName());
         List<TbScheduleTaskPojo> list = scheduleTaskService.list(wrapper);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
         ArrayList<ScheduleRes> res = new ArrayList<>();
         Set<Long> collect = list.parallelStream().map(TbScheduleTaskPojo::getPluginId).collect(Collectors.toSet());
         Map<Long, TbPluginPojo> map = pluginService.listByIds(collect)
                                                    .parallelStream()
                                                    .collect(Collectors.toMap(TbPluginPojo::getId, pluginPojo -> pluginPojo));
-        
+    
         List<Long> dynamicTask = dynamicTaskService.getSchedulerTaskList();
         for (TbScheduleTaskPojo tbScheduleTaskPojo : list) {
             TbPluginPojo tbPluginPojo = map.get(tbScheduleTaskPojo.getPluginId());

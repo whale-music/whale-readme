@@ -39,7 +39,7 @@ create table if not exists sys_user
     username        varchar(128) not null comment '登录用户名',
     nickname        varchar(128) not null comment '登录显示昵称',
     password        varchar(20)  null comment '用户密码',
-    avatar_url      varchar(256) null comment '头像URL',
+    avatar_url      bigint       null comment '头像URL ID',
     background_url  varchar(256) null comment '背景照片URL',
     signature       varchar(50)  null comment '个性签名',
     account_type    int          null comment '账户类型',
@@ -66,7 +66,7 @@ create table if not exists tb_album
     sub_type     varchar(128) null comment '专辑版本（比如录音室版，现场版）',
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
-    pic          varchar(512) null comment '专辑封面地址',
+    pic_id       bigint       null comment '专辑封面地址ID',
     publish_time datetime     null comment '专辑发布时间',
     update_time  datetime     null comment '修改时间',
     create_time  datetime     null comment '创建时间'
@@ -83,7 +83,7 @@ create table if not exists tb_artist
     artist_name  varchar(128) not null comment '歌手名',
     alias_name   varchar(255) null comment '歌手别名',
     sex          varchar(64)  null comment '歌手性别',
-    pic          varchar(512) null comment '封面',
+    pic_id       bigint       null comment '封面ID',
     birth        date         null comment '出生年月',
     location     varchar(64)  null comment '所在国家',
     introduction longtext     null comment '歌手介绍',
@@ -111,7 +111,7 @@ create table if not exists tb_collect
     id             bigint               not null comment '歌单表ID'
         primary key,
     play_list_name varchar(256)         not null comment '歌单名（包括用户喜爱歌单）',
-    pic            varchar(512)         null comment '封面地址',
+    pic            bigint               null comment '封面地址ID',
     type           tinyint              not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单',
     subscribed     tinyint(1) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
     description    varchar(512)         null comment '简介',
@@ -134,14 +134,16 @@ create table if not exists tb_music
         primary key,
     music_name  varchar(128) null comment '音乐名',
     alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
-    pic         varchar(512) null comment '歌曲封面地址',
+    pic_id      bigint       null comment '歌曲封面地址ID',
     album_id    bigint       null comment '专辑ID',
-    sort        bigint       null comment '排序字段',
+    sort        bigint auto_increment comment '排序字段',
     time_length int          null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
     create_time datetime     null comment '创建时间',
     constraint tb_music_id_music_name_alias_name_album_id_uindex
         unique (id, music_name, alias_name, album_id),
+    constraint tb_music_pk
+        unique (sort),
     constraint tb_music_tb_album_id_fk
         foreign key (album_id) references tb_album (id)
             on update cascade on delete set null
@@ -254,6 +256,22 @@ create index tb_music_url_music_id_index
 create index tb_music_url_size_index
     on tb_music_url (size);
 
+create table if not exists tb_pic
+(
+    id          bigint       not null
+        primary key,
+    url         varchar(512) not null comment '音乐网络地址，或路径',
+    md5         char(32)     not null,
+    update_time datetime     not null comment '更新时间',
+    create_time datetime     not null comment '创建时间',
+    constraint id
+        unique (id)
+)
+    comment '音乐专辑歌单封面表';
+
+create index tb_pic_md5_index
+    on tb_pic (md5);
+
 create table if not exists tb_plugin
 (
     id          bigint       not null comment '插件ID'
@@ -322,6 +340,23 @@ create table if not exists tb_rank
             on update cascade on delete cascade
 )
     comment '音乐播放排行榜';
+
+create table if not exists tb_schedule_task
+(
+    id          bigint       not null comment 'ID'
+        primary key,
+    name        varchar(128) not null comment '定时任务名',
+    plugin_id   bigint       not null comment '插件ID',
+    cron        varchar(128) not null comment 'cron表达式',
+    params      tinytext     null comment '插件入参json格式',
+    status      tinyint      null comment '是否执行(true执行, false不执行)',
+    user_id     bigint       not null comment '用户ID',
+    create_time datetime     not null comment '创建时间',
+    update_time datetime     not null comment '更新时间',
+    constraint id
+        unique (id)
+)
+    comment '定时任务表';
 
 create table if not exists tb_tag
 (

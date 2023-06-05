@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.jetbrains.annotations.NotNull;
-import org.oss.service.impl.alist.model.address.Data;
+import org.oss.service.impl.alist.model.address.DataItem;
 import org.oss.service.impl.alist.model.address.MusicAddressReq;
 import org.oss.service.impl.alist.model.address.MusicAddressRes;
 import org.oss.service.impl.alist.model.list.ContentItem;
@@ -72,7 +72,7 @@ public class RequestUtils {
         try {
             String resStr = req(host + "/api/fs/get", JSON.toJSONString(musicAddressReq), null);
             MusicAddressRes res = JSON.parseObject(resStr, MusicAddressRes.class);
-            return Optional.ofNullable(res.getData()).orElse(new Data()).getSign();
+            return Optional.ofNullable(res.getData()).orElse(new DataItem()).getSign();
         } catch (Exception e) {
             log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
             throw new BaseException(ResultCode.SONG_NOT_EXIST);

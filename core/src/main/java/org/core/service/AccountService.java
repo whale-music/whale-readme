@@ -9,7 +9,15 @@ public interface AccountService extends SysUserService {
     void createAccount(SysUserPojo user);
     
     /**
+     * 创建管理员用户
+     *
+     * @param admin 管理员信息
+     */
+    void createAdmin(SysUserPojo admin);
+    
+    /**
      * 用户登录
+     *
      * @param username 用户名
      * @param password 密码
      * @return 用户信息

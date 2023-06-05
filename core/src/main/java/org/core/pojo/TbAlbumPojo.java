@@ -50,8 +50,8 @@ public class TbAlbumPojo implements Serializable {
     private String company;
     
     @ApiModelProperty("专辑封面地址")
-    @TableField("pic")
-    private String pic;
+    @TableField("pic_id")
+    private Long picId;
     
     @ApiModelProperty("专辑发布时间")
     @TableField("publish_time")

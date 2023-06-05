@@ -12,6 +12,10 @@ import org.core.pojo.TbArtistPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class ArtistRes extends TbArtistPojo {
+    @ApiModelProperty("封面")
+    private String picUrl;
+    
+    
     @ApiModelProperty("专辑数量")
     private String albumSize;
     

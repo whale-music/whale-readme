@@ -6,12 +6,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtConfig {
     
-    public static String SEED_KEY;
+    private static String seedKey = "";
     
-    public static Long EXPIRE_TIME;
+    private static Long expireTime = 0L;
     
     
     private JwtConfig() {
+    }
+    
+    public static String getSeedKey() {
+        return seedKey;
     }
     
     /**
@@ -19,7 +23,11 @@ public class JwtConfig {
      */
     @Value("${jwt-config.seed-key}")
     public void setSeedKey(String seedKey) {
-        JwtConfig.SEED_KEY = seedKey;
+        JwtConfig.seedKey = seedKey;
+    }
+    
+    public static Long getExpireTime() {
+        return expireTime;
     }
     
     /**
@@ -27,6 +35,6 @@ public class JwtConfig {
      */
     @Value("${jwt-config.expire-time}")
     public void setExpireTime(Long expireTime) {
-        JwtConfig.EXPIRE_TIME = expireTime;
+        JwtConfig.expireTime = expireTime;
     }
 }

@@ -9,7 +9,7 @@ import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
-import org.core.pojo.TbArtistPojo;
+import org.core.model.convert.ArtistConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +39,7 @@ public class ArtistController {
     
     @GetMapping("/getArtistByAlbumId")
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
-        List<TbArtistPojo> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
+        List<ArtistConvert> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
     }
     

@@ -14,11 +14,11 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
+import org.core.model.convert.PicConvert;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.service.impl.PluginPackage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -149,7 +149,7 @@ public class InteractivePluginTest implements ComboSearchPlugin {
         for (PluginLabelValue datum : data) {
             pluginPackage.logInfo(datum.getKey(), datum.getValue());
             JSONObject jsonObject = JSON.parseObject(datum.getValue());
-            
+    
             AudioInfoReq dto = new AudioInfoReq();
             dto.setMusicName(jsonObject.getObject("title", String.class));
             ArrayList<ArtistReq> artists = new ArrayList<>();
@@ -158,13 +158,15 @@ public class InteractivePluginTest implements ComboSearchPlugin {
             artists.add(artistReq);
             dto.setArtists(artists);
             dto.setLyric(jsonObject.getObject("lrc", String.class));
-            dto.setPic(jsonObject.getObject("pic", String.class));
+            PicConvert picConvert = new PicConvert();
+            picConvert.setUrl(jsonObject.getObject("pic", String.class));
+            dto.setPic(picConvert);
             dto.setMusicTemp(jsonObject.getObject("url", String.class));
             dto.setUploadFlag(false);
             try {
                 pluginPackage.saveMusic(dto);
                 successCount++;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 failCount++;
             }
         }

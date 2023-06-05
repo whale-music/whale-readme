@@ -14,6 +14,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
 import org.core.config.CookieConfig;
+import org.core.model.convert.UserConvert;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
 import org.core.utils.JwtUtil;
@@ -56,7 +57,7 @@ public class LoginController extends BaseController {
      */
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult login(HttpServletResponse response, String phone, String password) {
-        SysUserPojo userPojo = user.login(phone, password);
+        UserConvert userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, userPojo);
@@ -79,7 +80,7 @@ public class LoginController extends BaseController {
         r.put("exist", b ? -1 : 1);
         r.put("nickname", userPojo.getNickname());
         r.put("hasPassword", b);
-        r.put("avatarUrl", userPojo.getAvatarUrl());
+        r.put("avatarUrl", userPojo.getAvatarId());
         r.put("hasSnsBinded", !b);
         r.put("countryCode", "86");
         r.put("cellphone", userPojo.getId());

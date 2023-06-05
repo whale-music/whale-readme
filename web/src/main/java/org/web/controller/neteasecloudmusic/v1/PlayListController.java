@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.core.common.result.NeteaseResult;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.SysUserPojo;
 import org.core.pojo.TbCollectPojo;
 import org.core.pojo.TbMusicPojo;
@@ -146,14 +147,14 @@ public class PlayListController {
      */
     @GetMapping("/playlist/track/all")
     public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false, defaultValue = "9223372036854775807") Long pageSize, @RequestParam(value = "offset", required = false, defaultValue = "0") Long pageIndex) {
-        Page<TbMusicPojo> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
+        Page<MusicConvert> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
                                              .map(TbMusicPojo::getId)
                                              .collect(Collectors.toList());
         List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
-        for (TbMusicPojo musicPojo : playListAllSong.getRecords()) {
+        for (MusicConvert musicPojo : playListAllSong.getRecords()) {
             Map<Integer, TbMusicUrlPojo> musicInfoMaps = musicInfos.stream()
                                                                    .collect(Collectors.toMap(TbMusicUrlPojo::getRate,
                                                                            tbMusicUrlPojo -> tbMusicUrlPojo));
@@ -212,7 +213,7 @@ public class PlayListController {
             e.setAlia(Arrays.asList(musicPojo.getAliasName().split(",")));
             Al al = new Al();
             al.setName(musicPojo.getMusicName());
-            al.setPicUrl(musicPojo.getPic());
+            al.setPicUrl(musicPojo.getPicUrl());
             e.setAl(al);
             e.setPublishTime(musicPojo.getCreateTime().getNano());
             songs.add(e);

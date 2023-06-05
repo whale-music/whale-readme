@@ -3,7 +3,7 @@ package org.oss.service.impl.alist.model.address;
 
 public class MusicAddressRes {
     private Integer code;
-    private Data data;
+    private DataItem data;
     private String message;
     
     public Integer getCode() {
@@ -14,11 +14,11 @@ public class MusicAddressRes {
         this.code = code;
     }
     
-    public Data getData() {
+    public DataItem getData() {
         return data;
     }
     
-    public void setData(Data data) {
+    public void setData(DataItem data) {
         this.data = data;
     }
     

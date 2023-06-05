@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.core.model.convert.PicConvert;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
@@ -27,7 +28,7 @@ public class AudioInfoReq {
     private List<String> aliaName;
     
     @ApiModelProperty("音乐封面")
-    private String pic;
+    private PicConvert pic;
     
     @ApiModelProperty("音乐类型")
     private String type;
@@ -64,7 +65,7 @@ public class AudioInfoReq {
     @Length(min = 32, max = 32, message = "MD5长度错误，请重新生成")
     private String md5;
     
-    @ApiModelProperty("临时音乐，可以是本地地址，也可以是网络地址")
+    @ApiModelProperty("临时音乐，可以是本地地址，也可以是网络地址, 如果uploadFlag为true，则会把此字段作为相对路径写入数据库")
     @NotBlank
     private String musicTemp;
     

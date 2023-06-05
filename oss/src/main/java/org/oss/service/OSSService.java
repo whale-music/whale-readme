@@ -35,10 +35,10 @@ public interface OSSService {
      * @param refresh 是否刷新缓存
      * @return MD5值
      */
-    Collection<String> getMusicAllMD5(String md5, boolean refresh);
+    Collection<String> getAllMD5(String md5, boolean refresh);
     
-    default Collection<String> getMusicAllMD5(boolean refresh) {
-        return this.getMusicAllMD5(null, refresh);
+    default Collection<String> getAllMD5(boolean refresh) {
+        return this.getAllMD5(null, refresh);
     }
     
     /**

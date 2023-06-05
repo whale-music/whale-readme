@@ -4,15 +4,14 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.model.req.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
+import org.api.common.service.QukuAPI;
 import org.core.iservice.TbPluginMsgService;
 import org.core.iservice.TbPluginTaskService;
 import org.core.pojo.MusicDetails;
 import org.core.pojo.TbPluginMsgPojo;
 import org.core.pojo.TbPluginTaskPojo;
-import org.core.service.QukuService;
 import org.plugin.common.CommonPlugin;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +28,14 @@ public class PluginPackage {
     
     private final TbPluginTaskService pluginTaskService;
     
-    private final QukuService qukuService;
+    private final QukuAPI qukuService;
     
     private final List<TbPluginMsgPojo> msgPackages = new ArrayList<>();
     private final Long taskId;
     private final Long userId;
     private final CommonPlugin func;
     
-    public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, QukuService qukuService, Long taskId, Long userId, CommonPlugin func) {
+    public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, QukuAPI qukuService, Long taskId, Long userId, CommonPlugin func) {
         this.musicFlowApi = musicFlowApi;
         this.pluginMsgService = pluginMsgService;
         this.pluginTaskService = pluginTaskService;
@@ -46,7 +45,7 @@ public class PluginPackage {
         this.func = func;
     }
     
-    public QukuService getQukuService() {
+    public QukuAPI getQukuService() {
         return qukuService;
     }
     
@@ -54,7 +53,7 @@ public class PluginPackage {
         return msgPackages;
     }
     
-    public MusicDetails saveMusic(AudioInfoReq dto) throws IOException {
+    public MusicDetails saveMusic(AudioInfoReq dto) {
         return musicFlowApi.saveMusicInfo(dto);
     }
     

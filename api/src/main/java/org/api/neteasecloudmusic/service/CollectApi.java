@@ -6,17 +6,22 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
+import org.core.config.DefaultInfo;
 import org.core.iservice.*;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
-import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +61,10 @@ public class CollectApi {
     private AccountService accountService;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
+    
+    @Autowired
+    private DefaultInfo defaultInfo;
     
     /**
      * 是否包含tag
@@ -129,7 +137,10 @@ public class CollectApi {
      * @return 歌单信息
      */
     public TbCollectPojo createPlayList(Long userId, String name) {
-        return qukuService.createPlayList(userId, name, Short.parseShort("0"));
+        TbPicPojo pic = new TbPicPojo();
+        pic.setUrl(defaultInfo.getPlayListPic());
+        TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(pic);
+        return qukuService.createPlayList(userId, name, tbPicPojo.getId(), Short.parseShort("0"));
     }
     
     /**
@@ -270,7 +281,7 @@ public class CollectApi {
      * @param pageSize  每页多少条
      * @return 歌单内所有歌曲
      */
-    public Page<TbMusicPojo> getPlayListAllSong(Long collectId, Long pageIndex, Long pageSize) {
+    public Page<MusicConvert> getPlayListAllSong(Long collectId, Long pageIndex, Long pageSize) {
         LambdaQueryWrapper<TbCollectMusicPojo> wrapper = Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, collectId);
         Page<TbCollectMusicPojo> page = collectMusicService.page(new Page<>(pageIndex, pageSize), wrapper);
         if (page.getTotal() == 0) {
@@ -278,9 +289,16 @@ public class CollectApi {
         }
         List<Long> musicIds = page.getRecords().stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
         List<TbMusicPojo> tbMusicPojoList = musicService.listByIds(musicIds);
-    
-        Page<TbMusicPojo> musicPojoPage = new Page<>();
-        musicPojoPage.setRecords(tbMusicPojoList);
+        
+        List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
+            MusicConvert convert = new MusicConvert();
+            BeanUtils.copyProperties(tbMusicPojo, convert);
+            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getPicId()));
+            return convert;
+        }).collect(Collectors.toList());
+        
+        Page<MusicConvert> musicPojoPage = new Page<>();
+        musicPojoPage.setRecords(collect);
         musicPojoPage.setCurrent(page.getCurrent());
         musicPojoPage.setTotal(page.getTotal());
         musicPojoPage.setSize(page.getSize());
@@ -364,7 +382,7 @@ public class CollectApi {
         Playlist playlist = new Playlist();
         playlist.setId(byId.getId());
         playlist.setName(byId.getPlayListName());
-        playlist.setCoverImgUrl(byId.getPic());
+        playlist.setCoverImgUrl(qukuService.getPicUrl(byId.getPicId()));
         playlist.setUpdateTime((long) byId.getUpdateTime().getNano());
         playlist.setDescription(byId.getDescription());
         
@@ -374,7 +392,7 @@ public class CollectApi {
         userPojo = Optional.ofNullable(userPojo).orElse(new SysUserPojo());
         creator.setNickname(userPojo.getNickname());
         creator.setBackgroundUrl(userPojo.getBackgroundUrl());
-        creator.setAvatarUrl(userPojo.getAvatarUrl());
+        creator.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
         creator.setUserId(userPojo.getId());
         playlist.setCreator(creator);
         playlist.setUserId(userPojo.getId());
@@ -390,8 +408,8 @@ public class CollectApi {
             ArrayList<ArItem> ar = new ArrayList<>();
     
             // 艺术家数据
-            List<TbArtistPojo> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
-            for (TbArtistPojo tbArtistPojo : singerByMusicId) {
+            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
                 e1.setId(tbArtistPojo.getId());
                 e1.setName(tbArtistPojo.getArtistName());
@@ -401,11 +419,11 @@ public class CollectApi {
             e.setAr(ar);
     
             // 专辑数据
-            TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId())).orElse(new TbAlbumPojo());
+            AlbumConvert albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId())).orElse(new AlbumConvert());
             Al al = new Al();
             al.setId(albumByAlbumId.getId());
             al.setName(albumByAlbumId.getAlbumName());
-            al.setPicUrl(albumByAlbumId.getPic());
+            al.setPicUrl(albumByAlbumId.getPicUrl());
             e.setAl(al);
     
             tracks.add(e);

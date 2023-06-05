@@ -2,6 +2,7 @@ package org.api.subsonic.service;
 
 import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.api.common.service.QukuAPI;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.album.Album;
 import org.api.subsonic.model.res.album.AlbumRes;
@@ -10,11 +11,11 @@ import org.api.subsonic.model.res.song.Song;
 import org.api.subsonic.model.res.song.SongRes;
 import org.core.iservice.TbAlbumService;
 import org.core.iservice.TbMusicService;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
 import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
-import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class BrowsingApi {
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbAlbumService albumService;
@@ -43,8 +44,8 @@ public class BrowsingApi {
         Album album = new Album();
         album.setId(String.valueOf(albumPojo.getId()));
         album.setName(albumPojo.getAlbumName());
-        List<TbArtistPojo> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
-        TbArtistPojo artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new TbArtistPojo() : artistListByAlbumIds.get(0);
+        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+        ArtistConvert artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new ArtistConvert() : artistListByAlbumIds.get(0);
         album.setArtist(artistPojo.getArtistName());
         album.setArtistId(String.valueOf(artistPojo.getId()));
         album.setCoverArt(String.valueOf(albumPojo.getId()));
@@ -54,11 +55,11 @@ public class BrowsingApi {
         album.setCreated(albumPojo.getCreateTime().toString());
         album.setYear(albumPojo.getPublishTime().getYear());
         album.setStarred(albumPojo.getUpdateTime().toString());
-        
+    
         ArrayList<SongItem> song = new ArrayList<>();
-        List<TbMusicPojo> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
-        List<TbArtistPojo> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
-        TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new TbArtistPojo() : artistListByAlbumIds1.get(0);
+        List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
+        List<ArtistConvert> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
+        ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new ArtistConvert() : artistListByAlbumIds1.get(0);
         Map<Long, List<TbMusicUrlPojo>> musicMapUrl = qukuService.getMusicMapUrl(musicListByAlbumId.stream()
                                                                                                    .map(TbMusicPojo::getId)
                                                                                                    .collect(Collectors.toSet()));
@@ -105,10 +106,10 @@ public class BrowsingApi {
     public SongRes getSong(Long id) {
         TbMusicPojo musicPojo = musicService.getById(id);
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
-        List<TbArtistPojo> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
-        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicUrl(CollUtil.newHashSet(musicPojo.getId()));
+        List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
+        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
         TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
-        TbArtistPojo tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
+        ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new ArtistConvert() : artistByMusicId.get(0);
         Song song = new Song();
         song.setId(String.valueOf(musicPojo.getId()));
         song.setIsDir(false);
@@ -118,7 +119,7 @@ public class BrowsingApi {
         song.setArtistId(String.valueOf(tbArtistPojo.getId()));
         song.setTrack(0);
         song.setYear(albumByAlbumId.getPublishTime().getYear());
-        song.setCoverArt(String.valueOf(musicPojo.getId()));
+        song.setCoverArt(String.valueOf(musicPojo.getPicId()));
         song.setSize(Math.toIntExact((tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize())));
         song.setContentType("audio/mpeg");
         song.setSuffix(tbMusicUrlPojo.getEncodeType());

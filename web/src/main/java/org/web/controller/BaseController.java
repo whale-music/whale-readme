@@ -7,6 +7,7 @@ import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.core.common.result.NeteaseResult;
 import org.core.config.CookieConfig;
+import org.core.model.convert.UserConvert;
 import org.core.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class BaseController {
     
-    protected UserVo getUserVo(SysUserPojo account) {
+    protected UserVo getUserVo(UserConvert account) {
         // 包装返回结果
         UserVo userVo = new UserVo();
         userVo.setProfile(new Profile());

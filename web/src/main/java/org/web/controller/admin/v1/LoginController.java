@@ -28,9 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController extends BaseController {
     
     @Autowired
-    private JwtConfig jwtConfig;
-    
-    @Autowired
     private UserApi user;
     
     /**
@@ -39,7 +36,7 @@ public class LoginController extends BaseController {
     @PostMapping("/login")
     public R login(HttpServletResponse response, @RequestBody UserReq dto) {
         UserRes userPojo = user.login(dto.getUsername(), dto.getPassword());
-        userPojo.setExpiryTime(System.currentTimeMillis() + JwtConfig.EXPIRE_TIME);
+        userPojo.setExpiryTime(System.currentTimeMillis() + JwtConfig.getExpireTime());
         // 写入用户信息到cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), userPojo.getToken());
         response.addCookie(cookie);

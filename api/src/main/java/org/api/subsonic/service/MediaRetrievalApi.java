@@ -2,27 +2,27 @@ package org.api.subsonic.service;
 
 
 import cn.hutool.core.collection.CollUtil;
-import org.api.common.service.MusicCommonApi;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
+import org.core.config.DefaultInfo;
 import org.core.iservice.TbAlbumService;
 import org.core.iservice.TbCollectService;
 import org.core.iservice.TbMusicService;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbMusicPojo;
 import org.core.pojo.TbMusicUrlPojo;
-import org.core.service.QukuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service(SubsonicConfig.SUBSONIC + "MediaRetrievalApi")
+@Slf4j
 public class MediaRetrievalApi {
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbAlbumService albumService;
@@ -34,27 +34,20 @@ public class MediaRetrievalApi {
     private TbCollectService collectService;
     
     @Autowired
-    private MusicCommonApi musicCommonApi;
+    private DefaultInfo defaultInfo;
     
     public String getCoverArt(SubsonicCommonReq req, Long id) {
-        TbAlbumPojo byId = albumService.getById(id);
-        if (byId != null) {
-            return byId.getPic();
+        log.debug(req.toString());
+        String picUrl = qukuService.getPicUrl(id);
+        if (StringUtils.isNotBlank(picUrl)) {
+            return picUrl;
         }
-        TbMusicPojo byId1 = musicService.getById(id);
-        if (byId1 != null) {
-            return byId1.getPic();
-        }
-        TbCollectPojo byId2 = collectService.getById(id);
-        if (byId2 != null) {
-            return byId2.getPic();
-        }
-        
-        return "http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg";
+        return defaultInfo.getDefaultPic();
     }
     
     public String stream(SubsonicCommonReq req, Long id) {
-        List<TbMusicUrlPojo> musicUrlByMusicId = musicCommonApi.getMusicUrlByMusicId(id, false);
+        log.debug(req.toString());
+        List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
         return CollUtil.isEmpty(musicUrlByMusicId) ? "" : musicUrlByMusicId.get(0).getUrl();
     }
 }

@@ -6,27 +6,23 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.ArtistReq;
-import org.api.admin.model.req.AudioInfoReq;
-import org.api.admin.model.req.MusicInfoReq;
-import org.api.admin.model.req.UploadMusicReq;
+import org.api.admin.model.req.*;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
 import org.api.admin.model.res.MusicInfoRes;
-import org.api.common.service.MusicCommonApi;
+import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
 import org.core.config.LyricConfig;
 import org.core.config.SaveConfig;
 import org.core.iservice.*;
+import org.core.model.convert.ArtistConvert;
 import org.core.pojo.*;
 import org.core.service.AccountService;
-import org.core.service.QukuService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -61,7 +57,6 @@ import java.util.stream.Collectors;
 @Service(AdminConfig.ADMIN + "MusicFlowApi")
 @Slf4j
 public class MusicFlowApi {
-    
     /**
      * 音乐文件导入后缀名
      */
@@ -72,8 +67,6 @@ public class MusicFlowApi {
      */
     @Autowired
     private TbMusicService musicService;
-    
-    private static final Object lock = new Object();
     
     /**
      * 音乐保存数据链接表
@@ -106,14 +99,15 @@ public class MusicFlowApi {
     private AccountService accountService;
     
     String pathTemp = FileUtil.getTmpDirPath() + FileUtil.FILE_SEPARATOR + "musicTemp";
-    @Autowired
-    private MusicCommonApi musicCommonApi;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private TbMusicArtistService musicArtistService;
+    
+    @Autowired
+    private TbPicService picService;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -452,7 +446,6 @@ public class MusicFlowApi {
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getMusicName()), TbMusicPojo::getMusicName, dto.getMusicName());
         String join = StringUtils.join(dto.getAliaName(), ",");
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(join), TbMusicPojo::getAliasName, join);
-        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getPic()), TbMusicPojo::getPic, dto.getPic());
         TbMusicPojo one = musicService.getOne(musicPojoLambdaQueryWrapper);
         return saveMusicInfoTable(dto, albumPojo, one, aliaNames);
     }
@@ -505,23 +498,15 @@ public class MusicFlowApi {
     @NotNull
     private TbMusicPojo saveMusicInfoTable(AudioInfoReq dto, TbAlbumPojo albumPojo, TbMusicPojo musicPojo, String aliaNames) {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
-        synchronized (lock) {
-            if (tbMusicPojo.getSort() == null) {
-                Page<TbMusicPojo> page = new Page<>(musicService.count(), 1);
-                musicService.page(page, Wrappers.<TbMusicPojo>lambdaQuery().orderByAsc(TbMusicPojo::getSort));
-                Long value = CollUtil.isEmpty(page.getRecords()) ? 0 : Optional.ofNullable(page.getRecords().get(0)).orElse(new TbMusicPojo()).getSort();
-                long sort = Optional.of(value).orElse(0L) + 1;
-                tbMusicPojo.setSort(sort);
-            }
-        }
         // music 信息表
         tbMusicPojo.setMusicName(dto.getMusicName());
         tbMusicPojo.setAliasName(aliaNames);
-        tbMusicPojo.setPic(dto.getPic());
+        tbMusicPojo.setPicId(qukuService.saveOrUpdatePic(dto.getPic()).getId());
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
         tbMusicPojo.setTimeLength(dto.getTimeLength());
+        boolean save;
         // 保存音乐表
-        boolean save = musicService.saveOrUpdate(tbMusicPojo);
+        save = musicService.saveOrUpdate(tbMusicPojo);
         // 保存错误，抛出异常
         ExceptionUtil.isNull(!save, ResultCode.SAVE_FAIL);
         return tbMusicPojo;
@@ -546,9 +531,12 @@ public class MusicFlowApi {
         // 如果是数据库中已有数据，直接更新
         Long albumId = dto.getAlbum().getId();
         if (albumId != null) {
-            TbAlbumPojo byId = albumService.getById(albumId);
-            ExceptionUtil.isNull(byId == null, ResultCode.ALBUM_NOT_EXIST);
-            return byId;
+            AlbumReq album = dto.getAlbum();
+            album.setId(albumId);
+            TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(dto.getAlbum().getPic());
+            album.setPicId(tbPicPojo.getId());
+            albumService.updateById(album);
+            return album;
         }
         // 查询专辑名在数据库中是否存在专辑
         List<TbAlbumPojo> list = albumService.list(Wrappers.<TbAlbumPojo>lambdaQuery()
@@ -568,7 +556,7 @@ public class MusicFlowApi {
         List<Long> distinct = CollUtil.distinct(albumIds);
         ExceptionUtil.isNull(distinct.size() > 1, ResultCode.ALBUM_NOT_EXIST);
         TbAlbumPojo albumPojo = new TbAlbumPojo();
-        // 有一个更新数据库，并且保证数据中的专辑ID和根据专辑名查询出来的ID相同，否则不更新,直接新增专辑数据
+        // 数据库中有数据，并且保证数据中的专辑ID和根据专辑名查询出来的ID相同，否则直接抛出异常
         if (distinct.size() == 1) {
             // 获取关联的专辑表ID
             Long id = distinct.get(0);
@@ -578,14 +566,19 @@ public class MusicFlowApi {
                                               .findFirst();
             albumPojo = first.orElseThrow(() -> new BaseException(ResultCode.ALBUM_ERROR));
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo, "id", "updateTime", "createTime");
+            // 更新或新增封面
+            albumPojo.setPicId(qukuService.saveOrUpdatePic(dto.getAlbum().getPic()).getId());
             // 更新专辑表
             albumService.updateById(albumPojo);
+            return albumPojo;
         }
-        // 如果没有歌手数据则新增专辑表
-        // 默认新增歌手为歌曲歌手
+        // 如果没有歌手数据则只新增专辑表
         if (distinct.isEmpty()) {
             albumPojo = new TbAlbumPojo();
             BeanUtils.copyProperties(dto.getAlbum(), albumPojo);
+            // 更新或新增封面
+            albumPojo.setPicId(qukuService.saveOrUpdatePic(dto.getAlbum().getPic()).getId());
+            // 新增专辑
             albumService.saveOrUpdate(albumPojo);
             // 更新歌手和专辑中间表
             if (IterUtil.isNotEmpty(singerIds)) {
@@ -606,7 +599,6 @@ public class MusicFlowApi {
      * 返回添加歌手列表
      * 四种情况:
      * 前端传递数据中没有歌手，直接返回空数据
-     * 前端传入歌手ID直接查询，并返回
      * 前端传入数据有歌手，数据库中有，查询出歌手和音乐主键ID
      * 前端传入数据有歌手，数据库中没有，添加歌手数据并返回歌手存入数据
      * 前端有数据，数据库中也有，但是数据库中一半有歌手，一半没有歌手。则更新数据
@@ -616,22 +608,16 @@ public class MusicFlowApi {
      */
     private List<TbArtistPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
-        if (IterUtil.isEmpty(dto.getArtists()) || StringUtils.isBlank(dto.getArtists().get(0).getArtistName())) {
+        List<ArtistReq> artists = dto.getArtists();
+        if (IterUtil.isEmpty(artists) || StringUtils.isBlank(artists.get(0).getArtistName())) {
             return Collections.emptyList();
-        }
-        // 有歌手ID直接返回数据
-        if (CollUtil.isNotEmpty(dto.getArtists()) && dto.getArtists().get(0) != null && dto.getArtists().get(0).getId() != null) {
-            List<Long> singerIds = dto.getArtists().stream().map(TbArtistPojo::getId).filter(Objects::nonNull).collect(Collectors.toList());
-            List<TbArtistPojo> tbArtistPojos = artistService.listByIds(singerIds);
-            ExceptionUtil.isNull(CollUtil.isNotEmpty(tbArtistPojos), ResultCode.ALBUM_NOT_EXIST);
-            return tbArtistPojos;
         }
         // 有歌手，数据库中有，查询出歌手和音乐主键ID
         // 获取前端传入所有歌手
-        List<String> singerNameList = dto.getArtists()
-                                         .stream()
-                                         .map(TbArtistPojo::getArtistName)
-                                         .collect(Collectors.toList());
+        List<String> singerNameList = artists
+                .stream()
+                .map(TbArtistPojo::getArtistName)
+                .collect(Collectors.toList());
     
         // 查询数据库中歌手
         List<TbArtistPojo> singList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery()
@@ -640,8 +626,7 @@ public class MusicFlowApi {
     
         List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
-        List<ArtistReq> singerReqList = dto.getArtists();
-        for (ArtistReq singerReq : singerReqList) {
+        for (ArtistReq singerReq : artists) {
             TbArtistPojo pojo = new TbArtistPojo();
             BeanUtils.copyProperties(singerReq, pojo);
             // 覆盖数据中的数据，防止出现脏数据(多个相同的歌手)
@@ -651,6 +636,8 @@ public class MusicFlowApi {
                     pojo.setId(tbArtistPojo.getId());
                 }
             }
+            // 更新封面
+            pojo.setPicId(qukuService.saveOrUpdatePic(singerReq.getPic()).getId());
             saveBatch.add(pojo);
         }
         artistService.saveOrUpdateBatch(saveBatch);
@@ -672,7 +659,7 @@ public class MusicFlowApi {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
                 String address = tbMusicUrlPojo.getUrl();
-                TbMusicUrlPojo url = musicCommonApi.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
+                TbMusicUrlPojo url = qukuService.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
                 BeanUtils.copyProperties(url, musicFileRes);
                 musicFileRes.setUrl(address);
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
@@ -726,9 +713,10 @@ public class MusicFlowApi {
         entity.setId(req.getId());
         entity.setMusicName(req.getMusicName());
         entity.setAliasName(req.getMusicNameAlias());
-        entity.setPic(req.getPic());
         entity.setAlbumId(req.getAlbumId());
         entity.setTimeLength(req.getTimeLength());
+        // 更新封面
+        entity.setPicId(qukuService.saveOrUpdatePic(req.getPic()).getId());
     
         TbMusicPojo musicPojo = musicService.getById(req.getId());
         // 删除歌曲关联歌手
@@ -770,9 +758,9 @@ public class MusicFlowApi {
         // 音乐
         TbMusicPojo byId = musicService.getById(id);
         // 专辑艺术家
-        List<TbArtistPojo> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
+        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
         // 歌曲艺术家
-        List<TbArtistPojo> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
+        List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
         // 专辑
         TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
     
@@ -782,11 +770,13 @@ public class MusicFlowApi {
         musicInfoRes.setAlbumName(albumPojo.getAlbumName());
         musicInfoRes.setAlbumId(albumPojo.getId());
         BeanUtils.copyProperties(byId, musicInfoRes);
+        musicInfoRes.setPic(qukuService.getPicUrl(byId.getPicId()));
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
     }
     
     /**
+     * TODO: 保存时简繁比较
      * 保存音乐
      * 更新表: 音乐信息表  歌手表 专辑表
      * 如果上传文件更新: 音乐地址表
@@ -901,7 +891,7 @@ public class MusicFlowApi {
             entity.setUrl(musicSource.getName());
             entity.setMusicId(musicSource.getMusicId());
             musicUrlService.save(entity);
-            musicCommonApi.getMusicUrlByMusicId(entity.getMusicId(), true);
+            qukuService.getMusicUrlByMusicId(entity.getMusicId(), true);
         } else {
             throw new BaseException(ResultCode.SONG_UPLOADED);
         }

@@ -11,20 +11,20 @@ import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
+import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.iservice.TbArtistService;
-import org.core.pojo.TbAlbumPojo;
+import org.core.model.convert.AlbumConvert;
+import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.MusicConvert;
 import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.service.QukuService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service(AdminConfig.ADMIN + "ArtistApi")
 public class ArtistApi {
@@ -34,7 +34,7 @@ public class ArtistApi {
     private TbArtistService artistService;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     /**
      * 设置分页查询排序
@@ -73,12 +73,13 @@ public class ArtistApi {
         for (TbArtistPojo singerPojo : page.getRecords()) {
             long albumSize = qukuService.getAlbumCountBySingerId(singerPojo.getId());
             long musicSize = qukuService.getMusicCountBySingerId(singerPojo.getId());
-            
-            ArtistRes singerRes = new ArtistRes();
-            BeanUtils.copyProperties(singerPojo, singerRes);
-            singerRes.setAlbumSize(String.valueOf(albumSize));
-            singerRes.setMusicSize(String.valueOf(musicSize));
-            singerResPage.getRecords().add(singerRes);
+    
+            ArtistRes artistRes = new ArtistRes();
+            BeanUtils.copyProperties(singerPojo, artistRes);
+            artistRes.setAlbumSize(String.valueOf(albumSize));
+            artistRes.setMusicSize(String.valueOf(musicSize));
+            artistRes.setPicUrl(qukuService.getPicUrl(singerPojo.getPicId()));
+            singerResPage.getRecords().add(artistRes);
         }
     
     
@@ -103,7 +104,7 @@ public class ArtistApi {
         return maps;
     }
     
-    public List<TbArtistPojo> getSingerListByAlbumId(Long albumId) {
+    public List<ArtistConvert> getSingerListByAlbumId(Long albumId) {
         return qukuService.getAlbumArtistListByAlbumIds(albumId);
     }
     
@@ -113,12 +114,9 @@ public class ArtistApi {
         TbArtistPojo pojo = artistService.getById(id);
         BeanUtils.copyProperties(pojo, artistInfoRes);
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
-    
-        List<TbAlbumPojo> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
-        albumListByArtistIds = albumListByArtistIds.parallelStream()
-                                                   .filter(tbAlbumPojo -> StringUtils.isNotBlank(tbAlbumPojo.getAlbumName()))
-                                                   .collect(Collectors.toList());
-        List<TbMusicPojo> musicListByArtistId = qukuService.getMusicListByArtistId(id);
+        artistInfoRes.setPicUrl(qukuService.getPicUrl(pojo.getPicId()));
+        List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
+        List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);
         artistInfoRes.setAlbumList(albumListByArtistIds);
         artistInfoRes.setMusicList(musicListByArtistId);
         return artistInfoRes;

@@ -2,6 +2,7 @@ package org.oss.service.impl.alist;
 
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +113,9 @@ public class AListOSSServiceImpl implements OSSService {
         col.addAll(config.getImgSave());
         for (String s : col) {
             List<ContentItem> list = RequestUtils.list(config.getHost(), s, headers);
+            if (CollUtil.isEmpty(list)) {
+                continue;
+            }
             list.parallelStream().forEach(contentItem -> {
                 contentItem.setPath(s);
                 musicUrltimedCache.put(contentItem.getName(), contentItem);
@@ -159,14 +163,14 @@ public class AListOSSServiceImpl implements OSSService {
             throw new BaseException(e.getMessage());
         }
         String loginJwtCache = getLoginJwtCache(config);
-        String upload = RequestUtils.upload(config.getHost(), paths.get(index), srcFile, loginJwtCache);
+        String path = RequestUtils.upload(config.getHost(), paths.get(index), srcFile, loginJwtCache);
         // 校验是否上传成功
         try {
-            getAddresses(srcFile.getName(), true);
+            getAddresses(path, true);
         } catch (Exception e) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
-        return upload;
+        return path;
     }
     
     /**
@@ -177,7 +181,7 @@ public class AListOSSServiceImpl implements OSSService {
      * @return 音乐下载地址
      */
     @Override
-    public Collection<String> getMusicAllMD5(String md5, boolean refresh) {
+    public Collection<String> getAllMD5(String md5, boolean refresh) {
         try {
             String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存

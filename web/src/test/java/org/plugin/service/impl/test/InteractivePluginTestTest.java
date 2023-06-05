@@ -3,10 +3,10 @@ package org.plugin.service.impl.test;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.service.MusicFlowApi;
+import org.api.common.service.QukuAPI;
 import org.core.iservice.TbPluginMsgService;
 import org.core.iservice.TbPluginTaskService;
 import org.core.pojo.TbPluginTaskPojo;
-import org.core.service.QukuService;
 import org.junit.jupiter.api.Test;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.service.PluginService;
@@ -31,7 +31,7 @@ class InteractivePluginTestTest {
     private TbPluginTaskService pluginTaskService;
     
     @Autowired
-    private QukuService qukuService;
+    private QukuAPI qukuService;
     
     @Autowired
     private PluginService pluginService;

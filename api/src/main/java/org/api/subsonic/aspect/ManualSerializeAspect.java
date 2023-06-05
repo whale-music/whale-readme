@@ -16,6 +16,7 @@ import org.core.common.result.ResultCode;
 import org.core.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.SerializeUtil;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.http.HttpHeaders;
@@ -54,26 +55,31 @@ public class ManualSerializeAspect {
             String version = String.valueOf(beanMap.get("v"));
             String token = String.valueOf(beanMap.get("t"));
             String salt = String.valueOf(beanMap.get("s"));
-            try {
-                authenticate(user, password, token, salt, version);
-                Object obj = proceedingJoinPoint.proceed();
-                // 成功返回
-                return returnStr(obj, from);
-            } catch (BaseException e) {
-                log.error(e.getErrorMsg(), e);
-                // 用户登录错误
-                if (StringUtils.equals(e.getErrorCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getErrorCode(),
-                        ResultCode.PASSWORD_ERROR.getCode())) {
-                    return returnStr(new SubsonicResult().error(ErrorEnum.WRONG_USERNAME_OR_PASSWORD), from);
-                }
-                throw new BaseException();
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return returnStr(new SubsonicResult().error(ErrorEnum.A_GENERIC_ERROR), from);
-            }
-        } catch (Throwable throwable) {
+            return getStringResponseEntity(proceedingJoinPoint, from, user, password, version, token, salt);
+        } catch (Exception throwable) {
             throwable.printStackTrace();
             throw new BaseException(throwable.getMessage());
+        }
+    }
+    
+    @NotNull
+    private ResponseEntity<String> getStringResponseEntity(ProceedingJoinPoint proceedingJoinPoint, String from, String user, String password, String version, String token, String salt) {
+        try {
+            authenticate(user, password, token, salt, version);
+            Object obj = proceedingJoinPoint.proceed();
+            // 成功返回
+            return returnStr(obj, from);
+        } catch (BaseException e) {
+            log.error(e.getErrorMsg(), e);
+            // 用户登录错误
+            if (StringUtils.equals(e.getErrorCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getErrorCode(),
+                    ResultCode.PASSWORD_ERROR.getCode())) {
+                return returnStr(new SubsonicResult().error(ErrorEnum.WRONG_USERNAME_OR_PASSWORD), from);
+            }
+            throw new BaseException();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return returnStr(new SubsonicResult().error(ErrorEnum.A_GENERIC_ERROR), from);
         }
     }
     

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.core.model.convert.PicConvert;
 import org.core.pojo.TbArtistPojo;
 
 import java.io.Serializable;
@@ -25,7 +26,7 @@ public class MusicInfoReq implements Serializable {
     private String musicNameAlias;
     
     @ApiModelProperty("封面")
-    private String pic;
+    private PicConvert pic;
     
     @ApiModelProperty("歌手名ID")
     private List<TbArtistPojo> musicArtist;

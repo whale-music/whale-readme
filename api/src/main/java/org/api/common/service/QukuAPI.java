@@ -16,7 +16,6 @@ import org.core.pojo.TbPicPojo;
 import org.core.service.impl.QukuServiceImpl;
 import org.oss.factory.OSSFactory;
 import org.oss.service.OSSService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,11 +26,15 @@ import java.util.function.Consumer;
 @Slf4j
 public class QukuAPI extends QukuServiceImpl {
     
-    @Autowired
-    private SaveConfig config;
+    private final SaveConfig config;
     
-    @Autowired
-    private HttpRequestConfig httpRequestConfig;
+    private final HttpRequestConfig httpRequestConfig;
+    
+    public QukuAPI(HttpRequestConfig httpRequestConfig, SaveConfig config) {
+        this.httpRequestConfig = httpRequestConfig;
+        this.config = config;
+    }
+    
     
     private static String getAddresses(String url, SaveConfig config, boolean refresh) {
         // 获取音乐地址
@@ -65,11 +68,10 @@ public class QukuAPI extends QukuServiceImpl {
     /**
      * 保存封面
      *
-     * @param pic      封面
-     * @param consumer 删除封面文件
+     * @param pic 封面
      */
     @Override
-    public TbPicPojo saveOrUpdatePic(TbPicPojo pic, Consumer<String> consumer) {
+    public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
         if (StringUtils.isBlank(pic.getUrl())) {
             return new TbPicPojo();
         }
@@ -85,11 +87,18 @@ public class QukuAPI extends QukuServiceImpl {
         FileUtil.del(fileFromUrl);
         pic.setMd5(md5Hex);
         pic.setUrl(upload);
-        return super.saveOrUpdatePic(pic, ossService::delete);
+        return super.saveOrUpdatePic(pic);
     }
     
-    public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
-        return this.saveOrUpdatePic(pic, null);
+    /**
+     * @param pic      封面数据
+     * @param consumer 删除封面文件
+     */
+    @Override
+    public void removePicFile(TbPicPojo pic, Consumer<String> consumer) {
+        // 删除歌曲文件
+        OSSService ossService = OSSFactory.ossFactory(config);
+        super.removePicFile(pic, ossService::delete);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {
@@ -127,7 +136,8 @@ public class QukuAPI extends QukuServiceImpl {
                 log.warn("获取下载地址出错: {}", e.getMessage());
                 return "";
             }
-            throw new BaseException(e.getErrorCode(), e.getErrorCode());
+            log.error(e.getMessage(), e);
+            throw new BaseException(e.getErrorCode(), e.getErrorMsg());
         }
     }
     

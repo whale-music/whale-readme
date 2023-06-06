@@ -9,10 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
-import org.core.config.DefaultInfo;
 import org.core.iservice.*;
 import org.core.model.convert.AlbumConvert;
 import org.core.model.convert.ArtistConvert;
@@ -138,7 +138,7 @@ public class CollectApi {
      */
     public TbCollectPojo createPlayList(Long userId, String name) {
         TbPicPojo pic = new TbPicPojo();
-        pic.setUrl(defaultInfo.getPlayListPic());
+        pic.setUrl(defaultInfo.getPic().getPlayListPic());
         TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(pic);
         return qukuService.createPlayList(userId, name, tbPicPojo.getId(), Short.parseShort("0"));
     }

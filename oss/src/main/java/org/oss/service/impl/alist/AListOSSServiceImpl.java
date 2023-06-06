@@ -4,7 +4,6 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import com.sun.net.httpserver.Headers;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -94,25 +93,21 @@ public class AListOSSServiceImpl implements OSSService {
             if (item == null) {
                 throw new BaseException(ResultCode.DATA_NONE.getCode(), ResultCode.DATA_NONE.getResultMsg() + ": " + name);
             }
-            String musicAddress = String.format("%s/d/%s/%s?sign=%s", config.getHost(), item.getPath(), name, item.getSign());
-            if (StringUtils.isBlank(musicAddress)) {
+            if (StringUtils.isBlank(item.getPath())) {
                 throw new BaseException();
-            } else {
-                return musicAddress;
             }
+            return String.format("%s/d/%s/%s?sign=%s", config.getHost(), item.getPath(), name, item.getSign());
         } catch (BaseException e) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
         }
     }
     
     private void refreshMusicCache(String loginCacheStr) {
-        Headers headers = new Headers();
-        headers.put("Authorization", Collections.singletonList(loginCacheStr));
         ArrayList<String> col = new ArrayList<>();
         col.addAll(config.getObjectSave());
         col.addAll(config.getImgSave());
         for (String s : col) {
-            List<ContentItem> list = RequestUtils.list(config.getHost(), s, headers);
+            List<ContentItem> list = RequestUtils.list(config.getHost(), s, loginCacheStr);
             if (CollUtil.isEmpty(list)) {
                 continue;
             }
@@ -214,6 +209,11 @@ public class AListOSSServiceImpl implements OSSService {
     
     @Override
     public boolean delete(String name) {
-        throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
+        isExist(name);
+        String loginCacheStr = getLoginJwtCache(config);
+        // 音乐地址URL缓存
+        ContentItem item = musicUrltimedCache.get(name);
+        RequestUtils.delete(config.getHost(), item.getPath(), name, loginCacheStr);
+        return true;
     }
 }

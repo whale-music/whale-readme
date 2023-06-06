@@ -1,6 +1,6 @@
 package org.core.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.config.TargetTagConfig;
 import org.core.model.convert.AlbumConvert;
@@ -82,7 +82,7 @@ public interface QukuService {
      */
     Page<AlbumConvert> getRandomAlbum(String area, Long offset, Long limit);
     
-    Page<AlbumConvert> getAlbumPage(Page<TbAlbumPojo> albumPojoPage, LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper);
+    Page<AlbumConvert> getAlbumPage(Page<TbAlbumPojo> albumPojoPage, Wrapper<TbAlbumPojo> lambdaQueryWrapper);
     
     /**
      * 查询专辑下音乐数量
@@ -414,11 +414,14 @@ public interface QukuService {
     /**
      * 保存封面
      *
-     * @param pic
-     * @param consumer
      * @return 封面
      */
-    TbPicPojo saveOrUpdatePic(TbPicPojo pic, Consumer<String> consumer);
+    TbPicPojo saveOrUpdatePic(TbPicPojo pic);
     
     List<TbPicPojo> saveOrUpdatePic(List<TbPicPojo> pic, Consumer<String> consumer);
+    
+    /**
+     * 删除封面数据, 包括文件和数据库
+     */
+    void removePic(TbPicPojo pic);
 }

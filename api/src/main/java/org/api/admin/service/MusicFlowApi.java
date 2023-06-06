@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.houbb.opencc4j.util.ZhConverterUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
@@ -14,9 +15,12 @@ import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
 import org.api.admin.model.res.MusicInfoRes;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.defaultinfo.DefaultInfo;
+import org.core.common.constant.defaultinfo.NameType;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
+import org.core.config.HttpRequestConfig;
 import org.core.config.LyricConfig;
 import org.core.config.SaveConfig;
 import org.core.iservice.*;
@@ -37,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.oss.factory.OSSFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -60,54 +63,58 @@ public class MusicFlowApi {
     /**
      * 音乐文件导入后缀名
      */
-    @Autowired
-    private FileTypeConfig fileType;
+    private final FileTypeConfig fileType;
     /**
      * 音乐信息服务
      */
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
     /**
      * 音乐保存数据链接表
      */
-    @Autowired
-    private TbMusicUrlService musicUrlService;
-    @Autowired
-    private TbLyricService lyricService;
+    private final TbMusicUrlService musicUrlService;
+    private final TbLyricService lyricService;
     
     /**
      * 歌手服务
      */
-    @Autowired
-    private TbArtistService artistService;
+    private final TbArtistService artistService;
     
     /**
      * 专辑表
      */
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     /**
      * 上传配置
      */
-    @Autowired
-    private SaveConfig config;
+    private final SaveConfig config;
     
-    @Autowired
-    private TbAlbumArtistService albumSingerService;
-    @Autowired
-    private AccountService accountService;
+    private final TbAlbumArtistService albumSingerService;
+    private final AccountService accountService;
     
-    String pathTemp = FileUtil.getTmpDirPath() + FileUtil.FILE_SEPARATOR + "musicTemp";
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final TbMusicArtistService musicArtistService;
     
-    @Autowired
-    private TbMusicArtistService musicArtistService;
+    private final HttpRequestConfig requestConfig;
     
-    @Autowired
-    private TbPicService picService;
+    private final DefaultInfo defaultInfo;
+    
+    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbMusicUrlService musicUrlService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo) {
+        this.lyricService = lyricService;
+        this.fileType = fileType;
+        this.musicService = musicService;
+        this.musicUrlService = musicUrlService;
+        this.artistService = artistService;
+        this.albumService = albumService;
+        this.requestConfig = requestConfig;
+        this.config = config;
+        this.albumSingerService = albumSingerService;
+        this.accountService = accountService;
+        this.qukuService = qukuService;
+        this.musicArtistService = musicArtistService;
+        this.defaultInfo = defaultInfo;
+    }
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -128,11 +135,11 @@ public class MusicFlowApi {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
             fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType.getSuffix());
-            path = checkFileMd5(md5, new File(pathTemp, md5 + "." + fileSuffix));
+            path = checkFileMd5(md5, new File(requestConfig.getTempPath(), md5 + "." + fileSuffix));
             // 本地没有则保存
             if (path == null) {
                 String musicFileName = md5 + "." + fileSuffix;
-                path = new File(pathTemp, musicFileName);
+                path = new File(requestConfig.getTempPath(), musicFileName);
                 BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
                 outputStream.write(uploadFile.getBytes());
                 outputStream.close();
@@ -144,7 +151,7 @@ public class MusicFlowApi {
             fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getSuffix());
             byte[] bytes = HttpUtil.downloadBytes(url);
             String md5 = DigestUtils.md5DigestAsHex(bytes);
-            File dest = new File(pathTemp, md5 + "." + fileSuffix);
+            File dest = new File(requestConfig.getTempPath(), md5 + "." + fileSuffix);
             path = checkFileMd5(md5, dest);
             // 本地没有则保存
             if (path == null) {
@@ -201,7 +208,7 @@ public class MusicFlowApi {
      */
     public ResponseEntity<FileSystemResource> getMusicTempFile(String musicTempFile) {
         LocalFileUtil.checkFileNameLegal(musicTempFile);
-        File file = LocalFileUtil.checkFilePath(pathTemp, musicTempFile);
+        File file = LocalFileUtil.checkFilePath(requestConfig.getTempPath(), musicTempFile);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
@@ -367,8 +374,8 @@ public class MusicFlowApi {
             if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
                 // 没有md5，取文件的md5
                 if (StringUtils.isBlank(dto.getMd5())) {
-                    File file1 = new File(pathTemp);
-                    HttpUtil.downloadFile(dto.getMusicTemp(), file1, 600000);
+                    File file1 = new File(requestConfig.getTempPath());
+                    HttpUtil.downloadFile(dto.getMusicTemp(), file1, requestConfig.getTimeout());
                     File[] files = Objects.requireNonNull(file1.listFiles());
                     File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
                     ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
@@ -377,14 +384,14 @@ public class MusicFlowApi {
                     inputStream.close();
                     file = FileUtil.rename(lastFile, md5, true, true);
                 } else {
-                    String pathname = pathTemp + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
+                    String pathname = requestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
                     file = getMusicFile(dto, pathname);
                     file = FileUtil.rename(file, dto.getMd5(), true, true);
                     md5 = dto.getMd5();
                 }
             } else {
                 // 读取本地文件
-                file = new File(pathTemp, dto.getMusicTemp());
+                file = new File(requestConfig.getTempPath(), dto.getMusicTemp());
             }
             uploadPath = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), file, md5);
             size = FileUtil.size(file);
@@ -686,6 +693,12 @@ public class MusicFlowApi {
         return qukuService.getMusicLyric(musicId);
     }
     
+    /**
+     * 删除音乐
+     *
+     * @param musicId 音乐ID
+     * @param compel  是否强制删除
+     */
     public void deleteMusic(List<Long> musicId, Boolean compel) {
         qukuService.deleteMusic(musicId, compel);
     }
@@ -776,7 +789,6 @@ public class MusicFlowApi {
     }
     
     /**
-     * TODO: 保存时简繁比较
      * 保存音乐
      * 更新表: 音乐信息表  歌手表 专辑表
      * 如果上传文件更新: 音乐地址表
@@ -785,10 +797,11 @@ public class MusicFlowApi {
      */
     // @Transactional(rollbackFor = Exception.class)
     public MusicDetails saveMusicInfo(AudioInfoReq dto) {
+        nameHandler(dto);
         // 检测是读取本地缓存文件， 并且是本地地址
         if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
             // 检查文件目录是否合法
-            LocalFileUtil.checkFilePath(pathTemp, dto.getMusicTemp());
+            LocalFileUtil.checkFilePath(requestConfig.getTempPath(), dto.getMusicTemp());
         }
         // 保存专辑歌手中间表
         List<TbArtistPojo> albumArtist = saveAndReturnMusicAndSingList(dto);
@@ -804,7 +817,7 @@ public class MusicFlowApi {
         List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
         // 上传文件
         TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
-        
+    
         MusicDetails musicDetails = new MusicDetails();
         musicDetails.setMusic(musicPojo);
         musicDetails.setMusicUrl(tbMusicUrlPojo);
@@ -812,6 +825,59 @@ public class MusicFlowApi {
         musicDetails.setSinger(albumArtist);
         musicDetails.setLyrics(lyricPojoList);
         return musicDetails;
+    }
+    
+    private void nameHandler(AudioInfoReq dto) {
+        NameType music = defaultInfo.getName().getMusic();
+        switch (music) {
+            case CN:
+                dto.setMusicName(ZhConverterUtil.toSimple(dto.getMusicName()));
+                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toSimple).collect(Collectors.toList()));
+                break;
+            case TC:
+                dto.setMusicName(ZhConverterUtil.toTraditional(dto.getMusicName()));
+                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toTraditional).collect(Collectors.toList()));
+                break;
+            case DEFAULT:
+            default:
+                break;
+        }
+        
+        NameType artist = defaultInfo.getName().getArtist();
+        switch (artist) {
+            case CN:
+                dto.getArtists().parallelStream().forEach(
+                        req -> {
+                            req.setArtistName(ZhConverterUtil.toSimple(req.getArtistName()));
+                            req.setAliasName(ZhConverterUtil.toSimple(req.getAliasName()));
+                        }
+                );
+                break;
+            case TC:
+                dto.getArtists().parallelStream().forEach(
+                        req -> {
+                            req.setArtistName(ZhConverterUtil.toTraditional(req.getArtistName()));
+                            req.setAliasName(ZhConverterUtil.toTraditional(req.getAliasName()));
+                        }
+                );
+                break;
+            case DEFAULT:
+            default:
+                break;
+        }
+        
+        NameType album = defaultInfo.getName().getAlbum();
+        switch (album) {
+            case CN:
+                dto.getAlbum().setAlbumName(ZhConverterUtil.toSimple(dto.getAlbum().getAlbumName()));
+                break;
+            case TC:
+                dto.getAlbum().setAlbumName(ZhConverterUtil.toTraditional(dto.getAlbum().getAlbumName()));
+                break;
+            case DEFAULT:
+            default:
+                break;
+        }
     }
     
     public void uploadAutoMusic(Long userId, MultipartFile uploadFile, Long musicId) {

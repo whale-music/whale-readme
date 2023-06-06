@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.AlbumReq;
 import org.api.admin.model.req.ArtistReq;
 import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.service.AlbumApi;
+import org.api.admin.service.ArtistApi;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.iservice.TbAlbumService;
@@ -43,15 +45,31 @@ class MusicControllerTest {
     private TbAlbumService albumService;
     @Autowired
     private TbArtistService artistService;
+    
+    @Autowired
+    private MusicFlowApi musicFlowApi;
+    
+    @Autowired
+    private ArtistApi artistApi;
+    
+    @Autowired
+    private AlbumApi albumApi;
+    
     @Autowired
     private AccountService accountService;
     
     @Test
     @BeforeEach
     void cleanAllData() {
-        artistService.removeByIds(artistService.list().parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList()));
-        musicService.removeByIds(musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList()));
-        albumService.removeByIds(albumService.list().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList()));
+        List<Long> musicIds = musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
+        musicFlowApi.deleteMusic(musicIds, true);
+        
+        List<Long> albumIds = albumService.list().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList());
+        albumApi.deleteAlbum(albumIds, true);
+        
+        List<Long> artistIds = artistService.list().parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList());
+        artistApi.deleteArtist(artistIds);
+        
         
         long count = musicService.count();
         long count1 = artistService.count();
@@ -64,8 +82,8 @@ class MusicControllerTest {
     @Test
     void testUploadMusicInfo() throws InterruptedException {
         SysUserPojo user = accountService.getUser(ADMIN);
-        
-        final int number = 100;
+    
+        final int number = 2_000;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
         ArrayList<Callable<MusicDetails>> tasks = new ArrayList<>();

@@ -12,9 +12,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.DefaultInfo;
 import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
 import org.core.config.TargetTagConfig;
@@ -349,12 +349,12 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * @param albumPojoPage
-     * @param lambdaQueryWrapper
-     * @return
+     * @param albumPojoPage      专辑分页参数
+     * @param lambdaQueryWrapper 查询参数
+     * @return 返回数据
      */
     @Override
-    public Page<AlbumConvert> getAlbumPage(Page<TbAlbumPojo> albumPojoPage, LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper) {
+    public Page<AlbumConvert> getAlbumPage(Page<TbAlbumPojo> albumPojoPage, Wrapper<TbAlbumPojo> lambdaQueryWrapper) {
         albumService.page(albumPojoPage, lambdaQueryWrapper);
         return getAlbumConvertPage(albumPojoPage);
     }
@@ -939,8 +939,11 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteMusic(List<Long> musicId, Boolean compel) {
-        long count = musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicId));
-        if (count == 0) {
+        if (CollUtil.isEmpty(musicId)) {
+            return;
+        }
+        List<TbMusicPojo> musicList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicId));
+        if (CollUtil.isEmpty(musicList)) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
         // 删除歌单
@@ -963,6 +966,12 @@ public class QukuServiceImpl implements QukuService {
         musicUrlService.remove(queryWrapper);
         // 删除Tag中间表
         middleTagService.removeBatchByIds(musicId);
+        for (TbMusicPojo musicPojo : musicList) {
+            // 删除音乐封面
+            TbPicPojo pic = new TbPicPojo();
+            pic.setId(musicPojo.getPicId());
+            removePic(pic);
+        }
     }
     
     
@@ -976,6 +985,9 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteAlbum(List<Long> id, Boolean compel) {
+        if (CollUtil.isEmpty(id)) {
+            return;
+        }
         // 检测是否存在专辑
         long count = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().in(TbAlbumPojo::getId, id));
         if (count == 0) {
@@ -1004,6 +1016,10 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteArtist(List<Long> id) {
+        if (CollUtil.isEmpty(id)) {
+            return;
+        }
+    
         Wrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, id);
         long count = artistService.count(wrapper);
         if (count == 0) {
@@ -1049,7 +1065,7 @@ public class QukuServiceImpl implements QukuService {
     public String getPicUrl(Long id) {
         TbPicPojo pojo = picCache.get(id, picService::getById);
         if (pojo == null || StringUtils.isEmpty(pojo.getUrl())) {
-            return defaultInfo.getDefaultPic();
+            return defaultInfo.getPic().getDefaultPic();
         }
         return pojo.getUrl();
     }
@@ -1106,7 +1122,7 @@ public class QukuServiceImpl implements QukuService {
             return tbPicPojos.parallelStream().map(tbPicPojo -> {
                 if (tbPicPojo == null || StringUtils.isEmpty(tbPicPojo.getUrl())) {
                     TbPicPojo pojo = new TbPicPojo();
-                    pojo.setUrl(defaultInfo.getDefaultPic());
+                    pojo.setUrl(defaultInfo.getPic().getDefaultPic());
                     return pojo;
                 }
                 return tbPicPojo;
@@ -1124,27 +1140,52 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 保存封面
      *
-     * @param pic      封面
-     * @param consumer 删除封面文件
+     * @param pic 封面
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public TbPicPojo saveOrUpdatePic(TbPicPojo pic, Consumer<String> consumer) {
+    public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
         Long id = pic.getId();
         if (id == null) {
             picService.save(pic);
-            return pic;
         } else {
-            // 检查是否有一样的图片, 没有则删除源文件。有则不删除
-            String md5 = StringUtils.isBlank(pic.getMd5()) ? picService.getById(id).getMd5() : pic.getMd5();
-            long count = picService.count(Wrappers.lambdaQuery(pic).eq(TbPicPojo::getMd5, md5));
-            // 只有一个关联, 删除
-            if (count == 1) {
-                consumer.accept(md5);
-            }
+            removePicFile(pic);
             picService.updateById(pic);
-            return pic;
         }
+        return pic;
+    }
+    
+    public void removePicFile(TbPicPojo pic) {
+        removePicFile(pic, null);
+    }
+    
+    /**
+     * 删除封面文件，如果有其他关联数据则不删除
+     *
+     * @param pic      封面数据
+     * @param consumer 删除文件
+     */
+    public void removePicFile(TbPicPojo pic, Consumer<String> consumer) {
+        // 检查是否有一样的图片, 没有则删除源文件。有则不删除
+        TbPicPojo tbPicPojo = StringUtils.isBlank(pic.getMd5()) && StringUtils.isBlank(pic.getUrl()) ? picService.getById(pic.getId()) : pic;
+        long count = picService.count(Wrappers.lambdaQuery(pic).eq(TbPicPojo::getMd5, tbPicPojo.getMd5()));
+        // 只有一个关联, 删除文件
+        if (count == 1 && consumer != null) {
+            // 删除封面
+            log.debug("remove pic md5: {}", tbPicPojo.getUrl());
+            consumer.accept(tbPicPojo.getUrl());
+        }
+    }
+    
+    /**
+     * 删除封面数据
+     *
+     * @param pic 封面
+     */
+    public void removePic(TbPicPojo pic) {
+        this.removePicFile(pic);
+        // 删除数据库
+        picService.removeById(pic.getId());
     }
     
     /**

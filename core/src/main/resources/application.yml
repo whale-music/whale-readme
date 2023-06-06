@@ -80,8 +80,8 @@ save-config:
     - /test/img
     - /img
   assign-img-save: 0
-  # 请求地址(必须)
-  host: http://localhost:5244
+  # 请求地址(必须) 不要填写localhost and 127.0.0.1
+  host: http://192.168.2.4:5244
   # 账户(必须)
   access-key: admin
   # 密码(必须)
@@ -89,7 +89,7 @@ save-config:
 
 jwt-config:
   seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c
-  expire-time: 86400000
+  expire-time: 86_400_000
 
 file-type:
   suffix:
@@ -97,19 +97,37 @@ file-type:
     - ogg
     - flac
 
+# 网络请求配置
 http-request:
+  # 超时设置，最好设置大一些。否则上传文件很容易超时
   timeout: 6_000
-  temp-path: ./data/pic
+  # 上传缓存目录
+  temp-path: ./data/cache
 
+# web前端路径映射
 web-mapping:
   path: /web/index.html
 
+# 默认参数
 default-info:
-  # http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
-  default-pic: https://i.ibb.co/NLGThpw/wallhaven-9mjoy1.png
-  music-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
-  # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
-  play-list-pic: http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
-  album-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
+  # 保存时，自动简繁转换
+  # default 不自动, 默认保存
+  # cn 所有名字自动保存简体
+  # tc 所有名字自动保存繁体
+  name:
+    artist: default
+    music: default
+    album: default
+  pic:
+    # 如果封面没有值则返回此链接
+    # http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    default-pic: https://i.ibb.co/NLGThpw/wallhaven-9mjoy1.png
+    # 音乐没有封面则默认使用此链接
+    music-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
+    # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    # 歌单默认封面
+    play-list-pic: http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    # 专辑默认封面
+    album-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
 
 

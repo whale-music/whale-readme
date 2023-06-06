@@ -7,10 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
-import org.core.config.DefaultInfo;
-import org.core.iservice.TbAlbumService;
-import org.core.iservice.TbCollectService;
-import org.core.iservice.TbMusicService;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.pojo.TbMusicUrlPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +22,6 @@ public class MediaRetrievalApi {
     private QukuAPI qukuService;
     
     @Autowired
-    private TbAlbumService albumService;
-    
-    @Autowired
-    private TbMusicService musicService;
-    
-    @Autowired
-    private TbCollectService collectService;
-    
-    @Autowired
     private DefaultInfo defaultInfo;
     
     public String getCoverArt(SubsonicCommonReq req, Long id) {
@@ -42,7 +30,7 @@ public class MediaRetrievalApi {
         if (StringUtils.isNotBlank(picUrl)) {
             return picUrl;
         }
-        return defaultInfo.getDefaultPic();
+        return defaultInfo.getPic().getDefaultPic();
     }
     
     public String stream(SubsonicCommonReq req, Long id) {

@@ -17,9 +17,9 @@ import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.utils.MyPageUtil;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.DefaultInfo;
 import org.core.config.PlayListTypeConfig;
 import org.core.iservice.*;
 import org.core.model.convert.ArtistConvert;
@@ -439,7 +439,7 @@ public class PlayListApi {
     
     public TbCollectPojo createPlayList(String name) {
         TbPicPojo pic = new TbPicPojo();
-        pic.setUrl(defaultInfo.getPlayListPic());
+        pic.setUrl(defaultInfo.getPic().getPlayListPic());
         TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(pic);
         return qukuService.createPlayList(UserUtil.getUser().getId(), name, tbPicPojo.getId(), PlayListTypeConfig.ORDINARY);
     }

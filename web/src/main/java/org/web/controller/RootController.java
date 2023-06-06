@@ -1,6 +1,6 @@
 package org.web.controller;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.core.common.constant.WebMappingConstant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -8,11 +8,14 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 public class RootController {
     
-    @Value("${web-mapping}")
-    private String webMapping;
+    private final WebMappingConstant webMappingConstant;
+    
+    public RootController(WebMappingConstant webMappingConstant) {
+        this.webMappingConstant = webMappingConstant;
+    }
     
     @GetMapping("/")
     public ModelAndView web() {
-        return new ModelAndView(webMapping);
+        return new ModelAndView(webMappingConstant.getPath());
     }
 }

@@ -2,6 +2,7 @@ package org.oss.service.impl.alist.util;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.*;
 import cn.hutool.log.Log;
@@ -11,21 +12,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.jetbrains.annotations.NotNull;
-import org.oss.service.impl.alist.model.address.DataItem;
-import org.oss.service.impl.alist.model.address.MusicAddressReq;
-import org.oss.service.impl.alist.model.address.MusicAddressRes;
 import org.oss.service.impl.alist.model.list.ContentItem;
 import org.oss.service.impl.alist.model.list.MusicListReq;
 import org.oss.service.impl.alist.model.list.MusicListRes;
 import org.oss.service.impl.alist.model.login.req.LoginReq;
 import org.oss.service.impl.alist.model.login.res.DataRes;
 import org.oss.service.impl.alist.model.login.res.LoginRes;
+import org.oss.service.impl.alist.model.remove.req.Remove;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class RequestUtils {
     
@@ -38,9 +34,11 @@ public class RequestUtils {
      * 通用请求
      */
     @NotNull
-    private static String req(String host, String body, Map<String, List<String>> headers) {
-        try (HttpResponse execute = HttpUtil.createPost(host).body(body).header(headers).execute()) {
+    private static String req(String host, String body, Map<String, String> headers) {
+        try (HttpResponse execute = HttpUtil.createPost(host).body(body).headerMap(headers, true).execute()) {
             return execute.body();
+        } catch (IORuntimeException e) {
+            throw new BaseException(ResultCode.OSS_CONNECT_ERROR);
         } catch (HttpException e) {
             throw new HttpException("http请求失败" + e);
         }
@@ -65,21 +63,10 @@ public class RequestUtils {
         }
     }
     
-    
-    public static String getMusicAddress(String host, String objectSave, String path) {
-        MusicAddressReq musicAddressReq = new MusicAddressReq();
-        musicAddressReq.setPath('/' + objectSave + '/' + path);
-        try {
-            String resStr = req(host + "/api/fs/get", JSON.toJSONString(musicAddressReq), null);
-            MusicAddressRes res = JSON.parseObject(resStr, MusicAddressRes.class);
-            return Optional.ofNullable(res.getData()).orElse(new DataItem()).getSign();
-        } catch (Exception e) {
-            log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
-        }
-    }
-    
-    public static List<ContentItem> list(String host, String objectSave, Map<String, List<String>> headers) {
+    public static List<ContentItem> list(String host, String objectSave, String loginCacheStr) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", loginCacheStr);
+        
         MusicListReq musicListReq = new MusicListReq();
         musicListReq.setPath('/' + objectSave);
         musicListReq.setPage(1);
@@ -107,17 +94,9 @@ public class RequestUtils {
     public static String upload(String host, String objectSaveConfig, File srcFile, String loginJwtCache) {
         String url = objectSaveConfig + "/" + srcFile.getName();
         String musicAddress = URLEncodeUtil.encodeAll(url);
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Accept", "application/json, text/plain, */*");
-        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
-        headers.put("Authorization", loginJwtCache);
-        headers.put("Connection", "keep-alive");
+        HashMap<String, String> headers = getHeaders(host, objectSaveConfig, loginJwtCache);
         headers.put("File-Path", musicAddress);
-        headers.put("Origin", host);
-        headers.put("Password", "");
-        headers.put("Referer", host + objectSaveConfig);
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
-    
+        
         String resJson = req(host + "/api/fs/form", srcFile, headers);
         JSONObject parseObject = JSON.parseObject(resJson);
         if (!StringUtils.equals(String.valueOf(parseObject.get("code")), String.valueOf(200))) {
@@ -125,5 +104,32 @@ public class RequestUtils {
         }
         log.debug("上传成功: {},地址: {}", srcFile.getName(), url);
         return FileUtil.getName(srcFile.getName());
+    }
+    
+    @NotNull
+    private static HashMap<String, String> getHeaders(String host, String path, String loginJwtCache) {
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json, text/plain, */*");
+        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        headers.put("Authorization", loginJwtCache);
+        headers.put("Connection", "keep-alive");
+        headers.put("Origin", host);
+        headers.put("Password", "");
+        headers.put("Referer", host + path);
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
+        return headers;
+    }
+    
+    public static void delete(String host, String path, String name, String loginCacheStr) {
+        HashMap<String, String> headers = getHeaders(host, path, loginCacheStr);
+        
+        Remove remove = new Remove();
+        remove.setDir(path);
+        remove.setNames(Collections.singletonList(name));
+        String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
+        Object code = JSONObject.parseObject(req).get("code");
+        if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
+            throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+        }
     }
 }

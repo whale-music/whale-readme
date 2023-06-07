@@ -80,8 +80,8 @@ save-config:
     - /test/img
     - /img
   assign-img-save: 0
-  # 请求地址(必须) 不要填写localhost and 127.0.0.1
-  host: http://192.168.2.4:5244
+  # 请求地址(必须) 除非debug, 否则不要填写localhost and 127.0.0.1
+  host: http://localhost:5244
   # 账户(必须)
   access-key: admin
   # 密码(必须)

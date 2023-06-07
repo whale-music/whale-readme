@@ -433,7 +433,8 @@ public class PlayListApi {
         TbCollectPojo byId = collectService.getById(id);
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(byId, convert);
-        convert.setPicUrl(qukuService.getPicUrl(byId.getPicId()));
+        String picUrl = qukuService.getPicUrl(byId.getPicId());
+        convert.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         return convert;
     }
     

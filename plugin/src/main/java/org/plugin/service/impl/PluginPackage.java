@@ -2,7 +2,7 @@ package org.plugin.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.common.service.QukuAPI;
 import org.core.iservice.TbPluginMsgService;

@@ -9,10 +9,7 @@ import org.core.model.convert.CollectConvert;
 import org.core.model.convert.MusicConvert;
 import org.core.pojo.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public interface QukuService {
@@ -276,6 +273,15 @@ public interface QukuService {
     void addLabel(Short target, Long id, String label);
     
     /**
+     * 批量添加tag
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param labels 标签名
+     */
+    void addLabel(Short target, Long id, List<String> labels);
+    
+    /**
      * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
      *
      * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
@@ -283,6 +289,22 @@ public interface QukuService {
      * @param labelId 标签ID
      */
     void addLabel(Short target, Long id, Long labelId);
+    
+    /**
+     * 批量添加tag
+     *
+     * @param target   指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id       歌单或歌曲前ID
+     * @param labelIds 标签ID
+     */
+    void addLabel(Short target, Long id, Set<Long> labelIds);
+    
+    /**
+     * 删除全部tag
+     *
+     * @param id 音乐，歌单， 专辑
+     */
+    void removeLabelAll(Long id);
     
     /**
      * 删除歌单或音乐中的tag
@@ -345,6 +367,14 @@ public interface QukuService {
     
     default void addMusicLabel(Long id, String label) {
         this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, label);
+    }
+    
+    default void addMusicLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, labels);
+    }
+    
+    default void addAlbumLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConfig.TARGET_ALBUM_GENRE, id, labels);
     }
     
     default void addMusicLabel(Long id, Long labelId) {
@@ -424,4 +454,11 @@ public interface QukuService {
      * 删除封面数据, 包括文件和数据库
      */
     void removePic(TbPicPojo pic);
+    
+    /**
+     * 删除封面数据, 包括文件和数据库
+     */
+    void removePic(List<TbPicPojo> pic);
+    
+    void removePicIds(List<Long> pic);
 }

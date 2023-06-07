@@ -9,9 +9,9 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.req.AlbumReq;
-import org.api.admin.model.req.ArtistReq;
-import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.upload.AlbumInfoReq;
+import org.api.admin.model.req.upload.ArtistInfoReq;
+import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
@@ -104,7 +104,7 @@ class TestSaveMusicList {
         dto.setUserId(userId);
     
         // 专辑
-        AlbumReq album = new AlbumReq();
+        AlbumInfoReq album = new AlbumInfoReq();
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = RequestMusic163.getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
@@ -128,11 +128,11 @@ class TestSaveMusicList {
         dto.setPic(pic);
         
         // 歌手
-        ArrayList<ArtistReq> singer = new ArrayList<>();
+        ArrayList<ArtistInfoReq> singer = new ArrayList<>();
         JSONArray ar = MapUtil.get(song, "ar", JSONArray.class);
         for (Object arItem : ar) {
             JSONObject arItemMap = (JSONObject) arItem;
-            ArtistReq artistPojo = new ArtistReq();
+            ArtistInfoReq artistPojo = new ArtistInfoReq();
             Map<String, Object> data = new HashMap<>();
             Long id = MapUtil.getLong(arItemMap, "id");
             if (id != null && id != 0) {

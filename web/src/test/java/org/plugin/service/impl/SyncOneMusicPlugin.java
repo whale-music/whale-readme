@@ -13,9 +13,9 @@ import com.alibaba.fastjson2.JSON;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.req.AlbumReq;
-import org.api.admin.model.req.ArtistReq;
-import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.upload.AlbumInfoReq;
+import org.api.admin.model.req.upload.ArtistInfoReq;
+import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.config.PluginType;
 import org.core.model.convert.PicConvert;
 import org.core.pojo.MusicDetails;
@@ -139,13 +139,15 @@ class SyncOneMusicPlugin implements CommonPlugin {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
-        
+    
         // 专辑
-        AlbumReq album = new AlbumReq();
+        AlbumInfoReq album = new AlbumInfoReq();
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-        album.setPicUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
+        PicConvert picConvert1 = new PicConvert();
+        picConvert1.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
+        album.setPic(picConvert1);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -165,11 +167,11 @@ class SyncOneMusicPlugin implements CommonPlugin {
         dto.setPic(pic);
     
         // 歌手
-        ArrayList<ArtistReq> singer = new ArrayList<>();
+        ArrayList<ArtistInfoReq> singer = new ArrayList<>();
         JSONArray ar = MapUtil.get(song, "ar", JSONArray.class);
         for (Object arItem : ar) {
             JSONObject arItemMap = (JSONObject) arItem;
-            ArtistReq artistPojo = new ArtistReq();
+            ArtistInfoReq artistPojo = new ArtistInfoReq();
             Map<String, Object> data = new HashMap<>();
             Long id = MapUtil.getLong(arItemMap, "id");
             if (id != null && id != 0) {

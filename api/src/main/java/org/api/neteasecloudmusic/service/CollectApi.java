@@ -208,13 +208,13 @@ public class CollectApi {
                 // 添加到中间表
                 TbMiddleTagPojo e = new TbMiddleTagPojo();
                 e.setTagId(tbTagPojo.getId());
-                e.setId(collectId);
+                e.setMiddleId(collectId);
                 saveCollectTagPojoList.add(e);
             } else {
                 // 已有tag信息, 直接使用tag id
                 TbMiddleTagPojo e = new TbMiddleTagPojo();
                 e.setTagId(tagPojo.getId());
-                e.setId(collectId);
+                e.setMiddleId(collectId);
                 saveCollectTagPojoList.add(e);
             }
         }

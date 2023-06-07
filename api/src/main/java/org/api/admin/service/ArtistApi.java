@@ -12,6 +12,7 @@ import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.iservice.TbArtistService;
@@ -35,6 +36,9 @@ public class ArtistApi {
     
     @Autowired
     private QukuAPI qukuService;
+    
+    @Autowired
+    private DefaultInfo defaultInfo;
     
     /**
      * 设置分页查询排序
@@ -114,7 +118,8 @@ public class ArtistApi {
         TbArtistPojo pojo = artistService.getById(id);
         BeanUtils.copyProperties(pojo, artistInfoRes);
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
-        artistInfoRes.setPicUrl(qukuService.getPicUrl(pojo.getPicId()));
+        String picUrl = qukuService.getPicUrl(pojo.getPicId());
+        artistInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
         List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);
         artistInfoRes.setAlbumList(albumListByArtistIds);

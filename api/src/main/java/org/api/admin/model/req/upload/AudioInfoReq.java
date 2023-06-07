@@ -1,4 +1,4 @@
-package org.api.admin.model.req;
+package org.api.admin.model.req.upload;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -34,10 +34,10 @@ public class AudioInfoReq {
     private String type;
     
     @ApiModelProperty("歌手")
-    private List<ArtistReq> artists;
+    private List<ArtistInfoReq> artists;
     
     @ApiModelProperty("专辑")
-    private AlbumReq album;
+    private AlbumInfoReq album;
     
     @ApiModelProperty("音乐歌词")
     private String lyric;

@@ -31,9 +31,13 @@ public class TbMiddleTagPojo implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    @ApiModelProperty("中间ID, 包括歌曲，歌单，专辑")
-    @TableId(value = "id", type = IdType.NONE)
+    @ApiModelProperty("id")
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
+    
+    @ApiModelProperty("中间ID, 包括歌曲，歌单，专辑")
+    @TableField(value = "middle_id")
+    private Long middleId;
     
     @ApiModelProperty("tag ID")
     @TableField("tag_id")

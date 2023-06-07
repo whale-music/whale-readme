@@ -78,13 +78,22 @@ public class QukuAPI extends QukuServiceImpl {
         OSSService ossService = OSSFactory.ossFactory(config);
         String[] split = pic.getUrl().split("\\.");
         String suffix = split[split.length - 1];
+    
+        // 下载封面, 保存文件名为md5
         String randomName = System.currentTimeMillis() + "" + RandomUtils.nextLong();
         String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName + "." + suffix;
-        File fileFromUrl = HttpUtil.downloadFileFromUrl(pic.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
-        String md5Hex = DigestUtil.md5Hex(fileFromUrl);
-        File rename = FileUtil.rename(fileFromUrl, md5Hex, true, true);
-        String upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
-        FileUtil.del(fileFromUrl);
+        String md5Hex;
+        String upload;
+        File rename = null;
+        try {
+            File fileFromUrl = HttpUtil.downloadFileFromUrl(pic.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
+            md5Hex = DigestUtil.md5Hex(fileFromUrl);
+            rename = FileUtil.rename(fileFromUrl, md5Hex, true, true);
+            // 删除文件
+            upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+        } finally {
+            FileUtil.del(rename);
+        }
         pic.setMd5(md5Hex);
         pic.setUrl(upload);
         return super.saveOrUpdatePic(pic);
@@ -99,6 +108,30 @@ public class QukuAPI extends QukuServiceImpl {
         // 删除歌曲文件
         OSSService ossService = OSSFactory.ossFactory(config);
         super.removePicFile(pic, ossService::delete);
+    }
+    
+    /**
+     * @param pic      封面数据
+     * @param consumer 删除封面文件
+     */
+    @Override
+    public void removePicFile(List<TbPicPojo> pic, Consumer<List<String>> consumer) {
+        // 删除歌曲文件
+        OSSService ossService = OSSFactory.ossFactory(config);
+        super.removePicFile(pic, ossService::delete);
+    }
+    
+    /**
+     * 批量删除封面文件
+     *
+     * @param picIds   封面
+     * @param consumer 删除文件
+     */
+    @Override
+    public void removePicFile(Collection<Long> picIds, Consumer<List<String>> consumer) {
+        // 删除歌曲文件
+        OSSService ossService = OSSFactory.ossFactory(config);
+        super.removePicFile(picIds, ossService::delete);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {

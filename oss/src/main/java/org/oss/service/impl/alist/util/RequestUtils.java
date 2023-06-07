@@ -22,6 +22,7 @@ import org.oss.service.impl.alist.model.remove.req.Remove;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RequestUtils {
     
@@ -120,16 +121,18 @@ public class RequestUtils {
         return headers;
     }
     
-    public static void delete(String host, String path, String name, String loginCacheStr) {
-        HashMap<String, String> headers = getHeaders(host, path, loginCacheStr);
-        
-        Remove remove = new Remove();
-        remove.setDir(path);
-        remove.setNames(Collections.singletonList(name));
-        String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
-        Object code = JSONObject.parseObject(req).get("code");
-        if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
-            throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+    public static void delete(String host, Map<String, ArrayList<ContentItem>> item, String loginCacheStr) {
+        for (Map.Entry<String, ArrayList<ContentItem>> entry : item.entrySet()) {
+            HashMap<String, String> headers = getHeaders(host, entry.getKey(), loginCacheStr);
+            
+            Remove remove = new Remove();
+            remove.setDir(entry.getKey());
+            remove.setNames(entry.getValue().parallelStream().map(ContentItem::getName).collect(Collectors.toList()));
+            String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
+            Object code = JSONObject.parseObject(req).get("code");
+            if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
+                throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+            }
         }
     }
 }

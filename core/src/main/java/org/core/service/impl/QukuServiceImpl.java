@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
@@ -42,6 +43,7 @@ import java.util.stream.Stream;
 @Service("QukuService")
 @Slf4j
 public class QukuServiceImpl implements QukuService {
+    public static final Object lock = new Object();
     
     @Autowired
     private TbMusicService musicService;
@@ -588,9 +590,12 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<MusicConvert> getMusicListByArtistId(Long id) {
         List<TbMusicArtistPojo> musicArtistPojos = musicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery()
-                                                                                   .in(TbMusicArtistPojo::getArtistId, id));
+                                                                                   .eq(TbMusicArtistPojo::getArtistId, id));
+        if (CollUtil.isEmpty(musicArtistPojos)) {
+            return Collections.emptyList();
+        }
         List<Long> collect = musicArtistPojos.parallelStream().map(TbMusicArtistPojo::getMusicId).collect(Collectors.toList());
-        
+    
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, collect));
         return getMusicConvertList(list, getPicUrl(list.parallelStream().map(TbMusicPojo::getPicId).collect(Collectors.toList())));
     }
@@ -716,18 +721,23 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removePlayList(Long userId, Collection<Long> collectList) {
+        if (CollUtil.isEmpty(collectList)) {
+            return;
+        }
         List<TbCollectPojo> tbCollectPojos = collectService.listByIds(collectList);
         for (TbCollectPojo tbCollectPojo : tbCollectPojos) {
             checkUserAuth(userId, tbCollectPojo);
         }
-        // 删除歌单关联ID
-        collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, collectList));
         // 删除歌单ID
         collectService.removeByIds(collectList);
+        // 删除封面
+        removePicIds(tbCollectPojos.parallelStream().map(TbCollectPojo::getPicId).collect(Collectors.toList()));
+        // 删除歌单关联ID
+        collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, collectList));
         // 删除歌单关联tag
         middleTagService.remove(Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                         .eq(TbMiddleTagPojo::getType, TargetTagConfig.TARGET_COLLECT_TAG)
-                                        .in(TbMiddleTagPojo::getId, collectList));
+                                        .in(TbMiddleTagPojo::getMiddleId, collectList));
     }
     
     /**
@@ -787,33 +797,123 @@ public class QukuServiceImpl implements QukuService {
     public void addLabel(Short target, Long id, String label) {
         TbTagPojo tagPojo = tagService.getOne(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, label));
         Optional<TbTagPojo> pojo = Optional.ofNullable(tagPojo);
-        tagPojo = pojo.orElse(new TbTagPojo());
-        if (pojo.isPresent()) {
-            tagPojo.setTagName(label);
-            tagService.saveOrUpdate(tagPojo);
-        }
+        tagPojo = pojo.orElseGet(() -> {
+            TbTagPojo entity = new TbTagPojo();
+            entity.setTagName(label);
+            tagService.saveOrUpdate(entity);
+            return entity;
+        });
         addLabel(target, id, tagPojo.getId());
     }
     
     /**
-     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     * 批量添加tag
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param labels 标签名
+     */
+    @Override
+    public void addLabel(Short target, Long id, List<String> labels) {
+        List<TbTagPojo> list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, labels));
+        Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
+        for (String label : labels) {
+            if (collect.get(label) == null) {
+                TbTagPojo entity = new TbTagPojo();
+                entity.setTagName(label);
+                list.add(entity);
+            }
+        }
+        tagService.saveOrUpdateBatch(list);
+        Set<Long> tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
+        addLabel(target, id, tagIds);
+        
+    }
+    
+    /**
+     * 添加歌单，音乐tag， 或者指定音乐流派
      *
      * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
-     * @param id      歌单或歌曲前ID
+     * @param id      歌单, 专辑或歌曲ID
      * @param labelId 标签ID
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addLabel(Short target, Long id, Long labelId) {
+        // 添加标签
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
-                                                         .eq(TbMiddleTagPojo::getId, id);
+                                                         .eq(TbMiddleTagPojo::getTagId, labelId)
+                                                         .eq(TbMiddleTagPojo::getMiddleId, id);
         TbMiddleTagPojo one = middleTagService.getOne(eq);
         one = Optional.ofNullable(one).orElse(new TbMiddleTagPojo());
-        one.setId(id);
+        one.setMiddleId(id);
         one.setTagId(labelId);
         one.setType(target);
         middleTagService.save(one);
+    }
+    
+    /**
+     * 批量添加tag
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param tagIds 标签ID
+     */
+    @Override
+    public void addLabel(Short target, Long id, Set<Long> tagIds) {
+        LambdaQueryWrapper<TbMiddleTagPojo> in = Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tagIds);
+        List<TbMiddleTagPojo> list = middleTagService.list(in);
+        Map<Long, TbMiddleTagPojo> collect = list.parallelStream()
+                                                 .collect(Collectors.toMap(TbMiddleTagPojo::getTagId, tbMiddleTagPojo -> tbMiddleTagPojo));
+        List<TbMiddleTagPojo> middleTagPojos = new ArrayList<>();
+        for (Long labelId : tagIds) {
+            if (collect.get(labelId) == null) {
+                TbMiddleTagPojo entity = new TbMiddleTagPojo();
+                entity.setTagId(labelId);
+                entity.setMiddleId(id);
+                entity.setType(target);
+                middleTagPojos.add(entity);
+            }
+        }
+        middleTagService.saveOrUpdateBatch(middleTagPojos);
+    }
+    
+    /**
+     * 删除全部tag
+     *
+     * @param id 音乐，歌单， 专辑
+     */
+    @Override
+    public void removeLabelAll(Long id) {
+        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
+        List<TbMiddleTagPojo> tagPojoList = middleTagService.list(eq);
+        if (CollUtil.isEmpty(tagPojoList)) {
+            return;
+        }
+        
+        List<Long> tempTagList = tagPojoList.parallelStream().map(TbMiddleTagPojo::getTagId).collect(Collectors.toList());
+        List<TbMiddleTagPojo> list;
+        synchronized (lock) {
+            list = middleTagService.list(Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tempTagList));
+        }
+        Map<Long, ArrayList<TbMiddleTagPojo>> arrayListMap = list.parallelStream()
+                                                                 .collect(Collectors.toMap(TbMiddleTagPojo::getId,
+                                                                         ListUtil::toList,
+                                                                         (objects, objects2) -> {
+                                                                             objects2.addAll(objects);
+                                                                             return objects2;
+                                                                         }));
+        ArrayList<Long> tagIds = new ArrayList<>();
+        for (Map.Entry<Long, ArrayList<TbMiddleTagPojo>> longArrayListEntry : arrayListMap.entrySet()) {
+            // 无关联的tag直接删除
+            if (longArrayListEntry.getValue().size() == 1) {
+                tagIds.add(longArrayListEntry.getValue().get(0).getTagId());
+            }
+        }
+        middleTagService.remove(eq);
+        tagService.removeByIds(tagIds);
+        
     }
     
     /**
@@ -828,7 +928,7 @@ public class QukuServiceImpl implements QukuService {
     public void removeLabelById(Short target, Long id, Collection<Long> labelBatchId) {
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
-                                                         .eq(TbMiddleTagPojo::getId, id)
+                                                         .eq(TbMiddleTagPojo::getMiddleId, id)
                                                          .in(TbMiddleTagPojo::getTagId, labelBatchId);
         middleTagService.remove(eq);
     }
@@ -966,12 +1066,7 @@ public class QukuServiceImpl implements QukuService {
         musicUrlService.remove(queryWrapper);
         // 删除Tag中间表
         middleTagService.removeBatchByIds(musicId);
-        for (TbMusicPojo musicPojo : musicList) {
-            // 删除音乐封面
-            TbPicPojo pic = new TbPicPojo();
-            pic.setId(musicPojo.getPicId());
-            removePic(pic);
-        }
+        removePicIds(musicList.parallelStream().map(TbMusicPojo::getPicId).collect(Collectors.toList()));
     }
     
     
@@ -996,6 +1091,12 @@ public class QukuServiceImpl implements QukuService {
         // 检测专辑是否包括音乐
         List<MusicConvert> musicListByAlbumId = getMusicListByAlbumId(id);
         if (CollUtil.isEmpty(musicListByAlbumId) || Boolean.TRUE.equals(compel)) {
+            // 删除封面
+            List<TbAlbumPojo> albumPojoList = albumService.listByIds(id);
+            List<Long> collect = albumPojoList.parallelStream().map(TbAlbumPojo::getPicId).filter(Objects::nonNull).collect(Collectors.toList());
+            removePicIds(collect);
+            // 删除tag
+            albumPojoList.stream().map(TbAlbumPojo::getId).filter(Objects::nonNull).forEach(this::removeLabelAll);
             albumService.removeByIds(id);
         } else {
             throw new BaseException(ResultCode.ALBUM_MUSIC_EXIST_ERROR);
@@ -1019,7 +1120,6 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(id)) {
             return;
         }
-    
         Wrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, id);
         long count = artistService.count(wrapper);
         if (count == 0) {
@@ -1027,6 +1127,9 @@ public class QukuServiceImpl implements QukuService {
         }
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, id);
         albumArtistService.remove(in);
+        List<TbArtistPojo> tbArtistPojos = artistService.listByIds(id);
+        // 删除封面
+        removePicIds(tbArtistPojos.parallelStream().map(TbArtistPojo::getPicId).collect(Collectors.toList()));
         artistService.remove(wrapper);
     }
     
@@ -1145,14 +1248,22 @@ public class QukuServiceImpl implements QukuService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
-        Long id = pic.getId();
-        if (id == null) {
-            picService.save(pic);
+        // 查询是否存在
+        TbPicPojo one = picService.getOne(Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pic.getMd5()));
+        if (one == null) {
+            // 新增或更新
+            // 查看是否可以删除无关联的封面
+            if (pic.getId() != null) {
+                // 更新封面时删除试图删除没有关联的封面
+                TbPicPojo pic1 = new TbPicPojo();
+                pic1.setId(pic.getId());
+                removePic(pic1);
+            }
+            picService.saveOrUpdate(pic);
+            return pic;
         } else {
-            removePicFile(pic);
-            picService.updateById(pic);
+            return one;
         }
-        return pic;
     }
     
     public void removePicFile(TbPicPojo pic) {
@@ -1168,13 +1279,66 @@ public class QukuServiceImpl implements QukuService {
     public void removePicFile(TbPicPojo pic, Consumer<String> consumer) {
         // 检查是否有一样的图片, 没有则删除源文件。有则不删除
         TbPicPojo tbPicPojo = StringUtils.isBlank(pic.getMd5()) && StringUtils.isBlank(pic.getUrl()) ? picService.getById(pic.getId()) : pic;
-        long count = picService.count(Wrappers.lambdaQuery(pic).eq(TbPicPojo::getMd5, tbPicPojo.getMd5()));
-        // 只有一个关联, 删除文件
-        if (count == 1 && consumer != null) {
-            // 删除封面
-            log.debug("remove pic md5: {}", tbPicPojo.getUrl());
-            consumer.accept(tbPicPojo.getUrl());
+        if (tbPicPojo == null) {
+            return;
         }
+        // 同时只能获取一个，防止幻读
+        synchronized (lock) {
+            List<TbPicPojo> list = picService.list(Wrappers.lambdaQuery(pic).eq(TbPicPojo::getMd5, tbPicPojo.getMd5()));
+            // 只有一个关联, 删除文件
+            if (list.size() <= 1 && consumer != null) {
+                // 删除封面
+                log.debug("remove pic md5: {}", tbPicPojo.getUrl());
+                consumer.accept(tbPicPojo.getUrl());
+                picService.removeByIds(list.parallelStream().map(TbPicPojo::getId).collect(Collectors.toList()));
+            }
+        }
+    }
+    
+    /**
+     * 批量删除封面文件
+     *
+     * @param pic      封面
+     * @param consumer 删除文件
+     */
+    public void removePicFile(Collection<Long> pic, Consumer<List<String>> consumer) {
+        if (CollUtil.isEmpty(pic)) {
+            return;
+        }
+        List<TbPicPojo> picPojoList = picService.listByIds(pic);
+        removePicFile(ListUtil.toList(picPojoList), consumer);
+    }
+    
+    /**
+     * 批量删除封面文件
+     *
+     * @param picPojoList 封面
+     * @param consumer    删除文件
+     */
+    public void removePicFile(List<TbPicPojo> picPojoList, Consumer<List<String>> consumer) {
+        // 同时只能获取一个，防止幻读
+        ArrayList<Long> longs = new ArrayList<>();
+        Map<Long, ArrayList<TbPicPojo>> collect;
+        synchronized (lock) {
+            collect = picPojoList.parallelStream()
+                                 .collect(Collectors.toMap(TbPicPojo::getId,
+                                         ListUtil::toList,
+                                         (o1, o2) -> {
+                                             o2.addAll(o1);
+                                             return o2;
+                                         }));
+        }
+        for (Map.Entry<Long, ArrayList<TbPicPojo>> entry : collect.entrySet()) {
+            // 只有一个关联, 删除文件
+            if (entry.getValue().size() <= 1 && consumer != null) {
+                // 删除封面
+                log.debug("remove pic md5: {}", ArrayUtils.toString(entry.getValue()));
+                consumer.accept(entry.getValue().parallelStream().map(TbPicPojo::getUrl).collect(Collectors.toList()));
+                longs.addAll(entry.getValue().parallelStream().map(TbPicPojo::getId).collect(Collectors.toList()));
+            }
+        }
+        // 删除数据库
+        picService.removeByIds(longs);
     }
     
     /**
@@ -1184,8 +1348,26 @@ public class QukuServiceImpl implements QukuService {
      */
     public void removePic(TbPicPojo pic) {
         this.removePicFile(pic);
+    }
+    
+    /**
+     * 删除封面数据, 包括文件和数据库
+     *
+     * @param pic 封面数据
+     */
+    @Override
+    public void removePic(List<TbPicPojo> pic) {
+        removePicFile(pic, null);
         // 删除数据库
-        picService.removeById(pic.getId());
+        picService.removeByIds(pic);
+    }
+    
+    /**
+     * @param pic 封面数据
+     */
+    @Override
+    public void removePicIds(List<Long> pic) {
+        removePicFile(pic, null);
     }
     
     /**

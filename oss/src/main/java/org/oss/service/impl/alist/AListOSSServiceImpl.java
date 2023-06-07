@@ -3,6 +3,7 @@ package org.oss.service.impl.alist;
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -19,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AListOSSServiceImpl implements OSSService {
     
@@ -90,11 +92,8 @@ public class AListOSSServiceImpl implements OSSService {
                 item = musicUrltimedCache.get(name);
             }
             // 没有找到文件直接抛出异常
-            if (item == null) {
+            if (item == null || StringUtils.isBlank(item.getPath())) {
                 throw new BaseException(ResultCode.DATA_NONE.getCode(), ResultCode.DATA_NONE.getResultMsg() + ": " + name);
-            }
-            if (StringUtils.isBlank(item.getPath())) {
-                throw new BaseException();
             }
             return String.format("%s/d/%s/%s?sign=%s", config.getHost(), item.getPath(), name, item.getSign());
         } catch (BaseException e) {
@@ -208,12 +207,26 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     @Override
-    public boolean delete(String name) {
-        isExist(name);
+    public boolean delete(List<String> name) {
+        try {
+            // 忽略无文件错误
+            isExist(name.get(0));
+        } catch (BaseException e) {
+            if (StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+                return false;
+            } else {
+                throw new BaseException(e.getErrorCode(), e.getErrorMsg());
+            }
+        }
         String loginCacheStr = getLoginJwtCache(config);
         // 音乐地址URL缓存
-        ContentItem item = musicUrltimedCache.get(name);
-        RequestUtils.delete(config.getHost(), item.getPath(), name, loginCacheStr);
+        Map<String, ArrayList<ContentItem>> collect = name.parallelStream()
+                                                          .map(musicUrltimedCache::get)
+                                                          .collect(Collectors.toMap(ContentItem::getPath, ListUtil::toList, (objects, objects2) -> {
+                                                              objects2.addAll(objects);
+                                                              return objects2;
+                                                          }));
+        RequestUtils.delete(config.getHost(), collect, loginCacheStr);
         return true;
     }
 }

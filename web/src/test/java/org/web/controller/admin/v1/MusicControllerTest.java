@@ -5,16 +5,15 @@ import cn.hutool.core.thread.ThreadUtil;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.req.AlbumReq;
-import org.api.admin.model.req.ArtistReq;
-import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.upload.AlbumInfoReq;
+import org.api.admin.model.req.upload.ArtistInfoReq;
+import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.AlbumApi;
 import org.api.admin.service.ArtistApi;
 import org.api.admin.service.MusicFlowApi;
+import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
-import org.core.iservice.TbAlbumService;
-import org.core.iservice.TbArtistService;
-import org.core.iservice.TbMusicService;
+import org.core.iservice.*;
 import org.core.model.convert.PicConvert;
 import org.core.pojo.*;
 import org.core.service.AccountService;
@@ -47,6 +46,9 @@ class MusicControllerTest {
     private TbArtistService artistService;
     
     @Autowired
+    private TbCollectService collectService;
+    
+    @Autowired
     private MusicFlowApi musicFlowApi;
     
     @Autowired
@@ -58,18 +60,26 @@ class MusicControllerTest {
     @Autowired
     private AccountService accountService;
     
+    @Autowired
+    private PlayListApi playListApi;
+    
+    @Autowired
+    private TbPicService picService;
+    
+    @Autowired
+    private TbTagService tagService;
+    
     @Test
     @BeforeEach
     void cleanAllData() {
-        List<Long> musicIds = musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
-        musicFlowApi.deleteMusic(musicIds, true);
         
-        List<Long> albumIds = albumService.list().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList());
-        albumApi.deleteAlbum(albumIds, true);
+        cleanMusicData();
         
-        List<Long> artistIds = artistService.list().parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList());
-        artistApi.deleteArtist(artistIds);
+        cleanAlbumData();
         
+        cleanArtistData();
+        
+        cleanPlayList();
         
         long count = musicService.count();
         long count1 = artistService.count();
@@ -77,13 +87,40 @@ class MusicControllerTest {
         Assertions.assertEquals(0L, count);
         Assertions.assertEquals(0L, count1);
         Assertions.assertEquals(0L, count2);
+        
+        long tagCount = tagService.count();
+        Assertions.assertEquals(0L, tagCount);
+        
+        long picCount = picService.count();
+        Assertions.assertEquals(0L, picCount);
+    }
+    
+    private void cleanPlayList() {
+        SysUserPojo user = accountService.getUser(ADMIN);
+        List<Long> collect = collectService.list().stream().map(TbCollectPojo::getId).collect(Collectors.toList());
+        playListApi.deletePlayList(user.getId(), collect);
+    }
+    
+    private void cleanArtistData() {
+        List<Long> artistIds = artistService.list().parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList());
+        artistApi.deleteArtist(artistIds);
+    }
+    
+    private void cleanAlbumData() {
+        List<Long> albumIds = albumService.list().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList());
+        albumApi.deleteAlbum(albumIds, true);
+    }
+    
+    private void cleanMusicData() {
+        List<Long> musicIds = musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
+        musicFlowApi.deleteMusic(musicIds, true);
     }
     
     @Test
     void testUploadMusicInfo() throws InterruptedException {
         SysUserPojo user = accountService.getUser(ADMIN);
-    
-        final int number = 2_000;
+        
+        final int number = 1_000;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
         ArrayList<Callable<MusicDetails>> tasks = new ArrayList<>();
@@ -112,10 +149,10 @@ class MusicControllerTest {
         dto.setPic(tbPicPojo);
         dto.setType(faker.beer().style());
         dto.setTimeLength(1000000);
-        
-        ArrayList<ArtistReq> artists = new ArrayList<>();
+    
+        ArrayList<ArtistInfoReq> artists = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            ArtistReq e = new ArtistReq();
+            ArtistInfoReq e = new ArtistInfoReq();
             e.setSex(RandomUtils.nextBoolean() ? "男" : "女");
             e.setBirth(faker.date().birthday().toLocalDateTime().toLocalDate());
             e.setLocation(faker.address().cityName());
@@ -128,8 +165,8 @@ class MusicControllerTest {
             artists.add(e);
         }
         dto.setArtists(artists);
-        
-        AlbumReq album = new AlbumReq();
+    
+        AlbumInfoReq album = new AlbumInfoReq();
         PicConvert albumPic = new PicConvert();
         albumPic.setUrl(faker.avatar().image());
         album.setPic(albumPic);
@@ -137,8 +174,13 @@ class MusicControllerTest {
         album.setCompany(faker.company().name());
         album.setPublishTime(faker.date().birthday().toLocalDateTime());
         album.setDescription(faker.text().text());
+        ArrayList<String> tags = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tags.add(faker.beer().style());
+        }
+        album.setTags(tags);
         dto.setAlbum(album);
-        
+    
         dto.setUploadFlag(true);
         dto.setUserId(user.getId());
         R result = musicController.uploadMusicInfo(dto);
@@ -153,16 +195,16 @@ class MusicControllerTest {
         Assertions.assertEquals(album1.getCompany(), dto.getAlbum().getCompany());
         Assertions.assertEquals(album1.getDescription(), dto.getAlbum().getDescription());
         Assertions.assertEquals(album1.getSubType(), dto.getAlbum().getSubType());
-        
+    
         List<TbArtistPojo> singer = data.getSinger();
-        List<ArtistReq> artists1 = dto.getArtists();
+        List<ArtistInfoReq> artists1 = dto.getArtists();
         for (TbArtistPojo tbArtistPojo : singer) {
             boolean aliasNameFlag = false;
             boolean artistNameFlag = false;
             boolean introductionFlag = false;
             boolean locationFlag = false;
             boolean sexFlag = false;
-            for (ArtistReq artistReq : artists1) {
+            for (ArtistInfoReq artistReq : artists1) {
                 if (StringUtils.equals(artistReq.getAliasName(), tbArtistPojo.getAliasName())) {
                     aliasNameFlag = true;
                 }

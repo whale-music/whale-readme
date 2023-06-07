@@ -4,6 +4,7 @@ import org.core.config.SaveConfig;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public interface OSSService {
@@ -53,5 +54,9 @@ public interface OSSService {
     String upload(List<String> paths, Integer index, File srcFile, String md5);
     
     // 删除文件
-    boolean delete(String name);
+    boolean delete(List<String> name);
+    
+    default boolean delete(String name) {
+        return delete(Collections.singletonList(name));
+    }
 }

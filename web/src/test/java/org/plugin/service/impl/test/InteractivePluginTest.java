@@ -12,8 +12,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import org.api.admin.model.req.ArtistReq;
-import org.api.admin.model.req.AudioInfoReq;
+import org.api.admin.model.req.upload.ArtistInfoReq;
+import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.model.convert.PicConvert;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.converter.PluginLabelValue;
@@ -152,8 +152,8 @@ public class InteractivePluginTest implements ComboSearchPlugin {
     
             AudioInfoReq dto = new AudioInfoReq();
             dto.setMusicName(jsonObject.getObject("title", String.class));
-            ArrayList<ArtistReq> artists = new ArrayList<>();
-            ArtistReq artistReq = new ArtistReq();
+            ArrayList<ArtistInfoReq> artists = new ArrayList<>();
+            ArtistInfoReq artistReq = new ArtistInfoReq();
             artistReq.setArtistName(jsonObject.getObject("author", String.class));
             artists.add(artistReq);
             dto.setArtists(artists);

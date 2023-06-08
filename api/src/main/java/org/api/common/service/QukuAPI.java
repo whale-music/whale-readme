@@ -14,11 +14,14 @@ import org.core.config.SaveConfig;
 import org.core.pojo.TbMusicUrlPojo;
 import org.core.pojo.TbPicPojo;
 import org.core.service.impl.QukuServiceImpl;
+import org.core.utils.ImageTypeUtils;
 import org.oss.factory.OSSFactory;
 import org.oss.service.OSSService;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -66,7 +69,7 @@ public class QukuAPI extends QukuServiceImpl {
     }
     
     /**
-     * 保存封面
+     * 保存或更新封面
      *
      * @param pic 封面
      */
@@ -76,49 +79,34 @@ public class QukuAPI extends QukuServiceImpl {
             return new TbPicPojo();
         }
         OSSService ossService = OSSFactory.ossFactory(config);
-        String[] split = pic.getUrl().split("\\.");
-        String suffix = split[split.length - 1];
-    
         // 下载封面, 保存文件名为md5
         String randomName = System.currentTimeMillis() + "" + RandomUtils.nextLong();
-        String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName + "." + suffix;
+        String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName;
         String md5Hex;
         String upload;
         File rename = null;
         try {
             File fileFromUrl = HttpUtil.downloadFileFromUrl(pic.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
-            rename = FileUtil.rename(fileFromUrl, md5Hex, true, true);
+            try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
+                rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
+            }
             // 删除文件
             upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+        } catch (Exception e) {
+            throw new BaseException(e.getMessage());
         } finally {
-            FileUtil.del(rename);
+            if (rename != null) {
+                log.debug("删除缓存文件{}", rename.getName());
+                FileUtil.del(rename);
+            }
         }
         pic.setMd5(md5Hex);
         pic.setUrl(upload);
         return super.saveOrUpdatePic(pic);
-    }
-    
-    /**
-     * @param pic      封面数据
-     * @param consumer 删除封面文件
-     */
-    @Override
-    public void removePicFile(TbPicPojo pic, Consumer<String> consumer) {
-        // 删除歌曲文件
-        OSSService ossService = OSSFactory.ossFactory(config);
-        super.removePicFile(pic, ossService::delete);
-    }
-    
-    /**
-     * @param pic      封面数据
-     * @param consumer 删除封面文件
-     */
-    @Override
-    public void removePicFile(List<TbPicPojo> pic, Consumer<List<String>> consumer) {
-        // 删除歌曲文件
-        OSSService ossService = OSSFactory.ossFactory(config);
-        super.removePicFile(pic, ossService::delete);
     }
     
     /**
@@ -128,7 +116,7 @@ public class QukuAPI extends QukuServiceImpl {
      * @param consumer 删除文件
      */
     @Override
-    public void removePicFile(Collection<Long> picIds, Consumer<List<String>> consumer) {
+    protected void removePicFile(Collection<Long> picIds, Consumer<List<String>> consumer) {
         // 删除歌曲文件
         OSSService ossService = OSSFactory.ossFactory(config);
         super.removePicFile(picIds, ossService::delete);

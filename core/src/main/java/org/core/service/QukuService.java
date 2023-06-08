@@ -453,12 +453,10 @@ public interface QukuService {
     /**
      * 删除封面数据, 包括文件和数据库
      */
-    void removePic(TbPicPojo pic);
+    void removePic(Long id);
     
     /**
-     * 删除封面数据, 包括文件和数据库
+     * 批量根据ID删除封面数据
      */
-    void removePic(List<TbPicPojo> pic);
-    
-    void removePicIds(List<Long> pic);
+    void removePicIds(List<Long> picIds);
 }

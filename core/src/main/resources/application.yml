@@ -100,7 +100,7 @@ file-type:
 # 网络请求配置
 http-request:
   # 超时设置，最好设置大一些。否则上传文件很容易超时
-  timeout: 6_000
+  timeout: 60_000
   # 上传缓存目录
   temp-path: ./data/cache
 

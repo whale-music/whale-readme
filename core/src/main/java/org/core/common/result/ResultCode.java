@@ -88,6 +88,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_REMOVE_ERROR("50014", "删除失败"),
     
     OSS_CONNECT_ERROR("50015", "访问存储错误，请检查存储"),
+    IMG_DOWNLOAD_ERROR("50016", "下载封面错误"),
     
     
     /* 接口错误：60001-69999 */

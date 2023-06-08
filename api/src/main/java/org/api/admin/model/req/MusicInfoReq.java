@@ -37,12 +37,6 @@ public class MusicInfoReq implements Serializable {
     @ApiModelProperty("专辑")
     private Long albumId;
     
-    @ApiModelProperty("专辑")
-    private String albumName;
-    
-    @ApiModelProperty(value = "数据排序", example = "true: ASC, false: DESC")
-    private Boolean order;
-    
     @ApiModelProperty("歌曲时长")
     private Integer timeLength;
     

@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
@@ -44,6 +43,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class QukuServiceImpl implements QukuService {
     public static final Object lock = new Object();
+    public static final Object addLabelLock = new Object();
+    public static final Object removeLabelLock = new Object();
     
     @Autowired
     private TbMusicService musicService;
@@ -815,19 +816,23 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public void addLabel(Short target, Long id, List<String> labels) {
-        List<TbTagPojo> list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, labels));
-        Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
-        for (String label : labels) {
-            if (collect.get(label) == null) {
-                TbTagPojo entity = new TbTagPojo();
-                entity.setTagName(label);
-                list.add(entity);
+        // 新增tag
+        List<TbTagPojo> list;
+        synchronized (addLabelLock) {
+            list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, labels));
+            Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
+            for (String label : labels) {
+                if (collect.get(label) == null) {
+                    TbTagPojo entity = new TbTagPojo();
+                    entity.setTagName(label);
+                    list.add(entity);
+                }
             }
+            tagService.saveOrUpdateBatch(list);
         }
-        tagService.saveOrUpdateBatch(list);
         Set<Long> tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
+        // 关联到对应ID
         addLabel(target, id, tagIds);
-        
     }
     
     /**
@@ -886,34 +891,30 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public void removeLabelAll(Long id) {
-        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
-        List<TbMiddleTagPojo> tagPojoList = middleTagService.list(eq);
-        if (CollUtil.isEmpty(tagPojoList)) {
-            return;
-        }
-        
-        List<Long> tempTagList = tagPojoList.parallelStream().map(TbMiddleTagPojo::getTagId).collect(Collectors.toList());
-        List<TbMiddleTagPojo> list;
-        synchronized (lock) {
-            list = middleTagService.list(Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tempTagList));
-        }
-        Map<Long, ArrayList<TbMiddleTagPojo>> arrayListMap = list.parallelStream()
-                                                                 .collect(Collectors.toMap(TbMiddleTagPojo::getId,
-                                                                         ListUtil::toList,
-                                                                         (objects, objects2) -> {
-                                                                             objects2.addAll(objects);
-                                                                             return objects2;
-                                                                         }));
-        ArrayList<Long> tagIds = new ArrayList<>();
-        for (Map.Entry<Long, ArrayList<TbMiddleTagPojo>> longArrayListEntry : arrayListMap.entrySet()) {
-            // 无关联的tag直接删除
-            if (longArrayListEntry.getValue().size() == 1) {
-                tagIds.add(longArrayListEntry.getValue().get(0).getTagId());
+        synchronized (removeLabelLock) {
+            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
+            List<TbMiddleTagPojo> tagPojoList = middleTagService.list(eq);
+            if (CollUtil.isEmpty(tagPojoList)) {
+                return;
             }
+            Map<Long, ArrayList<TbMiddleTagPojo>> arrayListMap = tagPojoList.parallelStream()
+                                                                            .collect(Collectors.toMap(TbMiddleTagPojo::getId,
+                                                                                    ListUtil::toList,
+                                                                                    (objects, objects2) -> {
+                                                                                        objects2.addAll(objects);
+                                                                                        return objects2;
+                                                                                    }));
+            ArrayList<Long> tagIds = new ArrayList<>();
+            for (Map.Entry<Long, ArrayList<TbMiddleTagPojo>> longArrayListEntry : arrayListMap.entrySet()) {
+                // 无关联的tag直接删除
+                if (longArrayListEntry.getValue().size() == 1) {
+                    tagIds.add(longArrayListEntry.getValue().get(0).getTagId());
+                }
+            }
+            middleTagService.remove(eq);
+            tagService.removeByIds(tagIds);
         }
-        middleTagService.remove(eq);
-        tagService.removeByIds(tagIds);
-        
+    
     }
     
     /**
@@ -1066,6 +1067,7 @@ public class QukuServiceImpl implements QukuService {
         musicUrlService.remove(queryWrapper);
         // 删除Tag中间表
         middleTagService.removeBatchByIds(musicId);
+        // 删除封面
         removePicIds(musicList.parallelStream().map(TbMusicPojo::getPicId).collect(Collectors.toList()));
     }
     
@@ -1128,9 +1130,9 @@ public class QukuServiceImpl implements QukuService {
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, id);
         albumArtistService.remove(in);
         List<TbArtistPojo> tbArtistPojos = artistService.listByIds(id);
+        artistService.remove(wrapper);
         // 删除封面
         removePicIds(tbArtistPojos.parallelStream().map(TbArtistPojo::getPicId).collect(Collectors.toList()));
-        artistService.remove(wrapper);
     }
     
     /**
@@ -1248,126 +1250,89 @@ public class QukuServiceImpl implements QukuService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
-        // 查询是否存在
-        TbPicPojo one = picService.getOne(Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pic.getMd5()));
-        if (one == null) {
+        TbPicPojo one;
+        synchronized (lock) {
             // 新增或更新
-            // 查看是否可以删除无关联的封面
-            if (pic.getId() != null) {
-                // 更新封面时删除试图删除没有关联的封面
-                TbPicPojo pic1 = new TbPicPojo();
-                pic1.setId(pic.getId());
-                removePic(pic1);
+            one = picService.getOne(Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pic.getMd5()));
+            // 新增封面时，增加关联数据
+            // ID相同则表示更新不增加数量
+            if (one != null && !Objects.equals(one.getId(), pic.getId())) {
+                int count = one.getCount();
+                count++;
+                one.setCount(count);
+                picService.updateById(one);
             }
-            picService.saveOrUpdate(pic);
+        }
+        if (one == null) {
+            picService.save(pic);
             return pic;
         } else {
+            if (pic.getId() != null && !Objects.equals(pic.getId(), one.getId())) {
+                // 更新封面时删除试图删除没有关联的封面
+                removePic(pic.getId());
+            }
             return one;
         }
     }
     
-    public void removePicFile(TbPicPojo pic) {
-        removePicFile(pic, null);
-    }
-    
-    /**
-     * 删除封面文件，如果有其他关联数据则不删除
-     *
-     * @param pic      封面数据
-     * @param consumer 删除文件
-     */
-    public void removePicFile(TbPicPojo pic, Consumer<String> consumer) {
-        // 检查是否有一样的图片, 没有则删除源文件。有则不删除
-        TbPicPojo tbPicPojo = StringUtils.isBlank(pic.getMd5()) && StringUtils.isBlank(pic.getUrl()) ? picService.getById(pic.getId()) : pic;
-        if (tbPicPojo == null) {
-            return;
-        }
-        // 同时只能获取一个，防止幻读
-        synchronized (lock) {
-            List<TbPicPojo> list = picService.list(Wrappers.lambdaQuery(pic).eq(TbPicPojo::getMd5, tbPicPojo.getMd5()));
-            // 只有一个关联, 删除文件
-            if (list.size() <= 1 && consumer != null) {
-                // 删除封面
-                log.debug("remove pic md5: {}", tbPicPojo.getUrl());
-                consumer.accept(tbPicPojo.getUrl());
-                picService.removeByIds(list.parallelStream().map(TbPicPojo::getId).collect(Collectors.toList()));
-            }
-        }
-    }
-    
     /**
      * 批量删除封面文件
      *
-     * @param pic      封面
+     * @param picIds   封面
      * @param consumer 删除文件
      */
-    public void removePicFile(Collection<Long> pic, Consumer<List<String>> consumer) {
-        if (CollUtil.isEmpty(pic)) {
-            return;
+    protected void removePicFile(Collection<Long> picIds, Consumer<List<String>> consumer) {
+        ArrayList<TbPicPojo> removePicList = new ArrayList<>();
+        List<TbPicPojo> updatePicList = new ArrayList<>();
+        List<TbPicPojo> tbPicPojos = picService.listByIds(picIds);
+        
+        Map<Long, TbPicPojo> collect = tbPicPojos.stream().collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo, (v1, v2) -> v2));
+        for (Long picId : picIds) {
+            if (picId == null) {
+                continue;
+            }
+            TbPicPojo tbPicPojo = collect.get(picId);
+            int count = tbPicPojo.getCount();
+            count--;
+            tbPicPojo.setCount(count);
+            
         }
-        List<TbPicPojo> picPojoList = picService.listByIds(pic);
-        removePicFile(ListUtil.toList(picPojoList), consumer);
-    }
-    
-    /**
-     * 批量删除封面文件
-     *
-     * @param picPojoList 封面
-     * @param consumer    删除文件
-     */
-    public void removePicFile(List<TbPicPojo> picPojoList, Consumer<List<String>> consumer) {
-        // 同时只能获取一个，防止幻读
-        ArrayList<Long> longs = new ArrayList<>();
-        Map<Long, ArrayList<TbPicPojo>> collect;
-        synchronized (lock) {
-            collect = picPojoList.parallelStream()
-                                 .collect(Collectors.toMap(TbPicPojo::getId,
-                                         ListUtil::toList,
-                                         (o1, o2) -> {
-                                             o2.addAll(o1);
-                                             return o2;
-                                         }));
-        }
-        for (Map.Entry<Long, ArrayList<TbPicPojo>> entry : collect.entrySet()) {
-            // 只有一个关联, 删除文件
-            if (entry.getValue().size() <= 1 && consumer != null) {
+        for (Map.Entry<Long, TbPicPojo> longTbPicPojoEntry : collect.entrySet()) {
+            // 只有无关联文件, 删除文件
+            TbPicPojo picPojo = longTbPicPojoEntry.getValue();
+            if (picPojo.getCount() <= 0) {
                 // 删除封面
-                log.debug("remove pic md5: {}", ArrayUtils.toString(entry.getValue()));
-                consumer.accept(entry.getValue().parallelStream().map(TbPicPojo::getUrl).collect(Collectors.toList()));
-                longs.addAll(entry.getValue().parallelStream().map(TbPicPojo::getId).collect(Collectors.toList()));
+                log.debug("remove pic md5: {}", picPojo);
+                // 删除数据库
+                removePicList.add(picPojo);
+            } else {
+                updatePicList.add(picPojo);
             }
         }
-        // 删除数据库
-        picService.removeByIds(longs);
+        if (CollUtil.isNotEmpty(removePicList)) {
+            picService.removeByIds(removePicList.parallelStream().map(TbPicPojo::getId).collect(Collectors.toList()));
+            consumer.accept(removePicList.parallelStream().map(TbPicPojo::getUrl).collect(Collectors.toList()));
+        }
+        if (CollUtil.isNotEmpty(updatePicList)) {
+            picService.saveOrUpdateBatch(updatePicList);
+        }
     }
     
     /**
      * 删除封面数据
      *
-     * @param pic 封面
+     * @param id 封面
      */
-    public void removePic(TbPicPojo pic) {
-        this.removePicFile(pic);
+    public void removePic(Long id) {
+        this.removePicFile(Collections.singletonList(id), null);
     }
     
     /**
-     * 删除封面数据, 包括文件和数据库
-     *
-     * @param pic 封面数据
+     * @param picIds 封面数据
      */
     @Override
-    public void removePic(List<TbPicPojo> pic) {
-        removePicFile(pic, null);
-        // 删除数据库
-        picService.removeByIds(pic);
-    }
-    
-    /**
-     * @param pic 封面数据
-     */
-    @Override
-    public void removePicIds(List<Long> pic) {
-        removePicFile(pic, null);
+    public void removePicIds(List<Long> picIds) {
+        removePicFile(picIds, null);
     }
     
     /**

@@ -20,6 +20,7 @@ import org.core.iservice.TbArtistService;
 import org.core.model.convert.AlbumConvert;
 import org.core.model.convert.ArtistConvert;
 import org.core.model.convert.MusicConvert;
+import org.core.model.convert.PicConvert;
 import org.core.pojo.TbAlbumArtistPojo;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
@@ -196,7 +197,12 @@ public class AlbumApi {
         if (req.getId() == null && StringUtils.isBlank(req.getAlbumName())) {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
-        req.setPicId(qukuService.saveOrUpdatePic(req.getPicConvert()).getId());
         albumService.saveOrUpdate(req);
+        PicConvert picConvert = req.getPicConvert();
+        if (req.getPicId() != null) {
+            picConvert.setId(req.getPicId());
+        }
+        req.setPicId(qukuService.saveOrUpdatePic(picConvert).getId());
+        albumService.updateById(req);
     }
 }

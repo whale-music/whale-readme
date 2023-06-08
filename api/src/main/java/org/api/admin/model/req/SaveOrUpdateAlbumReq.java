@@ -11,5 +11,4 @@ import org.core.model.convert.PicConvert;
 @NoArgsConstructor
 public class SaveOrUpdateAlbumReq extends AlbumConvert {
     private PicConvert picConvert;
-    
 }

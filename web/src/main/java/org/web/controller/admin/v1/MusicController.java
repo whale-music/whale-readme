@@ -139,7 +139,7 @@ public class MusicController {
      */
     @PostMapping
     public R updateMusic(@RequestBody MusicInfoReq req) {
-        uploadMusic.updateMusic(req);
+        uploadMusic.saveOrUpdateMusic(req);
         return R.success();
     }
     

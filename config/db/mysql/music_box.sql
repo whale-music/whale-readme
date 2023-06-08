@@ -111,7 +111,7 @@ create table if not exists tb_collect
     id             bigint               not null comment '歌单表ID'
         primary key,
     play_list_name varchar(256)         not null comment '歌单名（包括用户喜爱歌单）',
-    pic            bigint               null comment '封面地址ID',
+    pic_id         bigint               null comment '封面地址ID',
     type           tinyint              not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单',
     subscribed     tinyint(1) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
     description    varchar(512)         null comment '简介',
@@ -258,14 +258,17 @@ create index tb_music_url_size_index
 
 create table if not exists tb_pic
 (
-    id          bigint       not null
+    id          bigint        not null
         primary key,
-    url         varchar(512) not null comment '音乐网络地址，或路径',
-    md5         char(32)     not null,
-    update_time datetime     not null comment '更新时间',
-    create_time datetime     not null comment '创建时间',
+    url         varchar(512)  not null comment '音乐网络地址，或路径',
+    md5         char(32)      not null,
+    count       int default 1 not null,
+    update_time datetime      not null comment '更新时间',
+    create_time datetime      not null comment '创建时间',
     constraint id
-        unique (id)
+        unique (id),
+    constraint md5
+        unique (md5)
 )
     comment '音乐专辑歌单封面表';
 
@@ -360,11 +363,11 @@ create table if not exists tb_schedule_task
 
 create table if not exists tb_tag
 (
-    id          bigint      not null
+    id          bigint       not null
         primary key,
-    tag_name    varchar(20) null comment '风格（标签）',
-    create_time datetime    null comment '创建时间',
-    update_time datetime    null comment '修改时间',
+    tag_name    varchar(128) null comment '风格（标签）',
+    create_time datetime     null comment '创建时间',
+    update_time datetime     null comment '修改时间',
     constraint id
         unique (id)
 )
@@ -372,9 +375,10 @@ create table if not exists tb_tag
 
 create table if not exists tb_middle_tag
 (
-    id     bigint  not null comment '中间ID, 包括歌曲，歌单，专辑',
-    tag_id bigint  not null comment 'tag ID',
-    type   tinyint not null comment '0流派, 1歌曲tag, 2歌单tag',
+    id        bigint  not null comment '中间ID, 包括歌曲，歌单，专辑',
+    middle_id bigint  not null comment '中间键',
+    tag_id    bigint  not null comment 'tag ID',
+    type      tinyint not null comment '0流派, 1歌曲tag, 2歌单tag',
     primary key (id, tag_id),
     constraint tb_collect_tag_tb_tag_id_fk
         foreign key (tag_id) references tb_tag (id)

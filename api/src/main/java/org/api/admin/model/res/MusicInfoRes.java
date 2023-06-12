@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.core.model.convert.ArtistConvert;
+import org.core.model.convert.PicConvert;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class MusicInfoRes implements Serializable {
     private String musicNameAlias;
     
     @ApiModelProperty("封面")
-    private String pic;
+    private PicConvert pic;
     
     @ApiModelProperty("歌手名ID")
     private List<ArtistConvert> musicArtist;

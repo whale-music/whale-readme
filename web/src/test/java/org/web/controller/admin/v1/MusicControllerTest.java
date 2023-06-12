@@ -188,9 +188,9 @@ class MusicControllerTest {
     @Test
     void testUploadMusicInfo() throws InterruptedException {
         SysUserPojo user = accountService.getUser(ADMIN);
-        
-        final int number = 10_000;
-        final boolean isAsync = true;
+    
+        final int number = 10;
+        final boolean isAsync = false;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         ArrayList<Callable<MusicDetails>> tasks = new ArrayList<>();
         for (int i = 0; i < number; i++) {

@@ -795,7 +795,10 @@ public class MusicFlowApi {
         musicInfoRes.setAlbumName(albumPojo.getAlbumName());
         musicInfoRes.setAlbumId(albumPojo.getId());
         BeanUtils.copyProperties(byId, musicInfoRes);
-        musicInfoRes.setPic(qukuService.getPicUrl(byId.getPicId()));
+        PicConvert pic = new PicConvert();
+        pic.setId(byId.getPicId());
+        pic.setUrl(qukuService.getPicUrl(byId.getPicId()));
+        musicInfoRes.setPic(pic);
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
     }

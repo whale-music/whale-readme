@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.core.model.convert.PicConvert;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
@@ -28,7 +27,7 @@ public class AudioInfoReq {
     private List<String> aliaName;
     
     @ApiModelProperty("音乐封面")
-    private PicConvert pic;
+    private String pic;
     
     @ApiModelProperty("音乐类型")
     private String type;

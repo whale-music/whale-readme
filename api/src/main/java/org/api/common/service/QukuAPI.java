@@ -71,12 +71,14 @@ public class QukuAPI extends QukuServiceImpl {
     /**
      * 保存或更新封面
      *
-     * @param pic 封面
+     * @param id   添加封面关联ID,
+     * @param type 添加ID类型 歌曲，专辑，歌单，歌手
+     * @param pojo 封面数据
      */
     @Override
-    public TbPicPojo saveOrUpdatePic(TbPicPojo pic) {
-        if (StringUtils.isBlank(pic.getUrl())) {
-            return new TbPicPojo();
+    public void saveOrUpdatePic(Long id, Short type, TbPicPojo pojo) {
+        if (StringUtils.isBlank(pojo.getUrl())) {
+            throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
         OSSService ossService = OSSFactory.ossFactory(config);
         // 下载封面, 保存文件名为md5
@@ -86,7 +88,7 @@ public class QukuAPI extends QukuServiceImpl {
         String upload;
         File rename = null;
         try {
-            File fileFromUrl = HttpUtil.downloadFileFromUrl(pic.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
+            File fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
             try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
                 rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
@@ -104,22 +106,22 @@ public class QukuAPI extends QukuServiceImpl {
                 FileUtil.del(rename);
             }
         }
-        pic.setMd5(md5Hex);
-        pic.setUrl(upload);
-        return super.saveOrUpdatePic(pic);
+        pojo.setMd5(md5Hex);
+        pojo.setUrl(upload);
+        super.saveOrUpdatePic(id, type, pojo);
     }
     
     /**
      * 批量删除封面文件
      *
-     * @param picIds   封面
+     * @param ids      封面
      * @param consumer 删除文件
      */
     @Override
-    protected void removePicFile(Collection<Long> picIds, Consumer<List<String>> consumer) {
+    protected void removePicFile(Collection<Long> ids, Consumer<List<String>> consumer) {
         // 删除歌曲文件
         OSSService ossService = OSSFactory.ossFactory(config);
-        super.removePicFile(picIds, ossService::delete);
+        super.removePicFile(ids, ossService::delete);
     }
     
     public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {

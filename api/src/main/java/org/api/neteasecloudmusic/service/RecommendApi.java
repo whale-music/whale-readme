@@ -108,7 +108,7 @@ public class RecommendApi {
             ResultItem e = new ResultItem();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getPicId()));
+            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
             e.setCanDislike(true);
             e.setTrackNumberUpdateTime(tbCollectPojo.getUpdateTime().getNano());
             result.add(e);
@@ -124,7 +124,7 @@ public class RecommendApi {
             DailyRecommendResourceRes e = new DailyRecommendResourceRes();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getPicId()));
+            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
             e.setPlaycount(3000L);
             e.setCreateTime((long) tbCollectPojo.getCreateTime().getNano());
             e.setUserId(tbCollectPojo.getUserId());

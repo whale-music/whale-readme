@@ -139,8 +139,8 @@ public class CollectApi {
     public TbCollectPojo createPlayList(Long userId, String name) {
         TbPicPojo pic = new TbPicPojo();
         pic.setUrl(defaultInfo.getPic().getPlayListPic());
-        TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(pic);
-        return qukuService.createPlayList(userId, name, tbPicPojo.getId(), Short.parseShort("0"));
+        qukuService.saveOrUpdateUserPic(userId, defaultInfo.getPic().getPlayListPic());
+        return qukuService.createPlayList(userId, name, Short.parseShort("0"));
     }
     
     /**
@@ -293,7 +293,7 @@ public class CollectApi {
         List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getPicId()));
+            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
         
@@ -382,7 +382,7 @@ public class CollectApi {
         Playlist playlist = new Playlist();
         playlist.setId(byId.getId());
         playlist.setName(byId.getPlayListName());
-        playlist.setCoverImgUrl(qukuService.getPicUrl(byId.getPicId()));
+        playlist.setCoverImgUrl(qukuService.getPicUrl(byId.getId()));
         playlist.setUpdateTime((long) byId.getUpdateTime().getNano());
         playlist.setDescription(byId.getDescription());
         

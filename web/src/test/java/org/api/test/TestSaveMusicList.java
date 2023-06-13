@@ -15,7 +15,6 @@ import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
-import org.core.model.convert.PicConvert;
 import org.core.pojo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,9 +108,8 @@ class TestSaveMusicList {
         Map<String, Object> albumDto = RequestMusic163.getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
     
-        PicConvert pic = new PicConvert();
-        pic.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
-        album.setPic(pic);
+        String blurPicUrl = MapUtil.getStr(albumDto, "blurPicUrl");
+        album.setPic(blurPicUrl);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -125,7 +123,7 @@ class TestSaveMusicList {
         JSONArray alia = MapUtil.get(song, "alias", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
-        dto.setPic(pic);
+        dto.setPic(blurPicUrl);
         
         // 歌手
         ArrayList<ArtistInfoReq> singer = new ArrayList<>();
@@ -150,9 +148,7 @@ class TestSaveMusicList {
             alias.addAll(transNames2.stream().map(String::valueOf).collect(Collectors.toList()));
             artistPojo.setAliasName(CollUtil.join(alias, ","));
             // 歌手封面
-            PicConvert avatarPic = new PicConvert();
-            avatarPic.setUrl(MapUtil.getStr(artist, "avatar"));
-            artistPojo.setPic(avatarPic);
+            artistPojo.setPicUrl(MapUtil.getStr(artist, "avatar"));
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");

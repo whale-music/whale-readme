@@ -20,7 +20,6 @@ import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.config.PlayListTypeConfig;
 import org.core.config.PluginType;
-import org.core.model.convert.PicConvert;
 import org.core.pojo.*;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
@@ -137,7 +136,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         // 保存音乐到本地数据库，并返回保存的音乐信息
         List<MusicDetails> musicPojoList = saveMusicInfoList(playDetail, cookie, localUserId);
         // 创建歌单
-        TbCollectPojo collectApiPlayList = pluginPackage.getQukuService().createPlayList(localUserId, playName, null, PlayListTypeConfig.ORDINARY);
+        TbCollectPojo collectApiPlayList = pluginPackage.getQukuService().createPlayList(localUserId, playName, PlayListTypeConfig.ORDINARY);
         pluginPackage.logInfo("创建歌单成功: {}", playName);
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(musicIds)) {
@@ -212,9 +211,8 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-        PicConvert pic1 = new PicConvert();
-        pic1.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
-        album.setPic(pic1);
+        String blurPicUrl = MapUtil.getStr(albumDto, "blurPicUrl");
+        album.setPic(blurPicUrl);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -228,9 +226,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         JSONArray alia = MapUtil.get(song, "alia", JSONArray.class, new JSONArray());
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
-        PicConvert pic = new PicConvert();
-        pic.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
-        dto.setPic(pic);
+        dto.setPic(blurPicUrl);
     
         // 歌手
         ArrayList<ArtistInfoReq> singer = new ArrayList<>();
@@ -255,9 +251,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
             alias.addAll(transNames2.stream().map(String::valueOf).collect(Collectors.toList()));
             artistPojo.setAliasName(CollUtil.join(alias, ","));
             // 歌手封面
-            PicConvert pic2 = new PicConvert();
-            pic2.setUrl(MapUtil.getStr(artist, "avatar"));
-            artistPojo.setPic(pic2);
+            artistPojo.setPicUrl(MapUtil.getStr(artist, "avatar"));
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");

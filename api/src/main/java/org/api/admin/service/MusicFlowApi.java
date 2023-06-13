@@ -511,14 +511,12 @@ public class MusicFlowApi {
         // music 信息表
         tbMusicPojo.setMusicName(dto.getMusicName());
         tbMusicPojo.setAliasName(aliaNames);
-        PicConvert pic = dto.getPic();
-        pic.setId(tbMusicPojo.getPicId());
-        tbMusicPojo.setPicId(qukuService.saveOrUpdatePic(pic).getId());
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
         tbMusicPojo.setTimeLength(dto.getTimeLength());
         boolean save;
         // 保存音乐表
         save = musicService.saveOrUpdate(tbMusicPojo);
+        qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getPic());
         // 保存错误，抛出异常
         ExceptionUtil.isNull(!save, ResultCode.SAVE_FAIL);
         return tbMusicPojo;
@@ -544,7 +542,9 @@ public class MusicFlowApi {
         // 如果是数据库中已有数据，直接更新
         Long albumId = album.getId();
         if (albumId != null) {
-            album.setPicId(null);
+            if (StringUtils.isNotBlank(album.getPic())) {
+                qukuService.saveOrUpdateAlbumPic(albumId, album.getPic());
+            }
             albumService.updateById(album);
             return album;
         }
@@ -573,7 +573,6 @@ public class MusicFlowApi {
                                               .findFirst();
             albumPojo = first.orElseThrow(() -> new BaseException(ResultCode.ALBUM_ERROR));
             BeanUtils.copyProperties(album, albumPojo, "id", "updateTime", "createTime", "picId");
-            albumPojo.setPicId(null);
             // 更新专辑表
             albumService.updateById(albumPojo);
             return albumPojo;
@@ -638,16 +637,11 @@ public class MusicFlowApi {
                 if (StringUtils.equalsIgnoreCase(singerReq.getArtistName(), tbArtistPojo.getArtistName())) {
                     // 歌曲家名字相同，就把数据库中的ID拷贝到前端传入的数据中，直接更新数据库
                     pojo.setId(tbArtistPojo.getId());
-                    // copy pic ID 用作封面更新
-                    pojo.setPicId(tbArtistPojo.getPicId());
                 }
             }
             artistService.saveOrUpdate(pojo);
             // 更新封面
-            PicConvert pic = singerReq.getPic();
-            pic.setId(pojo.getPicId());
-            pojo.setPicId(qukuService.saveOrUpdatePic(pic).getId());
-            artistService.updateById(pojo);
+            qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPicUrl());
             saveBatch.add(pojo);
         }
         return saveBatch;
@@ -734,11 +728,8 @@ public class MusicFlowApi {
         musicService.saveOrUpdate(entity);
         
         // 更新封面
-        if (req.getPic().getId() == null) {
-            req.getPic().setId(entity.getPicId());
-        }
-        entity.setPicId(qukuService.saveOrUpdatePic(req.getPic()).getId());
         musicService.saveOrUpdate(entity);
+        qukuService.saveOrUpdateMusicPic(entity.getId(), req.getPic().getUrl());
         
         if (req.getId() != null) {
             entity = musicService.getById(req.getId());
@@ -796,8 +787,7 @@ public class MusicFlowApi {
         musicInfoRes.setAlbumId(albumPojo.getId());
         BeanUtils.copyProperties(byId, musicInfoRes);
         PicConvert pic = new PicConvert();
-        pic.setId(byId.getPicId());
-        pic.setUrl(qukuService.getPicUrl(byId.getPicId()));
+        pic.setUrl(qukuService.getPicUrl(byId.getId()));
         musicInfoRes.setPic(pic);
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
@@ -853,11 +843,7 @@ public class MusicFlowApi {
     
     private void saveAlbumPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
         // 更新或新增封面
-        Long picId = albumPojo.getPicId();
-        PicConvert pic = dto.getAlbum().getPic();
-        pic.setId(picId);
-        albumPojo.setPicId(qukuService.saveOrUpdatePic(pic).getId());
-        albumService.updateById(albumPojo);
+        qukuService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
     }
     
     private void saveAlbumTag(AudioInfoReq dto, TbAlbumPojo albumPojo) {

@@ -20,7 +20,6 @@ import org.core.iservice.TbArtistService;
 import org.core.model.convert.AlbumConvert;
 import org.core.model.convert.ArtistConvert;
 import org.core.model.convert.MusicConvert;
-import org.core.model.convert.PicConvert;
 import org.core.pojo.TbAlbumArtistPojo;
 import org.core.pojo.TbAlbumPojo;
 import org.core.pojo.TbArtistPojo;
@@ -106,17 +105,17 @@ public class AlbumApi {
             albumRes.setArtistList(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
             albumRes.setPicUrl(tbAlbumPojo.getPicUrl());
-        
+    
             // 获取专辑中所有歌手
             List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(tbAlbumPojo.getId());
             albumRes.setArtistList(artistConverts);
-        
+    
             // 获取专辑下歌曲数量
             albumRes.setAlbumSize(qukuService.getAlbumMusicCountByAlbumId(tbAlbumPojo.getId()).longValue());
-        
+    
             albumRes.setOrderBy(req.getOrderBy());
             albumRes.setOrder(req.getOrder());
-        
+    
             page.getRecords().add(albumRes);
         }
     
@@ -184,7 +183,7 @@ public class AlbumApi {
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
-        albumRes.setPicUrl(qukuService.getPicUrl(byId.getPicId()));
+        albumRes.setPicUrl(qukuService.getPicUrl(byId.getId()));
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
     }
@@ -198,11 +197,6 @@ public class AlbumApi {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         albumService.saveOrUpdate(req);
-        PicConvert picConvert = req.getPicConvert();
-        if (req.getPicId() != null) {
-            picConvert.setId(req.getPicId());
-        }
-        req.setPicId(qukuService.saveOrUpdatePic(picConvert).getId());
-        albumService.updateById(req);
+        qukuService.saveOrUpdateAlbumPic(req.getId(), req.getPicConvert().getUrl());
     }
 }

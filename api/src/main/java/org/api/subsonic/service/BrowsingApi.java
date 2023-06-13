@@ -119,7 +119,7 @@ public class BrowsingApi {
         song.setArtistId(String.valueOf(tbArtistPojo.getId()));
         song.setTrack(0);
         song.setYear(albumByAlbumId.getPublishTime().getYear());
-        song.setCoverArt(String.valueOf(musicPojo.getPicId()));
+        song.setCoverArt(String.valueOf(musicPojo.getId()));
         song.setSize(Math.toIntExact((tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize())));
         song.setContentType("audio/mpeg");
         song.setSuffix(tbMusicUrlPojo.getEncodeType());

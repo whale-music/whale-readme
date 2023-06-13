@@ -38,10 +38,6 @@ public class TbPicPojo implements Serializable {
     @TableField(value = "md5")
     private String md5;
     
-    @ApiModelProperty("封面关联数量")
-    @TableField(value = "count")
-    private Integer count;
-    
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

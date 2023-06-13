@@ -1,6 +1,6 @@
-package org.core.config;
+package org.core.common.constant;
 
-public class TargetTagConfig {
+public class TargetTagConstant {
     /**
      * 流派
      */
@@ -21,6 +21,6 @@ public class TargetTagConfig {
      */
     public static final Short TARGET_COLLECT_TAG = 2;
     
-    private TargetTagConfig() {
+    private TargetTagConstant() {
     }
 }

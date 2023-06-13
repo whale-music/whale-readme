@@ -189,8 +189,8 @@ class MusicControllerTest {
     void testUploadMusicInfo() throws InterruptedException {
         SysUserPojo user = accountService.getUser(ADMIN);
     
-        final int number = 10;
-        final boolean isAsync = false;
+        final int number = 10_00;
+        final boolean isAsync = true;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         ArrayList<Callable<MusicDetails>> tasks = new ArrayList<>();
         for (int i = 0; i < number; i++) {
@@ -222,9 +222,7 @@ class MusicControllerTest {
         AudioInfoReq dto = new AudioInfoReq();
         dto.setMusicName(faker.name().name());
         dto.setAliaName(Arrays.asList(faker.name().name(), faker.name().name()));
-        PicConvert tbPicPojo = new PicConvert();
-        tbPicPojo.setUrl(musicImg);
-        dto.setPic(tbPicPojo);
+        dto.setPic(musicImg);
         dto.setType(faker.beer().style());
         dto.setTimeLength(1000000);
         
@@ -237,17 +235,13 @@ class MusicControllerTest {
             e.setAliasName(faker.artist().name());
             e.setArtistName(faker.artist().name());
             e.setIntroduction(faker.text().text());
-            PicConvert artistPicPojo = new PicConvert();
-            artistPicPojo.setUrl(artistImg);
-            e.setPic(artistPicPojo);
+            e.setPicUrl(artistImg);
             artists.add(e);
         }
         dto.setArtists(artists);
         
         AlbumInfoReq album = new AlbumInfoReq();
-        PicConvert albumPic = new PicConvert();
-        albumPic.setUrl(albumImg);
-        album.setPic(albumPic);
+        album.setPic(albumImg);
         album.setAlbumName(faker.name().name());
         album.setCompany(faker.company().name());
         album.setPublishTime(faker.date().birthday().toLocalDateTime());

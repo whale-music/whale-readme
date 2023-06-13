@@ -76,7 +76,7 @@ public class ArtistApi {
     
         Artist artist = new Artist();
         TbArtistPojo singerPojo = singerService.getById(id);
-        String picUrl = qukuService.getPicUrl(singerPojo.getPicId());
+        String picUrl = qukuService.getPicUrl(singerPojo.getId());
         artist.setImg1v1Url(picUrl);
         artist.setId(singerPojo.getId());
         artist.setName(singerPojo.getArtistName());
@@ -102,7 +102,7 @@ public class ArtistApi {
             e.setId(tbAlbumPojo.getId());
             e.setName(tbAlbumPojo.getAlbumName());
             e.setCompany(tbAlbumPojo.getCompany());
-            String url = qukuService.getPicUrl(tbAlbumPojo.getPicId());
+            String url = qukuService.getPicUrl(tbAlbumPojo.getId());
             e.setPicUrl(url);
             e.setBlurPicUrl(url);
             e.setArtist(artist);
@@ -128,7 +128,7 @@ public class ArtistApi {
         org.api.neteasecloudmusic.model.vo.artist.artist.Artist artist = new org.api.neteasecloudmusic.model.vo.artist.artist.Artist();
         artist.setName(singerPojo.getArtistName());
         artist.setId(singerPojo.getId());
-        String picUrl = qukuService.getPicUrl(singerPojo.getPicId());
+        String picUrl = qukuService.getPicUrl(singerPojo.getId());
         artist.setPicUrl(picUrl);
         artist.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
         artist.setImg1v1IdStr(picUrl);

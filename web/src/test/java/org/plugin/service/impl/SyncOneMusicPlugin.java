@@ -17,7 +17,6 @@ import org.api.admin.model.req.upload.AlbumInfoReq;
 import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.config.PluginType;
-import org.core.model.convert.PicConvert;
 import org.core.pojo.MusicDetails;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
@@ -145,9 +144,8 @@ class SyncOneMusicPlugin implements CommonPlugin {
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-        PicConvert picConvert1 = new PicConvert();
-        picConvert1.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
-        album.setPic(picConvert1);
+        String blurPicUrl = MapUtil.getStr(albumDto, "blurPicUrl");
+        album.setPic(blurPicUrl);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
         album.setCompany(MapUtil.getStr(albumDto, "company"));
         Long publishTime = MapUtil.getLong(albumDto, "publishTime");
@@ -162,9 +160,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
         dto.setAliaName(alia.toList(String.class));
         dto.setTimeLength(MapUtil.getInt(song, "dt"));
     
-        PicConvert pic = new PicConvert();
-        pic.setUrl(MapUtil.getStr(albumDto, "blurPicUrl"));
-        dto.setPic(pic);
+        dto.setPic(blurPicUrl);
     
         // 歌手
         ArrayList<ArtistInfoReq> singer = new ArrayList<>();
@@ -190,9 +186,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
             artistPojo.setAliasName(CollUtil.join(alias, ","));
         
             // 歌手封面
-            PicConvert picConvert = new PicConvert();
-            picConvert.setUrl(MapUtil.getStr(artist, "avatar"));
-            artistPojo.setPic(picConvert);
+            artistPojo.setPicUrl(MapUtil.getStr(artist, "avatar"));
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");

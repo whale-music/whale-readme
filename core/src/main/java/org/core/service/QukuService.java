@@ -2,7 +2,8 @@ package org.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.core.config.TargetTagConfig;
+import org.core.common.constant.PicTypeConstant;
+import org.core.common.constant.TargetTagConstant;
 import org.core.model.convert.AlbumConvert;
 import org.core.model.convert.ArtistConvert;
 import org.core.model.convert.CollectConvert;
@@ -10,7 +11,6 @@ import org.core.model.convert.MusicConvert;
 import org.core.pojo.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public interface QukuService {
     
@@ -224,11 +224,10 @@ public interface QukuService {
      *
      * @param userId 用户ID
      * @param name   歌单名
-     * @param picId  封面ID
      * @param type   歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单
      * @return 歌单创建信息
      */
-    CollectConvert createPlayList(Long userId, String name, Long picId, short type);
+    CollectConvert createPlayList(Long userId, String name, short type);
     
     /**
      * 删除歌单
@@ -353,40 +352,40 @@ public interface QukuService {
      * @param labelName 需要删除的label ID
      */
     default void removeCollectLabelByName(Long id, Long labelName) {
-        removeLabelByName(TargetTagConfig.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
+        removeLabelByName(TargetTagConstant.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
     }
     
     
     default void addCollectLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConfig.TARGET_COLLECT_TAG, id, labelId);
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, labelId);
     }
     
     default void addCollectLabel(Long id, String label) {
-        this.addLabel(TargetTagConfig.TARGET_COLLECT_TAG, id, label);
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
     }
     
     default void addMusicLabel(Long id, String label) {
-        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, label);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
     }
     
     default void addMusicLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, labels);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
     }
     
     default void addAlbumLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConfig.TARGET_ALBUM_GENRE, id, labels);
+        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, labels);
     }
     
     default void addMusicLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConfig.TARGET_MUSIC_TAG, id, labelId);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labelId);
     }
     
     default void addMusicGenreLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConfig.TARGET_GENRE, id, labelId);
+        this.addLabel(TargetTagConstant.TARGET_GENRE, id, labelId);
     }
     
     default void addMusicGenreLabel(Long id, String label) {
-        this.addLabel(TargetTagConfig.TARGET_GENRE, id, label);
+        this.addLabel(TargetTagConstant.TARGET_GENRE, id, label);
     }
     
     /**
@@ -444,11 +443,47 @@ public interface QukuService {
     /**
      * 保存封面
      *
-     * @return 封面
+     * @param id   添加封面关联ID,
+     * @param type 添加ID类型 歌曲，专辑，歌单，歌手
+     * @param pojo 封面数据
      */
-    TbPicPojo saveOrUpdatePic(TbPicPojo pic);
+    void saveOrUpdatePic(Long id, Short type, TbPicPojo pojo);
     
-    List<TbPicPojo> saveOrUpdatePic(List<TbPicPojo> pic, Consumer<String> consumer);
+    default void saveOrUpdatePic(Long id, Short type, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, type, pojo);
+    }
+    
+    default void saveOrUpdateMusicPic(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, pojo);
+    }
+    
+    default void saveOrUpdateAlbumPic(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.ALBUM, pojo);
+    }
+    
+    default void saveOrUpdateArtistPic(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.ARTIST, pojo);
+    }
+    
+    default void saveOrUpdateCollectPic(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.COLLECT, pojo);
+    }
+    
+    default void saveOrUpdateUserPic(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.USER, pojo);
+    }
     
     /**
      * 删除封面数据, 包括文件和数据库

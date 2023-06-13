@@ -14,7 +14,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
-import org.core.model.convert.PicConvert;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.service.impl.PluginPackage;
@@ -158,9 +157,8 @@ public class InteractivePluginTest implements ComboSearchPlugin {
             artists.add(artistReq);
             dto.setArtists(artists);
             dto.setLyric(jsonObject.getObject("lrc", String.class));
-            PicConvert picConvert = new PicConvert();
-            picConvert.setUrl(jsonObject.getObject("pic", String.class));
-            dto.setPic(picConvert);
+            String pic = jsonObject.getObject("pic", String.class);
+            dto.setPic(pic);
             dto.setMusicTemp(jsonObject.getObject("url", String.class));
             dto.setUploadFlag(false);
             try {

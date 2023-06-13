@@ -49,10 +49,6 @@ public class TbAlbumPojo implements Serializable {
     @TableField("company")
     private String company;
     
-    @ApiModelProperty("专辑封面地址")
-    @TableField("pic_id")
-    private Long picId;
-    
     @ApiModelProperty("专辑发布时间")
     @TableField("publish_time")
     private LocalDateTime publishTime;

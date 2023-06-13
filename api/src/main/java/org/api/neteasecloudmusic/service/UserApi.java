@@ -182,7 +182,7 @@ public class UserApi {
             // 用户ID
             item.setUserId(tbCollectPojo.getUserId());
             // 封面图像ID
-            item.setCoverImgUrl(qukuService.getPicUrl(tbCollectPojo.getPicId()));
+            item.setCoverImgUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
             // 创建时间
             item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
             // 描述

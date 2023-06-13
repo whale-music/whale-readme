@@ -314,7 +314,7 @@ public class PlayListApi {
         List<MusicConvert> converts = page.getRecords().parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getPicId()));
+            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
         Page<MusicConvert> convertPage = new Page<>();
@@ -433,16 +433,16 @@ public class PlayListApi {
         TbCollectPojo byId = collectService.getById(id);
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(byId, convert);
-        String picUrl = qukuService.getPicUrl(byId.getPicId());
+        String picUrl = qukuService.getPicUrl(byId.getId());
         convert.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         return convert;
     }
     
     public TbCollectPojo createPlayList(String name) {
-        TbPicPojo pic = new TbPicPojo();
-        pic.setUrl(defaultInfo.getPic().getPlayListPic());
-        TbPicPojo tbPicPojo = qukuService.saveOrUpdatePic(pic);
-        return qukuService.createPlayList(UserUtil.getUser().getId(), name, tbPicPojo.getId(), PlayListTypeConfig.ORDINARY);
+        CollectConvert playList = qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
+        qukuService.saveOrUpdateCollectPic(playList.getId(), defaultInfo.getPic().getPlayListPic());
+        playList.setPicUrl(this.qukuService.getPicUrl(playList.getId()));
+        return playList;
     }
     
     public void deletePlayList(Long userId, List<Long> id) {
@@ -492,7 +492,7 @@ public class PlayListApi {
         List<CollectConvert> converts = playList.getRecords().parallelStream().map(collectPojo -> {
             CollectConvert convert = new CollectConvert();
             BeanUtils.copyProperties(collectPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(collectPojo.getPicId()));
+            convert.setPicUrl(qukuService.getPicUrl(collectPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
     

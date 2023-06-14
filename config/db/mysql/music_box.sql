@@ -47,6 +47,8 @@ create table if not exists sys_user
     last_login_time datetime     null comment '最后登录时间',
     create_time     datetime     null comment '创建时间',
     update_time     datetime     null comment '修改时间',
+    constraint id
+        unique (id),
     constraint username
         unique (username)
 )
@@ -75,6 +77,9 @@ create table if not exists tb_album
 
 create index tb_album_album_name_index
     on tb_album (album_name);
+
+create index tb_album_sys_user_id_fk
+    on tb_album (user_id);
 
 create table if not exists tb_artist
 (
@@ -105,6 +110,9 @@ create table if not exists tb_album_artist
             on update cascade on delete cascade
 )
     comment '歌手和专辑中间表';
+
+create index tb_artist_sys_user_id_fk
+    on tb_artist (user_id);
 
 create table if not exists tb_collect
 (

@@ -44,19 +44,23 @@ public class TbMusicPojo implements Serializable {
     @ApiModelProperty("专辑ID")
     @TableField("album_id")
     private Long albumId;
-
+    
     @ApiModelProperty("排序字段")
     @TableField("sort")
     private Long sort;
-
+    
     @ApiModelProperty("歌曲时长")
     @TableField("time_length")
     private Integer timeLength;
-
+    
+    @ApiModelProperty("上传用户ID")
+    @TableField("user_id")
+    private Long userId;
+    
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
+    
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

@@ -53,6 +53,10 @@ public class TbAlbumPojo implements Serializable {
     @TableField("publish_time")
     private LocalDateTime publishTime;
     
+    @ApiModelProperty("上传用户ID")
+    @TableField("user_id")
+    private Long userId;
+    
     @ApiModelProperty("修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;

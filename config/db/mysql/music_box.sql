@@ -67,6 +67,7 @@ create table if not exists tb_album
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
     publish_time datetime     null comment '专辑发布时间',
+    user_id      bigint       not null comment '上传用户ID',
     update_time  datetime     null comment '修改时间',
     create_time  datetime     null comment '创建时间'
 )
@@ -85,6 +86,7 @@ create table if not exists tb_artist
     birth        date         null comment '出生年月',
     location     varchar(64)  null comment '所在国家',
     introduction longtext     null comment '歌手介绍',
+    user_id      bigint       not null comment '上传用户ID',
     create_time  datetime     null comment '创建时间',
     update_time  datetime     null comment '修改时间'
 )
@@ -145,6 +147,7 @@ create table if not exists tb_music
     alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     album_id    bigint       null comment '专辑ID',
     sort        bigint auto_increment comment '排序字段',
+    user_id     bigint       not null comment '上传用户ID',
     time_length int          null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
     create_time datetime     null comment '创建时间',
@@ -232,19 +235,18 @@ create table if not exists tb_music_artist
 
 create table if not exists tb_music_url
 (
-    id          bigint        not null comment '主键'
+    id          bigint       not null comment '主键'
         primary key,
-    music_id    bigint        not null comment '音乐ID',
-    rate        int           null comment '比特率，音频文件的信息',
-    url         varchar(512)  null comment '音乐地址',
-    md5         char(32)      not null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
-    level       char(8)       null comment '音乐质量',
-    encode_type char(10)      null comment '文件格式类型',
-    size        bigint        null comment '文件大小',
-    user_id     bigint        not null comment '上传用户ID',
-    origin      varbinary(64) null comment '音乐来源',
-    create_time datetime      null comment '创建时间',
-    update_time datetime      null comment '修改时间',
+    music_id    bigint       not null comment '音乐ID',
+    rate        int          null comment '比特率，音频文件的信息',
+    url         varchar(512) null comment '音乐地址',
+    md5         char(32)     not null comment '保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在',
+    level       char(8)      null comment '音乐质量',
+    encode_type char(10)     null comment '文件格式类型',
+    size        bigint       null comment '文件大小',
+    user_id     bigint       not null comment '上传用户ID',
+    create_time datetime     null comment '创建时间',
+    update_time datetime     null comment '修改时间',
     constraint id
         unique (id),
     constraint md5

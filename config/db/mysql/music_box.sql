@@ -66,7 +66,6 @@ create table if not exists tb_album
     sub_type     varchar(128) null comment '专辑版本（比如录音室版，现场版）',
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
-    pic_id       bigint       null comment '专辑封面地址ID',
     publish_time datetime     null comment '专辑发布时间',
     update_time  datetime     null comment '修改时间',
     create_time  datetime     null comment '创建时间'
@@ -83,7 +82,6 @@ create table if not exists tb_artist
     artist_name  varchar(128) not null comment '歌手名',
     alias_name   varchar(255) null comment '歌手别名',
     sex          varchar(64)  null comment '歌手性别',
-    pic_id       bigint       null comment '封面ID',
     birth        date         null comment '出生年月',
     location     varchar(64)  null comment '所在国家',
     introduction longtext     null comment '歌手介绍',
@@ -111,7 +109,6 @@ create table if not exists tb_collect
     id             bigint               not null comment '歌单表ID'
         primary key,
     play_list_name varchar(256)         not null comment '歌单名（包括用户喜爱歌单）',
-    pic_id         bigint               null comment '封面地址ID',
     type           tinyint              not null comment '歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单',
     subscribed     tinyint(1) default 0 not null comment '该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)',
     description    varchar(512)         null comment '简介',
@@ -128,13 +125,24 @@ create table if not exists tb_collect
 create index tb_collect_play_list_name_index
     on tb_collect (play_list_name);
 
+create table if not exists tb_middle_pic
+(
+    id        bigint  not null
+        primary key,
+    middle_id bigint  not null comment '中间表',
+    pic_id    bigint  not null comment '封面ID',
+    type      tinyint null comment '封面类型',
+    constraint id
+        unique (id)
+)
+    comment '封面中间表';
+
 create table if not exists tb_music
 (
     id          bigint       not null comment '音乐ID'
         primary key,
     music_name  varchar(128) null comment '音乐名',
     alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
-    pic_id      bigint       null comment '歌曲封面地址ID',
     album_id    bigint       null comment '专辑ID',
     sort        bigint auto_increment comment '排序字段',
     time_length int          null comment '歌曲时长',
@@ -256,15 +264,27 @@ create index tb_music_url_music_id_index
 create index tb_music_url_size_index
     on tb_music_url (size);
 
+create table if not exists tb_origin
+(
+    id           bigint       not null
+        primary key,
+    music_id     bigint       not null comment '音乐ID',
+    music_url_id bigint       not null comment '源地址ID',
+    origin       varchar(256) not null comment '来源',
+    origin_url   varchar(256) null comment '来源地址',
+    constraint id
+        unique (id)
+)
+    comment '音乐来源';
+
 create table if not exists tb_pic
 (
-    id          bigint        not null
+    id          bigint       not null
         primary key,
-    url         varchar(512)  not null comment '音乐网络地址，或路径',
-    md5         char(32)      not null,
-    count       int default 1 not null,
-    update_time datetime      not null comment '更新时间',
-    create_time datetime      not null comment '创建时间',
+    url         varchar(512) not null comment '音乐网络地址，或路径',
+    md5         char(32)     not null,
+    update_time datetime     not null comment '更新时间',
+    create_time datetime     not null comment '创建时间',
     constraint id
         unique (id),
     constraint md5

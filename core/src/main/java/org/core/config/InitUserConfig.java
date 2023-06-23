@@ -30,9 +30,9 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
      */
     @Override
     public void run(ApplicationArguments args) {
-        // 是否查看用户密码
+        // 是否查看Admin用户密码
         if (args.getNonOptionArgs().contains(ADMIN)) {
-            SysUserPojo user = accountService.getUser(ADMIN);
+            SysUserPojo user = accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getAccountType, 0));
             log.info("\nuser: {}\npassword: {}", user.getUsername(), user.getPassword());
         }
     }

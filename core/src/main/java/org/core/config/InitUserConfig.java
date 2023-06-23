@@ -1,5 +1,6 @@
 package org.core.config;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.core.pojo.SysUserPojo;
@@ -19,6 +20,8 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
     private static final String PASS_WORD_SEED = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final AccountService accountService;
     
+    private final LambdaQueryWrapper<SysUserPojo> userEq = Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getAccountType, 0);
+    
     public InitUserConfig(AccountService accountService) {
         this.accountService = accountService;
     }
@@ -32,7 +35,7 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
     public void run(ApplicationArguments args) {
         // 是否查看Admin用户密码
         if (args.getNonOptionArgs().contains(ADMIN)) {
-            SysUserPojo user = accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getAccountType, 0));
+            SysUserPojo user = accountService.getOne(userEq);
             log.info("\nuser: {}\npassword: {}", user.getUsername(), user.getPassword());
         }
     }
@@ -44,7 +47,7 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
     public void afterPropertiesSet() {
         log.info("init user info");
         // 没有管理员用户则创建
-        long count = accountService.count(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getAccountType, 0));
+        long count = accountService.count(userEq);
         if (count == 0) {
             SecureRandom random = new SecureRandom();
             StringBuilder sb = new StringBuilder();

@@ -4,10 +4,10 @@ package org.api.admin.task.timer;
 import cn.hutool.core.collection.CollUtil;
 import org.api.admin.common.constant.TimeDeleteTask;
 import org.api.common.service.QukuAPI;
-import org.core.iservice.TbMiddleTagService;
-import org.core.iservice.TbTagService;
-import org.core.pojo.TbMiddleTagPojo;
-import org.core.pojo.TbTagPojo;
+import org.core.mybatis.iservice.TbMiddleTagService;
+import org.core.mybatis.iservice.TbTagService;
+import org.core.mybatis.pojo.TbMiddleTagPojo;
+import org.core.mybatis.pojo.TbTagPojo;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +54,9 @@ public class PicTimeDeleteTask {
         // }
     }
     
+    /**
+     * 每天自动删除多余tag定时任务
+     */
     @Scheduled(cron = TimeDeleteTask.CRON)   // 每天00:00执行一次
     public void autoDeleteTag() {
         List<TbTagPojo> tagList = tagService.list();

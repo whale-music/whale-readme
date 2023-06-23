@@ -8,7 +8,7 @@ import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.core.common.constant.defaultinfo.DefaultInfo;
-import org.core.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbMusicUrlPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

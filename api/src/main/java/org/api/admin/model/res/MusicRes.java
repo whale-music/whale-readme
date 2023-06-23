@@ -4,10 +4,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
-import org.core.pojo.TbMusicPojo;
-import org.core.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbAlbumPojo;
+import org.core.mybatis.pojo.TbArtistPojo;
+import org.core.mybatis.pojo.TbMusicPojo;
+import org.core.mybatis.pojo.TbMusicUrlPojo;
 
 import java.util.List;
 

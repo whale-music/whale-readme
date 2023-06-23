@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.PageCommon;
-import org.core.model.convert.AlbumConvert;
-import org.core.model.convert.PicConvert;
+import org.core.mybatis.model.convert.AlbumConvert;
+import org.core.mybatis.model.convert.PicConvert;
 
 import java.time.LocalDateTime;
 

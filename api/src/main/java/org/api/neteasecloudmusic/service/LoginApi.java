@@ -7,7 +7,7 @@ import org.api.neteasecloudmusic.model.vo.login.status.Account;
 import org.api.neteasecloudmusic.model.vo.login.status.DataJson;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.login.status.Profile;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

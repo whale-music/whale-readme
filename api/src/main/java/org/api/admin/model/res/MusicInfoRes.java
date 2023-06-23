@@ -4,8 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.model.convert.ArtistConvert;
-import org.core.model.convert.PicConvert;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.PicConvert;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

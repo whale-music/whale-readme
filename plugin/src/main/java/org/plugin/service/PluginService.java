@@ -1,8 +1,8 @@
 package org.plugin.service;
 
-import org.core.pojo.TbPluginMsgPojo;
-import org.core.pojo.TbPluginTaskPojo;
-import org.core.pojo.TbScheduleTaskPojo;
+import org.core.mybatis.pojo.TbPluginMsgPojo;
+import org.core.mybatis.pojo.TbPluginTaskPojo;
+import org.core.mybatis.pojo.TbScheduleTaskPojo;
 import org.plugin.converter.*;
 import org.plugin.model.PluginRunParamsRes;
 import org.plugin.model.PluginTaskLogRes;

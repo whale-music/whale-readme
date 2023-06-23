@@ -1,9 +1,9 @@
 package org.plugin.controller;
 
 import org.core.common.result.R;
-import org.core.pojo.TbPluginMsgPojo;
-import org.core.pojo.TbPluginTaskPojo;
-import org.core.pojo.TbScheduleTaskPojo;
+import org.core.mybatis.pojo.TbPluginMsgPojo;
+import org.core.mybatis.pojo.TbPluginTaskPojo;
+import org.core.mybatis.pojo.TbScheduleTaskPojo;
 import org.core.utils.UserUtil;
 import org.plugin.common.TaskStatus;
 import org.plugin.converter.*;

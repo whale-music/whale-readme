@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

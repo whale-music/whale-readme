@@ -3,7 +3,7 @@ package org.api.admin.model.req.upload;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.core.pojo.TbAlbumPojo;
+import org.core.mybatis.pojo.TbAlbumPojo;
 
 import java.util.List;
 

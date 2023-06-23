@@ -15,7 +15,7 @@ import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
-import org.core.pojo.*;
+import org.core.mybatis.pojo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

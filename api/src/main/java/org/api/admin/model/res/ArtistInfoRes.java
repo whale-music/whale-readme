@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.model.convert.AlbumConvert;
-import org.core.model.convert.ArtistConvert;
-import org.core.model.convert.MusicConvert;
+import org.core.mybatis.model.convert.AlbumConvert;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.MusicConvert;
 
 import java.util.List;
 

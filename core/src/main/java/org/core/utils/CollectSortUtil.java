@@ -1,6 +1,6 @@
 package org.core.utils;
 
-import org.core.pojo.TbCollectPojo;
+import org.core.mybatis.pojo.TbCollectPojo;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;

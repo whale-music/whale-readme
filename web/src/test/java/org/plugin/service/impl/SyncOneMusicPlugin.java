@@ -17,7 +17,7 @@ import org.api.admin.model.req.upload.AlbumInfoReq;
 import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.config.PluginType;
-import org.core.pojo.MusicDetails;
+import org.core.mybatis.pojo.MusicDetails;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;

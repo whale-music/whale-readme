@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbPluginTaskPojo;
+import org.core.mybatis.pojo.TbPluginTaskPojo;
 
 @Data
 @AllArgsConstructor

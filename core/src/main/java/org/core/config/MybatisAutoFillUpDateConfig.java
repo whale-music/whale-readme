@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.reflection.MetaObject;
-import org.core.pojo.TbPicPojo;
+import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

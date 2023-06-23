@@ -1,8 +1,8 @@
 package org.core.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.core.pojo.TbCollectPojo;
-import org.core.pojo.TbMusicPojo;
+import org.core.mybatis.pojo.TbCollectPojo;
+import org.core.mybatis.pojo.TbMusicPojo;
 
 import java.util.List;
 

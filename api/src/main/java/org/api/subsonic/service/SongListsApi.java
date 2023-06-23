@@ -8,10 +8,10 @@ import org.api.subsonic.model.req.albumlist2.AlbumReq;
 import org.api.subsonic.model.res.albumlist2.AlbumItem;
 import org.api.subsonic.model.res.albumlist2.AlbumList2;
 import org.api.subsonic.model.res.albumlist2.AlbumList2Res;
-import org.core.iservice.TbAlbumService;
-import org.core.model.convert.ArtistConvert;
-import org.core.pojo.TbAlbumPojo;
-import org.core.pojo.TbArtistPojo;
+import org.core.mybatis.iservice.TbAlbumService;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.pojo.TbAlbumPojo;
+import org.core.mybatis.pojo.TbArtistPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

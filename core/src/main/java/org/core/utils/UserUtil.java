@@ -2,7 +2,7 @@ package org.core.utils;
 
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 
 public class UserUtil {
     

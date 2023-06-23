@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.model.convert.ArtistConvert;
-import org.core.model.convert.MusicConvert;
-import org.core.pojo.TbAlbumPojo;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.MusicConvert;
+import org.core.mybatis.pojo.TbAlbumPojo;
 
 import java.util.List;
 

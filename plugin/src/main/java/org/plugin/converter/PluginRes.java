@@ -3,7 +3,7 @@ package org.plugin.converter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.core.pojo.TbPluginPojo;
+import org.core.mybatis.pojo.TbPluginPojo;
 
 @Data
 @AllArgsConstructor

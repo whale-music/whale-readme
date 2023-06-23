@@ -10,7 +10,7 @@ import org.api.neteasecloudmusic.model.vo.artist.mvs.ArtistMvRes;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.ArtistSubListRes;
 import org.api.neteasecloudmusic.service.ArtistApi;
 import org.core.common.result.NeteaseResult;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

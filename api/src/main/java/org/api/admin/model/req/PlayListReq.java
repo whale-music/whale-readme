@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.PageCommon;
-import org.core.pojo.TbCollectPojo;
+import org.core.mybatis.pojo.TbCollectPojo;
 
 @Data
 @AllArgsConstructor

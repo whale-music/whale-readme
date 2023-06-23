@@ -2,7 +2,7 @@ package org.core.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.core.pojo.TbPicPojo;
+import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

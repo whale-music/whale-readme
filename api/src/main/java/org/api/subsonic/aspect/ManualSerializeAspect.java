@@ -13,7 +13,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.SerializeUtil;
 import org.jetbrains.annotations.NotNull;

@@ -1,8 +1,8 @@
 package org.core.service;
 
 
-import org.core.iservice.SysUserService;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.iservice.SysUserService;
+import org.core.mybatis.pojo.SysUserPojo;
 
 public interface AccountService extends SysUserService {
     

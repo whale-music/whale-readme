@@ -20,7 +20,7 @@ import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.config.PlayListTypeConfig;
 import org.core.config.PluginType;
-import org.core.pojo.*;
+import org.core.mybatis.pojo.*;
 import org.jetbrains.annotations.NotNull;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;

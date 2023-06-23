@@ -5,7 +5,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.config.CookieConfig;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.springframework.lang.NonNull;

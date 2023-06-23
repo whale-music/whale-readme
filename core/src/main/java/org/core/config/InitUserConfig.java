@@ -3,7 +3,7 @@ package org.core.config;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.ApplicationArguments;

@@ -12,7 +12,7 @@ import org.core.common.result.NeteaseResult;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;

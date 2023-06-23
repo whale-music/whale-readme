@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.pojo.TbArtistPojo;
+import org.core.mybatis.pojo.TbArtistPojo;
 
 @Data
 @AllArgsConstructor

@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.common.service.QukuAPI;
-import org.core.iservice.TbPluginMsgService;
-import org.core.iservice.TbPluginTaskService;
-import org.core.pojo.MusicDetails;
-import org.core.pojo.TbPluginMsgPojo;
-import org.core.pojo.TbPluginTaskPojo;
+import org.core.mybatis.iservice.TbPluginMsgService;
+import org.core.mybatis.iservice.TbPluginTaskService;
+import org.core.mybatis.pojo.MusicDetails;
+import org.core.mybatis.pojo.TbPluginMsgPojo;
+import org.core.mybatis.pojo.TbPluginTaskPojo;
 import org.plugin.common.CommonPlugin;
 
 import java.util.ArrayList;

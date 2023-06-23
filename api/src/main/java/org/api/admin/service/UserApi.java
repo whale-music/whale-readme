@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
-import org.core.pojo.SysUserPojo;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.JwtUtil;
 import org.springframework.beans.BeanUtils;

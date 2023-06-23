@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
-import org.core.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

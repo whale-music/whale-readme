@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.TargetTagConstant;
-import org.core.model.convert.AlbumConvert;
-import org.core.model.convert.ArtistConvert;
-import org.core.model.convert.CollectConvert;
-import org.core.model.convert.MusicConvert;
-import org.core.pojo.*;
+import org.core.mybatis.model.convert.AlbumConvert;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.CollectConvert;
+import org.core.mybatis.model.convert.MusicConvert;
+import org.core.mybatis.pojo.*;
 
 import java.util.*;
 

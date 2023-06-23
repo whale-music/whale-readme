@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.PageCommon;
-import org.core.model.convert.ArtistConvert;
-import org.core.model.convert.PicConvert;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.PicConvert;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

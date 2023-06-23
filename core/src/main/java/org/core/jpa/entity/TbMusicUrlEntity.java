@@ -1,0 +1,192 @@
+package org.core.jpa.entity;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Objects;
+
+@Entity
+@Table(name = "tb_music_url")
+public class TbMusicUrlEntity implements Serializable {
+    public static final long serialVersionUID = 3852711638450316352L;
+    
+    @Id
+    @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
+    @GenericGenerator(name = "IdGenerator", strategy = "org.core.jpa.config.ManualInsertGenerator")
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @Basic
+    @Column(name = "music_id", nullable = false)
+    private Long musicId;
+    @Basic
+    @Column(name = "rate", nullable = true)
+    private Integer rate;
+    @Basic
+    @Column(name = "url", nullable = true, length = 512)
+    private String url;
+    @Basic
+    @Column(name = "md5", nullable = false, length = 32)
+    private String md5;
+    @Basic
+    @Column(name = "level", nullable = true, length = 8)
+    private String level;
+    @Basic
+    @Column(name = "encode_type", nullable = true, length = 10)
+    private String encodeType;
+    @Basic
+    @Column(name = "size", nullable = true)
+    private Long size;
+    @Basic
+    @Column(name = "user_id", nullable = true)
+    private Long userId;
+    @Basic
+    @Column(name = "create_time", nullable = true)
+    private Timestamp createTime;
+    @Basic
+    @Column(name = "update_time", nullable = true)
+    private Timestamp updateTime;
+    @ManyToOne
+    @JoinColumn(name = "music_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbMusicEntity tbMusicByMusicId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private SysUserEntity sysUserByUserId;
+    @OneToMany(mappedBy = "tbMusicUrlByMusicUrlId")
+    private Collection<TbOriginEntity> tbOriginsById;
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public Long getMusicId() {
+        return musicId;
+    }
+    
+    public void setMusicId(Long musicId) {
+        this.musicId = musicId;
+    }
+    
+    public Integer getRate() {
+        return rate;
+    }
+    
+    public void setRate(Integer rate) {
+        this.rate = rate;
+    }
+    
+    public String getUrl() {
+        return url;
+    }
+    
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    public String getMd5() {
+        return md5;
+    }
+    
+    public void setMd5(String md5) {
+        this.md5 = md5;
+    }
+    
+    public String getLevel() {
+        return level;
+    }
+    
+    public void setLevel(String level) {
+        this.level = level;
+    }
+    
+    public String getEncodeType() {
+        return encodeType;
+    }
+    
+    public void setEncodeType(String encodeType) {
+        this.encodeType = encodeType;
+    }
+    
+    public Long getSize() {
+        return size;
+    }
+    
+    public void setSize(Long size) {
+        this.size = size;
+    }
+    
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+    
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+    
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+    
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+    
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TbMusicUrlEntity that = (TbMusicUrlEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(musicId, that.musicId) && Objects.equals(rate,
+                that.rate) && Objects.equals(url, that.url) && Objects.equals(md5, that.md5) && Objects.equals(level,
+                that.level) && Objects.equals(encodeType, that.encodeType) && Objects.equals(size, that.size) && Objects.equals(
+                userId,
+                that.userId) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, musicId, rate, url, md5, level, encodeType, size, userId, createTime, updateTime);
+    }
+    
+    public TbMusicEntity getTbMusicByMusicId() {
+        return tbMusicByMusicId;
+    }
+    
+    public void setTbMusicByMusicId(TbMusicEntity tbMusicByMusicId) {
+        this.tbMusicByMusicId = tbMusicByMusicId;
+    }
+    
+    public SysUserEntity getSysUserByUserId() {
+        return sysUserByUserId;
+    }
+    
+    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
+        this.sysUserByUserId = sysUserByUserId;
+    }
+    
+    public Collection<TbOriginEntity> getTbOriginsById() {
+        return tbOriginsById;
+    }
+    
+    public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
+        this.tbOriginsById = tbOriginsById;
+    }
+}

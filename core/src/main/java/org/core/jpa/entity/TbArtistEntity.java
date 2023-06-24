@@ -53,6 +53,8 @@ public class TbArtistEntity implements Serializable {
     private SysUserEntity sysUserByUserId;
     @OneToMany(mappedBy = "tbArtistByMiddleId")
     private Collection<TbMiddlePicEntity> tbMiddlePicsById;
+    @OneToMany(mappedBy = "tbArtistByMiddleId")
+    private Collection<TbMiddleTagEntity> tbMiddleTagsById;
     @OneToMany(mappedBy = "tbArtistByArtistId")
     private Collection<TbMusicArtistEntity> tbMusicArtistsById;
     @OneToMany(mappedBy = "tbArtistByArtistId")
@@ -180,6 +182,14 @@ public class TbArtistEntity implements Serializable {
     
     public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
         this.tbMiddlePicsById = tbMiddlePicsById;
+    }
+    
+    public Collection<TbMiddleTagEntity> getTbMiddleTagsById() {
+        return tbMiddleTagsById;
+    }
+    
+    public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
+        this.tbMiddleTagsById = tbMiddleTagsById;
     }
     
     public Collection<TbMusicArtistEntity> getTbMusicArtistsById() {

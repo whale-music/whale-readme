@@ -8,7 +8,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tb_middle_tag")
-@IdClass(TbMiddleTagEntityPK.class)
 public class TbMiddleTagEntity implements Serializable {
     public static final long serialVersionUID = 7501414934794658903L;
     
@@ -20,9 +19,7 @@ public class TbMiddleTagEntity implements Serializable {
     @Basic
     @Column(name = "middle_id", nullable = false)
     private Long middleId;
-    @Id
-    @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
-    @GenericGenerator(name = "IdGenerator", strategy = "org.core.jpa.config.ManualInsertGenerator")
+    @Basic
     @Column(name = "tag_id", nullable = false)
     private Long tagId;
     @Basic
@@ -31,6 +28,9 @@ public class TbMiddleTagEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbAlbumEntity tbAlbumByMiddleId;
+    @ManyToOne
+    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbArtistEntity tbArtistByMiddleId;
     @ManyToOne
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbCollectEntity tbCollectByMiddleId;
@@ -97,6 +97,14 @@ public class TbMiddleTagEntity implements Serializable {
     
     public void setTbAlbumByMiddleId(TbAlbumEntity tbAlbumByMiddleId) {
         this.tbAlbumByMiddleId = tbAlbumByMiddleId;
+    }
+    
+    public TbArtistEntity getTbArtistByMiddleId() {
+        return tbArtistByMiddleId;
+    }
+    
+    public void setTbArtistByMiddleId(TbArtistEntity tbArtistByMiddleId) {
+        this.tbArtistByMiddleId = tbArtistByMiddleId;
     }
     
     public TbCollectEntity getTbCollectByMiddleId() {

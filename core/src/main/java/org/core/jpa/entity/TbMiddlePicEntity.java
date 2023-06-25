@@ -27,6 +27,9 @@ public class TbMiddlePicEntity implements Serializable {
     private Byte type;
     @ManyToOne
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private SysUserEntity sysUserByMiddleId;
+    @ManyToOne
+    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbAlbumEntity tbAlbumByMiddleId;
     @ManyToOne
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
@@ -89,6 +92,14 @@ public class TbMiddlePicEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, middleId, picId, type);
+    }
+    
+    public SysUserEntity getSysUserByMiddleId() {
+        return sysUserByMiddleId;
+    }
+    
+    public void setSysUserByMiddleId(SysUserEntity sysUserByMiddleId) {
+        this.sysUserByMiddleId = sysUserByMiddleId;
     }
     
     public TbAlbumEntity getTbAlbumByMiddleId() {

@@ -2,6 +2,9 @@ package org.core.interceptor;
 
 import com.alibaba.fastjson2.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.config.CookieConfig;
@@ -12,9 +15,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Slf4j

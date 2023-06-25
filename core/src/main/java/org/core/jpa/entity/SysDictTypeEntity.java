@@ -1,8 +1,9 @@
 package org.core.jpa.entity;
 
+import jakarta.persistence.*;
+import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 public class SysDictTypeEntity {
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
-    @GenericGenerator(name = "IdGenerator", strategy = "org.core.jpa.config.ManualInsertGenerator")
+    @GenericGenerator(name = "IdGenerator", type = ManualInsertGenerator.class)
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic

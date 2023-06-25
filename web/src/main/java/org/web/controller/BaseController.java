@@ -2,6 +2,8 @@ package org.web.controller;
 
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.api.neteasecloudmusic.model.vo.user.Account;
 import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
@@ -12,9 +14,6 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 
 public class BaseController {
     

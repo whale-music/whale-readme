@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@MapperScan("org.core.mapper")
+// mybatis
+@MapperScan("org.core.mybatis.mapper") // 指定要扫描的Mapper接口所在的包路径
 public class MybatisPlusPaginateConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

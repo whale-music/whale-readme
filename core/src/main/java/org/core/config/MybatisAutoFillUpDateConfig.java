@@ -6,7 +6,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.reflection.MetaObject;
 import org.core.mybatis.pojo.TbPicPojo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -16,8 +15,11 @@ import java.util.List;
 @Component
 public class MybatisAutoFillUpDateConfig implements MetaObjectHandler {
     
-    @Autowired
-    private Cache<Long, TbPicPojo> picCache;
+    private final Cache<Long, TbPicPojo> picCache;
+    
+    public MybatisAutoFillUpDateConfig(Cache<Long, TbPicPojo> picCache) {
+        this.picCache = picCache;
+    }
     
     /**
      * 使用mp做添加操作时候，这个方法执行
@@ -35,11 +37,11 @@ public class MybatisAutoFillUpDateConfig implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         this.setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
-    
+        
         // 更新自动删除缓存
         List<String> list = Arrays.asList(metaObject.getSetterNames());
         if (CollUtil.contains(list, "url") && StringUtils.isNotBlank(String.valueOf(metaObject.getValue("url")))) {
-            picCache.invalidate(metaObject.getValue("id"));
+            picCache.invalidate((Long) metaObject.getValue("id"));
         }
     }
 }

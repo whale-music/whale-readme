@@ -1,12 +1,13 @@
 package org.api.subsonic.model.req.albumlist2;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
-import javax.validation.constraints.NotBlank;
+
 
 @Data
 @AllArgsConstructor

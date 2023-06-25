@@ -2,9 +2,9 @@ package org.core.jpa.model.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @ApiModel("保存 字典类型表")
 public class SysDictTypeEntityVO implements Serializable {
-    private static final long serialVersionUID = 1L;
+    public static final long serialVersionUID = 1L;
     
     
     /**

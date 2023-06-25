@@ -1,8 +1,8 @@
 package org.core.utils;
 
+import jakarta.validation.constraints.NotNull;
 import org.core.mybatis.pojo.TbCollectPojo;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -67,7 +67,7 @@ public class DynamicTaskService {
         // 任务 – 触发器触发时执行的 Runnable
         // trigger – 任务的cron
         ScheduledFuture<?> schedule = syncScheduler.schedule(getRunnable(task, pluginService),
-                triggerContext -> new CronTrigger(task.getCron()).nextExecutionTime(triggerContext));
+                triggerContext -> new CronTrigger(task.getCron()).nextExecution(triggerContext));
         taskMap.put(task.getId(), schedule);
         taskList.add(task.getId());
         return true;

@@ -1,8 +1,9 @@
 package org.core.jpa.entity;
 
+import jakarta.persistence.*;
+import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,12 +15,12 @@ public class TbUserAlbumEntity implements Serializable {
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
-    @GenericGenerator(name = "IdGenerator", strategy = "org.core.jpa.config.ManualInsertGenerator")
+    @GenericGenerator(name = "IdGenerator", type = ManualInsertGenerator.class)
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
-    @GenericGenerator(name = "IdGenerator", strategy = "org.core.jpa.config.ManualInsertGenerator")
+    @GenericGenerator(name = "IdGenerator", type = ManualInsertGenerator.class)
     @Column(name = "album_id", nullable = false)
     private Long albumId;
     @ManyToOne

@@ -52,7 +52,7 @@ public class TopListApi {
             e.setId(singerPojo.getId());
             e.setName(singerPojo.getArtistName());
             e.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
-            e.setPicUrl(qukuService.getPicUrl(singerPojo.getId()));
+            e.setPicUrl(qukuService.getArtistPicUrl(singerPojo.getId()));
             e.setAlbumSize(qukuService.getAlbumCountBySingerId(singerPojo.getId()));
             e.setBriefDesc("");
             artists.add(e);
@@ -95,15 +95,15 @@ public class TopListApi {
             // 播放次数
             e.setPlayCount(0);
             e.setDescription(tbCollectPojo.getDescription());
-        
+    
             SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
             Creator creator = new Creator();
-            creator.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
-            creator.setBackgroundUrl(userPojo.getBackgroundUrl());
+            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
+            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
             creator.setNickname(userPojo.getNickname());
             creator.setSignature(userPojo.getSignature());
             e.setCreator(creator);
-            
+    
             playlists.add(e);
         }
         BeanUtils.copyProperties(page, res);

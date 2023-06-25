@@ -140,7 +140,7 @@ public class CollectApi {
     public TbCollectPojo createPlayList(Long userId, String name) {
         TbPicPojo pic = new TbPicPojo();
         pic.setUrl(defaultInfo.getPic().getPlayListPic());
-        qukuService.saveOrUpdateUserPic(userId, defaultInfo.getPic().getPlayListPic());
+        qukuService.saveOrUpdateUserAvatar(userId, defaultInfo.getPic().getPlayListPic());
         return qukuService.createPlayList(userId, name, PlayListTypeConfig.ORDINARY);
     }
     
@@ -294,7 +294,7 @@ public class CollectApi {
         List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getId()));
+            convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
         
@@ -383,21 +383,21 @@ public class CollectApi {
         Playlist playlist = new Playlist();
         playlist.setId(byId.getId());
         playlist.setName(byId.getPlayListName());
-        playlist.setCoverImgUrl(qukuService.getPicUrl(byId.getId()));
+        playlist.setCoverImgUrl(qukuService.getCollectPicUrl(byId.getId()));
         playlist.setUpdateTime((long) byId.getUpdateTime().getNano());
         playlist.setDescription(byId.getDescription());
-        
+    
         // 歌单创建者
         Creator creator = new Creator();
         SysUserPojo userPojo = accountService.getById(byId.getUserId());
         userPojo = Optional.ofNullable(userPojo).orElse(new SysUserPojo());
         creator.setNickname(userPojo.getNickname());
-        creator.setBackgroundUrl(userPojo.getBackgroundUrl());
-        creator.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
+        creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
+        creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
         creator.setUserId(userPojo.getId());
         playlist.setCreator(creator);
         playlist.setUserId(userPojo.getId());
-        
+    
         ArrayList<TracksItem> tracks = new ArrayList<>();
         ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
         for (TbMusicPojo tbMusicPojo : playListAllMusic) {

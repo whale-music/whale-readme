@@ -29,10 +29,10 @@ public class LoginApi {
         profile.setUserId(account.getId());
         profile.setUserName(account.getUsername());
         profile.setNickname(account.getNickname());
-        profile.setBackgroundUrl(account.getBackgroundUrl());
-        profile.setAvatarUrl(qukuAPI.getPicUrl(account.getAvatarId()));
+        profile.setBackgroundUrl(qukuAPI.getUserBackgroundPicUrl(account.getId()));
+        profile.setAvatarUrl(qukuAPI.getUserAvatarPicUrl(account.getId()));
         profile.setCreateTime(account.getCreateTime().getNano());
-        
+    
         dataJson.setProfile(profile);
         Account account1 = new Account();
         account1.setId(account.getId());

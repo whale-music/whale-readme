@@ -23,9 +23,14 @@ public class PicTypeConstant {
     public static final Byte ARTIST = 3;
     
     /**
-     * 用户
+     * 用户头像
      */
-    public static final Byte USER = 4;
+    public static final Byte USER_AVATAR = 4;
+    
+    /**
+     * 用户背景
+     */
+    public static final Byte USER_BACKGROUND = 4;
     
     private PicTypeConstant() {
     }

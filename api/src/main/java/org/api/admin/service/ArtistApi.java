@@ -82,7 +82,7 @@ public class ArtistApi {
             BeanUtils.copyProperties(singerPojo, artistRes);
             artistRes.setAlbumSize(String.valueOf(albumSize));
             artistRes.setMusicSize(String.valueOf(musicSize));
-            artistRes.setPicUrl(qukuService.getPicUrl(singerPojo.getId()));
+            artistRes.setPicUrl(qukuService.getArtistPicUrl(singerPojo.getId()));
             singerResPage.getRecords().add(artistRes);
         }
     
@@ -118,7 +118,7 @@ public class ArtistApi {
         TbArtistPojo pojo = artistService.getById(id);
         BeanUtils.copyProperties(pojo, artistInfoRes);
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
-        String picUrl = qukuService.getPicUrl(pojo.getId());
+        String picUrl = qukuService.getArtistPicUrl(pojo.getId());
         artistInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
         List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);

@@ -100,6 +100,9 @@ public class QukuServiceImpl implements QukuService {
     private Cache<Long, TbPicPojo> picCache;
     
     @Autowired
+    private Cache<Long, Long> picMiddleCache;
+    
+    @Autowired
     private DefaultInfo defaultInfo;
     
     private static List<AlbumConvert> getAlbumConvertList(List<TbAlbumPojo> albumPojoList, Map<Long, String> picUrl) {
@@ -195,7 +198,7 @@ public class QukuServiceImpl implements QukuService {
     public List<AlbumConvert> getAlbumListByAlbumId(Collection<Long> albumIds) {
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
         List<Long> collect = albumPojoList.parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList());
-        Map<Long, String> picUrl = getPicUrl(collect);
+        Map<Long, String> picUrl = getCollectPicUrl(collect);
         return getAlbumConvertList(albumPojoList, picUrl);
     }
     
@@ -258,13 +261,13 @@ public class QukuServiceImpl implements QukuService {
                 albumArtistMap.put(tbAlbumArtistPojo.getAlbumId(), pojos);
             }
         }
-        
+    
         Set<Long> artistIds = list.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
         List<TbArtistPojo> artistPojoList = artistService.listByIds(artistIds);
-        
-        Map<Long, String> picUrl = getPicUrl(artistIds);
+    
+        Map<Long, String> picUrl = getArtistPicUrl(artistIds);
         Map<Long, ArtistConvert> artistMap = getLongArtistConvertMap(artistPojoList, picUrl);
-        
+    
         Map<Long, List<ArtistConvert>> resMap = new HashMap<>();
         for (Map.Entry<Long, TbAlbumPojo> longTbAlbumPojoEntry : albumPojoMap.entrySet()) {
             TbAlbumPojo tbAlbumPojo = longTbAlbumPojoEntry.getValue();
@@ -342,7 +345,7 @@ public class QukuServiceImpl implements QukuService {
         TbMusicPojo musicPojo = Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>()).get(0);
         MusicConvert convert = new MusicConvert();
         BeanUtils.copyProperties(musicPojo, convert);
-        convert.setPicUrl(getPicUrl(musicPojo.getId()));
+        convert.setPicUrl(getMusicPicUrl(musicPojo.getId()));
         return convert;
     }
     
@@ -366,7 +369,7 @@ public class QukuServiceImpl implements QukuService {
     
     @NotNull
     private Page<AlbumConvert> getAlbumConvertPage(Page<TbAlbumPojo> albumPojoPage) {
-        Map<Long, String> picUrl = getPicUrl(albumPojoPage.getRecords().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList()));
+        Map<Long, String> picUrl = getAlbumPicUrl(albumPojoPage.getRecords().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toList()));
         Page<AlbumConvert> convertPage = new Page<>();
         BeanUtils.copyProperties(albumPojoPage, convertPage);
         convertPage.setRecords(getAlbumConvertList(albumPojoPage.getRecords(), picUrl));
@@ -417,9 +420,9 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(list)) {
             return new HashMap<>();
         }
-        List<Long> singerIds = list.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toList());
-        List<TbArtistPojo> tbArtistPojos = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, singerIds));
-        Map<Long, String> picUrl = getPicUrl(singerIds);
+        List<Long> artists = list.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toList());
+        List<TbArtistPojo> tbArtistPojos = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, artists));
+        Map<Long, String> picUrl = getArtistPicUrl(artists);
         Map<Long, ArtistConvert> collect = getLongArtistConvertMap(tbArtistPojos, picUrl);
         return list.parallelStream()
                    .collect(Collectors.toMap(TbAlbumArtistPojo::getAlbumId,
@@ -448,7 +451,7 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyList();
         }
         List<TbArtistPojo> tbArtistPojos = artistService.listByIds(collect);
-        return getArtistConvertList(tbArtistPojos, getPicUrl(collect));
+        return getArtistConvertList(tbArtistPojos, getCollectPicUrl(collect));
     }
     
     /**
@@ -468,7 +471,7 @@ public class QukuServiceImpl implements QukuService {
         }
         List<Long> artistIds = list.parallelStream().map(TbMusicArtistPojo::getArtistId).collect(Collectors.toList());
         List<TbArtistPojo> tbArtistPojos = artistService.listByIds(artistIds);
-        Map<Long, ArtistConvert> artistMap = getLongArtistConvertMap(tbArtistPojos, getPicUrl(artistIds));
+        Map<Long, ArtistConvert> artistMap = getLongArtistConvertMap(tbArtistPojos, getArtistPicUrl(artistIds));
         
         HashMap<Long, List<ArtistConvert>> longListHashMap = new HashMap<>();
         for (TbMusicArtistPojo tbMusicArtistPojo : list) {
@@ -496,9 +499,9 @@ public class QukuServiceImpl implements QukuService {
         if (empty) {
             return Collections.emptyList();
         }
-        List<Long> singerIds = longStream.collect(Collectors.toList());
-        List<TbArtistPojo> list = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, singerIds));
-        Map<Long, String> picUrl = getPicUrl(singerIds);
+        List<Long> artistIds = longStream.collect(Collectors.toList());
+        List<TbArtistPojo> list = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, artistIds));
+        Map<Long, String> picUrl = getArtistPicUrl(artistIds);
         return getArtistConvertList(list, picUrl);
     }
     
@@ -542,8 +545,8 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(userLikeSinger)) {
             return Collections.emptyList();
         }
-        List<Long> singerIds = userLikeSinger.stream().map(TbUserArtistPojo::getArtistId).collect(Collectors.toList());
-        return getArtistConvertList(artistService.listByIds(singerIds), getPicUrl(singerIds));
+        List<Long> aritstIds = userLikeSinger.stream().map(TbUserArtistPojo::getArtistId).collect(Collectors.toList());
+        return getArtistConvertList(artistService.listByIds(aritstIds), getArtistPicUrl(aritstIds));
     }
     
     /**
@@ -554,13 +557,13 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<MusicConvert> getMusicListByAlbumId(Long id) {
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getAlbumId, id));
-        return getMusicConvertList(list, getPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
+        return getMusicConvertList(list, getMusicPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
     }
     
     @Override
     public List<MusicConvert> getMusicListByAlbumId(Collection<Long> ids) {
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, ids));
-        return getMusicConvertList(list, getPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
+        return getMusicConvertList(list, getMusicPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
     }
     
     /**
@@ -600,7 +603,7 @@ public class QukuServiceImpl implements QukuService {
         List<Long> collect = musicArtistPojos.parallelStream().map(TbMusicArtistPojo::getMusicId).collect(Collectors.toList());
     
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, collect));
-        return getMusicConvertList(list, getPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
+        return getMusicConvertList(list, getMusicPicUrl(list.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList())));
     }
     
     /**
@@ -617,7 +620,7 @@ public class QukuServiceImpl implements QukuService {
             Page<TbArtistPojo> page = artistService.page(new Page<>(randomNum, 1));
             res.addAll(page.getRecords());
         }
-        return getArtistConvertList(res, getPicUrl(res.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList())));
+        return getArtistConvertList(res, getArtistPicUrl(res.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toList())));
     }
     
     /**
@@ -659,7 +662,7 @@ public class QukuServiceImpl implements QukuService {
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(collectId);
             if (musicPojo != null) {
-                String picUrl = getPicUrl(songId);
+                String picUrl = getMusicPicUrl(songId);
                 this.saveOrUpdateCollectPic(entity.getId(), picUrl);
             }
             collectService.updateById(entity);
@@ -692,7 +695,7 @@ public class QukuServiceImpl implements QukuService {
         collectService.save(collectPojo);
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(collectPojo, convert);
-        convert.setPicUrl(getPicUrl(collectPojo.getId()));
+        convert.setPicUrl(getCollectPicUrl(collectPojo.getId()));
         return convert;
     }
     
@@ -761,7 +764,7 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyList();
         }
         return getCollectConvertList(collectPojoList,
-                getPicUrl(collectPojoList.parallelStream().map(TbCollectPojo::getId).collect(Collectors.toList())));
+                getCollectPicUrl(collectPojoList.parallelStream().map(TbCollectPojo::getId).collect(Collectors.toList())));
     }
     
     /**
@@ -975,7 +978,7 @@ public class QukuServiceImpl implements QukuService {
             entity.setUserId(userId);
             entity.setType(PlayListTypeConfig.LIKE);
             collectService.save(entity);
-            this.saveOrUpdateCollectPic(entity.getId(), this.getPicUrl(userId));
+            this.saveOrUpdateCollectPic(entity.getId(), this.getUserAvatarPicUrl(userId));
             collectServiceById = entity;
         }
         TbMusicPojo byId = musicService.getById(id);
@@ -1006,7 +1009,7 @@ public class QukuServiceImpl implements QukuService {
     
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(collectServiceById.getId());
-            this.saveOrUpdateCollectPic(entity.getId(), this.getPicUrl(byId.getId()));
+            this.saveOrUpdateCollectPic(entity.getId(), this.getMusicPicUrl(byId.getId()));
             collectService.updateById(entity);
         } else {
             // 歌曲不存在
@@ -1159,24 +1162,9 @@ public class QukuServiceImpl implements QukuService {
         lyricService.saveOrUpdate(entity);
     }
     
-    /**
-     * 封面
-     *
-     * @param id 封面ID
-     * @return 封面地址
-     */
-    @Override
-    public String getPicUrl(Long id) {
-        TbPicPojo pojo = picCache.get(id, picService::getById);
-        if (pojo == null || StringUtils.isEmpty(pojo.getUrl())) {
-            return defaultInfo.getPic().getDefaultPic();
-        }
-        return pojo.getUrl();
-    }
-    
     public List<MusicConvert> getPicMusicList(Collection<TbMusicPojo> musicList) {
         Set<Long> collect = musicList.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getPicUrl(collect);
+        Map<Long, String> picUrl = getCollectPicUrl(collect);
         return musicList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
             MusicConvert musicConvert = new MusicConvert();
@@ -1188,7 +1176,7 @@ public class QukuServiceImpl implements QukuService {
     
     public List<AlbumConvert> getPicAlbumList(Collection<TbAlbumPojo> musicList) {
         Set<Long> collect = musicList.parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getPicUrl(collect);
+        Map<Long, String> picUrl = getCollectPicUrl(collect);
         return musicList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
             AlbumConvert musicConvert = new AlbumConvert();
@@ -1200,7 +1188,7 @@ public class QukuServiceImpl implements QukuService {
     
     public List<ArtistConvert> getPicArtistList(Collection<TbArtistPojo> musicList) {
         Set<Long> collect = musicList.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getPicUrl(collect);
+        Map<Long, String> picUrl = getCollectPicUrl(collect);
         return musicList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
             ArtistConvert musicConvert = new ArtistConvert();
@@ -1210,25 +1198,34 @@ public class QukuServiceImpl implements QukuService {
         }).collect(Collectors.toList());
     }
     
+    
     /**
      * 封面
      *
-     * @param ids 封面ID
+     * @param ids  封面ID
+     * @param type 关联ID类型
      * @return 封面地址
      */
     @Override
-    public Map<Long, String> getPicUrl(Collection<Long> ids) {
+    public Map<Long, String> getPicUrl(Collection<Long> ids, Byte type) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
-        Map<Long, TbPicPojo> map = picCache.getAll(ids, longs -> {
-            List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().eq(TbMiddlePicPojo::getMiddleId, longs));
-            List<TbPicPojo> tbPicPojos = picService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toList()));
-            return tbPicPojos.parallelStream().map(tbPicPojo -> {
-                if (tbPicPojo == null || StringUtils.isEmpty(tbPicPojo.getUrl())) {
-                    TbPicPojo pojo = new TbPicPojo();
-                    pojo.setUrl(defaultInfo.getPic().getDefaultPic());
-                    return pojo;
+        // 通过关联ID获取封面ID
+        Map<Long, Long> picMiddle = picMiddleCache.getAll(ids, aLong -> {
+            List<TbMiddlePicPojo> list = middlePicService.list();
+            return list.stream().collect(Collectors.toMap(TbMiddlePicPojo::getMiddleId, TbMiddlePicPojo::getPicId));
+        });
+        List<Long> picIds = ids.parallelStream().map(picMiddle::get).collect(Collectors.toList());
+        Map<Long, TbPicPojo> map = picCache.getAll(picIds, longs -> {
+            List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
+                                                                       .eq(TbMiddlePicPojo::getMiddleId, longs)
+                                                                       .eq(TbMiddlePicPojo::getType, type));
+            List<TbPicPojo> tbPicPojoList = picService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toSet()));
+            return tbPicPojoList.parallelStream().map(tbPicPojo -> {
+                tbPicPojo = tbPicPojo == null ? new TbPicPojo() : tbPicPojo;
+                if (StringUtils.isEmpty(tbPicPojo.getUrl())) {
+                    tbPicPojo.setUrl(defaultInfo.getPic().getDefaultPic());
                 }
                 return tbPicPojo;
             }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
@@ -1252,8 +1249,10 @@ public class QukuServiceImpl implements QukuService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
+        // 查询封面是否存在, 不存在则创建。存在则创建中间表关联
         Wrapper<TbPicPojo> eq = Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pojo.getMd5());
         TbPicPojo one = picService.getOne(eq);
+        // 删除多余文件
         removePic(id);
         if (one == null) {
             picService.save(pojo);
@@ -1264,21 +1263,14 @@ public class QukuServiceImpl implements QukuService {
             middlePicService.save(entity);
         } else {
             Long picId = one.getId();
-            LambdaQueryWrapper<TbMiddlePicPojo> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(TbMiddlePicPojo::getMiddleId, picId);
-            wrapper.eq(TbMiddlePicPojo::getId, id);
-            TbMiddlePicPojo middlePicPojo = middlePicService.getOne(wrapper);
-            if (middlePicPojo == null) {
-                middlePicPojo = new TbMiddlePicPojo();
-                middlePicPojo.setMiddleId(id);
-                middlePicPojo.setPicId(picId);
-                middlePicPojo.setType(type);
-                middlePicService.save(middlePicPojo);
-            } else {
-                middlePicPojo.setMiddleId(id);
-                middlePicPojo.setType(type);
-                middlePicService.updateById(middlePicPojo);
-            }
+            TbMiddlePicPojo tbMiddlePicPojo = new TbMiddlePicPojo();
+            tbMiddlePicPojo.setMiddleId(id);
+            tbMiddlePicPojo.setPicId(picId);
+            tbMiddlePicPojo.setType(type);
+            LambdaQueryWrapper<TbMiddlePicPojo> update = Wrappers.lambdaQuery(tbMiddlePicPojo)
+                                                                 .eq(TbMiddlePicPojo::getMiddleId, picId)
+                                                                 .eq(TbMiddlePicPojo::getId, id);
+            middlePicService.saveOrUpdate(tbMiddlePicPojo, update);
         }
     }
     

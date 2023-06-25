@@ -1,5 +1,6 @@
 package org.core.service;
 
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.common.constant.PicTypeConstant;
@@ -433,12 +434,143 @@ public interface QukuService {
     /**
      * 查询封面地址
      *
-     * @param id 封面ID
+     * @param id   封面ID
+     * @param type 关联ID类型
      * @return 封面地址
      */
-    String getPicUrl(Long id);
+    default String getPicUrl(Long id, Byte type) {
+        Map<Long, String> picUrl = getPicUrl(Collections.singletonList(id), type);
+        return MapUtil.get(picUrl, id, String.class);
+    }
     
-    Map<Long, String> getPicUrl(Collection<Long> ids);
+    /**
+     * 获取歌音乐封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getMusicPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.MUSIC);
+    }
+    
+    /**
+     * 获取歌单封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getCollectPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.COLLECT);
+    }
+    
+    /**
+     * 获取专辑封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getAlbumPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.ALBUM);
+    }
+    
+    /**
+     * 获取歌手封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getArtistPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 获取用户头像封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getUserAvatarPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.USER_AVATAR);
+    }
+    
+    /**
+     * 获取用户背景封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getUserBackgroundPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.USER_BACKGROUND);
+    }
+    
+    /**
+     * 获取封面地址
+     *
+     * @param ids  封面关联ID
+     * @param type 关联ID类型
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    Map<Long, String> getPicUrl(Collection<Long> ids, Byte type);
+    
+    /**
+     * 获取歌音乐封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getMusicPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.MUSIC);
+    }
+    
+    /**
+     * 获取歌单封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getCollectPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.COLLECT);
+    }
+    
+    /**
+     * 获取专辑封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getAlbumPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.ALBUM);
+    }
+    
+    /**
+     * 获取歌手封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getArtistPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 获取用户头像封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getUserAvatarPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.USER_AVATAR);
+    }
+    
+    /**
+     * 获取用户背景封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getUserBackgroundPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.USER_BACKGROUND);
+    }
     
     /**
      * 保存封面
@@ -479,10 +611,16 @@ public interface QukuService {
         this.saveOrUpdatePic(id, PicTypeConstant.COLLECT, pojo);
     }
     
-    default void saveOrUpdateUserPic(Long id, String url) {
+    default void saveOrUpdateUserAvatar(Long id, String url) {
         TbPicPojo pojo = new TbPicPojo();
         pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.USER, pojo);
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_AVATAR, pojo);
+    }
+    
+    default void saveOrUpdateUserBackground(Long id, String url) {
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setUrl(url);
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, pojo);
     }
     
     /**

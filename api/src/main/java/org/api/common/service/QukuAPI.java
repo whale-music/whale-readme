@@ -47,24 +47,26 @@ public class QukuAPI extends QukuServiceImpl {
     /**
      * 封面
      *
-     * @param id 封面ID
+     * @param id   封面ID
+     * @param type 关联ID类型
      * @return 封面地址
      */
     @Override
-    public String getPicUrl(Long id) {
-        String picUrl = super.getPicUrl(id);
+    public String getPicUrl(Long id, Byte type) {
+        String picUrl = super.getPicUrl(id, type);
         return getPicUrl(picUrl, false);
     }
     
     /**
      * 封面
      *
-     * @param ids 封面ID
+     * @param ids  封面ID
+     * @param type 关联ID类型
      * @return 封面地址
      */
     @Override
-    public Map<Long, String> getPicUrl(Collection<Long> ids) {
-        Map<Long, String> picUrl = super.getPicUrl(ids);
+    public Map<Long, String> getPicUrl(Collection<Long> ids, Byte type) {
+        Map<Long, String> picUrl = super.getPicUrl(ids, type);
         return getPicUrlList(picUrl, false);
     }
     

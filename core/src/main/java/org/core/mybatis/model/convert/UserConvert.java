@@ -12,4 +12,5 @@ import org.core.mybatis.pojo.SysUserPojo;
 @NoArgsConstructor
 public class UserConvert extends SysUserPojo {
     private String avatarUrl;
+    private String backgroundPicUrl;
 }

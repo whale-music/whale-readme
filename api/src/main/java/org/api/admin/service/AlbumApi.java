@@ -183,7 +183,7 @@ public class AlbumApi {
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
-        albumRes.setPicUrl(qukuService.getPicUrl(byId.getId()));
+        albumRes.setPicUrl(qukuService.getAlbumPicUrl(byId.getId()));
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
     }

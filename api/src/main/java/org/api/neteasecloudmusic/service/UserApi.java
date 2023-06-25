@@ -96,7 +96,7 @@ public class UserApi {
         }
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(userPojo, userConvert);
-        userConvert.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
+        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
         return userConvert;
     }
     
@@ -111,7 +111,8 @@ public class UserApi {
         SysUserPojo login = accountService.login(phone, password);
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(login, userConvert);
-        userConvert.setAvatarUrl(qukuService.getPicUrl(login.getAvatarId()));
+        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(login.getId()));
+        userConvert.setBackgroundPicUrl(qukuService.getUserBackgroundPicUrl(login.getId()));
         return userConvert;
     }
     
@@ -177,13 +178,13 @@ public class UserApi {
             SysUserPojo account = Optional.ofNullable(accountService.getById(uid)).orElse(new SysUserPojo());
             creator.setNickname(account.getNickname());
             creator.setUserId(account.getId());
-            creator.setAvatarUrl(qukuService.getPicUrl(account.getAvatarId()));
-            creator.setBackgroundUrl(account.getBackgroundUrl());
+            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(account.getId()));
+            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(account.getId()));
             item.setCreator(creator);
             // 用户ID
             item.setUserId(tbCollectPojo.getUserId());
             // 封面图像ID
-            item.setCoverImgUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
+            item.setCoverImgUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
             // 创建时间
             item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
             // 描述
@@ -325,8 +326,13 @@ public class UserApi {
      * @param phone       账户
      * @param countrycode 手机号默认86
      */
-    public SysUserPojo checkPhone(Long phone, String countrycode) {
-        return accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
+    public UserConvert checkPhone(Long phone, String countrycode) {
+        SysUserPojo one = accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
+        UserConvert userConvert = new UserConvert();
+        BeanUtils.copyProperties(one, userConvert);
+        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(one.getId()));
+        userConvert.setBackgroundPicUrl(qukuService.getUserBackgroundPicUrl(one.getId()));
+        return userConvert;
     }
     
     /**
@@ -345,23 +351,23 @@ public class UserApi {
         userPoint.setUpdateTime(accUserPojo.getUpdateTime().getNano());
         userPoint.setStatus(1);
         res.setUserPoint(userPoint);
-        
-        
+    
+    
         Profile profile = new Profile();
         profile.setUserId(accUserPojo.getId());
-        profile.setAvatarUrl(qukuService.getPicUrl(accUserPojo.getAvatarId()));
-        profile.setBackgroundUrl(accUserPojo.getBackgroundUrl());
+        profile.setAvatarUrl(qukuService.getUserAvatarPicUrl(accUserPojo.getId()));
+        profile.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(accUserPojo.getId()));
         profile.setEventCount(233);
         profile.setFollows(2333);
         profile.setFolloweds(23333);
         res.setProfile(profile);
-        
+    
         ProfileVillageInfo profileVillageInfo = new ProfileVillageInfo();
         profileVillageInfo.setTitle("crown");
-        profileVillageInfo.setImageUrl(qukuService.getPicUrl(accUserPojo.getAvatarId()));
-        profileVillageInfo.setTargetUrl(accUserPojo.getBackgroundUrl());
+        profileVillageInfo.setImageUrl(qukuService.getUserAvatarPicUrl(accUserPojo.getId()));
+        profileVillageInfo.setTargetUrl(qukuService.getUserBackgroundPicUrl(accUserPojo.getId()));
         res.setProfileVillageInfo(profileVillageInfo);
-        
+    
         return res;
     }
 }

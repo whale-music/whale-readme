@@ -46,14 +46,6 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField("password")
     private String password;
 
-    @ApiModelProperty("头像URL ID")
-    @TableField("avatar_url")
-    private Long avatarId;
-
-    @ApiModelProperty("背景照片URL")
-    @TableField("background_url")
-    private String backgroundUrl;
-
     @ApiModelProperty("个性签名")
     @TableField("signature")
     private String signature;

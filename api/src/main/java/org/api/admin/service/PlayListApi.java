@@ -314,7 +314,7 @@ public class PlayListApi {
         List<MusicConvert> converts = page.getRecords().parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(tbMusicPojo.getId()));
+            convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
         Page<MusicConvert> convertPage = new Page<>();
@@ -433,7 +433,7 @@ public class PlayListApi {
         TbCollectPojo byId = collectService.getById(id);
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(byId, convert);
-        String picUrl = qukuService.getPicUrl(byId.getId());
+        String picUrl = qukuService.getCollectPicUrl(byId.getId());
         convert.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         return convert;
     }
@@ -441,7 +441,7 @@ public class PlayListApi {
     public TbCollectPojo createPlayList(String name) {
         CollectConvert playList = qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
         qukuService.saveOrUpdateCollectPic(playList.getId(), defaultInfo.getPic().getPlayListPic());
-        playList.setPicUrl(this.qukuService.getPicUrl(playList.getId()));
+        playList.setPicUrl(this.qukuService.getCollectPicUrl(playList.getId()));
         return playList;
     }
     
@@ -492,7 +492,7 @@ public class PlayListApi {
         List<CollectConvert> converts = playList.getRecords().parallelStream().map(collectPojo -> {
             CollectConvert convert = new CollectConvert();
             BeanUtils.copyProperties(collectPojo, convert);
-            convert.setPicUrl(qukuService.getPicUrl(collectPojo.getId()));
+            convert.setPicUrl(qukuService.getCollectPicUrl(collectPojo.getId()));
             return convert;
         }).collect(Collectors.toList());
     

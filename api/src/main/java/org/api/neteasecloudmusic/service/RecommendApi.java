@@ -108,7 +108,7 @@ public class RecommendApi {
             ResultItem e = new ResultItem();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
+            e.setPicUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
             e.setCanDislike(true);
             e.setTrackNumberUpdateTime(tbCollectPojo.getUpdateTime().getNano());
             result.add(e);
@@ -124,16 +124,16 @@ public class RecommendApi {
             DailyRecommendResourceRes e = new DailyRecommendResourceRes();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getPicUrl(tbCollectPojo.getId()));
+            e.setPicUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
             e.setPlaycount(3000L);
             e.setCreateTime((long) tbCollectPojo.getCreateTime().getNano());
             e.setUserId(tbCollectPojo.getUserId());
-            
+    
             // 创建者信息
             SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
             Creator creator = new Creator();
-            creator.setAvatarUrl(qukuService.getPicUrl(userPojo.getAvatarId()));
-            creator.setBackgroundUrl(userPojo.getBackgroundUrl());
+            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
+            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
             creator.setNickname(userPojo.getNickname());
             creator.setDescription(userPojo.getSignature());
             creator.setSignature(userPojo.getSignature());

@@ -1,5 +1,6 @@
 package org.web.controller.admin.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
@@ -28,6 +29,7 @@ public class HomeController {
     private HoneApi honeApi;
     
     @GetMapping("/count")
+    @Operation(summary = "获取数据库统计")
     public R getCount() {
         Count musicCount = honeApi.getMusicCount();
         Count albumCount = honeApi.getAlbumCount();

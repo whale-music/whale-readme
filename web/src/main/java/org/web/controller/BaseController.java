@@ -30,7 +30,7 @@ public class BaseController {
         profile.setShortUserName(account.getUsername());
         
         profile.setAvatarUrl(account.getAvatarUrl());
-        profile.setBackgroundUrl(account.getBackgroundUrl());
+        profile.setBackgroundUrl(account.getBackgroundPicUrl());
         
         profile.setLastLoginIP(account.getLastLoginIp());
         profile.setLastLoginTime(account.getLastLoginTime());

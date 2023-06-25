@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("sys_user")
 @ApiModel(value = "SysUserPojo对象", description = "系统用户表")
-public class SysUserPojo implements Serializable {
+public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +46,7 @@ public class SysUserPojo implements Serializable {
     @TableField("password")
     private String password;
 
-    @ApiModelProperty("头像URL")
+    @ApiModelProperty("头像URL ID")
     @TableField("avatar_url")
     private Long avatarId;
 

@@ -1,11 +1,11 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -17,15 +17,14 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
-@ToString
 @Accessors(chain = true)
 @TableName("tb_music")
 @ApiModel(value = "TbMusicPojo对象", description = "所有音乐列表")
-public class TbMusicPojo implements Serializable {
+public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -49,13 +48,13 @@ public class TbMusicPojo implements Serializable {
     @TableField("sort")
     private Long sort;
     
-    @ApiModelProperty("歌曲时长")
-    @TableField("time_length")
-    private Integer timeLength;
-    
     @ApiModelProperty("上传用户ID")
     @TableField("user_id")
     private Long userId;
+
+    @ApiModelProperty("歌曲时长")
+    @TableField("time_length")
+    private Integer timeLength;
     
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)

@@ -682,7 +682,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CollectConvert createPlayList(Long userId, String name, short type) {
+    public CollectConvert createPlayList(Long userId, String name, byte type) {
         TbCollectPojo collectPojo = new TbCollectPojo();
         collectPojo.setUserId(userId);
         collectPojo.setPlayListName(name);
@@ -750,7 +750,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 返回用户创建歌单
      */
     @Override
-    public List<CollectConvert> getUserPlayList(Long uid, Collection<Short> type) {
+    public List<CollectConvert> getUserPlayList(Long uid, Collection<Byte> type) {
         LambdaQueryWrapper<TbCollectPojo> queryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
                                                                  .eq(TbCollectPojo::getUserId, uid)
                                                                  .in(CollUtil.isNotEmpty(type), TbCollectPojo::getType, type);
@@ -796,7 +796,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Short target, Long id, String label) {
+    public void addLabel(Byte target, Long id, String label) {
         TbTagPojo tagPojo = tagService.getOne(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, label));
         Optional<TbTagPojo> pojo = Optional.ofNullable(tagPojo);
         tagPojo = pojo.orElseGet(() -> {
@@ -816,7 +816,7 @@ public class QukuServiceImpl implements QukuService {
      * @param labels 标签名
      */
     @Override
-    public void addLabel(Short target, Long id, List<String> labels) {
+    public void addLabel(Byte target, Long id, List<String> labels) {
         // 新增tag
         List<TbTagPojo> list;
         synchronized (addLabelLock) {
@@ -845,7 +845,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Short target, Long id, Long labelId) {
+    public void addLabel(Byte target, Long id, Long labelId) {
         // 添加标签
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
@@ -867,7 +867,7 @@ public class QukuServiceImpl implements QukuService {
      * @param tagIds 标签ID
      */
     @Override
-    public void addLabel(Short target, Long id, Set<Long> tagIds) {
+    public void addLabel(Byte target, Long id, Set<Long> tagIds) {
         LambdaQueryWrapper<TbMiddleTagPojo> in = Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tagIds);
         List<TbMiddleTagPojo> list = middleTagService.list(in);
         Map<Long, TbMiddleTagPojo> collect = list.parallelStream()
@@ -927,7 +927,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeLabelById(Short target, Long id, Collection<Long> labelBatchId) {
+    public void removeLabelById(Byte target, Long id, Collection<Long> labelBatchId) {
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getType, target)
                                                          .eq(TbMiddleTagPojo::getMiddleId, id)
@@ -944,7 +944,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeLabelByName(Short target, Long id, Collection<Long> labelBatchName) {
+    public void removeLabelByName(Byte target, Long id, Collection<Long> labelBatchName) {
         LambdaQueryWrapper<TbTagPojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(TbTagPojo::getTagName, labelBatchName);
         List<TbTagPojo> list = tagService.list(queryWrapper);
@@ -1251,7 +1251,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveOrUpdatePic(Long id, Short type, TbPicPojo pojo) {
+    public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
         Wrapper<TbPicPojo> eq = Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pojo.getMd5());
         TbPicPojo one = picService.getOne(eq);
         removePic(id);

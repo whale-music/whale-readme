@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2023-03-29
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,8 +26,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_plugin_msg")
 @ApiModel(value = "TbPluginMsgPojo对象", description = "插件消息表")
-public class TbPluginMsgPojo implements Serializable {
-    
+public class TbPluginMsgPojo extends Model<TbPluginMsgPojo> implements Serializable {
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("插件消息ID")
@@ -47,7 +48,7 @@ public class TbPluginMsgPojo implements Serializable {
     
     @ApiModelProperty("插件消息等级,0 info 1 debug 2 warn 3 error")
     @TableField("level")
-    private Short level;
+    private Byte level;
     
     @ApiModelProperty("插件运行消息")
     @TableField("msg")

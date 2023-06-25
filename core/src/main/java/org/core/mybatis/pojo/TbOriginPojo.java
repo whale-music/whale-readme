@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -14,19 +15,19 @@ import java.io.Serializable;
 
 /**
  * <p>
- *
+ * 音乐来源
  * </p>
  *
  * @author Sakura
- * @since 2023-06-14
+ * @since 2023-06-25
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("tb_origin")
 @ApiModel(value = "TbOriginPojo对象", description = "音乐来源")
-public class TbOriginPojo implements Serializable {
-    
+public class TbOriginPojo extends Model<TbOriginPojo> implements Serializable{
+
     private static final long serialVersionUID = 1L;
     
     @TableId(value = "id", type = IdType.ASSIGN_ID)

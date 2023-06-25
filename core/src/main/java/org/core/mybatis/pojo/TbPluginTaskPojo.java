@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2023-03-29
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,8 +26,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_plugin_task")
 @ApiModel(value = "TbPluginTaskPojo对象", description = "插件任务表")
-public class TbPluginTaskPojo implements Serializable {
-    
+public class TbPluginTaskPojo extends Model<TbPluginTaskPojo> implements Serializable {
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("任务ID")
@@ -39,15 +40,15 @@ public class TbPluginTaskPojo implements Serializable {
     
     @ApiModelProperty("当前任务执行状态,0: stop, 1: run, 2: error")
     @TableField("status")
-    private Short status;
-    
-    @ApiModelProperty("用户创建ID")
-    @TableField("user_id")
-    private Long userId;
-    
+    private Byte status;
+
     @ApiModelProperty("插件入参")
     @TableField("params")
     private String params;
+
+    @ApiModelProperty("用户创建ID")
+    @TableField("user_id")
+    private Long userId;
     
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)

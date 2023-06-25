@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -26,8 +27,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_artist")
 @ApiModel(value = "TbArtistPojo对象", description = "歌手表")
-public class TbArtistPojo implements Serializable {
-    
+public class TbArtistPojo extends Model<TbArtistPojo> implements Serializable{
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌手ID")
@@ -38,7 +39,7 @@ public class TbArtistPojo implements Serializable {
     @TableField("artist_name")
     private String artistName;
     
-    @ApiModelProperty("歌手名")
+    @ApiModelProperty("歌手别名")
     @TableField("alias_name")
     private String aliasName;
 

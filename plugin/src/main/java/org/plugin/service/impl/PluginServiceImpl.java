@@ -218,7 +218,7 @@ public class PluginServiceImpl implements PluginService {
                     task.getId(),
                     task.getUserId(),
                     null);
-            pluginPackage.log((short) 3, "error错误: {}: {}", e.getClass().getName(), e.getMessage());
+            pluginPackage.log((byte) 3, "error错误: {}: {}", e.getClass().getName(), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
         }

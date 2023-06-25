@@ -57,7 +57,7 @@ public class PluginPackage {
         return musicFlowApi.saveMusicInfo(dto);
     }
     
-    public void log(short level, String format, Object... arguments) {
+    public void log(byte level, String format, Object... arguments) {
         log.info(format, arguments);
         TbPluginMsgPojo entity = new TbPluginMsgPojo();
         TbPluginTaskPojo taskServiceById = pluginTaskService.getById(taskId);
@@ -72,18 +72,18 @@ public class PluginPackage {
     }
     
     public void logInfo(String format, Object... arguments) {
-        log((short) 0, format, arguments);
+        log((byte) 0, format, arguments);
     }
     
     public void logDebug(String format, Object... arguments) {
-        log((short) 1, format, arguments);
+        log((byte) 1, format, arguments);
     }
     
     public void logWarn(String format, Object... arguments) {
-        log((short) 2, format, arguments);
+        log((byte) 2, format, arguments);
     }
     
     public void logError(String format, Object... arguments) {
-        log((short) 3, format, arguments);
+        log((byte) 3, format, arguments);
     }
 }

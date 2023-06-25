@@ -17,8 +17,8 @@ import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.core.config.LyricConfig;
 import org.core.mybatis.iservice.TbAlbumService;
 import org.core.mybatis.iservice.TbCollectService;
+import org.core.mybatis.iservice.TbHistoryService;
 import org.core.mybatis.iservice.TbMusicService;
-import org.core.mybatis.iservice.TbRankService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
@@ -41,7 +41,7 @@ public class MusicApi {
     private QukuAPI qukuService;
     
     @Autowired
-    private TbRankService rankService;
+    private TbHistoryService historyService;
     
     @Autowired
     private TbAlbumService albumService;
@@ -174,52 +174,52 @@ public class MusicApi {
     public void scrobble(Long id, Long sourceid, Integer time) {
         Long userId = UserUtil.getUser().getId();
         
-        LambdaQueryWrapper<TbRankPojo> musicWrapper = Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, userId).eq(TbRankPojo::getId, id);
-        TbRankPojo musicRank = rankService.getOne(musicWrapper);
-        ArrayList<TbRankPojo> entityList = new ArrayList<>();
+        LambdaQueryWrapper<TbHistoryPojo> musicWrapper = Wrappers.<TbHistoryPojo>lambdaQuery().eq(TbHistoryPojo::getUserId, userId).eq(TbHistoryPojo::getId, id);
+        TbHistoryPojo musicRank = historyService.getOne(musicWrapper);
+        ArrayList<TbHistoryPojo> entityList = new ArrayList<>();
         // 没有数据则添加数据到表中
         if (musicRank == null) {
-            TbRankPojo musicRankPojo = new TbRankPojo();
+            TbHistoryPojo musicRankPojo = new TbHistoryPojo();
             musicRankPojo.setId(id);
             musicRankPojo.setUserId(userId);
-            musicRankPojo.setBroadcastCount(1);
-            musicRankPojo.setBroadcastType(0);
+            musicRankPojo.setCount(1);
+            musicRankPojo.setCount(0);
             entityList.add(musicRankPojo);
         } else {
-            Integer broadcastCount = musicRank.getBroadcastCount();
+            Integer broadcastCount = musicRank.getCount();
             broadcastCount = broadcastCount + 1;
-            musicRank.setBroadcastCount(broadcastCount);
-            rankService.update(musicRank, musicWrapper);
+            musicRank.setCount(broadcastCount);
+            historyService.update(musicRank, musicWrapper);
         }
         
         // 专辑或歌单
-        LambdaQueryWrapper<TbRankPojo> sourceWrapper = Wrappers.<TbRankPojo>lambdaQuery()
-                                                               .eq(TbRankPojo::getUserId, userId)
-                                                               .eq(TbRankPojo::getId, sourceid);
-        TbRankPojo sourcePojo = rankService.getOne(sourceWrapper);
+        LambdaQueryWrapper<TbHistoryPojo> sourceWrapper = Wrappers.<TbHistoryPojo>lambdaQuery()
+                                                               .eq(TbHistoryPojo::getUserId, userId)
+                                                               .eq(TbHistoryPojo::getId, sourceid);
+        TbHistoryPojo sourcePojo = historyService.getOne(sourceWrapper);
         if (sourcePojo == null) {
             // 专辑或歌单ID
-            TbRankPojo rankPojo = new TbRankPojo();
+            TbHistoryPojo rankPojo = new TbHistoryPojo();
             rankPojo.setUserId(userId);
             rankPojo.setId(sourceid);
-            rankPojo.setBroadcastCount(1);
+            rankPojo.setCount(1);
     
             TbCollectPojo collectPojo = collectService.getById(sourceid);
             if (collectPojo != null) {
-                rankPojo.setBroadcastType(1);
+                rankPojo.setCount(1);
             } else {
                 TbAlbumPojo albumPojo = albumService.getById(sourceid);
                 if (albumPojo != null) {
-                    rankPojo.setBroadcastType(2);
+                    rankPojo.setType(2);
                 }
             }
             entityList.add(rankPojo);
         } else {
-            Integer broadcastCount = sourcePojo.getBroadcastCount();
+            Integer broadcastCount = sourcePojo.getCount();
             broadcastCount = broadcastCount + 1;
-            sourcePojo.setBroadcastCount(broadcastCount);
-            rankService.update(sourcePojo, sourceWrapper);
+            sourcePojo.setType(broadcastCount);
+            historyService.update(sourcePojo, sourceWrapper);
         }
-        rankService.saveBatch(entityList);
+        historyService.saveBatch(entityList);
     }
 }

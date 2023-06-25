@@ -76,7 +76,7 @@ public class QukuAPI extends QukuServiceImpl {
      * @param pojo 封面数据
      */
     @Override
-    public void saveOrUpdatePic(Long id, Short type, TbPicPojo pojo) {
+    public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
         if (StringUtils.isBlank(pojo.getUrl())) {
             throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }

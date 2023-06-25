@@ -227,7 +227,7 @@ public interface QukuService {
      * @param type   歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单
      * @return 歌单创建信息
      */
-    CollectConvert createPlayList(Long userId, String name, short type);
+    CollectConvert createPlayList(Long userId, String name, byte type);
     
     /**
      * 删除歌单
@@ -244,7 +244,7 @@ public interface QukuService {
      * @param type 歌单类型
      * @return 返回用户创建歌单
      */
-    List<CollectConvert> getUserPlayList(Long uid, Collection<Short> type);
+    List<CollectConvert> getUserPlayList(Long uid, Collection<Byte> type);
     
     /**
      * 获取歌单音乐数量
@@ -269,7 +269,7 @@ public interface QukuService {
      * @param id     歌单或歌曲前ID
      * @param label  标签名
      */
-    void addLabel(Short target, Long id, String label);
+    void addLabel(Byte target, Long id, String label);
     
     /**
      * 批量添加tag
@@ -278,7 +278,7 @@ public interface QukuService {
      * @param id     歌单或歌曲前ID
      * @param labels 标签名
      */
-    void addLabel(Short target, Long id, List<String> labels);
+    void addLabel(Byte target, Long id, List<String> labels);
     
     /**
      * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
@@ -287,7 +287,7 @@ public interface QukuService {
      * @param id      歌单或歌曲前ID
      * @param labelId 标签ID
      */
-    void addLabel(Short target, Long id, Long labelId);
+    void addLabel(Byte target, Long id, Long labelId);
     
     /**
      * 批量添加tag
@@ -296,7 +296,7 @@ public interface QukuService {
      * @param id       歌单或歌曲前ID
      * @param labelIds 标签ID
      */
-    void addLabel(Short target, Long id, Set<Long> labelIds);
+    void addLabel(Byte target, Long id, Set<Long> labelIds);
     
     /**
      * 删除全部tag
@@ -312,7 +312,7 @@ public interface QukuService {
      * @param id           歌单或歌曲前ID
      * @param labelBatchId 需要删除的label ID
      */
-    void removeLabelById(Short target, Long id, Collection<Long> labelBatchId);
+    void removeLabelById(Byte target, Long id, Collection<Long> labelBatchId);
     
     /**
      * 删除歌单或音乐中的tag
@@ -321,7 +321,7 @@ public interface QukuService {
      * @param id             歌单或歌曲前ID
      * @param labelBatchName 需要删除的label ID
      */
-    void removeLabelByName(Short target, Long id, Collection<Long> labelBatchName);
+    void removeLabelByName(Byte target, Long id, Collection<Long> labelBatchName);
     
     /**
      * 删除歌单或音乐中的tag
@@ -330,7 +330,7 @@ public interface QukuService {
      * @param id      歌单或歌曲前ID
      * @param labelId 需要删除的label ID
      */
-    default void removeLabelById(Short target, Long id, Long labelId) {
+    default void removeLabelById(Byte target, Long id, Long labelId) {
         removeLabelById(target, id, Collections.singletonList(labelId));
     }
     
@@ -341,7 +341,7 @@ public interface QukuService {
      * @param id        歌单或歌曲前ID
      * @param labelName 需要删除的label ID
      */
-    default void removeLabelByName(Short target, Long id, Long labelName) {
+    default void removeLabelByName(Byte target, Long id, Long labelName) {
         removeLabelByName(target, id, Collections.singletonList(labelName));
     }
     
@@ -447,9 +447,9 @@ public interface QukuService {
      * @param type 添加ID类型 歌曲，专辑，歌单，歌手
      * @param pojo 封面数据
      */
-    void saveOrUpdatePic(Long id, Short type, TbPicPojo pojo);
+    void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo);
     
-    default void saveOrUpdatePic(Long id, Short type, String url) {
+    default void saveOrUpdatePic(Long id, Byte type, String url) {
         TbPicPojo pojo = new TbPicPojo();
         pojo.setUrl(url);
         this.saveOrUpdatePic(id, type, pojo);

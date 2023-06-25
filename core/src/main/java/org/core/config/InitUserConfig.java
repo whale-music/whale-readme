@@ -1,8 +1,12 @@
 package org.core.config;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,7 +40,8 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
         // 是否查看Admin用户密码
         if (args.getNonOptionArgs().contains(ADMIN)) {
             SysUserPojo user = accountService.getOne(userEq);
-            log.info("\nuser: {}\npassword: {}", user.getUsername(), user.getPassword());
+            Log logger = LogFactory.getLog(NoOpLog.class);
+            logger.info(CharSequenceUtil.format("\nuser: {}\npassword: {}", user.getUsername(), user.getPassword()));
         }
     }
     

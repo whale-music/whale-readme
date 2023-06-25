@@ -11,7 +11,7 @@ public interface PlayListService {
     /**
      * 歌单查询
      */
-    Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Short type);
+    Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Byte type);
     
     /**
      * 歌单查询

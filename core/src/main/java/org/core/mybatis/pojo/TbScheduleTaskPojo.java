@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -16,15 +17,15 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2023-05-17
+ * @since 2023-06-25
  */
 @Getter
 @Setter
 @Accessors(chain = true)
 @TableName("tb_schedule_task")
-@ApiModel(value = "TbSchedulePojo对象", description = "定时任务表")
-public class TbScheduleTaskPojo implements Serializable {
-    
+@ApiModel(value = "TbScheduleTaskPojo对象", description = "定时任务表")
+public class TbScheduleTaskPojo extends Model<TbScheduleTaskPojo> implements Serializable{
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("ID")

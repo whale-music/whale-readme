@@ -13,6 +13,7 @@ import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
+import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -140,7 +141,7 @@ public class CollectApi {
         TbPicPojo pic = new TbPicPojo();
         pic.setUrl(defaultInfo.getPic().getPlayListPic());
         qukuService.saveOrUpdateUserPic(userId, defaultInfo.getPic().getPlayListPic());
-        return qukuService.createPlayList(userId, name, Short.parseShort("0"));
+        return qukuService.createPlayList(userId, name, PlayListTypeConfig.ORDINARY);
     }
     
     /**

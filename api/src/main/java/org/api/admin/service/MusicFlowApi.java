@@ -335,7 +335,6 @@ public class MusicFlowApi {
         TbMusicUrlPojo urlPojo = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
         urlPojo = urlPojo == null ? new TbMusicUrlPojo() : urlPojo;
         urlPojo.setMusicId(musicPojo.getId());
-        urlPojo.setOrigin(dto.getOrigin());
         Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
         SysUserPojo byId = accountService.getById(userId);
         ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
@@ -932,7 +931,6 @@ public class MusicFlowApi {
                 entity.setUrl(upload);
                 entity.setUserId(userId);
                 entity.setEncodeType(nameArr[1]);
-                entity.setOrigin("auto");
                 entity.setSize(FileUtil.size(dest));
                 entity.setMd5(tempMd5);
                 musicUrlService.save(entity);
@@ -974,7 +972,6 @@ public class MusicFlowApi {
             entity.setRate(musicSource.getRate());
             entity.setUserId(musicSource.getUserId());
             entity.setEncodeType(nameArr[1]);
-            entity.setOrigin("manual");
             entity.setMd5(musicSource.getMd5());
             entity.setSize(musicSource.getSize());
             entity.setUrl(musicSource.getName());

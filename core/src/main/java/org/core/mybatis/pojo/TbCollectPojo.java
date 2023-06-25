@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_collect")
 @ApiModel(value = "TbCollectPojo对象", description = "歌单列表")
-public class TbCollectPojo implements Serializable {
+public class TbCollectPojo extends Model<TbCollectPojo> implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -39,8 +40,12 @@ public class TbCollectPojo implements Serializable {
     
     @ApiModelProperty("歌单类型，0为普通歌单，1为用户喜爱歌单，2为推荐歌单")
     @TableField("type")
-    private Short type;
-    
+    private Byte type;
+
+    @ApiModelProperty("该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)")
+    @TableField("subscribed")
+    private Boolean subscribed;
+
     @ApiModelProperty("简介")
     @TableField("description")
     private String description;
@@ -52,10 +57,6 @@ public class TbCollectPojo implements Serializable {
     @ApiModelProperty("排序字段")
     @TableField("sort")
     private Long sort;
-
-    @ApiModelProperty("该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)")
-    @TableField("subscribed")
-    private Boolean subscribed;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)

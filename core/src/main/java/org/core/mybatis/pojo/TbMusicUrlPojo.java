@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,8 +26,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_music_url")
 @ApiModel(value = "TbMusicUrlPojo对象", description = "音乐下载地址")
-public class TbMusicUrlPojo implements Serializable {
-    
+public class TbMusicUrlPojo extends Model<TbMusicUrlPojo> implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
@@ -40,10 +41,6 @@ public class TbMusicUrlPojo implements Serializable {
     @ApiModelProperty("比特率，音频文件的信息")
     @TableField("rate")
     private Integer rate;
-    
-    @ApiModelProperty("音乐质量")
-    @TableField("level")
-    private String level;
 
     @ApiModelProperty("音乐地址")
     @TableField("url")
@@ -52,6 +49,10 @@ public class TbMusicUrlPojo implements Serializable {
     @ApiModelProperty("保存音乐本体的md5，当上传新的音乐时做比较。如果相同则表示已存在")
     @TableField("md5")
     private String md5;
+
+    @ApiModelProperty("音乐质量")
+    @TableField("level")
+    private String level;
 
     @ApiModelProperty("文件格式类型")
     @TableField("encode_type")
@@ -64,10 +65,6 @@ public class TbMusicUrlPojo implements Serializable {
     @ApiModelProperty("上传用户ID")
     @TableField("user_id")
     private Long userId;
-    
-    @ApiModelProperty("音乐来源")
-    @TableField("origin")
-    private String origin;
     
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)

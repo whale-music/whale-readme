@@ -509,7 +509,7 @@ public class PlayListApi {
         if (req.getId() == null) {
             throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
-        Short type = req.getType();
+        Byte type = req.getType();
         // 只允许用户只有一个喜爱歌单
         if (type == 1) {
             Long userId = UserUtil.getUser().getId();

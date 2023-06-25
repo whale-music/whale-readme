@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -27,8 +28,8 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("tb_collect_music")
 @ApiModel(value = "TbCollectMusicPojo对象", description = "歌单和音乐的中间表，用于记录歌单中的每一个音乐")
-public class TbCollectMusicPojo implements Serializable {
-    
+public class TbCollectMusicPojo extends Model<TbCollectMusicPojo> implements Serializable {
+
     private static final long serialVersionUID = 1L;
     
     @ApiModelProperty("歌单ID")

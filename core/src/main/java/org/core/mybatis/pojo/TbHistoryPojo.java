@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-25
  */
 @Getter
 @Setter
@@ -25,21 +26,28 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("tb_history")
 @ApiModel(value = "TbHistoryPojo对象", description = "音乐播放历史(包括歌单，音乐，专辑）")
-public class TbHistoryPojo implements Serializable {
+public class TbHistoryPojo extends Model<TbHistoryPojo> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("歌曲ID")
-    @TableId(value = "music_id", type = IdType.ASSIGN_ID)
-    private Long musicId;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-    @ApiModelProperty("听歌次数")
-    @TableField("count")
-    private Integer count;
+    @ApiModelProperty("用户ID")
+    @TableField("user_id")
+    private Long userId;
 
-    @ApiModelProperty("历史类型")
+    @ApiModelProperty("播放ID，可能是歌曲，专辑，歌单")
+    @TableField("middle_id")
+    private Long middleId;
+
+    @ApiModelProperty("播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑")
     @TableField("type")
     private Integer type;
+
+    @ApiModelProperty("歌曲播放次数")
+    @TableField("count")
+    private Integer count;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)

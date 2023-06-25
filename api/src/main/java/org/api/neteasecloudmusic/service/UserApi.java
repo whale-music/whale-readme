@@ -20,6 +20,7 @@ import org.api.neteasecloudmusic.model.vo.user.record.Song;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -62,9 +63,6 @@ public class UserApi {
     private TbUserArtistService userSingerService;
     
     @Autowired
-    private TbRankService rankService;
-    
-    @Autowired
     private TbMusicService musicService;
     
     @Autowired
@@ -72,6 +70,9 @@ public class UserApi {
     
     @Autowired
     private CollectApi collectApi;
+    
+    @Autowired
+    private TbHistoryService historyService;
     
     /**
      * 创建用户
@@ -233,7 +234,7 @@ public class UserApi {
      */
     public Long getCreatedPlaylistCount(Long userId) {
         LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getType, Short.valueOf("0"))
+                                                                       .eq(TbCollectPojo::getType, PlayListTypeConfig.ORDINARY)
                                                                        .eq(TbCollectPojo::getUserId, userId);
         return collectService.count(lambdaQueryWrapper);
     }
@@ -272,21 +273,21 @@ public class UserApi {
     public List<UserRecordRes> userRecord(Long uid, Long type) {
         log.debug("type: {}", type);
         ArrayList<UserRecordRes> res = new ArrayList<>();
-        List<TbRankPojo> list = rankService.list(Wrappers.<TbRankPojo>lambdaQuery().eq(TbRankPojo::getUserId, uid));
-        Map<Long, TbRankPojo> rankPojoMap = list.stream().collect(Collectors.toMap(TbRankPojo::getId, tbRankPojo -> tbRankPojo));
+        List<TbHistoryPojo> list = historyService.list(Wrappers.<TbHistoryPojo>lambdaQuery().eq(TbHistoryPojo::getUserId, uid));
+        Map<Long, TbHistoryPojo> rankPojoMap = list.stream().collect(Collectors.toMap(TbHistoryPojo::getId, tbRankPojo -> tbRankPojo));
         
         List<TbMusicPojo> musicPojoList;
         if (CollUtil.isEmpty(list)) {
             Page<TbMusicPojo> page = musicService.page(new Page<>(0, 100L));
             musicPojoList = page.getRecords();
         } else {
-            List<Long> musicIds = list.stream().map(TbRankPojo::getId).collect(Collectors.toList());
+            List<Long> musicIds = list.stream().map(TbHistoryPojo::getId).collect(Collectors.toList());
             musicPojoList = musicService.listByIds(musicIds);
         }
         
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             UserRecordRes userRecordRes = new UserRecordRes();
-            int count = rankPojoMap.get(tbMusicPojo.getId()) == null ? 0 : rankPojoMap.get(tbMusicPojo.getId()).getBroadcastCount();
+            int count = rankPojoMap.get(tbMusicPojo.getId()) == null ? 0 : rankPojoMap.get(tbMusicPojo.getId()).getCount();
             userRecordRes.setPlayCount(count);
             Song song = new Song();
             song.setName(tbMusicPojo.getMusicName());

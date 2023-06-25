@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
+import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbMusicService;
@@ -31,7 +32,7 @@ public class PlayListServiceImpl implements PlayListService {
     @Autowired
     private TbMusicService musicService;
     
-    public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Short type) {
+    public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Byte type) {
         collectPojo = Optional.ofNullable(collectPojo).orElse(new TbCollectPojo());
         Page<TbCollectPojo> page = new Page<>(current, size);
         LambdaQueryWrapper<TbCollectPojo> queryWrapper = new LambdaQueryWrapper<>();
@@ -51,7 +52,7 @@ public class PlayListServiceImpl implements PlayListService {
         }
         for (int i = 0; i < limit; i++) {
             long randomNum = RandomUtil.randomLong(count);
-            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L, Short.valueOf("0"));
+            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L, PlayListTypeConfig.ORDINARY);
             tbCollectPojos.addAll(playList.getRecords());
         }
         Set<TbCollectPojo> playerSet = new TreeSet<>(Comparator.comparing(TbCollectPojo::getId));

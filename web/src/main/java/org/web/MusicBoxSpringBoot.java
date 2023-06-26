@@ -6,9 +6,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.web.controller.admin.AdminSpringBootApplication;
-import org.web.controller.neteasecloudmusic.NeteaseCloudMusicSpringBootApplication;
-import org.web.controller.subsonic.SubsonicSpringBootApplication;
+import org.web.admin.AdminSpringBootApplication;
+import org.web.neteasecloudmusic.NeteaseCloudMusicSpringBootApplication;
+import org.web.subsonic.SubsonicSpringBootApplication;
 
 // jpa
 @EntityScan(basePackages = "org.core.jpa.entity")
@@ -23,6 +23,5 @@ public class MusicBoxSpringBoot {
                 .sibling(NeteaseCloudMusicSpringBootApplication.class)
                 .sibling(SubsonicSpringBootApplication.class)
                 .run(args);
-        // SpringApplication.run(MusicBoxSpringBoot.class, args);
     }
 }

@@ -14,7 +14,6 @@ import org.api.admin.service.AlbumApi;
 import org.api.admin.service.ArtistApi;
 import org.api.admin.service.MusicFlowApi;
 import org.api.admin.service.PlayListApi;
-import org.core.common.result.R;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.*;
@@ -37,8 +36,6 @@ class MusicControllerTest {
     public static final String ADMIN = "admin";
     @Autowired
     MusicFlowApi uploadMusic;
-    @Autowired
-    MusicController musicController;
     @Autowired
     private TbMusicService musicService;
     @Autowired
@@ -255,8 +252,7 @@ class MusicControllerTest {
         
         dto.setUploadFlag(true);
         dto.setUserId(user.getId());
-        R result = musicController.uploadMusicInfo(dto);
-        MusicDetails data = (MusicDetails) result.getData();
+        MusicDetails data = uploadMusic.saveMusicInfo(dto);
         TbMusicPojo music = data.getMusic();
         Assertions.assertEquals(music.getMusicName(), dto.getMusicName());
         Assertions.assertEquals(music.getAliasName(), CollUtil.join(dto.getAliaName(), ","));

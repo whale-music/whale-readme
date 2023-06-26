@@ -15,7 +15,7 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.web.controller.BaseController;
+import org.web.controller.neteasecloudmusic.BaseController;
 
 import java.util.List;
 import java.util.Optional;

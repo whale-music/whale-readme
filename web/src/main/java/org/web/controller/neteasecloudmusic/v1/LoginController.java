@@ -24,7 +24,7 @@ import org.core.utils.JwtUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.web.controller.BaseController;
+import org.web.controller.neteasecloudmusic.BaseController;
 
 import java.util.HashMap;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package org.web.controller;
+package org.web.controller.neteasecloudmusic;
 
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;

@@ -10,7 +10,6 @@ import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
 import org.api.admin.service.UserApi;
 import org.core.common.exception.BaseException;
-import org.core.common.result.NeteaseResult;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
@@ -20,13 +19,11 @@ import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.web.controller.BaseController;
-
 
 
 @RestController(AdminConfig.ADMIN + "LoginController")
 @RequestMapping("/admin/user")
-public class LoginController extends BaseController {
+public class LoginController {
     
     @Autowired
     private UserApi user;
@@ -48,17 +45,24 @@ public class LoginController extends BaseController {
      * 注册接口
      */
     @PostMapping("/register")
-    public NeteaseResult addUser(@RequestBody UserReq req) {
+    public R addUser(@RequestBody UserReq req) {
         user.createAccount(req);
-        return new NeteaseResult().success();
+        return R.success();
     }
     
     /**
      * 登出接口
      */
     @GetMapping("/logout")
-    public NeteaseResult userLogout(HttpServletResponse response) {
-        return super.logout(response);
+    public R userLogout(HttpServletResponse response) {
+        // 删除cookie
+        Cookie cookie = new Cookie(Header.COOKIE.getValue(), null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        // 删除用户
+        UserUtil.removeUser();
+        return R.success();
     }
     
     @PostMapping("/refreshToken")

@@ -5,32 +5,32 @@ public class PicTypeConstant {
     /**
      * 歌曲
      */
-    public static final Byte MUSIC = 0;
+    public static final byte MUSIC = 0;
     
     /**
      * 歌单
      */
-    public static final Byte COLLECT = 1;
+    public static final byte PLAYLIST = 1;
     
     /**
      * 专辑
      */
-    public static final Byte ALBUM = 2;
+    public static final byte ALBUM = 2;
     
     /**
      * 歌手
      */
-    public static final Byte ARTIST = 3;
+    public static final byte ARTIST = 3;
     
     /**
      * 用户头像
      */
-    public static final Byte USER_AVATAR = 4;
+    public static final byte USER_AVATAR = 4;
     
     /**
      * 用户背景
      */
-    public static final Byte USER_BACKGROUND = 4;
+    public static final byte USER_BACKGROUND = 5;
     
     private PicTypeConstant() {
     }

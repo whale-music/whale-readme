@@ -1,6 +1,6 @@
 server:
   # 配置启动端口号
-  port: 8000
+#  port: 8000
   servlet:
     session:
       timeout: 259200000000
@@ -134,13 +134,20 @@ default-info:
   pic:
     # 如果封面没有值则返回此链接
     # http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    # 冗余默认封面地址
     default-pic: https://i.ibb.co/NLGThpw/wallhaven-9mjoy1.png
     # 音乐没有封面则默认使用此链接
     music-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
-    # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
     # 歌单默认封面
     play-list-pic: http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
     # 专辑默认封面
     album-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
+    # 歌手默认封面
+    artist-pic: http://p2.music.126.net/DJfkuXG7P478Cb2ODUgmRg==/109951163608046759.jpg
+    # 用户默认头像
+    user-avatar-pic: https://fakeimg.pl/200x100/000000/fff?retina=2&text=%E7%94%A8%E6%88%B7%E5%A4%B4%E5%83%8F&font=noto
+    # 用户默认背景
+    user-background-pic: https://fakeimg.pl/200x100/000000/fff?retina=2&text=%E7%94%A8%E6%88%B7%E8%83%8C%E6%99%AF&font=noto
 
 

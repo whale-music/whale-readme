@@ -13,6 +13,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.TargetTagConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
@@ -111,7 +112,7 @@ public class QukuServiceImpl implements QukuService {
             BeanUtils.copyProperties(tbAlbumPojo, convert);
             convert.setPicUrl(MapUtil.get(picUrl, tbAlbumPojo.getId(), String.class));
             return convert;
-        }).collect(Collectors.toList());
+        }).toList();
     }
     
     private static Map<Long, ArtistConvert> getLongArtistConvertMap(List<TbArtistPojo> tbArtistPojos, Map<Long, String> picUrl) {
@@ -1216,7 +1217,12 @@ public class QukuServiceImpl implements QukuService {
             List<TbMiddlePicPojo> list = middlePicService.list();
             return list.stream().collect(Collectors.toMap(TbMiddlePicPojo::getMiddleId, TbMiddlePicPojo::getPicId));
         });
-        List<Long> picIds = ids.parallelStream().map(picMiddle::get).collect(Collectors.toList());
+        // 返回默认地址
+        if (CollUtil.isEmpty(picMiddle)) {
+            return ids.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type)));
+        }
+        // 获取缓存中地址
+        List<Long> picIds = ids.parallelStream().map(picMiddle::get).filter(Objects::nonNull).toList();
         Map<Long, TbPicPojo> map = picCache.getAll(picIds, longs -> {
             List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
                                                                        .eq(TbMiddlePicPojo::getMiddleId, longs)
@@ -1225,18 +1231,28 @@ public class QukuServiceImpl implements QukuService {
             return tbPicPojoList.parallelStream().map(tbPicPojo -> {
                 tbPicPojo = tbPicPojo == null ? new TbPicPojo() : tbPicPojo;
                 if (StringUtils.isEmpty(tbPicPojo.getUrl())) {
-                    tbPicPojo.setUrl(defaultInfo.getPic().getDefaultPic());
+                    tbPicPojo.setUrl(getDefaultPicUrl(type));
                 }
                 return tbPicPojo;
             }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
         });
-        HashMap<Long, String> res = new HashMap<>();
-        for (Map.Entry<Long, TbPicPojo> longTbPicPojoEntry : map.entrySet()) {
-            if (longTbPicPojoEntry.getValue() != null) {
-                res.put(longTbPicPojoEntry.getKey(), longTbPicPojoEntry.getValue().getUrl());
-            }
-        }
-        return res;
+        // 遍历ID，如果没有查找到，则返回默认数据
+        return ids.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
+            Long picId = picMiddle.get(aLong);
+            return picId == null ? getDefaultPicUrl(type) : map.get(picId).getUrl();
+        }));
+    }
+    
+    private String getDefaultPicUrl(Byte type) {
+        return switch (type) {
+            case PicTypeConstant.MUSIC -> defaultInfo.getPic().getMusicPic();
+            case PicTypeConstant.PLAYLIST -> defaultInfo.getPic().getPlayListPic();
+            case PicTypeConstant.ALBUM -> defaultInfo.getPic().getAlbumPic();
+            case PicTypeConstant.ARTIST -> defaultInfo.getPic().getArtistPic();
+            case PicTypeConstant.USER_AVATAR -> defaultInfo.getPic().getUserAvatarPic();
+            case PicTypeConstant.USER_BACKGROUND -> defaultInfo.getPic().getUserBackgroundPic();
+            default -> defaultInfo.getPic().getDefaultPic();
+        };
     }
     
     /**

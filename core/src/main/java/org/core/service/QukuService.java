@@ -460,7 +460,7 @@ public interface QukuService {
      * @return 封面地址map long -> 关联ID, String -> 封面地址
      */
     default String getCollectPicUrl(Long ids) {
-        return this.getPicUrl(ids, PicTypeConstant.COLLECT);
+        return this.getPicUrl(ids, PicTypeConstant.PLAYLIST);
     }
     
     /**
@@ -529,7 +529,7 @@ public interface QukuService {
      * @return 封面地址map long -> 关联ID, String -> 封面地址
      */
     default Map<Long, String> getCollectPicUrl(Collection<Long> ids) {
-        return this.getPicUrl(ids, PicTypeConstant.COLLECT);
+        return this.getPicUrl(ids, PicTypeConstant.PLAYLIST);
     }
     
     /**
@@ -608,7 +608,7 @@ public interface QukuService {
     default void saveOrUpdateCollectPic(Long id, String url) {
         TbPicPojo pojo = new TbPicPojo();
         pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.COLLECT, pojo);
+        this.saveOrUpdatePic(id, PicTypeConstant.PLAYLIST, pojo);
     }
     
     default void saveOrUpdateUserAvatar(Long id, String url) {

@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Configuration
 @ConfigurationProperties(prefix = "default-info")
 public class DefaultInfo implements Serializable {
-    private static final long serialVersionUID = 1905122041950251207L;
+    public static final long serialVersionUID = 1905122041950251207L;
     
     private Name name;
     private Pic pic;
@@ -22,7 +22,7 @@ public class DefaultInfo implements Serializable {
     
     @Data
     public static class Name implements Serializable {
-        private static final long serialVersionUID = 1905122241950251207L;
+        public static final long serialVersionUID = 1905122241950251207L;
         
         private NameType artist = NameType.DEFAULT;
         private NameType music = NameType.DEFAULT;
@@ -31,12 +31,15 @@ public class DefaultInfo implements Serializable {
     
     @Data
     public static class Pic implements Serializable {
-        private static final long serialVersionUID = 1902222041950251207L;
+        public static final long serialVersionUID = 1902222041950251207L;
         
         private String defaultPic;
         private String musicPic;
         private String playListPic;
         private String albumPic;
+        private String artistPic;
+        private String userAvatarPic;
+        private String userBackgroundPic;
     }
     
 }

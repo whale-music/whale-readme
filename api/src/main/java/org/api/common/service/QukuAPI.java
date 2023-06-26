@@ -47,19 +47,6 @@ public class QukuAPI extends QukuServiceImpl {
     /**
      * 封面
      *
-     * @param id   封面ID
-     * @param type 关联ID类型
-     * @return 封面地址
-     */
-    @Override
-    public String getPicUrl(Long id, Byte type) {
-        String picUrl = super.getPicUrl(id, type);
-        return getPicUrl(picUrl, false);
-    }
-    
-    /**
-     * 封面
-     *
      * @param ids  封面ID
      * @param type 关联ID类型
      * @return 封面地址
@@ -167,7 +154,7 @@ public class QukuAPI extends QukuServiceImpl {
     }
     
     public String getPicUrl(String path, boolean refresh) {
-        return getAddresses(refresh, path);
+        return StringUtils.startsWithIgnoreCase("http", path) ? path : getAddresses(refresh, path);
     }
     
     public List<TbPicPojo> getPicList(List<TbPicPojo> picPojoList, boolean refresh) {
@@ -179,7 +166,12 @@ public class QukuAPI extends QukuServiceImpl {
     
     public Map<Long, String> getPicUrlList(Map<Long, String> paths, boolean refresh) {
         for (Map.Entry<Long, String> longStringEntry : paths.entrySet()) {
-            String s = getAddresses(refresh, longStringEntry.getValue());
+            String s;
+            if (StringUtils.startsWithIgnoreCase("http", longStringEntry.getValue())) {
+                s = getAddresses(refresh, longStringEntry.getValue());
+            } else {
+                s = longStringEntry.getValue();
+            }
             paths.put(longStringEntry.getKey(), s);
         }
         return paths;

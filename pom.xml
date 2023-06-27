@@ -128,7 +128,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.15</version>
+            <version>5.8.20</version>
         </dependency>
 
         <!--生成文档-->
@@ -175,7 +175,7 @@
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
-            <version>3.15.4.RELEASE</version>
+            <version>3.15.6.RELEASE</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
@@ -207,6 +207,29 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--stater web 修复低版本漏洞-->
+            <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.0</version>
+            </dependency>
+
+            <!--unirest-java 修复低版本漏洞-->
+            <!-- https://mvnrepository.com/artifact/org.json/json -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20230618</version>
+            </dependency>
+
+            <!--unirest-java 修复低版本漏洞-->
+            <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.13</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public R bizExceptionHandler(BaseException e) {
         log.error("发生业务异常！原因是：{}", e.getErrorMsg());
+        log.error("Throwable: ", e);
         return R.error(e.getErrorCode(), e.getErrorMsg());
     }
     

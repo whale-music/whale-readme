@@ -13,7 +13,7 @@ import org.web.subsonic.SubsonicSpringBootApplication;
 // jpa
 @EntityScan(basePackages = "org.core.jpa.entity")
 @EnableJpaRepositories(basePackages = "org.core.jpa.repository")
-@SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss", "org.plugin"}, excludeName = "org.web")
+@SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss"}, excludeName = "org.web")
 @EnableAsync // 开启任务
 @EnableScheduling // 开启定时任务
 public class MusicBoxSpringBoot {

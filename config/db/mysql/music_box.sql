@@ -39,8 +39,6 @@ create table if not exists sys_user
     username        varchar(128) not null comment '登录用户名',
     nickname        varchar(128) not null comment '登录显示昵称',
     password        varchar(20)  null comment '用户密码',
-    avatar_url      bigint       null comment '头像URL ID',
-    background_url  varchar(256) null comment '背景照片URL',
     signature       varchar(50)  null comment '个性签名',
     account_type    int          null comment '账户类型',
     last_login_ip   varchar(20)  null comment '最后登录IP',
@@ -69,17 +67,17 @@ create table if not exists tb_album
     description  text         null comment '专辑简介',
     company      varchar(256) null comment '发行公司',
     publish_time datetime     null comment '专辑发布时间',
-    user_id      bigint       not null comment '上传用户ID',
+    user_id      bigint       null comment '上传用户ID',
     update_time  datetime     null comment '修改时间',
-    create_time  datetime     null comment '创建时间'
+    create_time  datetime     null comment '创建时间',
+    constraint tb_album_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete set null
 )
     comment '歌曲专辑表';
 
 create index tb_album_album_name_index
     on tb_album (album_name);
-
-create index tb_album_sys_user_id_fk
-    on tb_album (user_id);
 
 create table if not exists tb_artist
 (
@@ -91,9 +89,12 @@ create table if not exists tb_artist
     birth        date         null comment '出生年月',
     location     varchar(64)  null comment '所在国家',
     introduction longtext     null comment '歌手介绍',
-    user_id      bigint       not null comment '上传用户ID',
+    user_id      bigint       null comment '上传用户ID',
     create_time  datetime     null comment '创建时间',
-    update_time  datetime     null comment '修改时间'
+    update_time  datetime     null comment '修改时间',
+    constraint tb_artist_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete set null
 )
     comment '歌手表';
 
@@ -111,9 +112,6 @@ create table if not exists tb_album_artist
 )
     comment '歌手和专辑中间表';
 
-create index tb_artist_sys_user_id_fk
-    on tb_artist (user_id);
-
 create table if not exists tb_collect
 (
     id             bigint               not null comment '歌单表ID'
@@ -128,24 +126,12 @@ create table if not exists tb_collect
     update_time    datetime             null comment '修改时间',
     constraint tb_collect_sys_user_id_fk
         foreign key (user_id) references sys_user (id)
-            on update cascade on delete set null
+            on update cascade on delete cascade
 )
     comment '歌单列表';
 
 create index tb_collect_play_list_name_index
     on tb_collect (play_list_name);
-
-create table if not exists tb_middle_pic
-(
-    id        bigint  not null
-        primary key,
-    middle_id bigint  not null comment '中间表',
-    pic_id    bigint  not null comment '封面ID',
-    type      tinyint null comment '封面类型',
-    constraint id
-        unique (id)
-)
-    comment '封面中间表';
 
 create table if not exists tb_music
 (
@@ -155,7 +141,7 @@ create table if not exists tb_music
     alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
     album_id    bigint       null comment '专辑ID',
     sort        bigint auto_increment comment '排序字段',
-    user_id     bigint       not null comment '上传用户ID',
+    user_id     bigint       null comment '上传用户ID',
     time_length int          null comment '歌曲时长',
     update_time datetime     null comment '更新时间',
     create_time datetime     null comment '创建时间',
@@ -163,6 +149,9 @@ create table if not exists tb_music
         unique (id, music_name, alias_name, album_id),
     constraint tb_music_pk
         unique (sort),
+    constraint tb_music_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete set null,
     constraint tb_music_tb_album_id_fk
         foreign key (album_id) references tb_album (id)
             on update cascade on delete set null
@@ -186,20 +175,27 @@ create table if not exists tb_collect_music
 
 create table if not exists tb_history
 (
-    music_id    bigint   not null comment '歌曲ID'
+    id          bigint        not null
         primary key,
-    count       int      null comment '听歌次数',
-    type        int      null comment '历史类型',
-    create_time datetime null comment '创建时间',
-    update_time datetime null comment '修改时间',
+    user_id     bigint        not null comment '用户ID',
+    middle_id   bigint        null comment '播放ID，可能是歌曲，专辑，歌单',
+    type        tinyint       null comment '播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑',
+    count       int default 0 null comment '歌曲播放次数',
+    create_time datetime      null comment '创建时间',
+    update_time datetime      null comment '更新时间',
+    constraint id
+        unique (id),
     constraint tb_history_tb_album_id_fk
-        foreign key (music_id) references tb_album (id)
+        foreign key (middle_id) references tb_album (id)
             on update cascade on delete cascade,
     constraint tb_history_tb_collect_id_fk
-        foreign key (music_id) references tb_collect (id)
+        foreign key (middle_id) references tb_collect (id)
             on update cascade on delete cascade,
     constraint tb_history_tb_music_id_fk
-        foreign key (music_id) references tb_music (id)
+        foreign key (middle_id) references tb_music (id)
+            on update cascade on delete cascade,
+    constraint tb_rank_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
             on update cascade on delete cascade
 )
     comment '音乐播放历史(包括歌单，音乐，专辑）';
@@ -252,13 +248,16 @@ create table if not exists tb_music_url
     level       char(8)      null comment '音乐质量',
     encode_type char(10)     null comment '文件格式类型',
     size        bigint       null comment '文件大小',
-    user_id     bigint       not null comment '上传用户ID',
+    user_id     bigint       null comment '上传用户ID',
     create_time datetime     null comment '创建时间',
     update_time datetime     null comment '修改时间',
     constraint id
         unique (id),
     constraint md5
         unique (md5),
+    constraint tb_music_url_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete set null,
     constraint tb_music_url_tb_music_id_fk
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
@@ -283,7 +282,13 @@ create table if not exists tb_origin
     origin       varchar(256) not null comment '来源',
     origin_url   varchar(256) null comment '来源地址',
     constraint id
-        unique (id)
+        unique (id),
+    constraint tb_origin_tb_music_id_fk
+        foreign key (music_id) references tb_music (id)
+            on update cascade on delete cascade,
+    constraint tb_origin_tb_music_url_id_fk
+        foreign key (music_url_id) references tb_music_url (id)
+            on update cascade on delete cascade
 )
     comment '音乐来源';
 
@@ -302,6 +307,36 @@ create table if not exists tb_pic
 )
     comment '音乐专辑歌单封面表';
 
+create table if not exists tb_middle_pic
+(
+    id        bigint  not null
+        primary key,
+    middle_id bigint  not null comment '中间表',
+    pic_id    bigint  not null comment '封面ID',
+    type      tinyint null comment '封面类型,歌单-1,专辑-2,歌手-3,歌手-3.用户头像-4,用户背景-5',
+    constraint id
+        unique (id),
+    constraint tb_middle_pic_tb_album_id_fk
+        foreign key (middle_id) references tb_album (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_pic_tb_artist_id_fk
+        foreign key (middle_id) references tb_artist (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_pic_tb_collect_id_fk
+        foreign key (middle_id) references tb_collect (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_pic_tb_music_id_fk
+        foreign key (middle_id) references tb_music (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_pic_sys_user_id_fk
+        foreign key (middle_id) references sys_user (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_pic_tb_pic_id_fk
+        foreign key (pic_id) references tb_pic (id)
+            on update cascade on delete cascade
+)
+    comment '封面中间表';
+
 create index tb_pic_md5_index
     on tb_pic (md5);
 
@@ -318,9 +353,33 @@ create table if not exists tb_plugin
     create_time datetime     not null comment '创建时间',
     update_time datetime     not null comment '更新时间',
     constraint id
-        unique (id)
+        unique (id),
+    constraint tb_plugin_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete cascade
 )
     comment '插件表';
+
+create table if not exists tb_plugin_task
+(
+    id          bigint   not null comment '任务ID'
+        primary key,
+    plugin_id   bigint   not null comment '插件ID',
+    status      tinyint  not null comment '当前任务执行状态,0: stop, 1: run, 2: error',
+    params      text     null comment '插件入参',
+    user_id     bigint   not null comment '用户创建ID',
+    create_time datetime not null comment '创建时间',
+    update_time datetime not null comment '更新时间',
+    constraint id
+        unique (id),
+    constraint tb_plugin_task_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete cascade,
+    constraint tb_plugin_task_tb_plugin_id_fk
+        foreign key (plugin_id) references tb_plugin (id)
+            on update cascade on delete cascade
+)
+    comment '插件任务表';
 
 create table if not exists tb_plugin_msg
 (
@@ -334,45 +393,21 @@ create table if not exists tb_plugin_msg
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',
     constraint id
-        unique (id)
+        unique (id),
+    constraint tb_plugin_msg_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete cascade,
+    constraint tb_plugin_msg_tb_plugin_id_fk
+        foreign key (plugin_id) references tb_plugin (id)
+            on update cascade on delete cascade,
+    constraint tb_plugin_msg_tb_plugin_task_id_fk
+        foreign key (task_id) references tb_plugin_task (id)
+            on update cascade on delete cascade
 )
     comment '插件消息表';
 
 create index tb_plugin_msg_task_id_user_id_index
     on tb_plugin_msg (task_id, user_id);
-
-create table if not exists tb_plugin_task
-(
-    id          bigint   not null comment '任务ID'
-        primary key,
-    plugin_id   bigint   not null comment '插件ID',
-    status      tinyint  not null comment '当前任务执行状态,0: stop, 1: run, 2: error',
-    params      text     null comment '插件入参',
-    user_id     bigint   not null comment '用户创建ID',
-    create_time datetime not null comment '创建时间',
-    update_time datetime not null comment '更新时间',
-    constraint id
-        unique (id)
-)
-    comment '插件任务表';
-
-create table if not exists tb_rank
-(
-    id              bigint        not null
-        primary key,
-    user_id         bigint        not null comment '用户ID',
-    broadcast_id    int           null comment '播放ID，可能是歌曲，专辑，歌单',
-    broadcast_type  int default 0 null comment '播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑',
-    broadcast_count int           null comment '歌曲播放次数',
-    create_time     datetime      null comment '创建时间',
-    update_time     datetime      null comment '更新时间',
-    constraint id
-        unique (id),
-    constraint tb_rank_sys_user_id_fk
-        foreign key (user_id) references sys_user (id)
-            on update cascade on delete cascade
-)
-    comment '音乐播放排行榜';
 
 create table if not exists tb_schedule_task
 (
@@ -387,7 +422,13 @@ create table if not exists tb_schedule_task
     create_time datetime     not null comment '创建时间',
     update_time datetime     not null comment '更新时间',
     constraint id
-        unique (id)
+        unique (id),
+    constraint tb_schedule_task_sys_user_id_fk
+        foreign key (user_id) references sys_user (id)
+            on update cascade on delete cascade,
+    constraint tb_schedule_task_tb_plugin_id_fk
+        foreign key (plugin_id) references tb_plugin (id)
+            on update cascade on delete cascade
 )
     comment '定时任务表';
 
@@ -405,13 +446,25 @@ create table if not exists tb_tag
 
 create table if not exists tb_middle_tag
 (
-    id        bigint  not null comment '中间ID, 包括歌曲，歌单，专辑',
+    id        bigint  not null comment '中间ID, 包括歌曲，歌单，专辑'
+        primary key,
     middle_id bigint  not null comment '中间键',
     tag_id    bigint  not null comment 'tag ID',
     type      tinyint not null comment '0流派, 1歌曲tag, 2歌单tag',
-    primary key (id, tag_id),
     constraint tb_collect_tag_tb_tag_id_fk
         foreign key (tag_id) references tb_tag (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_tag_tb_album_id_fk
+        foreign key (middle_id) references tb_album (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_tag_tb_collect_id_fk
+        foreign key (middle_id) references tb_collect (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_tag_tb_music_id_fk
+        foreign key (middle_id) references tb_music (id)
+            on update cascade on delete cascade,
+    constraint tb_middle_tag_tb_artist_id_fk
+        foreign key (middle_id) references tb_artist (id)
             on update cascade on delete cascade
 )
     comment '歌单风格中间表';

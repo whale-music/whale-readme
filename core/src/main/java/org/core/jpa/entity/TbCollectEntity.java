@@ -26,9 +26,6 @@ public class TbCollectEntity implements Serializable {
     @Column(name = "type", nullable = false)
     private Byte type;
     @Basic
-    @Column(name = "subscribed", nullable = false)
-    private Byte subscribed;
-    @Basic
     @Column(name = "description", nullable = true, length = 512)
     private String description;
     @Basic
@@ -54,6 +51,8 @@ public class TbCollectEntity implements Serializable {
     private Collection<TbMiddlePicEntity> tbMiddlePicsById;
     @OneToMany(mappedBy = "tbCollectByMiddleId")
     private Collection<TbMiddleTagEntity> tbMiddleTagsById;
+    @OneToMany(mappedBy = "tbCollectByCollectId")
+    private Collection<TbUserCollectEntity> tbUserCollectsById;
     
     public Long getId() {
         return id;
@@ -77,14 +76,6 @@ public class TbCollectEntity implements Serializable {
     
     public void setType(Byte type) {
         this.type = type;
-    }
-    
-    public Byte getSubscribed() {
-        return subscribed;
-    }
-    
-    public void setSubscribed(Byte subscribed) {
-        this.subscribed = subscribed;
     }
     
     public String getDescription() {
@@ -137,15 +128,15 @@ public class TbCollectEntity implements Serializable {
         }
         TbCollectEntity that = (TbCollectEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(playListName, that.playListName) && Objects.equals(type,
-                that.type) && Objects.equals(subscribed, that.subscribed) && Objects.equals(description,
-                that.description) && Objects.equals(userId, that.userId) && Objects.equals(sort, that.sort) && Objects.equals(
-                createTime,
-                that.createTime) && Objects.equals(updateTime, that.updateTime);
+                that.type) && Objects.equals(description, that.description) && Objects.equals(userId,
+                that.userId) && Objects.equals(sort, that.sort) && Objects.equals(createTime, that.createTime) && Objects.equals(
+                updateTime,
+                that.updateTime);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, playListName, type, subscribed, description, userId, sort, createTime, updateTime);
+        return Objects.hash(id, playListName, type, description, userId, sort, createTime, updateTime);
     }
     
     public SysUserEntity getSysUserByUserId() {
@@ -186,5 +177,13 @@ public class TbCollectEntity implements Serializable {
     
     public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
         this.tbMiddleTagsById = tbMiddleTagsById;
+    }
+    
+    public Collection<TbUserCollectEntity> getTbUserCollectsById() {
+        return tbUserCollectsById;
+    }
+    
+    public void setTbUserCollectsById(Collection<TbUserCollectEntity> tbUserCollectsById) {
+        this.tbUserCollectsById = tbUserCollectsById;
     }
 }

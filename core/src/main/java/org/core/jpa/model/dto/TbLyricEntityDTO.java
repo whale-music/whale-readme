@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel("歌词表")
@@ -45,13 +45,13 @@ public class TbLyricEntityDTO implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

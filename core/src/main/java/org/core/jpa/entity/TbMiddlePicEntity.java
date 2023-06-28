@@ -42,6 +42,9 @@ public class TbMiddlePicEntity implements Serializable {
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMiddleId;
     @ManyToOne
+    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbMvEntity tbMvByMiddleId;
+    @ManyToOne
     @JoinColumn(name = "pic_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbPicEntity tbPicByPicId;
     
@@ -133,6 +136,14 @@ public class TbMiddlePicEntity implements Serializable {
     
     public void setTbMusicByMiddleId(TbMusicEntity tbMusicByMiddleId) {
         this.tbMusicByMiddleId = tbMusicByMiddleId;
+    }
+    
+    public TbMvEntity getTbMvByMiddleId() {
+        return tbMvByMiddleId;
+    }
+    
+    public void setTbMvByMiddleId(TbMvEntity tbMvByMiddleId) {
+        this.tbMvByMiddleId = tbMvByMiddleId;
     }
     
     public TbPicEntity getTbPicByPicId() {

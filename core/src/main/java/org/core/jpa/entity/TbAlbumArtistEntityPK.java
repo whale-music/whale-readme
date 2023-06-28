@@ -1,5 +1,6 @@
 package org.core.jpa.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

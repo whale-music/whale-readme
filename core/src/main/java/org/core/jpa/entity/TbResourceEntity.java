@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_music_url")
-public class TbMusicUrlEntity implements Serializable {
+@Table(name = "tb_resource")
+public class TbResourceEntity implements Serializable {
     public static final long serialVersionUID = 3852711638450316352L;
     
     @Id
@@ -26,8 +26,8 @@ public class TbMusicUrlEntity implements Serializable {
     @Column(name = "rate", nullable = true)
     private Integer rate;
     @Basic
-    @Column(name = "url", nullable = true, length = 512)
-    private String url;
+    @Column(name = "path", nullable = true, length = 512)
+    private String path;
     @Basic
     @Column(name = "md5", nullable = false, length = 32)
     private String md5;
@@ -49,14 +49,16 @@ public class TbMusicUrlEntity implements Serializable {
     @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
+    @OneToMany(mappedBy = "tbResourceBySourceId")
+    private Collection<TbMvEntity> tbMvsById;
+    @OneToMany(mappedBy = "tbResourceByResourceId")
+    private Collection<TbOriginEntity> tbOriginsById;
     @ManyToOne
     @JoinColumn(name = "music_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMusicId;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
-    @OneToMany(mappedBy = "tbMusicUrlByMusicUrlId")
-    private Collection<TbOriginEntity> tbOriginsById;
     
     public Long getId() {
         return id;
@@ -82,12 +84,12 @@ public class TbMusicUrlEntity implements Serializable {
         this.rate = rate;
     }
     
-    public String getUrl() {
-        return url;
+    public String getPath() {
+        return path;
     }
     
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPath(String path) {
+        this.path = path;
     }
     
     public String getMd5() {
@@ -154,9 +156,9 @@ public class TbMusicUrlEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TbMusicUrlEntity that = (TbMusicUrlEntity) o;
+        TbResourceEntity that = (TbResourceEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(musicId, that.musicId) && Objects.equals(rate,
-                that.rate) && Objects.equals(url, that.url) && Objects.equals(md5, that.md5) && Objects.equals(level,
+                that.rate) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(level,
                 that.level) && Objects.equals(encodeType, that.encodeType) && Objects.equals(size, that.size) && Objects.equals(
                 userId,
                 that.userId) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
@@ -164,7 +166,23 @@ public class TbMusicUrlEntity implements Serializable {
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, musicId, rate, url, md5, level, encodeType, size, userId, createTime, updateTime);
+        return Objects.hash(id, musicId, rate, path, md5, level, encodeType, size, userId, createTime, updateTime);
+    }
+    
+    public Collection<TbMvEntity> getTbMvsById() {
+        return tbMvsById;
+    }
+    
+    public void setTbMvsById(Collection<TbMvEntity> tbMvsById) {
+        this.tbMvsById = tbMvsById;
+    }
+    
+    public Collection<TbOriginEntity> getTbOriginsById() {
+        return tbOriginsById;
+    }
+    
+    public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
+        this.tbOriginsById = tbOriginsById;
     }
     
     public TbMusicEntity getTbMusicByMusicId() {
@@ -181,13 +199,5 @@ public class TbMusicUrlEntity implements Serializable {
     
     public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
         this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbOriginEntity> getTbOriginsById() {
-        return tbOriginsById;
-    }
-    
-    public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
-        this.tbOriginsById = tbOriginsById;
     }
 }

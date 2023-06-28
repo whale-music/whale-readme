@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel("自定义查询 歌曲专辑表")
@@ -53,7 +53,7 @@ public class TbAlbumEntityQueryVO implements Serializable {
      * 专辑发布时间
      */
     @ApiModelProperty("专辑发布时间")
-    private Date publishTime;
+    private LocalDateTime publishTime;
     
     
     /**
@@ -67,13 +67,13 @@ public class TbAlbumEntityQueryVO implements Serializable {
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
     
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
 }

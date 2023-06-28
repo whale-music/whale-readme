@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Data
-@ApiModel("保存 音乐下载地址")
-public class TbMusicUrlEntityVO implements Serializable {
+@ApiModel("保存 存储地址")
+public class TbResourceEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     
@@ -39,10 +39,10 @@ public class TbMusicUrlEntityVO implements Serializable {
     
     
     /**
-     * 音乐地址
+     * 音乐地址, 存储相对路径
      */
-    @ApiModelProperty("音乐地址")
-    private String url;
+    @ApiModelProperty("音乐地址, 存储相对路径")
+    private String path;
     
     
     /**
@@ -77,7 +77,6 @@ public class TbMusicUrlEntityVO implements Serializable {
     /**
      * 上传用户ID
      */
-    @NotNull(message = "userId can not null")
     @ApiModelProperty("上传用户ID")
     private Long userId;
     
@@ -86,13 +85,13 @@ public class TbMusicUrlEntityVO implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

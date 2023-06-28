@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel("自定义查询 插件消息表")
@@ -43,9 +43,9 @@ public class TbPluginMsgEntityQueryVO implements Serializable {
     
     
     /**
-     * 消息等级
+     * 插件消息等级,0 info 1 debug 2 warn 3 error
      */
-    @ApiModelProperty("消息等级")
+    @ApiModelProperty("插件消息等级,0 info 1 debug 2 warn 3 error")
     private Integer level;
     
     
@@ -60,13 +60,13 @@ public class TbPluginMsgEntityQueryVO implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 更新时间
      */
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

@@ -21,8 +21,8 @@ public class TbOriginEntity implements Serializable {
     @Column(name = "music_id", nullable = false)
     private Long musicId;
     @Basic
-    @Column(name = "music_url_id", nullable = false)
-    private Long musicUrlId;
+    @Column(name = "resource_id", nullable = false)
+    private Long resourceId;
     @Basic
     @Column(name = "origin", nullable = false, length = 256)
     private String origin;
@@ -33,8 +33,8 @@ public class TbOriginEntity implements Serializable {
     @JoinColumn(name = "music_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMusicId;
     @ManyToOne
-    @JoinColumn(name = "music_url_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbMusicUrlEntity tbMusicUrlByMusicUrlId;
+    @JoinColumn(name = "resource_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbResourceEntity tbResourceByResourceId;
     
     public Long getId() {
         return id;
@@ -52,12 +52,12 @@ public class TbOriginEntity implements Serializable {
         this.musicId = musicId;
     }
     
-    public Long getMusicUrlId() {
-        return musicUrlId;
+    public Long getResourceId() {
+        return resourceId;
     }
     
-    public void setMusicUrlId(Long musicUrlId) {
-        this.musicUrlId = musicUrlId;
+    public void setResourceId(Long resourceId) {
+        this.resourceId = resourceId;
     }
     
     public String getOrigin() {
@@ -85,13 +85,13 @@ public class TbOriginEntity implements Serializable {
             return false;
         }
         TbOriginEntity that = (TbOriginEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(musicId, that.musicId) && Objects.equals(musicUrlId,
-                that.musicUrlId) && Objects.equals(origin, that.origin) && Objects.equals(originUrl, that.originUrl);
+        return Objects.equals(id, that.id) && Objects.equals(musicId, that.musicId) && Objects.equals(resourceId,
+                that.resourceId) && Objects.equals(origin, that.origin) && Objects.equals(originUrl, that.originUrl);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, musicId, musicUrlId, origin, originUrl);
+        return Objects.hash(id, musicId, resourceId, origin, originUrl);
     }
     
     public TbMusicEntity getTbMusicByMusicId() {
@@ -102,11 +102,11 @@ public class TbOriginEntity implements Serializable {
         this.tbMusicByMusicId = tbMusicByMusicId;
     }
     
-    public TbMusicUrlEntity getTbMusicUrlByMusicUrlId() {
-        return tbMusicUrlByMusicUrlId;
+    public TbResourceEntity getTbResourceByResourceId() {
+        return tbResourceByResourceId;
     }
     
-    public void setTbMusicUrlByMusicUrlId(TbMusicUrlEntity tbMusicUrlByMusicUrlId) {
-        this.tbMusicUrlByMusicUrlId = tbMusicUrlByMusicUrlId;
+    public void setTbResourceByResourceId(TbResourceEntity tbResourceByResourceId) {
+        this.tbResourceByResourceId = tbResourceByResourceId;
     }
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @ApiModel("保存 用户关注歌曲家")
 public class TbUserArtistEntityVO implements Serializable {
-    public static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     
     
     /**

@@ -25,7 +25,7 @@ public class TbOriginEntityDTO implements Serializable {
      * 源地址ID
      */
     @ApiModelProperty("源地址ID")
-    private Long musicUrlId;
+    private Long resourceId;
     
     
     /**

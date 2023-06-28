@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -49,7 +50,7 @@ public class TbArtistEntityVO implements Serializable {
      * 出生年月
      */
     @ApiModelProperty("出生年月")
-    private Date birth;
+    private LocalDate birth;
     
     
     /**
@@ -69,7 +70,6 @@ public class TbArtistEntityVO implements Serializable {
     /**
      * 上传用户ID
      */
-    @NotNull(message = "userId can not null")
     @ApiModelProperty("上传用户ID")
     private Long userId;
     
@@ -78,13 +78,13 @@ public class TbArtistEntityVO implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private java.util.Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private java.util.Date updateTime;
+    private LocalDateTime updateTime;
     
 }

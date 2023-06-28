@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -74,7 +74,7 @@ public class TbScheduleTaskEntityVO implements Serializable {
      */
     @NotNull(message = "createTime can not null")
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
@@ -82,6 +82,6 @@ public class TbScheduleTaskEntityVO implements Serializable {
      */
     @NotNull(message = "updateTime can not null")
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

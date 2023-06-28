@@ -23,7 +23,7 @@ public class TbAlbumArtistEntityService {
         TbAlbumArtistEntity bean = new TbAlbumArtistEntity();
         BeanUtils.copyProperties(vO, bean);
         bean = tbAlbumArtistEntityRepository.save(bean);
-        return bean.getTbAlbumByAlbumId().getId();
+        return bean.getAlbumId();
     }
     
     public void delete(Long id) {

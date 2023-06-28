@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -14,40 +14,51 @@ import java.util.Date;
 public class TbHistoryEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    
-    /**
-     * 歌曲ID
-     */
-    @NotNull(message = "musicId can not null")
-    @ApiModelProperty("歌曲ID")
-    private Long musicId;
+    @NotNull(message = "id can not null")
+    private Long id;
     
     
     /**
-     * 听歌次数
+     * 用户ID
      */
-    @ApiModelProperty("听歌次数")
-    private Integer count;
+    @NotNull(message = "userId can not null")
+    @ApiModelProperty("用户ID")
+    private Long userId;
     
     
     /**
-     * 历史类型
+     * 播放ID，可能是歌曲，专辑，歌单，mv
      */
-    @ApiModelProperty("历史类型")
+    @NotNull(message = "middleId can not null")
+    @ApiModelProperty("播放ID，可能是歌曲，专辑，歌单，mv")
+    private Long middleId;
+    
+    
+    /**
+     * 播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑, 3mv
+     */
+    @ApiModelProperty("播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑, 3mv")
     private Integer type;
+    
+    
+    /**
+     * 歌曲播放次数
+     */
+    @ApiModelProperty("歌曲播放次数")
+    private Integer count;
     
     
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
-     * 修改时间
+     * 更新时间
      */
-    @ApiModelProperty("修改时间")
-    private Date updateTime;
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updateTime;
     
 }

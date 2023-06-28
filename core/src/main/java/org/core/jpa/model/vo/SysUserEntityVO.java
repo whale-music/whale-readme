@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -47,20 +47,6 @@ public class SysUserEntityVO implements Serializable {
     
     
     /**
-     * 头像URL ID
-     */
-    @ApiModelProperty("头像URL ID")
-    private Long avatarUrl;
-    
-    
-    /**
-     * 背景照片URL
-     */
-    @ApiModelProperty("背景照片URL")
-    private String backgroundUrl;
-    
-    
-    /**
      * 个性签名
      */
     @ApiModelProperty("个性签名")
@@ -85,20 +71,20 @@ public class SysUserEntityVO implements Serializable {
      * 最后登录时间
      */
     @ApiModelProperty("最后登录时间")
-    private Date lastLoginTime;
+    private LocalDateTime lastLoginTime;
     
     
     /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

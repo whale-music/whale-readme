@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -48,9 +48,9 @@ public class TbPluginMsgEntityVO implements Serializable {
     
     
     /**
-     * 消息等级
+     * 插件消息等级,0 info 1 debug 2 warn 3 error
      */
-    @ApiModelProperty("消息等级")
+    @ApiModelProperty("插件消息等级,0 info 1 debug 2 warn 3 error")
     private Integer level;
     
     
@@ -66,7 +66,7 @@ public class TbPluginMsgEntityVO implements Serializable {
      */
     @NotNull(message = "createTime can not null")
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
@@ -74,6 +74,6 @@ public class TbPluginMsgEntityVO implements Serializable {
      */
     @NotNull(message = "updateTime can not null")
     @ApiModelProperty("更新时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

@@ -59,7 +59,7 @@ public class SysUserEntity implements Serializable {
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbMusicEntity> tbMusicsById;
     @OneToMany(mappedBy = "sysUserByUserId")
-    private Collection<TbMusicUrlEntity> tbMusicUrlsById;
+    private Collection<TbMvEntity> tbMvsById;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbPluginEntity> tbPluginsById;
     @OneToMany(mappedBy = "sysUserByUserId")
@@ -67,11 +67,17 @@ public class SysUserEntity implements Serializable {
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbPluginTaskEntity> tbPluginTasksById;
     @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<TbResourceEntity> tbResourcesById;
+    @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbScheduleTaskEntity> tbScheduleTasksById;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbUserAlbumEntity> tbUserAlbumsById;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbUserArtistEntity> tbUserArtistsById;
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<TbUserCollectEntity> tbUserCollectsById;
+    @OneToMany(mappedBy = "sysUserByUserId")
+    private Collection<TbUserMvEntity> tbUserMvsById;
     
     public Long getId() {
         return id;
@@ -153,6 +159,27 @@ public class SysUserEntity implements Serializable {
         this.updateTime = updateTime;
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SysUserEntity that = (SysUserEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(username, that.username) && Objects.equals(nickname,
+                that.nickname) && Objects.equals(password, that.password) && Objects.equals(signature,
+                that.signature) && Objects.equals(accountType, that.accountType) && Objects.equals(lastLoginIp,
+                that.lastLoginIp) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(createTime,
+                that.createTime) && Objects.equals(updateTime, that.updateTime);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, nickname, password, signature, accountType, lastLoginIp, lastLoginTime, createTime, updateTime);
+    }
+    
     public Collection<TbAlbumEntity> getTbAlbumsById() {
         return tbAlbumsById;
     }
@@ -201,12 +228,12 @@ public class SysUserEntity implements Serializable {
         this.tbMusicsById = tbMusicsById;
     }
     
-    public Collection<TbMusicUrlEntity> getTbMusicUrlsById() {
-        return tbMusicUrlsById;
+    public Collection<TbMvEntity> getTbMvsById() {
+        return tbMvsById;
     }
     
-    public void setTbMusicUrlsById(Collection<TbMusicUrlEntity> tbMusicUrlsById) {
-        this.tbMusicUrlsById = tbMusicUrlsById;
+    public void setTbMvsById(Collection<TbMvEntity> tbMvsById) {
+        this.tbMvsById = tbMvsById;
     }
     
     public Collection<TbPluginEntity> getTbPluginsById() {
@@ -233,6 +260,14 @@ public class SysUserEntity implements Serializable {
         this.tbPluginTasksById = tbPluginTasksById;
     }
     
+    public Collection<TbResourceEntity> getTbResourcesById() {
+        return tbResourcesById;
+    }
+    
+    public void setTbResourcesById(Collection<TbResourceEntity> tbResourcesById) {
+        this.tbResourcesById = tbResourcesById;
+    }
+    
     public Collection<TbScheduleTaskEntity> getTbScheduleTasksById() {
         return tbScheduleTasksById;
     }
@@ -257,88 +292,19 @@ public class SysUserEntity implements Serializable {
         this.tbUserArtistsById = tbUserArtistsById;
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SysUserEntity that = (SysUserEntity) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getUsername(), that.getUsername()) && Objects.equals(
-                getNickname(),
-                that.getNickname()) && Objects.equals(getPassword(), that.getPassword()) && Objects.equals(getSignature(),
-                that.getSignature()) && Objects.equals(getAccountType(), that.getAccountType()) && Objects.equals(getLastLoginIp(),
-                that.getLastLoginIp()) && Objects.equals(getLastLoginTime(), that.getLastLoginTime()) && Objects.equals(getCreateTime(),
-                that.getCreateTime()) && Objects.equals(getUpdateTime(), that.getUpdateTime()) && Objects.equals(getTbAlbumsById(),
-                that.getTbAlbumsById()) && Objects.equals(getTbArtistsById(),
-                that.getTbArtistsById()) && Objects.equals(getTbCollectsById(), that.getTbCollectsById()) && Objects.equals(
-                getTbHistoriesById(),
-                that.getTbHistoriesById()) && Objects.equals(getTbMiddlePicsById(), that.getTbMiddlePicsById()) && Objects.equals(
-                getTbMusicsById(),
-                that.getTbMusicsById()) && Objects.equals(getTbMusicUrlsById(), that.getTbMusicUrlsById()) && Objects.equals(
-                getTbPluginsById(),
-                that.getTbPluginsById()) && Objects.equals(getTbPluginMsgsById(), that.getTbPluginMsgsById()) && Objects.equals(
-                getTbPluginTasksById(),
-                that.getTbPluginTasksById()) && Objects.equals(getTbScheduleTasksById(), that.getTbScheduleTasksById()) && Objects.equals(
-                getTbUserAlbumsById(),
-                that.getTbUserAlbumsById()) && Objects.equals(getTbUserArtistsById(), that.getTbUserArtistsById());
+    public Collection<TbUserCollectEntity> getTbUserCollectsById() {
+        return tbUserCollectsById;
     }
     
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(),
-                getUsername(),
-                getNickname(),
-                getPassword(),
-                getSignature(),
-                getAccountType(),
-                getLastLoginIp(),
-                getLastLoginTime(),
-                getCreateTime(),
-                getUpdateTime(),
-                getTbAlbumsById(),
-                getTbArtistsById(),
-                getTbCollectsById(),
-                getTbHistoriesById(),
-                getTbMiddlePicsById(),
-                getTbMusicsById(),
-                getTbMusicUrlsById(),
-                getTbPluginsById(),
-                getTbPluginMsgsById(),
-                getTbPluginTasksById(),
-                getTbScheduleTasksById(),
-                getTbUserAlbumsById(),
-                getTbUserArtistsById());
+    public void setTbUserCollectsById(Collection<TbUserCollectEntity> tbUserCollectsById) {
+        this.tbUserCollectsById = tbUserCollectsById;
     }
     
-    @Override
-    public String toString() {
-        return "SysUserEntity{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", password='" + password + '\'' +
-                ", signature='" + signature + '\'' +
-                ", accountType=" + accountType +
-                ", lastLoginIp='" + lastLoginIp + '\'' +
-                ", lastLoginTime=" + lastLoginTime +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", tbAlbumsById=" + tbAlbumsById +
-                ", tbArtistsById=" + tbArtistsById +
-                ", tbCollectsById=" + tbCollectsById +
-                ", tbHistoriesById=" + tbHistoriesById +
-                ", tbMiddlePicsById=" + tbMiddlePicsById +
-                ", tbMusicsById=" + tbMusicsById +
-                ", tbMusicUrlsById=" + tbMusicUrlsById +
-                ", tbPluginsById=" + tbPluginsById +
-                ", tbPluginMsgsById=" + tbPluginMsgsById +
-                ", tbPluginTasksById=" + tbPluginTasksById +
-                ", tbScheduleTasksById=" + tbScheduleTasksById +
-                ", tbUserAlbumsById=" + tbUserAlbumsById +
-                ", tbUserArtistsById=" + tbUserArtistsById +
-                '}';
+    public Collection<TbUserMvEntity> getTbUserMvsById() {
+        return tbUserMvsById;
+    }
+    
+    public void setTbUserMvsById(Collection<TbUserMvEntity> tbUserMvsById) {
+        this.tbUserMvsById = tbUserMvsById;
     }
 }

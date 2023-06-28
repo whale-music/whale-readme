@@ -7,9 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- * 歌手和专辑中间表
- */
 @Entity
 @Table(name = "tb_album_artist")
 @IdClass(TbAlbumArtistEntityPK.class)

@@ -28,9 +28,9 @@ public class TbOriginEntityVO implements Serializable {
     /**
      * 源地址ID
      */
-    @NotNull(message = "musicUrlId can not null")
+    @NotNull(message = "resourceId can not null")
     @ApiModelProperty("源地址ID")
-    private Long musicUrlId;
+    private Long resourceId;
     
     
     /**

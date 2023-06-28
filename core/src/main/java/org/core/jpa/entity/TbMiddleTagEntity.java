@@ -39,6 +39,9 @@ public class TbMiddleTagEntity implements Serializable {
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMiddleId;
     @ManyToOne
+    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbMvEntity tbMvByMiddleId;
+    @ManyToOne
     @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbTagEntity tbTagByTagId;
     
@@ -122,6 +125,14 @@ public class TbMiddleTagEntity implements Serializable {
     
     public void setTbMusicByMiddleId(TbMusicEntity tbMusicByMiddleId) {
         this.tbMusicByMiddleId = tbMusicByMiddleId;
+    }
+    
+    public TbMvEntity getTbMvByMiddleId() {
+        return tbMvByMiddleId;
+    }
+    
+    public void setTbMvByMiddleId(TbMvEntity tbMvByMiddleId) {
+        this.tbMvByMiddleId = tbMvByMiddleId;
     }
     
     public TbTagEntity getTbTagByTagId() {

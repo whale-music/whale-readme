@@ -62,9 +62,9 @@ public class TbMusicEntity implements Serializable {
     @OneToMany(mappedBy = "tbMusicByMusicId")
     private Collection<TbMusicArtistEntity> tbMusicArtistsById;
     @OneToMany(mappedBy = "tbMusicByMusicId")
-    private Collection<TbMusicUrlEntity> tbMusicUrlsById;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
     private Collection<TbOriginEntity> tbOriginsById;
+    @OneToMany(mappedBy = "tbMusicByMusicId")
+    private Collection<TbResourceEntity> tbResourcesById;
     
     public Long getId() {
         return id;
@@ -223,19 +223,19 @@ public class TbMusicEntity implements Serializable {
         this.tbMusicArtistsById = tbMusicArtistsById;
     }
     
-    public Collection<TbMusicUrlEntity> getTbMusicUrlsById() {
-        return tbMusicUrlsById;
-    }
-    
-    public void setTbMusicUrlsById(Collection<TbMusicUrlEntity> tbMusicUrlsById) {
-        this.tbMusicUrlsById = tbMusicUrlsById;
-    }
-    
     public Collection<TbOriginEntity> getTbOriginsById() {
         return tbOriginsById;
     }
     
     public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
         this.tbOriginsById = tbOriginsById;
+    }
+    
+    public Collection<TbResourceEntity> getTbResourcesById() {
+        return tbResourcesById;
+    }
+    
+    public void setTbResourcesById(Collection<TbResourceEntity> tbResourcesById) {
+        this.tbResourcesById = tbResourcesById;
     }
 }

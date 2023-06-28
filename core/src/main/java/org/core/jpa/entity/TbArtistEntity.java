@@ -59,6 +59,8 @@ public class TbArtistEntity implements Serializable {
     @OneToMany(mappedBy = "tbArtistByArtistId")
     private Collection<TbMusicArtistEntity> tbMusicArtistsById;
     @OneToMany(mappedBy = "tbArtistByArtistId")
+    private Collection<TbMvArtistEntity> tbMvArtistsById;
+    @OneToMany(mappedBy = "tbArtistByArtistId")
     private Collection<TbUserArtistEntity> tbUserArtistsById;
     
     public Long getId() {
@@ -199,6 +201,14 @@ public class TbArtistEntity implements Serializable {
     
     public void setTbMusicArtistsById(Collection<TbMusicArtistEntity> tbMusicArtistsById) {
         this.tbMusicArtistsById = tbMusicArtistsById;
+    }
+    
+    public Collection<TbMvArtistEntity> getTbMvArtistsById() {
+        return tbMvArtistsById;
+    }
+    
+    public void setTbMvArtistsById(Collection<TbMvArtistEntity> tbMvArtistsById) {
+        this.tbMvArtistsById = tbMvArtistsById;
     }
     
     public Collection<TbUserArtistEntity> getTbUserArtistsById() {

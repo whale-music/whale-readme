@@ -12,18 +12,13 @@ import java.io.Serializable;
 public class TbMiddleTagEntityQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    private Long id;
+    
     
     /**
      * 中间ID, 包括歌曲，歌单，专辑
      */
     @ApiModelProperty("中间ID, 包括歌曲，歌单，专辑")
-    private Long id;
-    
-    
-    /**
-     * 中间键
-     */
-    @ApiModelProperty("中间键")
     private Long middleId;
     
     
@@ -35,9 +30,9 @@ public class TbMiddleTagEntityQueryVO implements Serializable {
     
     
     /**
-     * 0流派, 1歌曲tag, 2歌单tag
+     * 0: 流派, 1: 歌曲tag, 2: 歌单tag, 3: mv标签
      */
-    @ApiModelProperty("0流派, 1歌曲tag, 2歌单tag")
+    @ApiModelProperty("0: 流派, 1: 歌曲tag, 2: 歌单tag, 3: mv标签")
     private Integer type;
     
 }

@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel("歌单列表")
@@ -35,13 +35,6 @@ public class TbCollectEntityDTO implements Serializable {
     
     
     /**
-     * 该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)
-     */
-    @ApiModelProperty("该歌单是否订阅(收藏). 0: 为创建,1: 为订阅(收藏)")
-    private Integer subscribed;
-    
-    
-    /**
      * 简介
      */
     @ApiModelProperty("简介")
@@ -66,13 +59,13 @@ public class TbCollectEntityDTO implements Serializable {
      * 创建时间
      */
     @ApiModelProperty("创建时间")
-    private Date createTime;
+    private LocalDateTime createTime;
     
     
     /**
      * 修改时间
      */
     @ApiModelProperty("修改时间")
-    private Date updateTime;
+    private LocalDateTime updateTime;
     
 }

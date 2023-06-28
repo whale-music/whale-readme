@@ -29,9 +29,9 @@ public class TbMiddlePicEntityDTO implements Serializable {
     
     
     /**
-     * 封面类型
+     * 封面类型,歌单-1,专辑-2,歌手-3,歌手-3.用户头像-4,用户背景-5, mv标签-6
      */
-    @ApiModelProperty("封面类型")
+    @ApiModelProperty("封面类型,歌单-1,专辑-2,歌手-3,歌手-3.用户头像-4,用户背景-5, mv标签-6")
     private Integer type;
     
 }

@@ -22,7 +22,7 @@ public class TbHistoryEntity implements Serializable {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Basic
-    @Column(name = "middle_id", nullable = true)
+    @Column(name = "middle_id", nullable = false)
     private Long middleId;
     @Basic
     @Column(name = "type", nullable = true)
@@ -48,6 +48,9 @@ public class TbHistoryEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMiddleId;
+    @ManyToOne
+    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    private TbMvEntity tbMvByMiddleId;
     
     public Long getId() {
         return id;
@@ -155,5 +158,13 @@ public class TbHistoryEntity implements Serializable {
     
     public void setTbMusicByMiddleId(TbMusicEntity tbMusicByMiddleId) {
         this.tbMusicByMiddleId = tbMusicByMiddleId;
+    }
+    
+    public TbMvEntity getTbMvByMiddleId() {
+        return tbMvByMiddleId;
+    }
+    
+    public void setTbMvByMiddleId(TbMvEntity tbMvByMiddleId) {
+        this.tbMvByMiddleId = tbMvByMiddleId;
     }
 }

@@ -52,10 +52,6 @@ public class TbArtistEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
-    @OneToMany(mappedBy = "tbArtistByMiddleId")
-    private Collection<TbMiddlePicEntity> tbMiddlePicsById;
-    @OneToMany(mappedBy = "tbArtistByMiddleId")
-    private Collection<TbMiddleTagEntity> tbMiddleTagsById;
     @OneToMany(mappedBy = "tbArtistByArtistId")
     private Collection<TbMusicArtistEntity> tbMusicArtistsById;
     @OneToMany(mappedBy = "tbArtistByArtistId")
@@ -177,22 +173,6 @@ public class TbArtistEntity implements Serializable {
     
     public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
         this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {
-        return tbMiddlePicsById;
-    }
-    
-    public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
-        this.tbMiddlePicsById = tbMiddlePicsById;
-    }
-    
-    public Collection<TbMiddleTagEntity> getTbMiddleTagsById() {
-        return tbMiddleTagsById;
-    }
-    
-    public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
-        this.tbMiddleTagsById = tbMiddleTagsById;
     }
     
     public Collection<TbMusicArtistEntity> getTbMusicArtistsById() {

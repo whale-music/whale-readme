@@ -49,12 +49,6 @@ public class TbAlbumEntity implements Serializable {
     private SysUserEntity sysUserByUserId;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
     private Collection<TbAlbumArtistEntity> tbAlbumArtistsById;
-    @OneToMany(mappedBy = "tbAlbumByMiddleId")
-    private Collection<TbHistoryEntity> tbHistoriesById;
-    @OneToMany(mappedBy = "tbAlbumByMiddleId")
-    private Collection<TbMiddlePicEntity> tbMiddlePicsById;
-    @OneToMany(mappedBy = "tbAlbumByMiddleId")
-    private Collection<TbMiddleTagEntity> tbMiddleTagsById;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
     private Collection<TbMusicEntity> tbMusicsById;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
@@ -166,30 +160,6 @@ public class TbAlbumEntity implements Serializable {
     
     public void setTbAlbumArtistsById(Collection<TbAlbumArtistEntity> tbAlbumArtistsById) {
         this.tbAlbumArtistsById = tbAlbumArtistsById;
-    }
-    
-    public Collection<TbHistoryEntity> getTbHistoriesById() {
-        return tbHistoriesById;
-    }
-    
-    public void setTbHistoriesById(Collection<TbHistoryEntity> tbHistoriesById) {
-        this.tbHistoriesById = tbHistoriesById;
-    }
-    
-    public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {
-        return tbMiddlePicsById;
-    }
-    
-    public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
-        this.tbMiddlePicsById = tbMiddlePicsById;
-    }
-    
-    public Collection<TbMiddleTagEntity> getTbMiddleTagsById() {
-        return tbMiddleTagsById;
-    }
-    
-    public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
-        this.tbMiddleTagsById = tbMiddleTagsById;
     }
     
     public Collection<TbMusicEntity> getTbMusicsById() {

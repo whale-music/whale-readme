@@ -24,26 +24,8 @@ public class TbMiddlePicEntity implements Serializable {
     @Column(name = "pic_id", nullable = false)
     private Long picId;
     @Basic
-    @Column(name = "type", nullable = true)
+    @Column(name = "type", nullable = false)
     private Byte type;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private SysUserEntity sysUserByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbAlbumEntity tbAlbumByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbArtistEntity tbArtistByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbCollectEntity tbCollectByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbMusicEntity tbMusicByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbMvEntity tbMvByMiddleId;
     @ManyToOne
     @JoinColumn(name = "pic_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbPicEntity tbPicByPicId;
@@ -96,54 +78,6 @@ public class TbMiddlePicEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, middleId, picId, type);
-    }
-    
-    public SysUserEntity getSysUserByMiddleId() {
-        return sysUserByMiddleId;
-    }
-    
-    public void setSysUserByMiddleId(SysUserEntity sysUserByMiddleId) {
-        this.sysUserByMiddleId = sysUserByMiddleId;
-    }
-    
-    public TbAlbumEntity getTbAlbumByMiddleId() {
-        return tbAlbumByMiddleId;
-    }
-    
-    public void setTbAlbumByMiddleId(TbAlbumEntity tbAlbumByMiddleId) {
-        this.tbAlbumByMiddleId = tbAlbumByMiddleId;
-    }
-    
-    public TbArtistEntity getTbArtistByMiddleId() {
-        return tbArtistByMiddleId;
-    }
-    
-    public void setTbArtistByMiddleId(TbArtistEntity tbArtistByMiddleId) {
-        this.tbArtistByMiddleId = tbArtistByMiddleId;
-    }
-    
-    public TbCollectEntity getTbCollectByMiddleId() {
-        return tbCollectByMiddleId;
-    }
-    
-    public void setTbCollectByMiddleId(TbCollectEntity tbCollectByMiddleId) {
-        this.tbCollectByMiddleId = tbCollectByMiddleId;
-    }
-    
-    public TbMusicEntity getTbMusicByMiddleId() {
-        return tbMusicByMiddleId;
-    }
-    
-    public void setTbMusicByMiddleId(TbMusicEntity tbMusicByMiddleId) {
-        this.tbMusicByMiddleId = tbMusicByMiddleId;
-    }
-    
-    public TbMvEntity getTbMvByMiddleId() {
-        return tbMvByMiddleId;
-    }
-    
-    public void setTbMvByMiddleId(TbMvEntity tbMvByMiddleId) {
-        this.tbMvByMiddleId = tbMvByMiddleId;
     }
     
     public TbPicEntity getTbPicByPicId() {

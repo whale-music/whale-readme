@@ -18,6 +18,7 @@ import org.core.utils.ImageTypeUtils;
 import org.oss.factory.OSSFactory;
 import org.oss.service.OSSService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,6 +65,7 @@ public class QukuAPI extends QukuServiceImpl {
      * @param type 添加ID类型 歌曲，专辑，歌单，歌手
      * @param pojo 封面数据
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
         if (StringUtils.isBlank(pojo.getUrl())) {

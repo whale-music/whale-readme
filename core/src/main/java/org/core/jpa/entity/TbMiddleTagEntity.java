@@ -27,21 +27,6 @@ public class TbMiddleTagEntity implements Serializable {
     @Column(name = "type", nullable = false)
     private Byte type;
     @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbAlbumEntity tbAlbumByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbArtistEntity tbArtistByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbCollectEntity tbCollectByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbMusicEntity tbMusicByMiddleId;
-    @ManyToOne
-    @JoinColumn(name = "middle_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbMvEntity tbMvByMiddleId;
-    @ManyToOne
     @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbTagEntity tbTagByTagId;
     
@@ -93,46 +78,6 @@ public class TbMiddleTagEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, middleId, tagId, type);
-    }
-    
-    public TbAlbumEntity getTbAlbumByMiddleId() {
-        return tbAlbumByMiddleId;
-    }
-    
-    public void setTbAlbumByMiddleId(TbAlbumEntity tbAlbumByMiddleId) {
-        this.tbAlbumByMiddleId = tbAlbumByMiddleId;
-    }
-    
-    public TbArtistEntity getTbArtistByMiddleId() {
-        return tbArtistByMiddleId;
-    }
-    
-    public void setTbArtistByMiddleId(TbArtistEntity tbArtistByMiddleId) {
-        this.tbArtistByMiddleId = tbArtistByMiddleId;
-    }
-    
-    public TbCollectEntity getTbCollectByMiddleId() {
-        return tbCollectByMiddleId;
-    }
-    
-    public void setTbCollectByMiddleId(TbCollectEntity tbCollectByMiddleId) {
-        this.tbCollectByMiddleId = tbCollectByMiddleId;
-    }
-    
-    public TbMusicEntity getTbMusicByMiddleId() {
-        return tbMusicByMiddleId;
-    }
-    
-    public void setTbMusicByMiddleId(TbMusicEntity tbMusicByMiddleId) {
-        this.tbMusicByMiddleId = tbMusicByMiddleId;
-    }
-    
-    public TbMvEntity getTbMvByMiddleId() {
-        return tbMvByMiddleId;
-    }
-    
-    public void setTbMvByMiddleId(TbMvEntity tbMvByMiddleId) {
-        this.tbMvByMiddleId = tbMvByMiddleId;
     }
     
     public TbTagEntity getTbTagByTagId() {

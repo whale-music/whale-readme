@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "tb_user_mv")
 @IdClass(TbUserMvEntityPK.class)
-public class TbUserMvEntity {
+public class TbUserMvEntity implements Serializable {
+    public static final long serialVersionUID = 2405432543551807L;
+    
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
     @GenericGenerator(name = "IdGenerator", type = ManualInsertGenerator.class)

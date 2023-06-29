@@ -45,14 +45,8 @@ public class TbMusicEntity implements Serializable {
     private Timestamp createTime;
     @OneToMany(mappedBy = "tbMusicByMusicId")
     private Collection<TbCollectMusicEntity> tbCollectMusicsById;
-    @OneToMany(mappedBy = "tbMusicByMiddleId")
-    private Collection<TbHistoryEntity> tbHistoriesById;
     @OneToMany(mappedBy = "tbMusicByMusicId")
     private Collection<TbLyricEntity> tbLyricsById;
-    @OneToMany(mappedBy = "tbMusicByMiddleId")
-    private Collection<TbMiddlePicEntity> tbMiddlePicsById;
-    @OneToMany(mappedBy = "tbMusicByMiddleId")
-    private Collection<TbMiddleTagEntity> tbMiddleTagsById;
     @ManyToOne
     @JoinColumn(name = "album_id", referencedColumnName = "id", insertable = false, updatable = false)
     private TbAlbumEntity tbAlbumByAlbumId;
@@ -167,36 +161,12 @@ public class TbMusicEntity implements Serializable {
         this.tbCollectMusicsById = tbCollectMusicsById;
     }
     
-    public Collection<TbHistoryEntity> getTbHistoriesById() {
-        return tbHistoriesById;
-    }
-    
-    public void setTbHistoriesById(Collection<TbHistoryEntity> tbHistoriesById) {
-        this.tbHistoriesById = tbHistoriesById;
-    }
-    
     public Collection<TbLyricEntity> getTbLyricsById() {
         return tbLyricsById;
     }
     
     public void setTbLyricsById(Collection<TbLyricEntity> tbLyricsById) {
         this.tbLyricsById = tbLyricsById;
-    }
-    
-    public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {
-        return tbMiddlePicsById;
-    }
-    
-    public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
-        this.tbMiddlePicsById = tbMiddlePicsById;
-    }
-    
-    public Collection<TbMiddleTagEntity> getTbMiddleTagsById() {
-        return tbMiddleTagsById;
-    }
-    
-    public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
-        this.tbMiddleTagsById = tbMiddleTagsById;
     }
     
     public TbAlbumEntity getTbAlbumByAlbumId() {

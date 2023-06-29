@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 @Service("QukuService")
 @Slf4j
 public class QukuServiceImpl implements QukuService {
+    private static final Object picLock = new Object();
     public static final Object addLabelLock = new Object();
     public static final Object removeLabelLock = new Object();
     
@@ -78,6 +79,9 @@ public class QukuServiceImpl implements QukuService {
     
     @Autowired
     private TbCollectService collectService;
+    
+    @Autowired
+    private TbUserCollectService userCollectService;
     
     @Autowired
     private TbMiddleTagService middleTagService;
@@ -677,6 +681,24 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
+     * 检查用户是否有权限操作歌单
+     *
+     * @param userId        用户ID
+     * @param tbCollectPojo 歌单信息
+     */
+    public static void checkUserAuth(Long userId, TbCollectPojo tbCollectPojo) {
+        // 检查是否有该歌单
+        if (tbCollectPojo == null || tbCollectPojo.getUserId() == null) {
+            throw new BaseException(ResultCode.SONG_LIST_DOES_NOT_EXIST);
+        }
+        // 检查用户是否有权限
+        if (!userId.equals(tbCollectPojo.getUserId())) {
+            log.warn(ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
+            throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
+        }
+    }
+    
+    /**
      * 添加歌单
      *
      * @param userId 用户ID
@@ -687,34 +709,29 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CollectConvert createPlayList(Long userId, String name, byte type) {
+        TbPicPojo pic = new TbPicPojo();
+        pic.setUrl(defaultInfo.getPic().getPlayListPic());
+        this.saveOrUpdateUserAvatar(userId, defaultInfo.getPic().getPlayListPic());
+        
         TbCollectPojo collectPojo = new TbCollectPojo();
-        collectPojo.setUserId(userId);
-        collectPojo.setPlayListName(name);
-        collectPojo.setSort(collectService.count() + 1);
-        collectPojo.setType(type);
-        collectService.save(collectPojo);
+        synchronized (picLock) {
+            // 歌单表保存
+            collectPojo.setUserId(userId);
+            collectPojo.setPlayListName(name);
+            collectPojo.setSort(collectService.count() + 1);
+            collectPojo.setType(type);
+            collectService.save(collectPojo);
+        }
+        // 保存用户关联表
+        TbUserCollectPojo entity = new TbUserCollectPojo();
+        entity.setCollectId(collectPojo.getId());
+        entity.setUserId(userId);
+        userCollectService.save(entity);
+        // 封面查询
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(collectPojo, convert);
-        convert.setPicUrl(getCollectPicUrl(collectPojo.getId()));
+        convert.setPicUrl(getCollectPicUrl(entity.getCollectId()));
         return convert;
-    }
-    
-    /**
-     * 检查用户是否有权限操作歌单
-     *
-     * @param userId        用户ID
-     * @param tbCollectPojo 歌单信息
-     */
-    private static void checkUserAuth(Long userId, TbCollectPojo tbCollectPojo) {
-        // 检查是否有该歌单
-        if (tbCollectPojo == null || tbCollectPojo.getUserId() == null) {
-            throw new BaseException(ResultCode.SONG_LIST_DOES_NOT_EXIST);
-        }
-        // 检查用户是否有权限
-        if (!userId.equals(tbCollectPojo.getUserId())) {
-            log.warn(ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
-            throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
-        }
     }
     
     /**
@@ -1267,26 +1284,26 @@ public class QukuServiceImpl implements QukuService {
         // 查询封面是否存在, 不存在则创建。存在则创建中间表关联
         Wrapper<TbPicPojo> eq = Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pojo.getMd5());
         TbPicPojo one = picService.getOne(eq);
-        // 删除多余文件
-        removePic(id);
+        TbMiddlePicPojo entity;
         if (one == null) {
             picService.save(pojo);
-            TbMiddlePicPojo entity = new TbMiddlePicPojo();
+            entity = new TbMiddlePicPojo();
             entity.setMiddleId(id);
             entity.setType(type);
             entity.setPicId(pojo.getId());
-            middlePicService.save(entity);
         } else {
-            Long picId = one.getId();
-            TbMiddlePicPojo tbMiddlePicPojo = new TbMiddlePicPojo();
-            tbMiddlePicPojo.setMiddleId(id);
-            tbMiddlePicPojo.setPicId(picId);
-            tbMiddlePicPojo.setType(type);
-            LambdaQueryWrapper<TbMiddlePicPojo> update = Wrappers.lambdaQuery(tbMiddlePicPojo)
-                                                                 .eq(TbMiddlePicPojo::getMiddleId, picId)
-                                                                 .eq(TbMiddlePicPojo::getId, id);
-            middlePicService.saveOrUpdate(tbMiddlePicPojo, update);
+            Wrapper<TbMiddlePicPojo> lambdaQuery = Wrappers.<TbMiddlePicPojo>lambdaQuery()
+                                                           .eq(TbMiddlePicPojo::getPicId, one.getId())
+                                                           .eq(TbMiddlePicPojo::getMiddleId, id);
+            TbMiddlePicPojo one1 = middlePicService.getOne(lambdaQuery);
+            entity = one1 == null ? new TbMiddlePicPojo() : one1;
+            entity.setMiddleId(id);
+            entity.setType(type);
+            entity.setPicId(one.getId());
         }
+        middlePicService.saveOrUpdate(entity);
+        // 删除多余文件
+        removePic(id);
     }
     
     /**

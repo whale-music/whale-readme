@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.core.common.result.NeteaseResult;
+import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
@@ -47,13 +48,14 @@ public class PlayListController {
     @RequestMapping(value = "/playlist/create", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult createPlayList(@RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
-        
-        TbCollectPojo collectPojo = collect.createPlayList(user.getId(), name);
-        
+    
+        CollectConvert collectPojo = collect.createPlayList(user.getId(), name);
+    
         CreatePlaylistVo vo = new CreatePlaylistVo();
         vo.setPlaylist(new Playlist());
         vo.getPlaylist().setId(collectPojo.getId());
         vo.getPlaylist().setName(collectPojo.getPlayListName());
+        vo.getPlaylist().setCoverImgUrl(collectPojo.getPicUrl());
         vo.getPlaylist().setUserId(user.getId());
         vo.getPlaylist().setCreateTime(collectPojo.getCreateTime().getNano());
         vo.getPlaylist().setUpdateTime(collectPojo.getUpdateTime().getNano());

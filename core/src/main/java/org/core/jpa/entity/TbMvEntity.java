@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Objects;
 
 @Entity
 @Table(name = "tb_mv")
-public class TbMvEntity {
+public class TbMvEntity implements Serializable {
+    public static final long serialVersionUID = 2405432543551807L;
+    
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
     @GenericGenerator(name = "IdGenerator", type = ManualInsertGenerator.class)
@@ -40,12 +43,6 @@ public class TbMvEntity {
     @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
-    @OneToMany(mappedBy = "tbMvByMiddleId")
-    private Collection<TbHistoryEntity> tbHistoriesById;
-    @OneToMany(mappedBy = "tbMvByMiddleId")
-    private Collection<TbMiddlePicEntity> tbMiddlePicsById;
-    @OneToMany(mappedBy = "tbMvByMiddleId")
-    private Collection<TbMiddleTagEntity> tbMiddleTagsById;
     @ManyToOne
     @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbResourceEntity tbResourceBySourceId;
@@ -147,30 +144,6 @@ public class TbMvEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, sourceId, title, description, duration, userId, publishTime, createTime, updateTime);
-    }
-    
-    public Collection<TbHistoryEntity> getTbHistoriesById() {
-        return tbHistoriesById;
-    }
-    
-    public void setTbHistoriesById(Collection<TbHistoryEntity> tbHistoriesById) {
-        this.tbHistoriesById = tbHistoriesById;
-    }
-    
-    public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {
-        return tbMiddlePicsById;
-    }
-    
-    public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
-        this.tbMiddlePicsById = tbMiddlePicsById;
-    }
-    
-    public Collection<TbMiddleTagEntity> getTbMiddleTagsById() {
-        return tbMiddleTagsById;
-    }
-    
-    public void setTbMiddleTagsById(Collection<TbMiddleTagEntity> tbMiddleTagsById) {
-        this.tbMiddleTagsById = tbMiddleTagsById;
     }
     
     public TbResourceEntity getTbResourceBySourceId() {

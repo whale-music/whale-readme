@@ -17,10 +17,12 @@ import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
@@ -28,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 歌单中间层
@@ -86,23 +87,6 @@ public class CollectApi {
         return null;
     }
     
-    /**
-     * 检查用户是否有权限操作歌单
-     *
-     * @param userId        用户ID
-     * @param tbCollectPojo 歌单信息
-     */
-    private static void checkUserAuth(Long userId, TbCollectPojo tbCollectPojo) {
-        // 检查是否有该歌单
-        if (tbCollectPojo == null || tbCollectPojo.getUserId() == null) {
-            throw new BaseException(ResultCode.SONG_LIST_DOES_NOT_EXIST);
-        }
-        // 检查用户是否有权限
-        if (!userId.equals(tbCollectPojo.getUserId())) {
-            log.warn(ResultCode.PERMISSION_NO_ACCESS.getResultMsg());
-            throw new BaseException(ResultCode.PERMISSION_NO_ACCESS);
-        }
-    }
     
     /**
      * 查询tag表
@@ -141,10 +125,7 @@ public class CollectApi {
      * @param name   歌单名
      * @return 歌单信息
      */
-    public TbCollectPojo createPlayList(Long userId, String name) {
-        TbPicPojo pic = new TbPicPojo();
-        pic.setUrl(defaultInfo.getPic().getPlayListPic());
-        qukuService.saveOrUpdateUserAvatar(userId, defaultInfo.getPic().getPlayListPic());
+    public CollectConvert createPlayList(Long userId, String name) {
         return qukuService.createPlayList(userId, name, PlayListTypeConfig.ORDINARY);
     }
     
@@ -156,7 +137,7 @@ public class CollectApi {
      */
     public void updatePlayList(Long userId, TbCollectPojo collectPojo) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectPojo.getId());
-        checkUserAuth(userId, tbCollectPojo);
+        QukuServiceImpl.checkUserAuth(userId, tbCollectPojo);
         
         collectService.updateById(collectPojo);
     }
@@ -172,7 +153,7 @@ public class CollectApi {
         TbCollectPojo collectPojo = new TbCollectPojo();
         collectPojo.setId(collectId);
         collectPojo.setUserId(userId);
-        checkUserAuth(userId, collectPojo);
+        QukuServiceImpl.checkUserAuth(userId, collectPojo);
     
     
         // 如果为0则直接不需要保存操作
@@ -284,15 +265,15 @@ public class CollectApi {
         if (page.getTotal() == 0) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
-        List<Long> musicIds = page.getRecords().stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        List<Long> musicIds = page.getRecords().stream().map(TbCollectMusicPojo::getMusicId).toList();
         List<TbMusicPojo> tbMusicPojoList = musicService.listByIds(musicIds);
-        
+    
         List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
             convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));
             return convert;
-        }).collect(Collectors.toList());
+        }).toList();
         
         Page<MusicConvert> musicPojoPage = new Page<>();
         musicPojoPage.setRecords(collect);
@@ -323,7 +304,7 @@ public class CollectApi {
      */
     public NeteaseResult addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
-        checkUserAuth(userID, tbCollectPojo);
+        QukuServiceImpl.checkUserAuth(userID, tbCollectPojo);
         try {
             qukuService.addMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
         } catch (BaseException e) {
@@ -360,7 +341,7 @@ public class CollectApi {
      */
     public List<Long> likelist(Long uid) {
         List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, uid));
-        return list.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        return list.stream().map(TbCollectMusicPojo::getMusicId).toList();
     }
     
     

@@ -54,8 +54,6 @@ public class SysUserEntity implements Serializable {
     private Collection<TbCollectEntity> tbCollectsById;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbHistoryEntity> tbHistoriesById;
-    @OneToMany(mappedBy = "sysUserByMiddleId")
-    private Collection<TbMiddlePicEntity> tbMiddlePicsById;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbMusicEntity> tbMusicsById;
     @OneToMany(mappedBy = "sysUserByUserId")
@@ -204,22 +202,6 @@ public class SysUserEntity implements Serializable {
         this.tbCollectsById = tbCollectsById;
     }
     
-    public Collection<TbHistoryEntity> getTbHistoriesById() {
-        return tbHistoriesById;
-    }
-    
-    public void setTbHistoriesById(Collection<TbHistoryEntity> tbHistoriesById) {
-        this.tbHistoriesById = tbHistoriesById;
-    }
-    
-    public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {
-        return tbMiddlePicsById;
-    }
-    
-    public void setTbMiddlePicsById(Collection<TbMiddlePicEntity> tbMiddlePicsById) {
-        this.tbMiddlePicsById = tbMiddlePicsById;
-    }
-    
     public Collection<TbMusicEntity> getTbMusicsById() {
         return tbMusicsById;
     }
@@ -307,4 +289,13 @@ public class SysUserEntity implements Serializable {
     public void setTbUserMvsById(Collection<TbUserMvEntity> tbUserMvsById) {
         this.tbUserMvsById = tbUserMvsById;
     }
+    
+    public Collection<TbHistoryEntity> getTbHistoriesById() {
+        return tbHistoriesById;
+    }
+    
+    public void setTbHistoriesById(Collection<TbHistoryEntity> tbHistoriesById) {
+        this.tbHistoriesById = tbHistoriesById;
+    }
+    
 }

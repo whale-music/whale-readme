@@ -10,7 +10,7 @@ import org.core.mybatis.pojo.TbScheduleTaskPojo;
  * </p>
  *
  * @author Sakura
- * @since 2023-05-17
+ * @since 2023-06-28
  */
 @Mapper
 public interface TbScheduleTaskMapper extends BaseMapper<TbScheduleTaskPojo> {

@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UploadMusicReq extends TbMusicUrlPojo {
+public class UploadMusicReq extends TbResourcePojo {
     private String name;
 }

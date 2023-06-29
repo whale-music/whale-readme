@@ -1,68 +1,66 @@
 package org.core.mybatis.pojo;
 
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 所有音乐列表
- * </p>
+ * 所有音乐列表(TbMusic)表实体类
  *
  * @author Sakura
- * @since 2023-06-25
+ * @since 2023-06-28 13:02:31
  */
 @Getter
 @Setter
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("tb_music")
-@ApiModel(value = "TbMusicPojo对象", description = "所有音乐列表")
-public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable{
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("音乐ID")
+@Schema(name = "TbMusic", description = "所有音乐列表")
+public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable {
+    public static final long serialVersionUID = -57031801034641798L;
+    
+    @Schema(title = "音乐ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
-    @ApiModelProperty("音乐名")
+    
+    @Schema(title = "音乐名")
     @TableField("music_name")
     private String musicName;
-
-    @ApiModelProperty("歌曲别名，数组则使用逗号分割")
+    
+    @Schema(title = "歌曲别名，数组则使用逗号分割")
     @TableField("alias_name")
     private String aliasName;
-
-    @ApiModelProperty("专辑ID")
+    
+    @Schema(title = "专辑ID")
     @TableField("album_id")
     private Long albumId;
     
-    @ApiModelProperty("排序字段")
+    @Schema(title = "排序字段")
     @TableField("sort")
     private Long sort;
     
-    @ApiModelProperty("上传用户ID")
+    @Schema(title = "上传用户ID")
     @TableField("user_id")
     private Long userId;
-
-    @ApiModelProperty("歌曲时长")
+    
+    @Schema(title = "歌曲时长")
     @TableField("time_length")
     private Integer timeLength;
     
-    @ApiModelProperty("更新时间")
+    @Schema(title = "更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
-    @ApiModelProperty("创建时间")
+    @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-
+    
+    
 }
+

@@ -41,3 +41,4 @@ build/
 /data/
 /config/application.yml
 /core/src/main/resources/static/web/
+/.jpb/

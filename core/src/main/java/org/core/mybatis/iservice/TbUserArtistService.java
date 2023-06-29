@@ -9,7 +9,7 @@ import org.core.mybatis.pojo.TbUserArtistPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2023-06-28
  */
 public interface TbUserArtistService extends IService<TbUserArtistPojo> {
 

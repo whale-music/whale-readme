@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 服务实现类
+ * 插件任务表 服务实现类
  * </p>
  *
  * @author Sakura
- * @since 2023-03-29
+ * @since 2023-06-28
  */
 @Service
-public class TbPluginTasksServiceImpl extends ServiceImpl<TbPluginTaskMapper, TbPluginTaskPojo> implements TbPluginTaskService {
+public class TbPluginTaskServiceImpl extends ServiceImpl<TbPluginTaskMapper, TbPluginTaskPojo> implements TbPluginTaskService {
 
 }

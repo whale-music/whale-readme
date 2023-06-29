@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class MusicRes extends TbMusicPojo {
     private TbAlbumPojo album;
     
     @ApiModelProperty("歌曲地址")
-    private List<TbMusicUrlPojo> musicUrlList;
+    private List<TbResourcePojo> musicUrlList;
     
     @ApiModelProperty("是否可以播放")
     private Boolean isPlaying;

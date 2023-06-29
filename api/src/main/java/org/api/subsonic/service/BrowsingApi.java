@@ -15,7 +15,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +60,7 @@ public class BrowsingApi {
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
         List<ArtistConvert> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new ArtistConvert() : artistListByAlbumIds1.get(0);
-        Map<Long, List<TbMusicUrlPojo>> musicMapUrl = qukuService.getMusicMapUrl(musicListByAlbumId.stream()
+        Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicMapUrl(musicListByAlbumId.stream()
                                                                                                    .map(TbMusicPojo::getId)
                                                                                                    .collect(Collectors.toSet()));
         int duration = 0;
@@ -77,15 +77,15 @@ public class BrowsingApi {
             e.setTrack(1);
             e.setYear(albumPojo.getPublishTime().getYear());
             e.setCoverArt(String.valueOf(musicPojo.getId()));
-            List<TbMusicUrlPojo> musicUrl = musicMapUrl.get(musicPojo.getId());
-            TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
+            List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
+            TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
             e.setContentType("audio/" + tbMusicUrlPojo.getEncodeType());
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
             e.setStarred(musicPojo.getUpdateTime().toString());
             e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setBitRate(tbMusicUrlPojo.getRate());
-            e.setPath(tbMusicUrlPojo.getUrl());
+            e.setPath(tbMusicUrlPojo.getPath());
             e.setPlayCount(0);
             e.setPlayed(musicPojo.getCreateTime().toString());
             e.setType("music");
@@ -107,8 +107,8 @@ public class BrowsingApi {
         TbMusicPojo musicPojo = musicService.getById(id);
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
         List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
-        List<TbMusicUrlPojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
-        TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
+        List<TbResourcePojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
+        TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new ArtistConvert() : artistByMusicId.get(0);
         Song song = new Song();
         song.setId(String.valueOf(musicPojo.getId()));
@@ -126,7 +126,7 @@ public class BrowsingApi {
         song.setStarred(musicPojo.getUpdateTime().toString());
         song.setDuration(musicPojo.getTimeLength() / 1000);
         song.setBitRate(tbMusicUrlPojo.getRate());
-        song.setPath(tbMusicUrlPojo.getUrl());
+        song.setPath(tbMusicUrlPojo.getPath());
         song.setPlayCount(0);
         song.setPlayed(musicPojo.getUpdateTime().toString());
         song.setCreated(musicPojo.getCreateTime().toString());

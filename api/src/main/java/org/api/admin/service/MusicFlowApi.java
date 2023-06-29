@@ -77,7 +77,7 @@ public class MusicFlowApi {
     /**
      * 音乐保存数据链接表
      */
-    private final TbMusicUrlService musicUrlService;
+    private final TbResourceService musicUrlService;
     private final TbLyricService lyricService;
     
     /**
@@ -105,7 +105,7 @@ public class MusicFlowApi {
     
     private final DefaultInfo defaultInfo;
     
-    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbMusicUrlService musicUrlService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo) {
+    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbResourceService musicUrlService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo) {
         this.lyricService = lyricService;
         this.fileType = fileType;
         this.musicService = musicService;
@@ -193,15 +193,25 @@ public class MusicFlowApi {
         return audioInfoRes;
     }
     
-    private File checkFileMd5(String md5, File file) {
-        if (FileUtil.isFile(file)) {
-            return file;
+    private static void getLevel(TbResourcePojo entity, int rate) {
+        // 标准
+        if (128000 >= rate) {
+            entity.setLevel("standard");
+            return;
         }
-        long count = musicUrlService.count(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, md5));
-        if (count > 0) {
-            throw new BaseException(ResultCode.SONG_EXIST);
+        // 较高
+        if (192000 == rate) {
+            entity.setLevel("higher");
+            return;
         }
-        return null;
+        // 极高
+        if (320_000 >= rate) {
+            entity.setLevel("exhigh");
+            return;
+        }
+        // 无损
+        entity.setLevel("lossless");
+        // hires rate < 1411_000
     }
     
     
@@ -293,25 +303,15 @@ public class MusicFlowApi {
         return list;
     }
     
-    private static void getLevel(TbMusicUrlPojo entity, int rate) {
-        // 标准
-        if (128000 >= rate) {
-            entity.setLevel("standard");
-            return;
+    private File checkFileMd5(String md5, File file) {
+        if (FileUtil.isFile(file)) {
+            return file;
         }
-        // 较高
-        if (192000 == rate) {
-            entity.setLevel("higher");
-            return;
+        long count = musicUrlService.count(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, md5));
+        if (count > 0) {
+            throw new BaseException(ResultCode.SONG_EXIST);
         }
-        // 极高
-        if (320_000 >= rate) {
-            entity.setLevel("exhigh");
-            return;
-        }
-        // 无损
-        entity.setLevel("lossless");
-        // hires rate < 1411_000
+        return null;
     }
     
     private void saveRandReturnArtistList(Set<Long> artistIds, TbMusicPojo musicPojo) {
@@ -331,9 +331,9 @@ public class MusicFlowApi {
      * @param dto       前端请求数据
      * @param musicPojo 音乐表数据
      */
-    private TbMusicUrlPojo uploadFile(AudioInfoReq dto, TbMusicPojo musicPojo) {
-        TbMusicUrlPojo urlPojo = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, dto.getMd5()));
-        urlPojo = urlPojo == null ? new TbMusicUrlPojo() : urlPojo;
+    private TbResourcePojo uploadFile(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        TbResourcePojo urlPojo = musicUrlService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, dto.getMd5()));
+        urlPojo = urlPojo == null ? new TbResourcePojo() : urlPojo;
         urlPojo.setMusicId(musicPojo.getId());
         Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
         SysUserPojo byId = accountService.getById(userId);
@@ -348,7 +348,7 @@ public class MusicFlowApi {
                     || StringUtils.isBlank(dto.getMd5())
                     || StringUtils.isBlank(dto.getType())
                     || StringUtils.isBlank(dto.getMusicTemp())) {
-                return new TbMusicUrlPojo();
+                return new TbResourcePojo();
             }
             // 只保存到数据库，不上传文件
             urlPojo.setSize(dto.getSize());
@@ -356,20 +356,20 @@ public class MusicFlowApi {
             urlPojo.setLevel(dto.getLevel());
             urlPojo.setMd5(dto.getMd5());
             urlPojo.setEncodeType(dto.getType());
-            urlPojo.setUrl(dto.getMusicTemp());
+            urlPojo.setPath(dto.getMusicTemp());
         } else {
             uploadLocalFile(dto, urlPojo);
         }
         // 检测是否重复上传相同的MD5音乐文件
         if (urlPojo.getId() == null) {
-            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, urlPojo.getMd5()));
+            TbResourcePojo one = musicUrlService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, urlPojo.getMd5()));
             ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
         }
         musicUrlService.saveOrUpdate(urlPojo);
         return urlPojo;
     }
     
-    private void uploadLocalFile(AudioInfoReq dto, TbMusicUrlPojo urlPojo) {
+    private void uploadLocalFile(AudioInfoReq dto, TbResourcePojo urlPojo) {
         File file = null;
         String md5 = "";
         String uploadPath;
@@ -410,7 +410,7 @@ public class MusicFlowApi {
         urlPojo.setLevel(dto.getLevel());
         urlPojo.setMd5(md5);
         urlPojo.setEncodeType(FileUtil.extName(file));
-        urlPojo.setUrl(uploadPath);
+        urlPojo.setPath(uploadPath);
     }
     
     /**
@@ -656,19 +656,19 @@ public class MusicFlowApi {
      */
     public List<MusicFileRes> getMusicUrl(Set<String> musicIds, Boolean refresh) {
         List<MusicFileRes> files = new ArrayList<>();
-        List<TbMusicUrlPojo> list = musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
-        for (TbMusicUrlPojo tbMusicUrlPojo : list) {
+        List<TbResourcePojo> list = musicUrlService.list(Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicIds));
+        for (TbResourcePojo tbMusicUrlPojo : list) {
             MusicFileRes musicFileRes = new MusicFileRes();
             try {
-                String address = tbMusicUrlPojo.getUrl();
-                TbMusicUrlPojo url = qukuService.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
+                String address = tbMusicUrlPojo.getPath();
+                TbResourcePojo url = qukuService.getMusicUrlByMusicUrlList(tbMusicUrlPojo, refresh);
                 BeanUtils.copyProperties(url, musicFileRes);
-                musicFileRes.setUrl(address);
+                musicFileRes.setPath(address);
                 musicFileRes.setSize(tbMusicUrlPojo.getSize());
                 musicFileRes.setLevel(tbMusicUrlPojo.getLevel());
                 musicFileRes.setMd5(tbMusicUrlPojo.getMd5());
-                musicFileRes.setRawUrl(url.getUrl());
-                musicFileRes.setExists(StringUtils.isNotBlank(url.getUrl()));
+                musicFileRes.setRawUrl(url.getPath());
+                musicFileRes.setExists(StringUtils.isNotBlank(url.getPath()));
             } catch (BaseException e) {
                 if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
                     throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
@@ -822,11 +822,11 @@ public class MusicFlowApi {
         // 保存歌词
         List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
         // 上传文件
-        TbMusicUrlPojo tbMusicUrlPojo = uploadFile(dto, musicPojo);
+        TbResourcePojo resourcePojo = uploadFile(dto, musicPojo);
     
         MusicDetails musicDetails = new MusicDetails();
         musicDetails.setMusic(musicPojo);
-        musicDetails.setMusicUrl(tbMusicUrlPojo);
+        musicDetails.setResource(resourcePojo);
         musicDetails.setAlbum(albumPojo);
         musicDetails.setSinger(albumArtist);
         musicDetails.setLyrics(lyricPojoList);
@@ -903,12 +903,12 @@ public class MusicFlowApi {
     }
     
     public void uploadAutoMusic(Long userId, MultipartFile uploadFile, Long musicId) {
-        TbMusicUrlPojo entity = new TbMusicUrlPojo();
+        TbResourcePojo entity = new TbResourcePojo();
         entity.setMusicId(musicId);
         userId = userId == null ? UserUtil.getUser().getId() : userId;
         try {
             String tempMd5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
-            TbMusicUrlPojo tempOne = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
+            TbResourcePojo tempOne = musicUrlService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
             // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
             if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
                 throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
@@ -922,13 +922,13 @@ public class MusicFlowApi {
             FileUtil.writeBytes(uploadFile.getBytes(), dest);
             AudioFile audioInfo = getAudioInfo(dest);
             String upload = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), dest, tempMd5);
-            TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, tempMd5));
+            TbResourcePojo one = musicUrlService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
             int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
             rate = rate * 1000;
             if (one == null) {
                 entity.setRate(rate);
                 getLevel(entity, rate);
-                entity.setUrl(upload);
+                entity.setPath(upload);
                 entity.setUserId(userId);
                 entity.setEncodeType(nameArr[1]);
                 entity.setSize(FileUtil.size(dest));
@@ -938,7 +938,7 @@ public class MusicFlowApi {
             } else {
                 one.setRate(rate);
                 getLevel(one, rate);
-                one.setUrl(upload);
+                one.setPath(upload);
                 one.setSize(FileUtil.size(dest));
                 one.setEncodeType(nameArr[1]);
                 musicUrlService.updateById(one);
@@ -961,20 +961,20 @@ public class MusicFlowApi {
     }
     
     public void uploadManualMusic(UploadMusicReq musicSource) {
-        TbMusicUrlPojo one = musicUrlService.getOne(Wrappers.<TbMusicUrlPojo>lambdaQuery().eq(TbMusicUrlPojo::getMd5, musicSource.getMd5()));
+        TbResourcePojo one = musicUrlService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, musicSource.getMd5()));
         String[] nameArr = StringUtils.split(musicSource.getName(), ".");
         if (nameArr.length == 1) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
         if (one == null) {
-            TbMusicUrlPojo entity = new TbMusicUrlPojo();
+            TbResourcePojo entity = new TbResourcePojo();
             getLevel(entity, musicSource.getRate());
             entity.setRate(musicSource.getRate());
             entity.setUserId(musicSource.getUserId());
             entity.setEncodeType(nameArr[1]);
             entity.setMd5(musicSource.getMd5());
             entity.setSize(musicSource.getSize());
-            entity.setUrl(musicSource.getName());
+            entity.setPath(musicSource.getName());
             entity.setMusicId(musicSource.getMusicId());
             musicUrlService.save(entity);
             qukuService.getMusicUrlByMusicId(entity.getMusicId(), true);
@@ -983,7 +983,7 @@ public class MusicFlowApi {
         }
     }
     
-    public void updateSource(TbMusicUrlPojo source) {
+    public void updateSource(TbResourcePojo source) {
         musicUrlService.updateById(source);
     }
     

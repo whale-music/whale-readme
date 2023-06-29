@@ -22,6 +22,7 @@ import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.utils.AliasUtil;
+import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class CollectApi {
     private TbCollectService collectService;
     
     @Autowired
+    private TbUserCollectService userCollectService;
+    
+    @Autowired
     private TbTagService tagService;
     
     @Autowired
@@ -52,7 +56,7 @@ public class CollectApi {
     private TbMusicService musicService;
     
     @Autowired
-    private TbMusicUrlService musicUrlService;
+    private TbResourceService musicUrlService;
     
     
     @Autowired
@@ -241,36 +245,28 @@ public class CollectApi {
      *
      * @param userId    用户ID
      * @param collectId 歌单ID
-     * @param flag      取消/收藏 1:收藏,2:取消收藏
+     * @param flag      取消/收藏 true:收藏,false:取消收藏
      */
-    public void subscribePlayList(Long userId, Long collectId, Integer flag) {
+    public void subscribePlayList(Long userId, Long collectId, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
-        // 需要收藏歌单存在，并且用户不一样（防止重复收藏）
-        if (tbCollectPojo != null && !Objects.equals(tbCollectPojo.getUserId(), userId) && flag == 1) {
-            tbCollectPojo.setId(null);
-            // 复制歌单，并更新信息
-            tbCollectPojo.setUserId(userId);
-            // 收藏
-            tbCollectPojo.setSubscribed(true);
-            // 增加排序值
-            tbCollectPojo.setSort(collectService.count() + 1);
-            collectService.save(tbCollectPojo);
-    
-            // 保存歌单
-            List<TbCollectMusicPojo> tbCollectMusicPojos = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                                                            .eq(TbCollectMusicPojo::getCollectId, collectId));
-            Set<TbCollectMusicPojo> batch = tbCollectMusicPojos.stream().map(tbCollectMusicPojo -> {
-                TbCollectMusicPojo tbCollectMusicPojo1 = new TbCollectMusicPojo();
-                tbCollectMusicPojo1.setCollectId(collectId);
-                tbCollectMusicPojo1.setMusicId(tbCollectMusicPojo.getMusicId());
-                return tbCollectMusicPojo1;
-            }).collect(Collectors.toSet());
-    
-            collectMusicService.saveBatch(batch);
-        } else if (Boolean.TRUE.equals(tbCollectPojo != null && tbCollectPojo.getSubscribed()) && flag == 2) {
-            // 歌单存在并且是收藏状态
-            // 删除歌单
-            removePlayList(userId, Collections.singletonList(collectId));
+        ExceptionUtil.isNull(tbCollectPojo == null, ResultCode.PLAT_LIST_EXIST);
+        // 需要收藏歌单存在，并且用户不一样, 不等于为true
+        boolean userFlag = !Objects.equals(tbCollectPojo.getUserId(), userId);
+        
+        LambdaQueryWrapper<TbUserCollectPojo> eq = Wrappers.<TbUserCollectPojo>lambdaQuery()
+                                                           .eq(TbUserCollectPojo::getCollectId, collectId)
+                                                           .eq(TbUserCollectPojo::getUserId, userId);
+        TbUserCollectPojo one = userCollectService.getOne(eq);
+        // 防止重复收藏
+        ExceptionUtil.isNull(one == null, ResultCode.PLAT_LIST_LIKE);
+        // 收藏
+        if (userFlag && flag) {
+            TbUserCollectPojo entity = new TbUserCollectPojo();
+            entity.setCollectId(collectId);
+            entity.setUserId(userId);
+            userCollectService.save(entity);
+        } else {
+            userCollectService.remove(eq);
         }
     }
     
@@ -312,8 +308,8 @@ public class CollectApi {
      * @param musicIds 音乐id list
      * @return 音乐信息列表
      */
-    public List<TbMusicUrlPojo> getMusicInfo(List<Long> musicIds) {
-        return musicUrlService.list(Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicIds));
+    public List<TbResourcePojo> getMusicInfo(List<Long> musicIds) {
+        return musicUrlService.list(Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicIds));
     }
     
     /**

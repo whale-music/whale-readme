@@ -14,7 +14,7 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -130,11 +130,12 @@ public class PlayListController {
      * 收藏/取消歌单
      *
      * @param collectId 歌单ID
+     * @param flag      取消/收藏 1:收藏,2:取消收藏
      */
     @GetMapping("/playlist/subscribe")
     public NeteaseResult subscribePlayList(@RequestParam("id") Long collectId, @RequestParam("t") Integer flag) {
         SysUserPojo user = UserUtil.getUser();
-        collect.subscribePlayList(user.getId(), collectId, flag);
+        collect.subscribePlayList(user.getId(), collectId, flag == 1);
         return new NeteaseResult().success();
     }
     
@@ -152,46 +153,46 @@ public class PlayListController {
                                              .stream()
                                              .map(TbMusicPojo::getId)
                                              .collect(Collectors.toList());
-        List<TbMusicUrlPojo> musicInfos = collect.getMusicInfo(musicIds);
+        List<TbResourcePojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
         for (MusicConvert musicPojo : playListAllSong.getRecords()) {
-            Map<Integer, TbMusicUrlPojo> musicInfoMaps = musicInfos.stream()
-                                                                   .collect(Collectors.toMap(TbMusicUrlPojo::getRate,
+            Map<Integer, TbResourcePojo> musicInfoMaps = musicInfos.stream()
+                                                                   .collect(Collectors.toMap(TbResourcePojo::getRate,
                                                                            tbMusicUrlPojo -> tbMusicUrlPojo));
             SongsItem e = new SongsItem();
             // Sq 无损
-            Optional<TbMusicUrlPojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
+            Optional<TbResourcePojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
             musicInfoMaps.remove(320000);
             Sq sqPojo = new Sq();
-            TbMusicUrlPojo sqOrElse = sq.orElse(new TbMusicUrlPojo());
+            TbResourcePojo sqOrElse = sq.orElse(new TbResourcePojo());
             sqPojo.setBr(sqOrElse.getRate());
             sqPojo.setSize(sqOrElse.getSize());
             e.setSq(sqPojo);
             musicInfoMaps.remove(320000);
     
             // l 低质量
-            Optional<TbMusicUrlPojo> l = Optional.ofNullable(musicInfoMaps.get(128000));
+            Optional<TbResourcePojo> l = Optional.ofNullable(musicInfoMaps.get(128000));
             musicInfoMaps.remove(128000);
             L lPojo = new L();
-            TbMusicUrlPojo lOrElse = l.orElse(new TbMusicUrlPojo());
+            TbResourcePojo lOrElse = l.orElse(new TbResourcePojo());
             lPojo.setBr(lOrElse.getRate());
             lPojo.setSize(lOrElse.getSize());
             e.setL(lPojo);
     
             // m 中质量
-            Optional<TbMusicUrlPojo> m = Optional.ofNullable(musicInfoMaps.get(192000));
+            Optional<TbResourcePojo> m = Optional.ofNullable(musicInfoMaps.get(192000));
             musicInfoMaps.remove(192000);
             M mPojo = new M();
-            TbMusicUrlPojo mOrElse = m.orElse(new TbMusicUrlPojo());
+            TbResourcePojo mOrElse = m.orElse(new TbResourcePojo());
             mPojo.setBr(mOrElse.getRate());
             mPojo.setSize(mOrElse.getSize());
             e.setM(mPojo);
     
             // h高质量
-            Optional<TbMusicUrlPojo> h = Optional.ofNullable(musicInfoMaps.get(320000));
+            Optional<TbResourcePojo> h = Optional.ofNullable(musicInfoMaps.get(320000));
             musicInfoMaps.remove(320000);
             H hPojo = new H();
-            TbMusicUrlPojo hOrElse = h.orElse(new TbMusicUrlPojo());
+            TbResourcePojo hOrElse = h.orElse(new TbResourcePojo());
             hPojo.setBr(hOrElse.getRate());
             hPojo.setSize(hOrElse.getSize());
             e.setH(hPojo);
@@ -200,7 +201,7 @@ public class PlayListController {
             musicInfoMaps.forEach(
                     (integer, tbMusicUrlPojo) -> {
                         A aPojo = new A();
-                        TbMusicUrlPojo aOrElse = Optional.ofNullable(tbMusicUrlPojo).orElse(new TbMusicUrlPojo());
+                        TbResourcePojo aOrElse = Optional.ofNullable(tbMusicUrlPojo).orElse(new TbResourcePojo());
                         aPojo.setBr(aOrElse.getRate());
                         aPojo.setSize(aOrElse.getSize());
                         e.setA(aPojo);

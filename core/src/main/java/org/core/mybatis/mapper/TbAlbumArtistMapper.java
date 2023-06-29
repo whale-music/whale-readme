@@ -6,11 +6,11 @@ import org.core.mybatis.pojo.TbAlbumArtistPojo;
 
 /**
  * <p>
- * Mapper 接口
+ * 歌手和专辑中间表 Mapper 接口
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-28
  */
 @Mapper
 public interface TbAlbumArtistMapper extends BaseMapper<TbAlbumArtistPojo> {

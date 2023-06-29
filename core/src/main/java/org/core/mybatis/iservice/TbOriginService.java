@@ -5,11 +5,11 @@ import org.core.mybatis.pojo.TbOriginPojo;
 
 /**
  * <p>
- * 音乐来源服务类
+ * 音乐来源 服务类
  * </p>
  *
  * @author Sakura
- * @since 2023-06-14
+ * @since 2023-06-28
  */
 public interface TbOriginService extends IService<TbOriginPojo> {
 

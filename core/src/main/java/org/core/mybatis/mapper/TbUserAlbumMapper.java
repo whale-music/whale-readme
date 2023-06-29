@@ -10,7 +10,7 @@ import org.core.mybatis.pojo.TbUserAlbumPojo;
  * </p>
  *
  * @author Sakura
- * @since 2023-03-14
+ * @since 2023-06-28
  */
 @Mapper
 public interface TbUserAlbumMapper extends BaseMapper<TbUserAlbumPojo> {

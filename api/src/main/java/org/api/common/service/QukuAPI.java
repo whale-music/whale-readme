@@ -11,8 +11,8 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
 import org.core.mybatis.pojo.TbPicPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.ImageTypeUtils;
 import org.oss.factory.OSSFactory;
@@ -113,29 +113,29 @@ public class QukuAPI extends QukuServiceImpl {
         super.removePicFile(ids, ossService::delete);
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {
+    public List<TbResourcePojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {
         return getMusicUrlByMusicId(CollUtil.newHashSet(musicId), refresh);
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicId(Collection<Long> musicIds, boolean refresh) {
+    public List<TbResourcePojo> getMusicUrlByMusicId(Collection<Long> musicIds, boolean refresh) {
         if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }
         return getMusicUrlByMusicUrlList(getMusicPaths(musicIds), refresh);
     }
     
-    public TbMusicUrlPojo getMusicUrlByMusicUrlList(TbMusicUrlPojo musicUrlPojo, boolean refresh) {
-        List<TbMusicUrlPojo> urlList = getMusicUrlByMusicUrlList(Collections.singletonList(musicUrlPojo), refresh);
+    public TbResourcePojo getMusicUrlByMusicUrlList(TbResourcePojo musicUrlPojo, boolean refresh) {
+        List<TbResourcePojo> urlList = getMusicUrlByMusicUrlList(Collections.singletonList(musicUrlPojo), refresh);
         if (CollUtil.isNotEmpty(urlList) && urlList.get(0) != null) {
             return urlList.get(0);
         }
-        return new TbMusicUrlPojo();
+        return new TbResourcePojo();
     }
     
-    public List<TbMusicUrlPojo> getMusicUrlByMusicUrlList(List<TbMusicUrlPojo> list, boolean refresh) {
-        for (TbMusicUrlPojo tbMusicUrlPojo : list) {
-            String s = getAddresses(refresh, tbMusicUrlPojo.getUrl());
-            tbMusicUrlPojo.setUrl(s);
+    public List<TbResourcePojo> getMusicUrlByMusicUrlList(List<TbResourcePojo> list, boolean refresh) {
+        for (TbResourcePojo tbMusicUrlPojo : list) {
+            String s = getAddresses(refresh, tbMusicUrlPojo.getPath());
+            tbMusicUrlPojo.setPath(s);
         }
         return list;
     }

@@ -21,6 +21,8 @@ import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.PlayListTypeConfig;
+import org.core.jpa.entity.TbUserCollectEntity;
+import org.core.jpa.repository.TbUserCollectEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -54,6 +57,9 @@ public class UserApi {
     // 歌单表
     @Autowired
     private TbCollectService collectService;
+    
+    @Autowired
+    private TbUserCollectEntityRepository userCollectEntityRepository;
     
     @Autowired
     private TbCollectMusicService collectMusicService;
@@ -248,11 +254,10 @@ public class UserApi {
      * @return 订阅歌单总数
      */
     public Long getSubPlaylistCount(Long userId) {
-        LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getUserId, userId)
-                                                                       .eq(TbCollectPojo::getType, Short.valueOf("0"))
-                                                                       .eq(TbCollectPojo::getSubscribed, true);
-        return collectService.count(lambdaQueryWrapper);
+        Stream<TbUserCollectEntity> collectEntityStream = userCollectEntityRepository.findByUserIdEquals(userId);
+        // 过滤创建者用户ID
+        return collectEntityStream.filter(tbUserCollectEntity -> !Objects.equals(tbUserCollectEntity.getTbCollectByCollectId().getUserId(), userId))
+                                  .count();
     }
     
     /**

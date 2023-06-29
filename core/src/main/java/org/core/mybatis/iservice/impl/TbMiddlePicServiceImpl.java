@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2023-06-13
+ * @since 2023-06-28
  */
 @Service
 public class TbMiddlePicServiceImpl extends ServiceImpl<TbMiddlePicMapper, TbMiddlePicPojo> implements TbMiddlePicService {

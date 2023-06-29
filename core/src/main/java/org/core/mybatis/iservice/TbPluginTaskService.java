@@ -5,11 +5,11 @@ import org.core.mybatis.pojo.TbPluginTaskPojo;
 
 /**
  * <p>
- * 服务类
+ * 插件任务表 服务类
  * </p>
  *
  * @author Sakura
- * @since 2023-03-29
+ * @since 2023-06-28
  */
 public interface TbPluginTaskService extends IService<TbPluginTaskPojo> {
 

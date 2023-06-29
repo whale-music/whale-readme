@@ -5,11 +5,11 @@ import org.core.mybatis.pojo.TbAlbumArtistPojo;
 
 /**
  * <p>
- * 服务类
+ * 歌手和专辑中间表 服务类
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-28
  */
 public interface TbAlbumArtistService extends IService<TbAlbumArtistPojo> {
 

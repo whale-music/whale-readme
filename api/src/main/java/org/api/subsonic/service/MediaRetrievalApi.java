@@ -8,7 +8,7 @@ import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.core.common.constant.defaultinfo.DefaultInfo;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ public class MediaRetrievalApi {
     
     public String stream(SubsonicCommonReq req, Long id) {
         log.debug(req.toString());
-        List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
-        return CollUtil.isEmpty(musicUrlByMusicId) ? "" : musicUrlByMusicId.get(0).getUrl();
+        List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
+        return CollUtil.isEmpty(musicUrlByMusicId) ? "" : musicUrlByMusicId.get(0).getPath();
     }
 }

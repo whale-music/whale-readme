@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 服务实现类
+ * 歌手和专辑中间表 服务实现类
  * </p>
  *
  * @author Sakura
- * @since 2022-12-07
+ * @since 2023-06-28
  */
 @Service
 public class TbAlbumArtistServiceImpl extends ServiceImpl<TbAlbumArtistMapper, TbAlbumArtistPojo> implements TbAlbumArtistService {

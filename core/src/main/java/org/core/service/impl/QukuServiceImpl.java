@@ -59,7 +59,7 @@ public class QukuServiceImpl implements QukuService {
      * 音乐地址服务
      */
     @Autowired
-    private TbMusicUrlService musicUrlService;
+    private TbResourceService musicUrlService;
     
     @Autowired
     private TbUserAlbumService userAlbumService;
@@ -210,11 +210,11 @@ public class QukuServiceImpl implements QukuService {
      * @param musicId 音乐ID
      */
     @Override
-    public Map<Long, List<TbMusicUrlPojo>> getMusicMapUrl(Collection<Long> musicId) {
-        LambdaQueryWrapper<TbMusicUrlPojo> in = Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicId);
-        List<TbMusicUrlPojo> list = musicUrlService.list(in);
+    public Map<Long, List<TbResourcePojo>> getMusicMapUrl(Collection<Long> musicId) {
+        LambdaQueryWrapper<TbResourcePojo> in = Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicId);
+        List<TbResourcePojo> list = musicUrlService.list(in);
         return list.parallelStream()
-                   .collect(Collectors.toConcurrentMap(TbMusicUrlPojo::getMusicId, ListUtil::toList, (objects, objects2) -> {
+                   .collect(Collectors.toConcurrentMap(TbResourcePojo::getMusicId, ListUtil::toList, (objects, objects2) -> {
                        objects2.addAll(objects);
                        return objects2;
                    }));
@@ -292,8 +292,8 @@ public class QukuServiceImpl implements QukuService {
     }
     
     @Override
-    public List<TbMusicUrlPojo> getMusicPaths(Collection<Long> musicId) {
-        LambdaQueryWrapper<TbMusicUrlPojo> in = Wrappers.<TbMusicUrlPojo>lambdaQuery().in(TbMusicUrlPojo::getMusicId, musicId);
+    public List<TbResourcePojo> getMusicPaths(Collection<Long> musicId) {
+        LambdaQueryWrapper<TbResourcePojo> in = Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicId);
         return musicUrlService.list(in);
     }
     
@@ -691,7 +691,6 @@ public class QukuServiceImpl implements QukuService {
         collectPojo.setUserId(userId);
         collectPojo.setPlayListName(name);
         collectPojo.setSort(collectService.count() + 1);
-        collectPojo.setSubscribed(false);
         collectPojo.setType(type);
         collectService.save(collectPojo);
         CollectConvert convert = new CollectConvert();
@@ -1067,8 +1066,8 @@ public class QukuServiceImpl implements QukuService {
         // 删除歌曲
         musicService.removeBatchByIds(musicId);
         // 删除音源
-        LambdaQueryWrapper<TbMusicUrlPojo> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.in(TbMusicUrlPojo::getMusicId, musicId);
+        LambdaQueryWrapper<TbResourcePojo> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(TbResourcePojo::getMusicId, musicId);
         musicUrlService.remove(queryWrapper);
         // 删除Tag中间表
         middleTagService.removeBatchByIds(musicId);

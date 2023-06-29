@@ -1,46 +1,44 @@
 package org.core.mybatis.pojo;
 
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.io.Serializable;
 
 /**
- * <p>
- * 歌单和音乐的中间表，用于记录歌单中的每一个音乐
- * </p>
+ * 歌单和音乐的中间表，用于记录歌单中的每一个音乐(TbCollectMusic)表实体类
  *
  * @author Sakura
- * @since 2023-06-25
+ * @since 2023-06-28 13:02:31
  */
 @Getter
 @Setter
-@ToString
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("tb_collect_music")
-@ApiModel(value = "TbCollectMusicPojo对象", description = "歌单和音乐的中间表，用于记录歌单中的每一个音乐")
+@Schema(name = "TbCollectMusic", description = "歌单和音乐的中间表，用于记录歌单中的每一个音乐")
 public class TbCollectMusicPojo extends Model<TbCollectMusicPojo> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    public static final long serialVersionUID = 887945119772731986L;
     
-    @ApiModelProperty("歌单ID")
+    @Schema(title = "歌单ID")
     @TableId(value = "collect_id", type = IdType.ASSIGN_ID)
     private Long collectId;
     
-    @ApiModelProperty("音乐ID")
+    @Schema(title = "音乐ID")
     @TableField("music_id")
     private Long musicId;
     
-    @ApiModelProperty("添加顺序")
+    @Schema(title = "添加顺序")
     @TableField("sort")
     private Long sort;
+    
+    
 }
+

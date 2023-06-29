@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 音乐来源服务实现类
+ * 音乐来源 服务实现类
  * </p>
  *
  * @author Sakura
- * @since 2023-06-14
+ * @since 2023-06-28
  */
 @Service
 public class TbOriginServiceImpl extends ServiceImpl<TbOriginMapper, TbOriginPojo> implements TbOriginService {

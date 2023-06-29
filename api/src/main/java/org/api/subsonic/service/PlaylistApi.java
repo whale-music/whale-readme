@@ -83,10 +83,10 @@ public class PlaylistApi {
         int duration = 0;
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
-            List<TbMusicUrlPojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
+            List<TbResourcePojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
             e.setId(String.valueOf(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
-            TbMusicUrlPojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbMusicUrlPojo() : musicUrl.get(0);
+            TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
             e.setBitRate(tbMusicUrlPojo.getRate() == null ? 0 : tbMusicUrlPojo.getRate());
             e.setIsDir(false);
             e.setCoverArt(String.valueOf(musicPojo.getId()));
@@ -107,7 +107,7 @@ public class PlaylistApi {
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
             e.setType("music");
             e.setContentType("audio/mpeg");
-            e.setParent(tbMusicUrlPojo.getUrl());
+            e.setParent(tbMusicUrlPojo.getPath());
             e.setPlayCount(0);
     
             List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());

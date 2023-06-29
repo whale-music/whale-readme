@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2023-06-01
+ * @since 2023-06-28
  */
 @Service
 public class TbPicServiceImpl extends ServiceImpl<TbPicMapper, TbPicPojo> implements TbPicService {

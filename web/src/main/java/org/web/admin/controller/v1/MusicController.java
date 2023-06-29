@@ -9,7 +9,7 @@ import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.result.R;
 import org.core.mybatis.pojo.MusicDetails;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
@@ -176,7 +176,7 @@ public class MusicController {
      * @return 成功信息
      */
     @PostMapping("/update/source")
-    public R updateSource(@RequestBody TbMusicUrlPojo source) {
+    public R updateSource(@RequestBody TbResourcePojo source) {
         uploadMusic.updateSource(source);
         return R.success();
     }

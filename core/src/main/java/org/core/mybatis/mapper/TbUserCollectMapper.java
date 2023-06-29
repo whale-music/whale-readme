@@ -2,17 +2,17 @@ package org.core.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbUserCollectPojo;
 
 /**
  * <p>
- * 音乐下载地址 Mapper 接口
+ * 用户收藏歌单 Mapper 接口
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2023-06-28
  */
 @Mapper
-public interface TbMusicUrlMapper extends BaseMapper<TbMusicUrlPojo> {
+public interface TbUserCollectMapper extends BaseMapper<TbUserCollectPojo> {
 
 }

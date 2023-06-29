@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2023-03-14
+ * @since 2023-06-28
  */
 @Service
 public class TbUserAlbumServiceImpl extends ServiceImpl<TbUserAlbumMapper, TbUserAlbumPojo> implements TbUserAlbumService {

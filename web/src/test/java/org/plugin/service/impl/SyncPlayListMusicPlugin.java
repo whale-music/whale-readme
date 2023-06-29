@@ -148,11 +148,11 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
             tbMusicPojo.setMusic(Optional.ofNullable(tbMusicPojo.getMusic()).orElse(new TbMusicPojo()));
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
-            tbMusicPojo.setMusicUrl(Optional.ofNullable(tbMusicPojo.getMusicUrl()).orElse(new TbMusicUrlPojo()));
+            tbMusicPojo.setResource(Optional.ofNullable(tbMusicPojo.getResource()).orElse(new TbResourcePojo()));
     
             pluginPackage.logInfo("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             pluginPackage.logInfo("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
-            pluginPackage.logInfo("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getMusicUrl().getUrl(), tbMusicPojo.getMusicUrl().getId());
+            pluginPackage.logInfo("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getResource().getPath(), tbMusicPojo.getResource().getId());
             for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
                 pluginPackage.logInfo("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }

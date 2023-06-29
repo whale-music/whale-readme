@@ -22,7 +22,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbMusicUrlPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.utils.AliasUtil;
@@ -65,9 +65,9 @@ public class RecommendApi {
             e.setName(tbMusicPojo.getMusicName());
             e.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             // 歌曲下载地址
-            List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(tbMusicPojo.getId(), false);
+            List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(tbMusicPojo.getId(), false);
             if (CollUtil.isNotEmpty(musicUrlByMusicId)) {
-                e.setMp3Url(musicUrlByMusicId.get(0).getUrl());
+                e.setMp3Url(musicUrlByMusicId.get(0).getPath());
             }
             e.setDuration(tbMusicPojo.getTimeLength());
             

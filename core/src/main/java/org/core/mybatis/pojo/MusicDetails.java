@@ -14,5 +14,5 @@ public class MusicDetails {
     private TbAlbumPojo album;
     private List<TbArtistPojo> singer;
     private List<TbLyricPojo> lyrics;
-    private TbMusicUrlPojo musicUrl;
+    private TbResourcePojo resource;
 }

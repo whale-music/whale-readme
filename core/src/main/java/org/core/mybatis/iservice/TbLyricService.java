@@ -9,7 +9,7 @@ import org.core.mybatis.pojo.TbLyricPojo;
  * </p>
  *
  * @author Sakura
- * @since 2023-04-05
+ * @since 2023-06-28
  */
 public interface TbLyricService extends IService<TbLyricPojo> {
 

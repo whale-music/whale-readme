@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author Sakura
- * @since 2023-04-05
+ * @since 2023-06-28
  */
 @Service
 public class TbLyricServiceImpl extends ServiceImpl<TbLyricMapper, TbLyricPojo> implements TbLyricService {

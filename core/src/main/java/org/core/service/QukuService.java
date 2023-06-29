@@ -60,7 +60,7 @@ public interface QukuService {
     /**
      * 查询数据歌曲下载地址
      */
-    List<TbMusicUrlPojo> getMusicPaths(Collection<Long> musicId);
+    List<TbResourcePojo> getMusicPaths(Collection<Long> musicId);
     
     /**
      * 查询数据歌曲下载地址
@@ -68,7 +68,7 @@ public interface QukuService {
      *
      * @param musicId 音乐ID
      */
-    Map<Long, List<TbMusicUrlPojo>> getMusicMapUrl(Collection<Long> musicId);
+    Map<Long, List<TbResourcePojo>> getMusicMapUrl(Collection<Long> musicId);
     
     /**
      * 随即获取曲库中的一条数据

@@ -9,7 +9,7 @@ import org.core.mybatis.pojo.TbMusicPojo;
  * </p>
  *
  * @author Sakura
- * @since 2022-12-02
+ * @since 2023-06-28
  */
 public interface TbMusicService extends IService<TbMusicPojo> {
 

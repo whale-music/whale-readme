@@ -6,11 +6,11 @@ import org.core.mybatis.pojo.TbPluginTaskPojo;
 
 /**
  * <p>
- * Mapper 接口
+ * 插件任务表 Mapper 接口
  * </p>
  *
  * @author Sakura
- * @since 2023-03-29
+ * @since 2023-06-28
  */
 @Mapper
 public interface TbPluginTaskMapper extends BaseMapper<TbPluginTaskPojo> {

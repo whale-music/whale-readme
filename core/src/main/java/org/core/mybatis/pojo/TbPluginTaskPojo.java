@@ -1,62 +1,58 @@
 package org.core.mybatis.pojo;
 
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 插件任务表
- * </p>
+ * 插件任务表(TbPluginTask)表实体类
  *
  * @author Sakura
- * @since 2023-06-25
+ * @since 2023-06-28 13:02:32
  */
 @Getter
 @Setter
-@ToString
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("tb_plugin_task")
-@ApiModel(value = "TbPluginTaskPojo对象", description = "插件任务表")
+@Schema(name = "TbPluginTask", description = "插件任务表")
 public class TbPluginTaskPojo extends Model<TbPluginTaskPojo> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    public static final long serialVersionUID = -24393927956368288L;
     
-    @ApiModelProperty("任务ID")
+    @Schema(title = "任务ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
-    @ApiModelProperty("插件ID")
+    @Schema(title = "插件ID")
     @TableField("plugin_id")
     private Long pluginId;
     
-    @ApiModelProperty("当前任务执行状态,0: stop, 1: run, 2: error")
+    @Schema(title = "当前任务执行状态,0: stop, 1: run, 2: error")
     @TableField("status")
     private Byte status;
-
-    @ApiModelProperty("插件入参")
+    
+    @Schema(title = "插件入参")
     @TableField("params")
     private String params;
-
-    @ApiModelProperty("用户创建ID")
+    
+    @Schema(title = "用户创建ID")
     @TableField("user_id")
     private Long userId;
     
-    @ApiModelProperty("创建时间")
+    @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     
-    @ApiModelProperty("更新时间")
+    @Schema(title = "更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
     
 }
+

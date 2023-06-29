@@ -39,7 +39,7 @@ public class HoneApi {
     private TbArtistService artistService;
     
     @Autowired
-    private TbMusicUrlService musicUrlService;
+    private TbResourceService musicUrlService;
     
     @Autowired
     private TbPluginTaskService pluginTaskService;
@@ -170,9 +170,9 @@ public class HoneApi {
     
     public List<MusicStatisticsRes> getMusicStatistics() {
         ArrayList<MusicStatisticsRes> res = new ArrayList<>();
-        List<TbMusicUrlPojo> musicUrlList = musicUrlService.list();
+        List<TbResourcePojo> musicUrlList = musicUrlService.list();
         List<TbMusicPojo> musicList = musicService.list();
-        List<TbMusicUrlPojo> musicUrlByMusicUrlList = qukuAPI.getMusicUrlByMusicUrlList(musicUrlList, false);
+        List<TbResourcePojo> musicUrlByMusicUrlList = qukuAPI.getMusicUrlByMusicUrlList(musicUrlList, false);
         Collection<String> musicMD5 = qukuAPI.getMD5(false);
         // 有效音乐
         // 音乐数据对比存储地址，查找对应的音乐地址是否存在
@@ -187,7 +187,7 @@ public class HoneApi {
         long noSoundSourceCount = musicList.parallelStream().filter(tbMusicUrlPojo1 ->
                 musicUrlByMusicUrlList.parallelStream()
                                       .anyMatch(musicUrlPojo2 ->
-                                              StringUtils.isNotBlank(musicUrlPojo2.getUrl()) &&
+                                              StringUtils.isNotBlank(musicUrlPojo2.getPath()) &&
                                                       Objects.equals(tbMusicUrlPojo1.getId(), musicUrlPojo2.getMusicId()))
         ).count();
         MusicStatisticsRes e11 = new MusicStatisticsRes();

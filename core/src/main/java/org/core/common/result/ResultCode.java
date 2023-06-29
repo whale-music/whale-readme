@@ -31,6 +31,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     LYRIC_NO_EXIST_EXISTED("10014", "插件类型不存在"),
     SCHEDULED_NO_EXIST_EXISTED("10015", "定时任务不存在"),
     CRON_ERROR("10016", "Cron表达式错误, 请检查重试"),
+    PLAT_LIST_LIKE("10017", "歌单已收藏"),
     
     
     /* 用户错误：20001-29999*/

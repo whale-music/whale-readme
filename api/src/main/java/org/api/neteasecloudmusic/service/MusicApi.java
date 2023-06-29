@@ -51,15 +51,15 @@ public class MusicApi {
     
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
-        List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(new HashSet<>(id), false);
+        List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(new HashSet<>(id), false);
         List<TbMusicPojo> musicPojos = musicService.listByIds(id);
         Map<Long, TbMusicPojo> musicPojoMap = musicPojos.stream().collect(Collectors.toMap(TbMusicPojo::getId, tbMusicPojo -> tbMusicPojo));
         SongUrlRes songUrlRes = new SongUrlRes();
         ArrayList<DataItem> data = new ArrayList<>();
-        for (TbMusicUrlPojo tbMusicUrlPojo : musicUrlByMusicId) {
+        for (TbResourcePojo tbMusicUrlPojo : musicUrlByMusicId) {
             DataItem e = new DataItem();
             e.setId(tbMusicUrlPojo.getId());
-            e.setUrl(tbMusicUrlPojo.getUrl());
+            e.setUrl(tbMusicUrlPojo.getPath());
             e.setBr(tbMusicUrlPojo.getRate());
             e.setSize(tbMusicUrlPojo.getSize());
             e.setCode(200);
@@ -210,14 +210,14 @@ public class MusicApi {
             } else {
                 TbAlbumPojo albumPojo = albumService.getById(sourceid);
                 if (albumPojo != null) {
-                    rankPojo.setType(2);
+                    rankPojo.setType((byte) 2);
                 }
             }
             entityList.add(rankPojo);
         } else {
             Integer broadcastCount = sourcePojo.getCount();
             broadcastCount = broadcastCount + 1;
-            sourcePojo.setType(broadcastCount);
+            sourcePojo.setCount(broadcastCount);
             historyService.update(sourcePojo, sourceWrapper);
         }
         historyService.saveBatch(entityList);

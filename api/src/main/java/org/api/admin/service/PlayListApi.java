@@ -69,7 +69,7 @@ public class PlayListApi {
     private PlayListService playListService;
     
     @Autowired
-    private TbMusicUrlService musicUrlService;
+    private TbResourceService musicUrlService;
     
     @Autowired
     private DefaultInfo defaultInfo;
@@ -222,12 +222,12 @@ public class PlayListApi {
         // 歌手信息
         Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
         // 填充信息
-        Map<Long, TbMusicUrlPojo> urlPojoMap = new HashMap<>();
+        Map<Long, TbResourcePojo> urlPojoMap = new HashMap<>();
         // 获取音乐地址
         try {
-            List<TbMusicUrlPojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(musicIds, Boolean.TRUE.equals(req.getRefresh()));
+            List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(musicIds, Boolean.TRUE.equals(req.getRefresh()));
             urlPojoMap = musicUrlByMusicId.parallelStream()
-                                          .collect(Collectors.toMap(TbMusicUrlPojo::getMusicId,
+                                          .collect(Collectors.toMap(TbResourcePojo::getMusicId,
                                                   Function.identity(),
                                                   (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
         } catch (BaseException ex) {
@@ -250,18 +250,18 @@ public class PlayListApi {
             e.setMusicName(musicPojo.getMusicName());
             e.setMusicNameAlias(musicPojo.getAliasName());
             e.setPic(musicPojo.getPicUrl());
-            TbMusicUrlPojo tbMusicUrlPojo = Optional.ofNullable(urlPojoMap.get(musicPojo.getId())).orElse(new TbMusicUrlPojo());
-            e.setIsExist(StringUtils.isNotBlank(tbMusicUrlPojo.getUrl()));
-            e.setMusicRawUrl(tbMusicUrlPojo.getUrl());
-        
+            TbResourcePojo tbMusicUrlPojo = Optional.ofNullable(urlPojoMap.get(musicPojo.getId())).orElse(new TbResourcePojo());
+            e.setIsExist(StringUtils.isNotBlank(tbMusicUrlPojo.getPath()));
+            e.setMusicRawUrl(tbMusicUrlPojo.getPath());
+    
             e.setIsLike(likeMusic.contains(musicPojo.getId()));
-        
+    
             // 专辑
             TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumMap.get(musicPojo.getAlbumId())).orElse(new TbAlbumPojo());
             e.setAlbumId(tbAlbumPojo.getId());
             e.setAlbumName(tbAlbumPojo.getAlbumName());
             e.setPublishTime(tbAlbumPojo.getPublishTime());
-        
+    
             // 歌手
             List<ArtistConvert> tbArtistPojos = Optional.ofNullable(musicArtistByMusicIdToMap.get(musicPojo.getId())).orElse(new ArrayList<>());
             e.setArtistIds(new ArrayList<>());
@@ -288,15 +288,15 @@ public class PlayListApi {
             // 无音源音乐
             Collection<Long> union;
             List<Long> collect = musicService.list().parallelStream().map(TbMusicPojo::getId).collect(Collectors.toList());
-            List<TbMusicUrlPojo> musicUrlPojos = musicUrlService.list();
-            List<Long> collect1 = musicUrlPojos.parallelStream().map(TbMusicUrlPojo::getMusicId).collect(Collectors.toList());
+            List<TbResourcePojo> musicUrlPojos = musicUrlService.list();
+            List<Long> collect1 = musicUrlPojos.parallelStream().map(TbResourcePojo::getMusicId).collect(Collectors.toList());
             // 数据库中没有音源数据
             collect.removeAll(collect1);
             // 确认OSS音源存在
-            List<TbMusicUrlPojo> urls = qukuService.getMusicUrlByMusicUrlList(musicUrlPojos, false);
+            List<TbResourcePojo> urls = qukuService.getMusicUrlByMusicUrlList(musicUrlPojos, false);
             List<Long> noMusicSource = urls.parallelStream()
-                                           .filter(musicUrlPojo -> StringUtils.isEmpty(musicUrlPojo.getUrl()))
-                                           .map(TbMusicUrlPojo::getMusicId)
+                                           .filter(musicUrlPojo -> StringUtils.isEmpty(musicUrlPojo.getPath()))
+                                           .map(TbResourcePojo::getMusicId)
                                            .collect(Collectors.toList());
             // 是否都是无音源音乐
             union = CollUtil.union(noMusicSource, collect);
@@ -476,7 +476,7 @@ public class PlayListApi {
      */
     public void addMusicToPlayList(Long userId, Long pid, List<Long> id, Boolean flag) {
         TbCollectPojo byId = collectService.getById(pid);
-        ExceptionUtil.isNull(byId == null, ResultCode.PLAT_LIST_EXIST);
+        ExceptionUtil.isNull(byId == null, ResultCode.PLAT_LIST_LIKE);
         qukuService.addMusicToCollect(userId, byId.getId(), id, flag);
     }
     

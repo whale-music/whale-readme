@@ -9,7 +9,7 @@ import org.core.mybatis.pojo.TbScheduleTaskPojo;
  * </p>
  *
  * @author Sakura
- * @since 2023-05-17
+ * @since 2023-06-28
  */
 public interface TbScheduleTaskService extends IService<TbScheduleTaskPojo> {
 

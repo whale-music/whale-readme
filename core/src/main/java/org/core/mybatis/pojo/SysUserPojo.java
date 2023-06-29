@@ -1,74 +1,70 @@
 package org.core.mybatis.pojo;
 
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 系统用户表
- * </p>
+ * 系统用户表(SysUser)表实体类
  *
  * @author Sakura
- * @since 2023-06-25
+ * @since 2023-06-28 13:02:30
  */
 @Getter
 @Setter
-@ToString
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("sys_user")
-@ApiModel(value = "SysUserPojo对象", description = "系统用户表")
+@Schema(name = "SysUser", description = "系统用户表")
 public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty("系统用户ID")
+    public static final long serialVersionUID = -96556752193973287L;
+    
+    @Schema(title = "系统用户ID")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
-    @ApiModelProperty("登录用户名")
+    
+    @Schema(title = "登录用户名")
     @TableField("username")
     private String username;
-
-    @ApiModelProperty("登录显示昵称")
+    
+    @Schema(title = "登录显示昵称")
     @TableField("nickname")
     private String nickname;
-
-    @ApiModelProperty("用户密码")
+    
+    @Schema(title = "用户密码")
     @TableField("password")
     private String password;
-
-    @ApiModelProperty("个性签名")
+    
+    @Schema(title = "个性签名")
     @TableField("signature")
     private String signature;
-
-    @ApiModelProperty("账户类型")
+    
+    @Schema(title = "账户类型")
     @TableField("account_type")
     private Integer accountType;
-
-    @ApiModelProperty("最后登录IP")
+    
+    @Schema(title = "最后登录IP")
     @TableField("last_login_ip")
     private String lastLoginIp;
-
-    @ApiModelProperty("最后登录时间")
+    
+    @Schema(title = "最后登录时间")
     @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
-
-    @ApiModelProperty("创建时间")
+    
+    @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-    @ApiModelProperty("修改时间")
+    
+    @Schema(title = "修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-
+    
+    
 }
+

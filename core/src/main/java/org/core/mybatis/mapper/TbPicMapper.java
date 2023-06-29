@@ -10,7 +10,7 @@ import org.core.mybatis.pojo.TbPicPojo;
  * </p>
  *
  * @author Sakura
- * @since 2023-06-01
+ * @since 2023-06-28
  */
 @Mapper
 public interface TbPicMapper extends BaseMapper<TbPicPojo> {

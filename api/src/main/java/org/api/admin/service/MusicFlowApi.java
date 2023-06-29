@@ -105,7 +105,9 @@ public class MusicFlowApi {
     
     private final DefaultInfo defaultInfo;
     
-    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbResourceService musicUrlService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo) {
+    private final TbOriginService originService;
+    
+    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbResourceService musicUrlService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo, TbOriginService originService) {
         this.lyricService = lyricService;
         this.fileType = fileType;
         this.musicService = musicService;
@@ -119,6 +121,7 @@ public class MusicFlowApi {
         this.qukuService = qukuService;
         this.musicArtistService = musicArtistService;
         this.defaultInfo = defaultInfo;
+        this.originService = originService;
     }
     
     /**
@@ -550,7 +553,7 @@ public class MusicFlowApi {
         // 查询专辑名在数据库中是否存在专辑
         List<TbAlbumPojo> list = albumService.list(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, album.getAlbumName()));
         // 获取所有专辑ID
-        List<Long> albumList = list.stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
+        List<Long> albumList = list.stream().map(TbAlbumPojo::getId).toList();
         Set<Long> albumIds = new HashSet<>();
         // 根据歌手和专辑ID查找关联ID，如果有则更新专辑表。
         if (IterUtil.isNotEmpty(albumList) && IterUtil.isNotEmpty(singerIds)) {
@@ -619,7 +622,7 @@ public class MusicFlowApi {
         List<String> singerNameList = artists
                 .stream()
                 .map(TbArtistPojo::getArtistName)
-                .collect(Collectors.toList());
+                .toList();
     
         // 查询数据库中歌手
         List<TbArtistPojo> singList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery()
@@ -823,6 +826,7 @@ public class MusicFlowApi {
         List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
         // 上传文件
         TbResourcePojo resourcePojo = uploadFile(dto, musicPojo);
+        saveOriginTable(dto, musicPojo, resourcePojo);
     
         MusicDetails musicDetails = new MusicDetails();
         musicDetails.setMusic(musicPojo);
@@ -831,6 +835,15 @@ public class MusicFlowApi {
         musicDetails.setSinger(albumArtist);
         musicDetails.setLyrics(lyricPojoList);
         return musicDetails;
+    }
+    
+    private void saveOriginTable(AudioInfoReq dto, TbMusicPojo musicPojo, TbResourcePojo resourcePojo) {
+        if (dto.getOrigin() != null && StringUtils.isNotBlank(dto.getOrigin().getOrigin())) {
+            TbOriginPojo origin = dto.getOrigin();
+            origin.setMusicId(musicPojo.getId());
+            origin.setResourceId(resourcePojo.getId());
+            originService.save(origin);
+        }
     }
     
     private void saveAlbumTagAndPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
@@ -854,11 +867,11 @@ public class MusicFlowApi {
         switch (music) {
             case CN:
                 dto.setMusicName(ZhConverterUtil.toSimple(dto.getMusicName()));
-                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toSimple).collect(Collectors.toList()));
+                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toSimple).toList());
                 break;
             case TC:
                 dto.setMusicName(ZhConverterUtil.toTraditional(dto.getMusicName()));
-                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toTraditional).collect(Collectors.toList()));
+                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toTraditional).toList());
                 break;
             case DEFAULT:
             default:

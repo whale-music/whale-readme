@@ -247,8 +247,8 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
             JSONArray transNames1 = MapUtil.get(artist, "transNames", JSONArray.class, new JSONArray());
             JSONArray transNames2 = MapUtil.get(artist, "alias", JSONArray.class, new JSONArray());
             List<String> alias = new ArrayList<>();
-            alias.addAll(transNames1.stream().map(String::valueOf).collect(Collectors.toList()));
-            alias.addAll(transNames2.stream().map(String::valueOf).collect(Collectors.toList()));
+            alias.addAll(transNames1.stream().map(String::valueOf).toList());
+            alias.addAll(transNames2.stream().map(String::valueOf).toList());
             artistPojo.setAliasName(CollUtil.join(alias, ","));
             // 歌手封面
             artistPojo.setPicUrl(MapUtil.getStr(artist, "avatar"));
@@ -280,7 +280,11 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         // 逐字歌词
         dto.setKLyric(MapUtil.getStr(lyricMap, "klyric"));
         dto.setArtists(singer);
-        dto.setOrigin("163Music");
+        TbOriginPojo origin = new TbOriginPojo();
+        origin.setMusicId(musicId);
+        origin.setOriginUrl("https://music.163.com/#/song?id=" + musicId);
+        origin.setOrigin("163Music");
+        dto.setOrigin(origin);
         // 获取歌曲md5值
         Map<String, Object> musicUrlMap = songUrlMap.get(musicId);
         String url = MapUtil.getStr(musicUrlMap, "url");

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.core.mybatis.pojo.TbOriginPojo;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class AudioInfoReq {
     
     @ApiModelProperty("音乐来源")
     @NotBlank
-    private String origin;
+    private TbOriginPojo origin;
     
     @ApiModelProperty("音乐名")
     private String musicName;

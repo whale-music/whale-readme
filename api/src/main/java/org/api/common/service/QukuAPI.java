@@ -4,15 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
+import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.service.AccountService;
 import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.ImageTypeUtils;
 import org.oss.factory.OSSFactory;
@@ -34,9 +38,29 @@ public class QukuAPI extends QukuServiceImpl {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public QukuAPI(HttpRequestConfig httpRequestConfig, SaveConfig config) {
-        this.httpRequestConfig = httpRequestConfig;
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
+        super(musicService,
+                albumService,
+                artistService,
+                musicUrlService,
+                userAlbumService,
+                albumArtistService,
+                musicArtistService,
+                userSingerService,
+                collectMusicService,
+                collectService,
+                userCollectService,
+                middleTagService,
+                lyricService,
+                tagService,
+                accountService,
+                picService,
+                middlePicService,
+                picCache,
+                picMiddleCache,
+                defaultInfo);
         this.config = config;
+        this.httpRequestConfig = httpRequestConfig;
     }
     
     
@@ -78,17 +102,15 @@ public class QukuAPI extends QukuServiceImpl {
         String md5Hex;
         String upload;
         File rename = null;
-        try {
-            File fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
+        File fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
+        try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
-            try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
-                rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
-            }
+            rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
             // 删除文件
             upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
         } finally {
@@ -170,9 +192,9 @@ public class QukuAPI extends QukuServiceImpl {
         for (Map.Entry<Long, String> longStringEntry : paths.entrySet()) {
             String s;
             if (StringUtils.startsWithIgnoreCase("http", longStringEntry.getValue())) {
-                s = getAddresses(refresh, longStringEntry.getValue());
-            } else {
                 s = longStringEntry.getValue();
+            } else {
+                s = getAddresses(refresh, longStringEntry.getValue());
             }
             paths.put(longStringEntry.getKey(), s);
         }

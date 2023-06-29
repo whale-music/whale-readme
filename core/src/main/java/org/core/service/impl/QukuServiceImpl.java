@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.PicTypeConstant;
@@ -31,7 +32,6 @@ import org.core.service.QukuService;
 import org.core.utils.CollectSortUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
 @Service("QukuService")
 @Slf4j
 public class QukuServiceImpl implements QukuService {
@@ -47,68 +48,46 @@ public class QukuServiceImpl implements QukuService {
     public static final Object addLabelLock = new Object();
     public static final Object removeLabelLock = new Object();
     
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
-    @Autowired
-    private TbArtistService artistService;
+    private final TbArtistService artistService;
     
-    /**
-     * 音乐地址服务
-     */
-    @Autowired
-    private TbResourceService musicUrlService;
+    private final TbResourceService musicUrlService;
     
-    @Autowired
-    private TbUserAlbumService userAlbumService;
+    private final TbUserAlbumService userAlbumService;
     
-    @Autowired
-    private TbAlbumArtistService albumArtistService;
+    private final TbAlbumArtistService albumArtistService;
     
-    @Autowired
-    private TbMusicArtistService musicArtistService;
+    private final TbMusicArtistService musicArtistService;
     
-    @Autowired
-    private TbUserArtistService userSingerService;
+    private final TbUserArtistService userSingerService;
     
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
-    @Autowired
-    private TbUserCollectService userCollectService;
+    private final TbUserCollectService userCollectService;
     
-    @Autowired
-    private TbMiddleTagService middleTagService;
+    private final TbMiddleTagService middleTagService;
     
-    @Autowired
-    private TbLyricService lyricService;
+    private final TbLyricService lyricService;
     
-    @Autowired
-    private TbTagService tagService;
+    private final TbTagService tagService;
     
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
-    @Autowired
-    private TbPicService picService;
+    private final TbPicService picService;
     
-    @Autowired
-    private TbMiddlePicService middlePicService;
+    private final TbMiddlePicService middlePicService;
     
-    @Autowired
-    private Cache<Long, TbPicPojo> picCache;
+    private final Cache<Long, TbPicPojo> picCache;
     
-    @Autowired
-    private Cache<Long, Long> picMiddleCache;
+    private final Cache<Long, Long> picMiddleCache;
     
-    @Autowired
-    private DefaultInfo defaultInfo;
+    private final DefaultInfo defaultInfo;
+    
     
     private static List<AlbumConvert> getAlbumConvertList(List<TbAlbumPojo> albumPojoList, Map<Long, String> picUrl) {
         return albumPojoList.parallelStream().map(tbAlbumPojo -> {
@@ -266,13 +245,13 @@ public class QukuServiceImpl implements QukuService {
                 albumArtistMap.put(tbAlbumArtistPojo.getAlbumId(), pojos);
             }
         }
-    
+        
         Set<Long> artistIds = list.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
         List<TbArtistPojo> artistPojoList = artistService.listByIds(artistIds);
-    
+        
         Map<Long, String> picUrl = getArtistPicUrl(artistIds);
         Map<Long, ArtistConvert> artistMap = getLongArtistConvertMap(artistPojoList, picUrl);
-    
+        
         Map<Long, List<ArtistConvert>> resMap = new HashMap<>();
         for (Map.Entry<Long, TbAlbumPojo> longTbAlbumPojoEntry : albumPojoMap.entrySet()) {
             TbAlbumPojo tbAlbumPojo = longTbAlbumPojoEntry.getValue();
@@ -606,7 +585,7 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyList();
         }
         List<Long> collect = musicArtistPojos.parallelStream().map(TbMusicArtistPojo::getMusicId).toList();
-    
+        
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, collect));
         return getMusicConvertList(list, getMusicPicUrl(list.parallelStream().map(TbMusicPojo::getId).toList()));
     }
@@ -645,10 +624,10 @@ public class QukuServiceImpl implements QukuService {
                                                            .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                            .in(TbCollectMusicPojo::getMusicId, songIds));
             ExceptionUtil.isNull(count > 0, ResultCode.PLAT_LIST_MUSIC_EXIST);
-    
+            
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);
-    
+            
             long allCount = getCollectCount(collectId);
             List<TbCollectMusicPojo> collect = new ArrayList<>(tbMusicPojo.size());
             for (TbMusicPojo musicPojo : tbMusicPojo) {
@@ -723,11 +702,11 @@ public class QukuServiceImpl implements QukuService {
         entity.setCollectId(collectPojo.getId());
         entity.setUserId(userId);
         userCollectService.save(entity);
-    
+        
         TbPicPojo pic = new TbPicPojo();
         pic.setUrl(defaultInfo.getPic().getPlayListPic());
         this.saveOrUpdateCollectPic(collectPojo.getId(), defaultInfo.getPic().getPlayListPic());
-    
+        
         // 封面查询
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(collectPojo, convert);
@@ -936,7 +915,7 @@ public class QukuServiceImpl implements QukuService {
             middleTagService.remove(eq);
             tagService.removeByIds(tagIds);
         }
-    
+        
     }
     
     /**
@@ -1019,12 +998,12 @@ public class QukuServiceImpl implements QukuService {
             TbCollectMusicPojo tbLikeMusicPojo = new TbCollectMusicPojo();
             tbLikeMusicPojo.setCollectId(collectServiceById.getId());
             tbLikeMusicPojo.setMusicId(id);
-    
+            
             Long sort = getCollectCount(collectServiceById.getId());
             tbLikeMusicPojo.setSort(sort);
             collectMusicService.save(tbLikeMusicPojo);
             log.debug("歌单ID: {} 歌曲ID: {}  歌曲保存", tbLikeMusicPojo.getCollectId(), tbLikeMusicPojo.getMusicId());
-    
+            
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(collectServiceById.getId());
             this.saveOrUpdateCollectPic(entity.getId(), this.getMusicPicUrl(byId.getId()));
@@ -1037,7 +1016,7 @@ public class QukuServiceImpl implements QukuService {
             collectMusicService.remove(wrapper);
             log.debug("歌单ID: {} 歌曲ID: {}  歌曲已删除", collectServiceById.getId(), id);
         }
-    
+        
     }
     
     private Long getCollectCount(Long id) {
@@ -1079,7 +1058,7 @@ public class QukuServiceImpl implements QukuService {
         } else {
             throw new BaseException(ResultCode.COLLECT_MUSIC_ERROR);
         }
-    
+        
         // 删除专辑
         // 删除歌曲
         musicService.removeBatchByIds(musicId);
@@ -1129,7 +1108,7 @@ public class QukuServiceImpl implements QukuService {
             List<Long> collect = musicListByAlbumId.parallelStream().map(TbMusicPojo::getId).toList();
             deleteMusic(collect, true);
         }
-    
+        
     }
     
     /**

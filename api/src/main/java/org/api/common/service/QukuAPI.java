@@ -191,7 +191,7 @@ public class QukuAPI extends QukuServiceImpl {
     public Map<Long, String> getPicUrlList(Map<Long, String> paths, boolean refresh) {
         for (Map.Entry<Long, String> longStringEntry : paths.entrySet()) {
             String s;
-            if (StringUtils.startsWithIgnoreCase("http", longStringEntry.getValue())) {
+            if (StringUtils.startsWithIgnoreCase(longStringEntry.getValue(), "http")) {
                 s = longStringEntry.getValue();
             } else {
                 s = getAddresses(refresh, longStringEntry.getValue());

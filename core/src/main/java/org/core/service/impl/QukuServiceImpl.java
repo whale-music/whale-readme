@@ -1173,7 +1173,7 @@ public class QukuServiceImpl implements QukuService {
     
     public List<AlbumConvert> getPicAlbumList(Collection<TbAlbumPojo> musicList) {
         Set<Long> collect = musicList.parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getCollectPicUrl(collect);
+        Map<Long, String> picUrl = getAlbumPicUrl(collect);
         return musicList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
             AlbumConvert musicConvert = new AlbumConvert();

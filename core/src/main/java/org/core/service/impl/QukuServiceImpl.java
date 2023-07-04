@@ -21,6 +21,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
+import org.core.jpa.repository.TbMiddlePicEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -81,6 +82,8 @@ public class QukuServiceImpl implements QukuService {
     private final TbPicService picService;
     
     private final TbMiddlePicService middlePicService;
+    
+    private final TbMiddlePicEntityRepository middlePicEntityRepository;
     
     private final Cache<Long, TbPicPojo> picCache;
     
@@ -1183,15 +1186,15 @@ public class QukuServiceImpl implements QukuService {
         }).toList();
     }
     
-    public List<ArtistConvert> getPicArtistList(Collection<TbArtistPojo> musicList) {
-        Set<Long> collect = musicList.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getCollectPicUrl(collect);
-        return musicList.parallelStream().map(tbMusicPojo -> {
+    public List<ArtistConvert> getPicArtistList(Collection<TbArtistPojo> artistList) {
+        Set<Long> collect = artistList.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet());
+        Map<Long, String> picUrl = getArtistPicUrl(collect);
+        return artistList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
-            ArtistConvert musicConvert = new ArtistConvert();
-            musicConvert.setPicUrl(url);
-            BeanUtils.copyProperties(tbMusicPojo, musicConvert);
-            return musicConvert;
+            ArtistConvert artistConvert = new ArtistConvert();
+            artistConvert.setPicUrl(url);
+            BeanUtils.copyProperties(tbMusicPojo, artistConvert);
+            return artistConvert;
         }).toList();
     }
     
@@ -1215,7 +1218,7 @@ public class QukuServiceImpl implements QukuService {
         });
         // 返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
-            return ids.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type)));
+            return ids.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type), (s, s2) -> s2));
         }
         // 获取缓存中地址
         List<Long> picIds = ids.parallelStream().map(picMiddle::get).filter(Objects::nonNull).toList();
@@ -1265,10 +1268,11 @@ public class QukuServiceImpl implements QukuService {
         // 查询封面是否存在, 不存在则创建。存在则创建中间表关联
         Wrapper<TbPicPojo> eq = Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pojo.getMd5());
         TbPicPojo one = picService.getOne(eq);
-        TbMiddlePicPojo entity;
+        TbMiddlePicPojo entity = new TbMiddlePicPojo();
+        // 保存前先删除中间表
+        middlePicService.remove(Wrappers.<TbMiddlePicPojo>lambdaQuery().eq(TbMiddlePicPojo::getMiddleId, id).eq(TbMiddlePicPojo::getType, type));
         if (one == null) {
             picService.save(pojo);
-            entity = new TbMiddlePicPojo();
             entity.setMiddleId(id);
             entity.setType(type);
             entity.setPicId(pojo.getId());

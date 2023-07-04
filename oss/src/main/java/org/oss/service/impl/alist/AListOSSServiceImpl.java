@@ -95,10 +95,64 @@ public class AListOSSServiceImpl implements OSSService {
             if (item == null || StringUtils.isBlank(item.getPath())) {
                 throw new BaseException(ResultCode.DATA_NONE.getCode(), ResultCode.DATA_NONE.getResultMsg() + ": " + name);
             }
-            return String.format("%s/d/%s/%s?sign=%s", config.getHost(), item.getPath(), name, item.getSign());
+            return getPath(item);
         } catch (BaseException e) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
         }
+    }
+    
+    /**
+     * 获取音乐地址
+     *
+     * @param md5     音乐文件文件MD5
+     * @param refresh 是否刷新缓存
+     * @return 音乐地址
+     */
+    @Override
+    public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
+        try {
+            String loginCacheStr = getLoginJwtCache(config);
+            // 音乐地址URL缓存
+            Iterator<ContentItem> set = musicUrltimedCache.iterator();
+            // 没有地址便刷新缓存,获取所有文件保存到缓存中
+            // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+            if (musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
+                refreshMusicCache(loginCacheStr);
+                // 更新初始化音乐数量
+                this.initMusicAllCount = musicUrltimedCache.size();
+                set = musicUrltimedCache.iterator();
+            }
+            HashMap<String, Map<String, String>> map = new HashMap<>();
+            if (StringUtils.isBlank(md5)) {
+                set.forEachRemaining(contentItem -> getPathMap(map, contentItem));
+            } else {
+                set.forEachRemaining(contentItem -> {
+                    if (StringUtils.startsWithIgnoreCase(StringUtils.split(contentItem.getName(), ".")[0], md5)) {
+                        getPathMap(map, contentItem);
+                    }
+                });
+            }
+            return map;
+        } catch (BaseException e) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+        }
+    }
+    
+    private void getPathMap(HashMap<String, Map<String, String>> map, ContentItem contentItem) {
+        String path = getPath(contentItem);
+        HashMap<String, String> value = new HashMap<>();
+        value.put("size", String.valueOf(contentItem.getSize()));
+        value.put("url", path);
+        map.put(contentItem.getName(), value);
+    }
+    
+    private String getPath(ContentItem contentItem) {
+        String path = contentItem.getPath().charAt(0) == '/' ? StringUtils.substring(contentItem.getPath(), 1) : contentItem.getPath();
+        return String.format("%s/d/%s/%s?sign=%s",
+                config.getHost(),
+                path,
+                contentItem.getName(),
+                contentItem.getSign());
     }
     
     private void refreshMusicCache(String loginCacheStr) {

@@ -73,10 +73,10 @@ public class AlbumApi {
             List<TbArtistPojo> singerList = singerService.list(singerWrapper);
             // 查询歌手表
             if (CollUtil.isNotEmpty(singerList)) {
-                List<Long> collect = singerList.stream().map(TbArtistPojo::getId).collect(Collectors.toList());
+                List<Long> collect = singerList.stream().map(TbArtistPojo::getId).toList();
                 List<TbAlbumArtistPojo> list = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
                                                                                .in(TbAlbumArtistPojo::getArtistId, collect));
-                singerAlbumIdList = list.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toList());
+                singerAlbumIdList = list.stream().map(TbAlbumArtistPojo::getAlbumId).toList();
             }
         }
         List<Long> albumListId = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class AlbumApi {
         // 获取专辑ID，以供查询歌手信息
         Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = new HashMap<>();
         if (CollUtil.isNotEmpty(albumPage.getRecords())) {
-            List<Long> collect = albumPage.getRecords().stream().map(TbAlbumPojo::getId).collect(Collectors.toList());
+            List<Long> collect = albumPage.getRecords().stream().map(TbAlbumPojo::getId).toList();
             albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
         }
     
@@ -104,7 +104,7 @@ public class AlbumApi {
             AlbumRes albumRes = new AlbumRes();
             albumRes.setArtistList(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
-            albumRes.setPicUrl(tbAlbumPojo.getPicUrl());
+            albumRes.setPic(tbAlbumPojo.getPicUrl());
     
             // 获取专辑中所有歌手
             List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(tbAlbumPojo.getId());
@@ -160,7 +160,7 @@ public class AlbumApi {
             List<String> artistName = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId())
                                                  .parallelStream()
                                                  .map(TbArtistPojo::getArtistName)
-                                                 .collect(Collectors.toList());
+                                                 .toList();
             String join = CollUtil.join(artistName, ",");
             String albumName = albumPojo.getAlbumName();
             String format = String.format("%s <b style='color: var(--el-color-primary);'>#%s#</b>", albumName, join);
@@ -183,7 +183,7 @@ public class AlbumApi {
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
-        albumRes.setPicUrl(qukuService.getAlbumPicUrl(byId.getId()));
+        albumRes.setPic(qukuService.getAlbumPicUrl(byId.getId()));
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
     }
@@ -197,6 +197,14 @@ public class AlbumApi {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         albumService.saveOrUpdate(req);
-        qukuService.saveOrUpdateAlbumPic(req.getId(), req.getPicConvert().getUrl());
+        if (req.getPicConvert() != null && StringUtils.isBlank(req.getPicConvert().getUrl())) {
+            qukuService.saveOrUpdateAlbumPic(req.getId(), req.getPicConvert().getUrl());
+        }
+        // 如果是更新专辑关联歌手数据则删除原来的，重新添加
+        if (CollUtil.isNotEmpty(req.getArtistIds())) {
+            albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, req.getId()));
+            List<TbAlbumArtistPojo> albumArtistList = req.getArtistIds().parallelStream().map(aLong -> new TbAlbumArtistPojo(req.getId(), aLong)).toList();
+            albumSingerService.saveBatch(albumArtistList);
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public interface OSSService {
     
@@ -28,6 +29,15 @@ public interface OSSService {
      * @return 音乐地址
      */
     String getAddresses(String name, boolean refresh);
+    
+    /**
+     * 获取音乐地址
+     *
+     * @param md5     音乐文件文件MD5
+     * @param refresh 是否刷新缓存
+     * @return 音乐地址 key md5, value url, size
+     */
+    Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh);
     
     /**
      * 获取音乐MD5值，为null获取所有md5

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,7 +122,7 @@ public class MusicController {
     }
     
     /**
-     * 获取歌词信息
+     * 获取音乐信息
      *
      * @param id 歌曲ID
      * @return 歌曲信息
@@ -137,7 +138,7 @@ public class MusicController {
      * @param req 音乐信息
      * @return 成功信息
      */
-    @PostMapping
+    @PostMapping("/")
     public R updateMusic(@RequestBody MusicInfoReq req) {
         uploadMusic.saveOrUpdateMusic(req);
         return R.success();
@@ -191,5 +192,17 @@ public class MusicController {
     public R deleteSource(@PathVariable("id") Long id) {
         uploadMusic.deleteSource(id);
         return R.success();
+    }
+    
+    @GetMapping("/select")
+    public R selectResources(@RequestParam(value = "md5", required = false) String md5) {
+        List<HashMap<String, String>> maps = uploadMusic.selectResources(md5);
+        return R.success(maps);
+    }
+    
+    @PostMapping("/pic/upload")
+    public R uploadPic(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id, @RequestParam("type") String type) throws IOException {
+        String picUrl = uploadMusic.uploadPic(uploadFile, id, type);
+        return R.success(picUrl);
     }
 }

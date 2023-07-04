@@ -16,7 +16,7 @@ import java.util.List;
 public class AlbumRes extends TbAlbumPojo {
     
     @ApiModelProperty("封面")
-    private String picUrl;
+    private String pic;
     
     @ApiModelProperty("音乐数据")
     private List<MusicConvert> musicList;

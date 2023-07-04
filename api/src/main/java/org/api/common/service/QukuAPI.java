@@ -13,6 +13,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
+import org.core.jpa.repository.TbMiddlePicEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -38,7 +39,7 @@ public class QukuAPI extends QukuServiceImpl {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, TbMiddlePicEntityRepository middlePicEntityRepository, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
         super(musicService,
                 albumService,
                 artistService,
@@ -56,6 +57,7 @@ public class QukuAPI extends QukuServiceImpl {
                 accountService,
                 picService,
                 middlePicService,
+                middlePicEntityRepository,
                 picCache,
                 picMiddleCache,
                 defaultInfo);
@@ -80,6 +82,41 @@ public class QukuAPI extends QukuServiceImpl {
     public Map<Long, String> getPicUrl(Collection<Long> ids, Byte type) {
         Map<Long, String> picUrl = super.getPicUrl(ids, type);
         return getPicUrlList(picUrl, false);
+    }
+    
+    /**
+     * 保存或更新封面
+     *
+     * @param id   添加封面关联ID,
+     * @param type 添加ID类型 歌曲，专辑，歌单，歌手
+     * @param file 封面数据
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdatePic(Long id, Byte type, File file) {
+        OSSService ossService = OSSFactory.ossFactory(config);
+        String md5Hex;
+        String upload;
+        File rename = null;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            md5Hex = DigestUtil.md5Hex(file);
+            rename = FileUtil.rename(file, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
+            // 删除文件
+            upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
+        } catch (Exception e) {
+            throw new BaseException(e.getMessage());
+        } finally {
+            if (rename != null) {
+                log.debug("删除缓存文件{}", rename.getName());
+                FileUtil.del(rename);
+            }
+        }
+        TbPicPojo pojo = new TbPicPojo();
+        pojo.setMd5(md5Hex);
+        pojo.setUrl(upload);
+        super.saveOrUpdatePic(id, type, pojo);
     }
     
     /**
@@ -208,6 +245,14 @@ public class QukuAPI extends QukuServiceImpl {
     
     public Collection<String> getMD5(String md5, boolean refresh) {
         return OSSFactory.ossFactory(config).getAllMD5(md5, refresh);
+    }
+    
+    public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
+        return OSSFactory.ossFactory(config).getAddressByMd5(md5, refresh);
+    }
+    
+    public Map<String, Map<String, String>> getAddressByMd5(boolean refresh) {
+        return OSSFactory.ossFactory(config).getAddressByMd5(null, refresh);
     }
     
 }

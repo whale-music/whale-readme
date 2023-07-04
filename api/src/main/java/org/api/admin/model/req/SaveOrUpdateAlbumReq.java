@@ -6,9 +6,12 @@ import lombok.NoArgsConstructor;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.PicConvert;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class SaveOrUpdateAlbumReq extends AlbumConvert {
     private PicConvert picConvert;
+    private List<Long> artistIds;
 }

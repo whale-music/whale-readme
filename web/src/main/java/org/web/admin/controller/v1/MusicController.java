@@ -1,9 +1,10 @@
 package org.web.admin.controller.v1;
 
 import cn.hutool.core.map.MapUtil;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.MusicInfoReq;
+import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
@@ -29,22 +30,30 @@ import java.util.Set;
 @RequestMapping("/admin/music")
 @Slf4j
 @CrossOrigin
+@AllArgsConstructor
 public class MusicController {
     private final MusicFlowApi uploadMusic;
     
-    public MusicController(MusicFlowApi uploadMusic) {
-        this.uploadMusic = uploadMusic;
-    }
-    
     /**
-     * 上传临时文件
+     * 上传音乐临时文件
      *
      * @param uploadFile 临时文件
      * @return 返回音乐数据
      */
-    @PostMapping("/upload/file")
+    @PostMapping("/upload/music/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
+    }
+    
+    /**
+     * 上传图片临时文件
+     *
+     * @param uploadFile 临时文件
+     * @return 返回音乐数据
+     */
+    @PostMapping("/upload/pic/file")
+    public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
+        return R.success(uploadMusic.uploadPicFile(uploadFile, url));
     }
     
     /**
@@ -139,7 +148,7 @@ public class MusicController {
      * @return 成功信息
      */
     @PostMapping("/")
-    public R updateMusic(@RequestBody MusicInfoReq req) {
+    public R updateMusic(@RequestBody SaveOrUpdateMusicReq req) {
         uploadMusic.saveOrUpdateMusic(req);
         return R.success();
     }
@@ -153,8 +162,8 @@ public class MusicController {
      * @return 成功信息
      */
     @PostMapping("/auto/upload")
-    public R uploadAutoMusic(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) {
-        uploadMusic.uploadAutoMusic(userId, uploadFile, musicId);
+    public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) {
+        uploadMusic.uploadAutoMusicFile(userId, uploadFile, musicId);
         return R.success();
     }
     

@@ -21,7 +21,6 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
-import org.core.jpa.repository.TbMiddlePicEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -82,8 +81,6 @@ public class QukuServiceImpl implements QukuService {
     private final TbPicService picService;
     
     private final TbMiddlePicService middlePicService;
-    
-    private final TbMiddlePicEntityRepository middlePicEntityRepository;
     
     private final Cache<Long, TbPicPojo> picCache;
     
@@ -1240,7 +1237,7 @@ public class QukuServiceImpl implements QukuService {
         return ids.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
             Long picId = picMiddle.get(aLong);
             return picId == null ? getDefaultPicUrl(type) : map.get(picId).getUrl();
-        }));
+        }, (s, s2) -> s2));
     }
     
     private String getDefaultPicUrl(Byte type) {

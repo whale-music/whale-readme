@@ -6,17 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.PageCommon;
 import org.core.mybatis.model.convert.AlbumConvert;
-import org.core.mybatis.model.convert.PicConvert;
 
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class AlbumReq extends AlbumConvert {
-    @ApiModelProperty("封面")
-    private PicConvert pic;
-    
+public class AlbumPageReq extends AlbumConvert {
     @ApiModelProperty("歌手名")
     private String artistName;
     

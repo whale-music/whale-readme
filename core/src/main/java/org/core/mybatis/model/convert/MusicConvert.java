@@ -11,5 +11,5 @@ import org.core.mybatis.pojo.TbMusicPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class MusicConvert extends TbMusicPojo {
-    String picUrl;
+    private String picUrl;
 }

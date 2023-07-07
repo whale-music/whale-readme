@@ -87,9 +87,9 @@ public enum ResultCode implements BaseErrorInfoInterface {
     UPLOAD_ERROR("50012", "上传错误"),
     USER_LOVE_ERROR("50013", "只允许用户同时拥有一个歌单"),
     OSS_REMOVE_ERROR("50014", "删除失败"),
-    
     OSS_CONNECT_ERROR("50015", "访问存储错误，请检查存储"),
     IMG_DOWNLOAD_ERROR("50016", "下载封面错误"),
+    RESOURCE_DATA_EXISTED("50017", "音源已存在，请不要添加相同歌曲"),
     
     
     /* 接口错误：60001-69999 */

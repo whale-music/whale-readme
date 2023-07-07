@@ -5,8 +5,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.req.MusicInfoReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
+import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.upload.AlbumInfoReq;
 import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
@@ -15,7 +15,6 @@ import org.api.admin.service.ArtistApi;
 import org.api.admin.service.MusicFlowApi;
 import org.api.admin.service.PlayListApi;
 import org.core.mybatis.iservice.*;
-import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.junit.jupiter.api.Assertions;
@@ -126,24 +125,22 @@ class MusicControllerTest {
     void testAddMusic() throws InterruptedException {
         int count = 1_000;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
-        ArrayList<Callable<MusicInfoReq>> tasks = new ArrayList<>();
+        ArrayList<Callable<SaveOrUpdateMusicReq>> tasks = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            tasks.add(new Callable<MusicInfoReq>() {
+            tasks.add(new Callable<>() {
                 /**
                  * Computes a result, or throws an exception if unable to do so.
                  *
                  * @return computed result
                  */
                 @Override
-                public MusicInfoReq call() {
+                public SaveOrUpdateMusicReq call() {
                     Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
-                    MusicInfoReq req = new MusicInfoReq();
-                    PicConvert pic = new PicConvert();
-                    pic.setUrl(faker.avatar().image());
-                    req.setPic(pic);
+                    SaveOrUpdateMusicReq req = new SaveOrUpdateMusicReq();
+                    req.setPicUrl(faker.avatar().image());
                     req.setMusicName(faker.name().name());
-                    req.setMusicNameAlias(CollUtil.join(Arrays.asList(faker.name().name(), faker.name().name()), ","));
-                    
+                    req.setAliasName(CollUtil.join(Arrays.asList(faker.name().name(), faker.name().name()), ","));
+            
                     musicFlowApi.saveOrUpdateMusic(req);
                     return req;
                 }
@@ -158,7 +155,7 @@ class MusicControllerTest {
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         ArrayList<Callable<SaveOrUpdateAlbumReq>> tasks = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            tasks.add(new Callable<SaveOrUpdateAlbumReq>() {
+            tasks.add(new Callable<>() {
                 /**
                  * Computes a result, or throws an exception if unable to do so.
                  *
@@ -168,9 +165,7 @@ class MusicControllerTest {
                 public SaveOrUpdateAlbumReq call() {
                     Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
                     SaveOrUpdateAlbumReq req1 = new SaveOrUpdateAlbumReq();
-                    PicConvert pic = new PicConvert();
-                    pic.setUrl(faker.avatar().image());
-                    req1.setPicConvert(pic);
+                    req1.setPicUrl(faker.avatar().image());
                     req1.setAlbumName(faker.name().name());
                     req1.setCompany(faker.company().name());
                     req1.setDescription(faker.text().text());
@@ -185,14 +180,14 @@ class MusicControllerTest {
     @Test
     void testUploadMusicInfo() throws InterruptedException {
         SysUserPojo user = accountService.getUser(ADMIN);
-    
+        
         final int number = 10_00;
         final boolean isAsync = true;
         ExecutorService executorService = ThreadUtil.newFixedExecutor(10, 1000, "test-upload-music-info", true);
         ArrayList<Callable<MusicDetails>> tasks = new ArrayList<>();
         for (int i = 0; i < number; i++) {
             if (Boolean.TRUE.equals(isAsync)) {
-                tasks.add(new Callable<MusicDetails>() {
+                tasks.add(new Callable<>() {
                     /**
                      * Computes a result, or throws an exception if unable to do so.
                      *
@@ -200,7 +195,11 @@ class MusicControllerTest {
                      */
                     @Override
                     public MusicDetails call() {
-                        return saveMusicInfo(user);
+                        try {
+                            return saveMusicInfo(user);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             } else {

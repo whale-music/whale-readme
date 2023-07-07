@@ -3,9 +3,10 @@ package org.web.admin.controller.v1;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
-import org.api.admin.model.res.AlbumRes;
+import org.api.admin.model.res.AlbumInfoRes;
+import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,15 @@ public class AlbumController {
     @Autowired
     private AlbumApi albumApi;
     
-    @PostMapping("/allAlbum")
-    public R getAllAlbumList(@RequestBody AlbumReq req) {
-        Page<AlbumRes> page = albumApi.getAllAlbumList(req);
+    @PostMapping("/page")
+    public R getAllAlbumList(@RequestBody AlbumPageReq req) {
+        Page<AlbumPageRes> page = albumApi.getAllAlbumList(req);
         return R.success(page);
     }
     
-    @GetMapping("/{albumId}")
-    public R getAlbumInfo(@PathVariable Long albumId) {
-        AlbumRes res = albumApi.getAlbumInfo(albumId);
+    @GetMapping("/{id}")
+    public R getAlbumInfo(@PathVariable("id") Long id) {
+        AlbumInfoRes res = albumApi.getAlbumInfo(id);
         return R.success(res);
     }
     

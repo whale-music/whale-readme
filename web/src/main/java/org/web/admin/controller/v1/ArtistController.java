@@ -3,7 +3,7 @@ package org.web.admin.controller.v1;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
@@ -26,7 +26,7 @@ public class ArtistController {
     private ArtistApi artistApi;
     
     @PostMapping("/allSinger")
-    public R getAllSingerList(@RequestBody AlbumReq req) {
+    public R getAllSingerList(@RequestBody AlbumPageReq req) {
         Page<ArtistRes> page = artistApi.getAllSingerList(req);
         return R.success(page);
     }

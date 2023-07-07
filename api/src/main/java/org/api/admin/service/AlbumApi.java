@@ -7,13 +7,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
-import org.api.admin.model.res.AlbumRes;
+import org.api.admin.model.res.AlbumInfoRes;
+import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.utils.MyPageUtil;
 import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbAlbumArtistService;
 import org.core.mybatis.iservice.TbAlbumService;
 import org.core.mybatis.iservice.TbArtistService;
@@ -26,7 +28,9 @@ import org.core.mybatis.pojo.TbArtistPojo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,13 +58,16 @@ public class AlbumApi {
     @Autowired
     private QukuAPI qukuService;
     
+    @Autowired
+    private HttpRequestConfig httpRequestConfig;
     
-    public Page<AlbumRes> getAllAlbumList(AlbumReq req) {
+    
+    public Page<AlbumPageRes> getAllAlbumList(AlbumPageReq req) {
         req.setAlbumName(StringUtils.trim(req.getAlbumName()));
         req.setArtistName(StringUtils.trim(req.getArtistName()));
-    
+        
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-    
+        
         List<TbAlbumPojo> albumList = new ArrayList<>();
         if (StringUtils.isNotBlank(req.getAlbumName())) {
             LambdaQueryWrapper<TbAlbumPojo> albumWrapper = Wrappers.<TbAlbumPojo>lambdaQuery().like(TbAlbumPojo::getAlbumName, req.getAlbumName());
@@ -85,27 +92,27 @@ public class AlbumApi {
         LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         pageOrderBy(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
         lambdaQueryWrapper.in(CollUtil.isNotEmpty(albumListId), TbAlbumPojo::getId, albumListId);
-    
+        
         // 查询全部专辑数据
         Page<TbAlbumPojo> albumPojoPage = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         Page<AlbumConvert> albumPage = qukuService.getAlbumPage(albumPojoPage, lambdaQueryWrapper);
-    
+        
         // 获取专辑ID，以供查询歌手信息
         Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = new HashMap<>();
         if (CollUtil.isNotEmpty(albumPage.getRecords())) {
             List<Long> collect = albumPage.getRecords().stream().map(TbAlbumPojo::getId).toList();
             albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
         }
-    
-        Page<AlbumRes> page = new Page<>();
+        
+        Page<AlbumPageRes> page = new Page<>();
         BeanUtils.copyProperties(albumPage, page, "records");
         page.setRecords(new ArrayList<>());
         for (AlbumConvert tbAlbumPojo : albumPage.getRecords()) {
-            AlbumRes albumRes = new AlbumRes();
+            AlbumPageRes albumRes = new AlbumPageRes();
             albumRes.setArtistList(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
-            albumRes.setPic(tbAlbumPojo.getPicUrl());
-    
+            albumRes.setPicUrl(tbAlbumPojo.getPicUrl());
+            
             // 获取专辑中所有歌手
             List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(tbAlbumPojo.getId());
             albumRes.setArtistList(artistConverts);
@@ -157,33 +164,35 @@ public class AlbumApi {
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
-            List<String> artistName = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId())
-                                                 .parallelStream()
-                                                 .map(TbArtistPojo::getArtistName)
-                                                 .toList();
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            List<String> artistName = albumArtistListByAlbumIds
+                    .parallelStream()
+                    .map(TbArtistPojo::getArtistName)
+                    .toList();
             String join = CollUtil.join(artistName, ",");
             String albumName = albumPojo.getAlbumName();
             String format = String.format("%s <b style='color: var(--el-color-primary);'>#%s#</b>", albumName, join);
             map.put("display", format);
             map.put("value", albumName);
             map.put("link", String.valueOf(albumPojo.getId()));
+            map.put("artists", albumArtistListByAlbumIds);
             map.putAll(BeanUtil.beanToMap(albumPojo));
             maps.add(map);
         }
         return maps;
     }
     
-    public AlbumRes getAlbumInfo(Long albumId) {
+    public AlbumInfoRes getAlbumInfo(Long albumId) {
         TbAlbumPojo byId = albumService.getById(albumId);
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
-    
-        AlbumRes albumRes = new AlbumRes();
+        
+        AlbumInfoRes albumRes = new AlbumInfoRes();
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
-        albumRes.setPic(qukuService.getAlbumPicUrl(byId.getId()));
+        albumRes.setPicUrl(qukuService.getAlbumPicUrl(byId.getId()));
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
     }
@@ -192,18 +201,23 @@ public class AlbumApi {
         qukuService.deleteAlbum(id, compel);
     }
     
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateAlbum(SaveOrUpdateAlbumReq req) {
         if (req.getId() == null && StringUtils.isBlank(req.getAlbumName())) {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         albumService.saveOrUpdate(req);
-        if (req.getPicConvert() != null && StringUtils.isBlank(req.getPicConvert().getUrl())) {
-            qukuService.saveOrUpdateAlbumPic(req.getId(), req.getPicConvert().getUrl());
+        if (StringUtils.isNotBlank(req.getTempFile())) {
+            File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
+            qukuService.saveOrUpdateAlbumPic(req.getId(), file);
         }
         // 如果是更新专辑关联歌手数据则删除原来的，重新添加
+        albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, req.getId()));
         if (CollUtil.isNotEmpty(req.getArtistIds())) {
-            albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, req.getId()));
-            List<TbAlbumArtistPojo> albumArtistList = req.getArtistIds().parallelStream().map(aLong -> new TbAlbumArtistPojo(req.getId(), aLong)).toList();
+            Collection<TbAlbumArtistPojo> albumArtistList = req.getArtistIds()
+                                                               .parallelStream()
+                                                               .map(aLong -> new TbAlbumArtistPojo(req.getId(), aLong))
+                                                               .collect(Collectors.toSet());
             albumSingerService.saveBatch(albumArtistList);
         }
     }

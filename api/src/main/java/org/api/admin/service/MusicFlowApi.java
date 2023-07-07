@@ -4,15 +4,17 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.houbb.opencc4j.util.ZhConverterUtil;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.MusicInfoReq;
+import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AlbumInfoReq;
 import org.api.admin.model.req.upload.ArtistInfoReq;
@@ -30,12 +32,13 @@ import org.core.config.FileTypeConfig;
 import org.core.config.HttpRequestConfig;
 import org.core.config.LyricConfig;
 import org.core.config.SaveConfig;
+import org.core.jpa.repository.TbResourceEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.ArtistConvert;
-import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.utils.ExceptionUtil;
+import org.core.utils.ImageTypeUtils;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
 import org.jaudiotagger.audio.AudioFile;
@@ -58,15 +61,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service(AdminConfig.ADMIN + "MusicFlowApi")
 @Slf4j
+@AllArgsConstructor
 public class MusicFlowApi {
     /**
      * 音乐文件导入后缀名
@@ -111,6 +113,8 @@ public class MusicFlowApi {
      */
     private final TbResourceService resourceService;
     
+    private final TbResourceEntityRepository resourceEntityRepository;
+    
     /**
      * 上传文件或音乐URL下载到临时目录
      *
@@ -122,8 +126,9 @@ public class MusicFlowApi {
         File path;
         String fileSuffix;
         AudioInfoRes audioInfoRes = new AudioInfoRes();
+        String md5;
         if (StringUtils.isBlank(url)) {
-            String md5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
+            md5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
             // 上传文件
             String filename = uploadFile.getOriginalFilename();
             if (StringUtils.isBlank(filename)) {
@@ -145,7 +150,7 @@ public class MusicFlowApi {
             // 下载文件
             fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getSuffix());
             byte[] bytes = HttpUtil.downloadBytes(url);
-            String md5 = DigestUtils.md5DigestAsHex(bytes);
+            md5 = DigestUtils.md5DigestAsHex(bytes);
             File dest = new File(requestConfig.getTempPath(), md5 + "." + fileSuffix);
             path = checkFileMd5(md5, dest);
             // 本地没有则保存
@@ -155,9 +160,15 @@ public class MusicFlowApi {
             }
             audioInfoRes.setIsExist(true);
         }
+        audioInfoRes.setMd5(md5);
+        audioInfoRes.setEncodeType(fileSuffix);
+        audioInfoRes.setSize(FileUtil.size(path));
         AudioFile read;
         try {
             read = AudioFileIO.read(path);
+            int rate = Integer.parseInt(read.getAudioHeader().getBitRate());
+            audioInfoRes.setRate(rate);
+            getLevel(audioInfoRes, rate);
         } catch (InvalidAudioFrameException e) {
             log.warn("该音频文件没有包含音乐信息!!");
             audioInfoRes.setType(fileSuffix);
@@ -175,12 +186,28 @@ public class MusicFlowApi {
         log.info(" ----- ----- ");
         audioInfoRes.setMusicName(read.getTag().getFirst(FieldKey.TITLE));
         audioInfoRes.setOriginFileName(uploadFile == null || uploadFile.getOriginalFilename() == null ? "" : uploadFile.getOriginalFilename());
-        audioInfoRes.setSinger(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));
+        audioInfoRes.setArtists(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));
         audioInfoRes.setAlbum(read.getTag().getFirst(FieldKey.ALBUM));
         audioInfoRes.setTimeLength(read.getAudioHeader().getTrackLength());
         audioInfoRes.setSize(read.getFile().length());
         audioInfoRes.setMusicFileTemp(path.getName());
         return audioInfoRes;
+    }
+    
+    
+    public String uploadPicFile(MultipartFile uploadFile, String url) throws IOException {
+        File file;
+        if (StringUtils.isBlank(url)) {
+            file = FileUtil.writeBytes(uploadFile.getBytes(),
+                    new File(requestConfig.getTempPath(), LocalDateTime.now().getNano() + "-" + uploadFile.getResource().getFilename()));
+        } else {
+            byte[] bytes = HttpUtil.downloadBytes(url);
+            File fileBytes = FileUtil.writeBytes(bytes,
+                    new File(requestConfig.getTempPath(), String.valueOf(LocalDateTime.now().getNano() + RandomUtil.randomInt())));
+            file = FileUtil.touch(new File(requestConfig.getTempPath(),
+                    LocalDateTime.now().getNano() + "." + ImageTypeUtils.getPicType(new FileInputStream(fileBytes))));
+        }
+        return file.getName();
     }
     
     private static void getLevel(TbResourcePojo entity, int rate) {
@@ -291,23 +318,6 @@ public class MusicFlowApi {
         }
         lyricService.saveOrUpdateBatch(list);
         return list;
-    }
-    
-    public MusicFlowApi(TbLyricService lyricService, FileTypeConfig fileType, TbMusicService musicService, TbResourceService resourceService, TbArtistService artistService, TbAlbumService albumService, HttpRequestConfig requestConfig, SaveConfig config, TbAlbumArtistService albumSingerService, AccountService accountService, QukuAPI qukuService, TbMusicArtistService musicArtistService, DefaultInfo defaultInfo, TbOriginService originService) {
-        this.lyricService = lyricService;
-        this.fileType = fileType;
-        this.musicService = musicService;
-        this.resourceService = resourceService;
-        this.artistService = artistService;
-        this.albumService = albumService;
-        this.requestConfig = requestConfig;
-        this.config = config;
-        this.albumSingerService = albumSingerService;
-        this.accountService = accountService;
-        this.qukuService = qukuService;
-        this.musicArtistService = musicArtistService;
-        this.defaultInfo = defaultInfo;
-        this.originService = originService;
     }
     
     private void saveRandReturnArtistList(Set<Long> artistIds, TbMusicPojo musicPojo) {
@@ -722,58 +732,39 @@ public class MusicFlowApi {
      * @param req 信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateMusic(MusicInfoReq req) {
-        TbMusicPojo entity = new TbMusicPojo();
-        entity.setId(req.getId());
-        entity.setMusicName(req.getMusicName());
-        entity.setAliasName(req.getMusicNameAlias());
-        entity.setAlbumId(req.getAlbumId());
-        entity.setTimeLength(req.getTimeLength());
+    public void saveOrUpdateMusic(SaveOrUpdateMusicReq req) {
         // 音乐
-        musicService.saveOrUpdate(entity);
-    
+        musicService.saveOrUpdate(req);
         // 更新封面
-        if (req.getPic() != null && StringUtils.isBlank(req.getPic().getUrl())) {
-            qukuService.saveOrUpdateMusicPic(entity.getId(), req.getPic().getUrl());
+        if (StringUtils.isNotBlank(req.getTempPicFile())) {
+            File file = new File(requestConfig.getTempPath(), req.getTempPicFile());
+            ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_EXIST);
+            qukuService.saveOrUpdateMusicPic(req.getId(), file);
         }
-        if (req.getId() != null) {
-            TbMusicPojo byId = musicService.getById(req.getId());
-            // 删除歌曲关联歌手
-            musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().eq(TbMusicArtistPojo::getMusicId, byId.getId()));
-        }
-        ArrayList<TbMusicArtistPojo> musicArtistList = new ArrayList<>();
-        for (TbArtistPojo tbArtistPojo : req.getMusicArtist()) {
-            TbMusicArtistPojo e = new TbMusicArtistPojo();
-            e.setArtistId(tbArtistPojo.getId());
-            e.setMusicId(entity.getId());
-            musicArtistList.add(e);
-        }
+        // 如果是更新则删除原有数据
+        TbMusicPojo byId = musicService.getById(req.getId());
+        // 删除歌曲关联歌手
+        musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().eq(TbMusicArtistPojo::getMusicId, byId.getId()));
+        List<TbMusicArtistPojo> musicArtistList = req.getArtistIds().parallelStream().map(aLong -> new TbMusicArtistPojo(req.getId(), aLong)).toList();
         // 重新保存关联歌手
         musicArtistService.saveBatch(musicArtistList);
-    
-        // TODO 需要删除此代码，在专辑接口中更新
-        // 更新专辑关联信息
-        // if (entity.getAlbumId() != null) {
-        //     // 删除专辑原来关联的歌手
-        //     albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-        //                                       .eq(TbAlbumArtistPojo::getAlbumId, entity.getAlbumId()));
-        //     // 重新添加关联歌手
-        //     ArrayList<TbAlbumArtistPojo> entityList = new ArrayList<>();
-        //     for (TbArtistPojo tbArtistPojo : req.getAlbumArtist()) {
-        //         TbAlbumArtistPojo tbAlbumArtistPojo = new TbAlbumArtistPojo();
-        //         tbAlbumArtistPojo.setAlbumId(req.getAlbumId());
-        //         tbAlbumArtistPojo.setArtistId(tbArtistPojo.getId());
-        //         entityList.add(tbAlbumArtistPojo);
-        //     }
-        //     // 重新保存
-        //     albumSingerService.saveBatch(entityList);
-        //
-        //     // 更新专辑
-        //     TbAlbumPojo entity1 = new TbAlbumPojo();
-        //     entity1.setId(entity.getAlbumId());
-        //     entity1.setPublishTime(req.getPublishTime());
-        //     albumService.updateById(entity1);
-        // }
+        
+        // 保存音源
+        TbResourcePojo resource = req.getResource();
+        if (Objects.nonNull(resource) && Objects.nonNull(resource.getMd5())) {
+            long count = resourceEntityRepository.countByMd5EqualsIgnoreCase(req.getResource().getMd5());
+            ExceptionUtil.isNull(count >= 1, ResultCode.RESOURCE_DATA_EXISTED);
+            File file = new File(requestConfig.getTempPath(), req.getTempMusicFile());
+            
+            if (FileUtil.isEmpty(file)) {
+                resourceService.save(resource);
+            } else {
+                String path = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), file, resource.getMd5());
+                resource.setMusicId(req.getId());
+                resource.setPath(path);
+                resourceService.save(resource);
+            }
+        }
     }
     
     /**
@@ -912,9 +903,7 @@ public class MusicFlowApi {
         musicInfoRes.setAlbumName(albumPojo.getAlbumName());
         musicInfoRes.setAlbumId(albumPojo.getId());
         BeanUtils.copyProperties(byId, musicInfoRes);
-        PicConvert pic = new PicConvert();
-        pic.setUrl(qukuService.getMusicPicUrl(byId.getId()));
-        musicInfoRes.setPic(pic);
+        musicInfoRes.setPicUrl(qukuService.getMusicPicUrl(byId.getId()));
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
     }
@@ -929,7 +918,7 @@ public class MusicFlowApi {
         return read;
     }
     
-    public void uploadAutoMusic(Long userId, MultipartFile uploadFile, Long musicId) {
+    public void uploadAutoMusicFile(Long userId, MultipartFile uploadFile, Long musicId) {
         TbResourcePojo entity = new TbResourcePojo();
         entity.setMusicId(musicId);
         userId = userId == null ? UserUtil.getUser().getId() : userId;

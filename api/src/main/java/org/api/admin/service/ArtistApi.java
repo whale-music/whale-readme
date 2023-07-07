@@ -1,12 +1,13 @@
 package org.api.admin.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.AlbumReq;
+import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
@@ -15,16 +16,19 @@ import org.api.common.service.QukuAPI;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbArtistService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.utils.AliasUtil;
+import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 
 @Service(AdminConfig.ADMIN + "ArtistApi")
@@ -39,6 +43,9 @@ public class ArtistApi {
     
     @Autowired
     private DefaultInfo defaultInfo;
+    
+    @Autowired
+    private HttpRequestConfig httpRequestConfig;
     
     /**
      * 设置分页查询排序
@@ -59,12 +66,12 @@ public class ArtistApi {
         }
     }
     
-    public Page<ArtistRes> getAllSingerList(AlbumReq req) {
+    public Page<ArtistRes> getAllSingerList(AlbumPageReq req) {
         req.setArtistName(StringUtils.trim(req.getArtistName()));
         req.setAlbumName(StringUtils.trim(req.getAlbumName()));
-    
+        
         req.setPage(MyPageUtil.checkPage(req.getPage()));
-    
+        
         Page<TbArtistPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(req.getArtistName()), TbArtistPojo::getArtistName, req.getArtistName());
@@ -136,5 +143,10 @@ public class ArtistApi {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         artistService.saveOrUpdate(req);
+        if (StringUtils.isNotBlank(req.getTempFile())) {
+            File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
+            ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.DATA_NONE);
+            qukuService.saveOrUpdateArtistPic(req.getId(), file);
+        }
     }
 }

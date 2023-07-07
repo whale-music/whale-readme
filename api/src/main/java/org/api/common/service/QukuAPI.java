@@ -8,12 +8,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
-import org.core.jpa.repository.TbMiddlePicEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -39,7 +39,7 @@ public class QukuAPI extends QukuServiceImpl {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, TbMiddlePicEntityRepository middlePicEntityRepository, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
         super(musicService,
                 albumService,
                 artistService,
@@ -57,7 +57,6 @@ public class QukuAPI extends QukuServiceImpl {
                 accountService,
                 picService,
                 middlePicService,
-                middlePicEntityRepository,
                 picCache,
                 picMiddleCache,
                 defaultInfo);
@@ -108,15 +107,29 @@ public class QukuAPI extends QukuServiceImpl {
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
         } finally {
-            if (rename != null) {
-                log.debug("删除缓存文件{}", rename.getName());
-                FileUtil.del(rename);
-            }
+            log.debug("删除缓存文件{}", rename == null ? "" : rename.getName());
+            FileUtil.del(rename);
+            FileUtil.del(file);
         }
         TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
         pojo.setUrl(upload);
         super.saveOrUpdatePic(id, type, pojo);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateAlbumPic(Long id, File file) {
+        this.saveOrUpdatePic(id, PicTypeConstant.ALBUM, file);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateArtistPic(Long id, File file) {
+        this.saveOrUpdatePic(id, PicTypeConstant.ARTIST, file);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateMusicPic(Long id, File file) {
+        this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, file);
     }
     
     /**

@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
@@ -56,12 +57,13 @@ public class LoginController extends BaseController {
      * @return 返回登录结果
      */
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult login(HttpServletResponse response, String phone, String password) {
+    public NeteaseResult login(HttpServletResponse response, HttpSession session, String phone, String password) {
         UserConvert userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
+        session.setAttribute(String.valueOf(userPojo.getId()), userPojo);
         return r.success();
     }
     
@@ -128,7 +130,7 @@ public class LoginController extends BaseController {
     }
     
     @GetMapping("/login/qr/check")
-    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
+    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key, HttpSession session) {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
@@ -143,14 +145,16 @@ public class LoginController extends BaseController {
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
         String sign = JwtUtil.sign(userPojo.getUsername(), data);
         GlobeDataUtil.remove(key);
-    
+        
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
         response.addCookie(cookie);
-    
+        
         NeteaseResult r = new NeteaseResult();
         r.put("code", 803);
         r.put("message", "授权登陆成功");
         r.put(CookieConfig.COOKIE_NAME_COOKIE, CookieConfig.COOKIE_NAME_MUSIC_U + "=" + sign);
+        
+        session.setAttribute(String.valueOf(userPojo.getId()), userPojo);
         return r;
     }
     
@@ -202,8 +206,8 @@ public class LoginController extends BaseController {
      * 登出接口
      */
     @GetMapping("/logout")
-    public NeteaseResult userLogout(HttpServletResponse response) {
-        return super.logout(response);
+    public NeteaseResult userLogout(HttpServletResponse response, HttpSession session) {
+        return super.logout(response, session);
     }
     
 }

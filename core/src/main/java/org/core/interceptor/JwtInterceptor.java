@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.config.CookieConfig;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.JwtUtil;
@@ -16,6 +18,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @Slf4j
 public class JwtInterceptor implements HandlerInterceptor {
@@ -81,20 +84,22 @@ public class JwtInterceptor implements HandlerInterceptor {
             JwtUtil.checkSign(token);
         } catch (JWTVerificationException e) {
             log.warn("Cookie失效");
-            return true;
+            throw new BaseException(ResultCode.USER_NOT_LOGIN);
         }
-        
-        // 验证通过后， 这里测试取出JWT中存放的数据
-        // 获取 token 中的 userId
-        String userId = JwtUtil.getUserId(token);
-        log.debug("id : {}", userId);
-        
+    
         // 获取 token 中的其他数据
         String info = JwtUtil.getInfo(token);
         if (info == null) {
-            return false;
+            throw new BaseException(ResultCode.USER_NOT_LOGIN);
         }
         SysUserPojo userPojo = JSON.parseObject(info, SysUserPojo.class);
+    
+        Object attribute = request.getSession().getAttribute(String.valueOf(userPojo.getId()));
+        if (Objects.isNull(attribute)) {
+            log.warn("session timeout: {}", userPojo.getUsername());
+            throw new BaseException(ResultCode.USER_NOT_LOGIN);
+        }
+        log.debug("user name : {}", userPojo);
         // 设置当前线程值
         UserUtil.setUser(userPojo);
         return true;

@@ -4,6 +4,7 @@ import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
@@ -32,12 +33,14 @@ public class LoginController {
      * 登录接口
      */
     @PostMapping("/login")
-    public R login(HttpServletResponse response, @RequestBody UserReq dto) {
+    public R login(HttpServletResponse response, @RequestBody UserReq dto, HttpSession session) {
         UserRes userPojo = user.login(dto.getUsername(), dto.getPassword());
         userPojo.setExpiryTime(System.currentTimeMillis() + JwtConfig.getExpireTime());
         // 写入用户信息到cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), userPojo.getToken());
         response.addCookie(cookie);
+        // 保存到session
+        session.setAttribute(String.valueOf(userPojo.getId()), userPojo);
         return R.success(userPojo);
     }
     
@@ -54,12 +57,14 @@ public class LoginController {
      * 登出接口
      */
     @GetMapping("/logout")
-    public R userLogout(HttpServletResponse response) {
+    public R userLogout(HttpServletResponse response, HttpSession session) {
         // 删除cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+        // 删除session
+        session.removeAttribute(String.valueOf(UserUtil.getUser().getId()));
         // 删除用户
         UserUtil.removeUser();
         return R.success();

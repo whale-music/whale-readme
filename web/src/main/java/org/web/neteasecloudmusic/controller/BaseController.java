@@ -4,6 +4,7 @@ import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.api.neteasecloudmusic.model.vo.user.Account;
 import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
@@ -43,17 +44,18 @@ public class BaseController {
         return userVo;
     }
     
-    protected NeteaseResult logout(HttpServletResponse response) {
+    protected NeteaseResult logout(HttpServletResponse response, HttpSession session) {
         // 删除cookie
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+        
+        session.removeAttribute(String.valueOf(UserUtil.getUser().getId()));
         // 删除用户
         UserUtil.removeUser();
         NeteaseResult r = new NeteaseResult();
-        r.success();
-        return r;
+        return r.success();
     }
     
     @NotNull

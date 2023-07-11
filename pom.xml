@@ -60,6 +60,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--springboot 权限认证-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!--模拟数据-->
         <dependency>
             <groupId>net.datafaker</groupId>

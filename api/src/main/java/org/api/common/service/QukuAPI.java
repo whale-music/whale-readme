@@ -73,13 +73,13 @@ public class QukuAPI extends QukuServiceImpl {
     /**
      * 封面
      *
-     * @param ids  封面ID
-     * @param type 关联ID类型
+     * @param middleIds 封面ID
+     * @param type      关联ID类型
      * @return 封面地址
      */
     @Override
-    public Map<Long, String> getPicUrl(Collection<Long> ids, Byte type) {
-        Map<Long, String> picUrl = super.getPicUrl(ids, type);
+    public Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type) {
+        Map<Long, String> picUrl = super.getPicUrl(middleIds, type);
         return getPicUrlList(picUrl, false);
     }
     
@@ -218,12 +218,12 @@ public class QukuAPI extends QukuServiceImpl {
         try {
             return getAddresses(path, config, refresh);
         } catch (BaseException e) {
-            if (Objects.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+            if (Objects.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 log.warn("获取下载地址出错: {}", e.getMessage());
                 return "";
             }
             log.error(e.getMessage(), e);
-            throw new BaseException(e.getErrorCode(), e.getErrorMsg());
+            throw new BaseException(e.getCode(), e.getResultMsg());
         }
     }
     

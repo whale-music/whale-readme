@@ -8,6 +8,7 @@ import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
+import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.mybatis.pojo.MusicDetails;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -40,6 +41,7 @@ public class MusicController {
      * @param uploadFile 临时文件
      * @return 返回音乐数据
      */
+    @AnonymousAccess
     @PostMapping("/upload/music/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile, url));

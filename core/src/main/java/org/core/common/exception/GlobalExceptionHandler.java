@@ -3,11 +3,14 @@ package org.core.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.core.common.result.R;
 import org.core.common.result.ResultCode;
+import org.core.config.DebugConfig;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.Optional;
 
 /**
  * 全局异常处理
@@ -18,16 +21,16 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    
+    public static final String THROW_STR = "Throwable: ";
     /**
      * 处理自定义的业务异常
      */
     @ExceptionHandler(value = BaseException.class)
     @ResponseBody
     public R bizExceptionHandler(BaseException e) {
-        log.error("发生业务异常！原因是：{}", e.getErrorMsg());
-        log.error("Throwable: ", e);
-        return R.error(e.getErrorCode(), e.getErrorMsg());
+        log.error("发生业务异常！原因是：{}", e.getResultMsg());
+        Optional.ofNullable(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        return R.error(e.getCode(), e.getResultMsg());
     }
     
     /**
@@ -37,6 +40,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public R exceptionHandler8(NullPointerException e) {
         log.error("上传文件太大:", e);
+        Optional.ofNullable(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return R.error(e.getMessage());
     }
     
@@ -48,6 +52,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public R exceptionHandler(NullPointerException e) {
         log.error("发生空指针异常！原因是:", e);
+        Optional.ofNullable(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return R.error(ResultCode.NULL_POINTER_EXCEPTION);
     }
     
@@ -58,6 +63,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public R exceptionHandler(BadSqlGrammarException e) {
         log.error("SQL运行错误原因是:", e);
+        Optional.ofNullable(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return R.error(ResultCode.SQL_RUN_ERROR);
     }
     
@@ -68,6 +74,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public R exceptionHandler(Exception e) {
         log.error("未知异常！原因是:", e);
+        Optional.ofNullable(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         R error = R.error(ResultCode.INTERNAL_SERVER_ERROR);
         error.setMessage(error.getMessage() + ": " + e);
         return error;

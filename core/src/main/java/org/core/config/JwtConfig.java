@@ -1,18 +1,15 @@
 package org.core.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 public class JwtConfig {
     
     private static String seedKey = "";
     
     private static Long expireTime = 0L;
     
-    
-    private JwtConfig() {
-    }
     
     public static String getSeedKey() {
         return seedKey;

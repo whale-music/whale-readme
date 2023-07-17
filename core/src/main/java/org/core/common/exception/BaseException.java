@@ -1,12 +1,15 @@
 package org.core.common.exception;
 
+import java.io.Serial;
+
 /**
  * &#064;Deprecated  异常类
  *
  * @author Sakura
  */
-public class BaseException extends RuntimeException {
+public class BaseException extends RuntimeException implements BaseErrorInfoInterface {
     
+    @Serial
     private static final long serialVersionUID = 1L;
     
     /**
@@ -55,12 +58,14 @@ public class BaseException extends RuntimeException {
     }
     
     
-    public String getErrorCode() {
+    @Override
+    public String getCode() {
         return errorCode;
     }
     
     
-    public String getErrorMsg() {
+    @Override
+    public String getResultMsg() {
         return errorMsg;
     }
     

@@ -97,7 +97,7 @@ public class AListOSSServiceImpl implements OSSService {
             }
             return getPath(item);
         } catch (BaseException e) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
         }
     }
     
@@ -134,7 +134,7 @@ public class AListOSSServiceImpl implements OSSService {
             }
             return map;
         } catch (BaseException e) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
         }
     }
     
@@ -204,8 +204,8 @@ public class AListOSSServiceImpl implements OSSService {
                 return srcFile.getName();
             }
         } catch (BaseException e) {
-            if (!StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
-                throw new BaseException(e.getErrorCode(), e.getErrorMsg());
+            if (!StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+                throw new BaseException(e.getCode(), e.getResultMsg());
             }
         } catch (IOException e) {
             throw new BaseException(e.getMessage());
@@ -256,7 +256,7 @@ public class AListOSSServiceImpl implements OSSService {
                                                                       .orElse(new String[]{""})[0]));
             return res;
         } catch (BaseException e) {
-            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getErrorMsg());
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
         }
     }
     
@@ -266,10 +266,10 @@ public class AListOSSServiceImpl implements OSSService {
             // 忽略无文件错误
             isExist(name.get(0));
         } catch (BaseException e) {
-            if (StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+            if (StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 return false;
             } else {
-                throw new BaseException(e.getErrorCode(), e.getErrorMsg());
+                throw new BaseException(e.getCode(), e.getResultMsg());
             }
         }
         String loginCacheStr = getLoginJwtCache(config);

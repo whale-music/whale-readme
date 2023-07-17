@@ -1,4 +1,4 @@
-package org.core.config;
+package org.core.common.constant;
 
 public class CookieConfig {
     public static final String COOKIE_NAME_COOKIE = "cookie";

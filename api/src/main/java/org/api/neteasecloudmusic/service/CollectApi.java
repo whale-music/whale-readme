@@ -308,7 +308,7 @@ public class CollectApi {
         try {
             qukuService.addMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
         } catch (BaseException e) {
-            if (StringUtils.equals(e.getErrorCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+            if (StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 NeteaseResult r = new NeteaseResult();
                 return r.error("502", "歌单内歌曲重复");
             }

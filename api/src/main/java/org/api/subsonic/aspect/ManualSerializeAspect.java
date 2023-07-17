@@ -70,9 +70,9 @@ public class ManualSerializeAspect {
             // 成功返回
             return returnStr(obj, from);
         } catch (BaseException e) {
-            log.error(e.getErrorMsg(), e);
+            log.error(e.getResultMsg(), e);
             // 用户登录错误
-            if (StringUtils.equals(e.getErrorCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getErrorCode(),
+            if (StringUtils.equals(e.getCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getCode(),
                     ResultCode.PASSWORD_ERROR.getCode())) {
                 return returnStr(new SubsonicResult().error(ErrorEnum.WRONG_USERNAME_OR_PASSWORD), from);
             }

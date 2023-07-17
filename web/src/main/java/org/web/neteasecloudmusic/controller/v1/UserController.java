@@ -9,6 +9,7 @@ import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.model.vo.user.detail.UserDetailRes;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.UserApi;
+import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
@@ -42,6 +43,7 @@ public class UserController extends BaseController {
      *
      * @return 返回用户信息
      */
+    @AnonymousAccess
     @GetMapping("/user/account")
     public NeteaseResult getUser() {
         SysUserPojo userPojo = UserUtil.getUser();

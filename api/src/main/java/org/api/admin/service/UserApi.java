@@ -1,13 +1,12 @@
 package org.api.admin.service;
 
-import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.UserRes;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
-import org.core.utils.JwtUtil;
+import org.core.utils.TokenUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public class UserApi {
     
     public UserRes login(String phone, String password) {
         SysUserPojo userPojo = accountService.login(phone, password);
-        String sign = JwtUtil.sign(userPojo.getUsername(), JSON.toJSONString(userPojo));
+        String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
         UserRes userRes = new UserRes();
         BeanUtils.copyProperties(userPojo, userRes);
         userRes.setToken(sign);

@@ -14,14 +14,15 @@ import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.service.LoginApi;
 import org.api.neteasecloudmusic.service.UserApi;
+import org.core.common.annotation.AnonymousAccess;
+import org.core.common.constant.CookieConfig;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
-import org.core.config.CookieConfig;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
-import org.core.utils.JwtUtil;
+import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +57,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回登录结果
      */
+    @AnonymousAccess
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult login(HttpServletResponse response, HttpSession session, String phone, String password) {
         UserConvert userPojo = user.login(phone, password);
@@ -63,7 +65,6 @@ public class LoginController extends BaseController {
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
-        session.setAttribute(String.valueOf(userPojo.getId()), userPojo);
         return r.success();
     }
     
@@ -143,7 +144,7 @@ public class LoginController extends BaseController {
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
-        String sign = JwtUtil.sign(userPojo.getUsername(), data);
+        String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
         
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
@@ -154,7 +155,6 @@ public class LoginController extends BaseController {
         r.put("message", "授权登陆成功");
         r.put(CookieConfig.COOKIE_NAME_COOKIE, CookieConfig.COOKIE_NAME_MUSIC_U + "=" + sign);
         
-        session.setAttribute(String.valueOf(userPojo.getId()), userPojo);
         return r;
     }
     
@@ -175,6 +175,7 @@ public class LoginController extends BaseController {
      * @param nickname 昵称
      * @return 返回成功信息
      */
+    @AnonymousAccess
     @GetMapping("/register/account")
     public NeteaseResult addUser(String account, String password, String nickname) {
         SysUserPojo userPojo = new SysUserPojo();

@@ -151,3 +151,5 @@ default-info:
     user-background-pic: https://fakeimg.pl/350x200/c0392b/fff?retina=1&font=noto&text=用户默认背景
 
 
+enable:
+  debug: true

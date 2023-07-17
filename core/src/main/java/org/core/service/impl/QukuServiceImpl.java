@@ -182,7 +182,7 @@ public class QukuServiceImpl implements QukuService {
     public List<AlbumConvert> getAlbumListByAlbumId(Collection<Long> albumIds) {
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
         List<Long> collect = albumPojoList.parallelStream().map(TbAlbumPojo::getId).toList();
-        Map<Long, String> picUrl = getCollectPicUrl(collect);
+        Map<Long, String> picUrl = getAlbumPicUrl(collect);
         return getAlbumConvertList(albumPojoList, picUrl);
     }
     
@@ -1161,7 +1161,7 @@ public class QukuServiceImpl implements QukuService {
     
     public List<MusicConvert> getPicMusicList(Collection<TbMusicPojo> musicList) {
         Set<Long> collect = musicList.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toSet());
-        Map<Long, String> picUrl = getCollectPicUrl(collect);
+        Map<Long, String> picUrl = getMusicPicUrl(collect);
         return musicList.parallelStream().map(tbMusicPojo -> {
             String url = picUrl.get(tbMusicPojo.getId());
             MusicConvert musicConvert = new MusicConvert();
@@ -1199,30 +1199,30 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 封面
      *
-     * @param ids  封面ID
-     * @param type 关联ID类型
+     * @param middleIds 封面中间ID
+     * @param type      关联ID类型
      * @return 封面地址
      */
     @Override
-    public Map<Long, String> getPicUrl(Collection<Long> ids, Byte type) {
-        if (CollUtil.isEmpty(ids)) {
+    public Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type) {
+        if (CollUtil.isEmpty(middleIds)) {
             return Collections.emptyMap();
         }
         // 通过关联ID获取封面ID
-        Map<Long, Long> picMiddle = picMiddleCache.getAll(ids, aLong -> {
+        Map<Long, Long> picMiddle = picMiddleCache.getAll(middleIds, aLong -> {
             List<TbMiddlePicPojo> list = middlePicService.list();
             return list.stream().collect(Collectors.toMap(TbMiddlePicPojo::getMiddleId, TbMiddlePicPojo::getPicId));
         });
         // 返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
-            return ids.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type), (s, s2) -> s2));
+            return middleIds.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type), (s, s2) -> s2));
         }
         // 获取缓存中地址
-        List<Long> picIds = ids.parallelStream().map(picMiddle::get).filter(Objects::nonNull).toList();
-        Map<Long, TbPicPojo> map = picCache.getAll(picIds, longs -> {
+        List<Long> picIds = middleIds.parallelStream().map(picMiddle::get).filter(Objects::nonNull).toList();
+        Map<Long, TbPicPojo> map = picCache.getAll(picIds, picId -> {
             List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
-                                                                       .in(TbMiddlePicPojo::getMiddleId, ids)
-                                                                       .in(TbMiddlePicPojo::getPicId, longs)
+                                                                       .in(TbMiddlePicPojo::getMiddleId, middleIds)
+                                                                       .in(TbMiddlePicPojo::getPicId, picId)
                                                                        .eq(TbMiddlePicPojo::getType, type));
             List<TbPicPojo> tbPicPojoList = picService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toSet()));
             return tbPicPojoList.parallelStream().map(tbPicPojo -> {
@@ -1234,7 +1234,7 @@ public class QukuServiceImpl implements QukuService {
             }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
         });
         // 遍历ID，如果没有查找到，则返回默认数据
-        return ids.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
+        return middleIds.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
             Long picId = picMiddle.get(aLong);
             return picId == null ? getDefaultPicUrl(type) : map.get(picId).getUrl();
         }, (s, s2) -> s2));

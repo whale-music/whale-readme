@@ -712,7 +712,7 @@ public class MusicFlowApi {
                 musicFileRes.setRawUrl(url.getPath());
                 musicFileRes.setExists(StringUtils.isNotBlank(url.getPath()));
             } catch (BaseException e) {
-                if (StringUtils.equals(e.getErrorCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
+                if (StringUtils.equals(e.getCode(), ResultCode.OSS_LOGIN_ERROR.getCode())) {
                     throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
                 }
                 musicFileRes.setRawUrl("");

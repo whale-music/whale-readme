@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.api.neteasecloudmusic.model.vo.user.Account;
 import org.api.neteasecloudmusic.model.vo.user.Profile;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
-import org.core.common.constant.CookieConfig;
+import org.core.common.constant.CookieConstant;
 import org.core.common.result.NeteaseResult;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
@@ -57,7 +57,7 @@ public class BaseController {
     protected NeteaseResult getNeteaseResult(HttpServletResponse response, SysUserPojo userPojo) {
         String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
         // 写入用户信息到cookie
-        Cookie cookie = new Cookie(CookieConfig.COOKIE_NAME_MUSIC_U, sign);
+        Cookie cookie = new Cookie(CookieConstant.COOKIE_NAME_MUSIC_U, sign);
         cookie.setPath("/");
         response.addCookie(cookie);
     

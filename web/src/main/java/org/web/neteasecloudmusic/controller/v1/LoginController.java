@@ -15,7 +15,7 @@ import org.api.neteasecloudmusic.model.vo.user.UserVo;
 import org.api.neteasecloudmusic.service.LoginApi;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.annotation.AnonymousAccess;
-import org.core.common.constant.CookieConfig;
+import org.core.common.constant.CookieConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
@@ -107,7 +107,7 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(key);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
-            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
+            r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error(ResultCode.QR_ERROR);
         }
         String localhost = request.getServerName() + ":" + request.getServerPort();
@@ -122,7 +122,7 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(codekey);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
-            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
+            r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("800", "二维码不存在或已过期");
         }
         SysUserPojo userPojo = user.login(phone, password);
@@ -135,12 +135,12 @@ public class LoginController extends BaseController {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
-            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
+            r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("800", "二维码不存在或已过期");
         }
         if (Objects.equals(key, data)) {
             NeteaseResult r = new NeteaseResult();
-            r.put(CookieConfig.COOKIE_NAME_MUSIC_U, "");
+            r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
@@ -153,7 +153,7 @@ public class LoginController extends BaseController {
         NeteaseResult r = new NeteaseResult();
         r.put("code", 803);
         r.put("message", "授权登陆成功");
-        r.put(CookieConfig.COOKIE_NAME_COOKIE, CookieConfig.COOKIE_NAME_MUSIC_U + "=" + sign);
+        r.put(CookieConstant.COOKIE_NAME_COOKIE, CookieConstant.COOKIE_NAME_MUSIC_U + "=" + sign);
         
         return r;
     }

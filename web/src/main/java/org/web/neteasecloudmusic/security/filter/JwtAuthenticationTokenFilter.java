@@ -6,8 +6,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.constant.CookieConfig;
+import org.core.common.constant.CookieConstant;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.utils.RoleUtil;
 import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
         Optional<String> first = Arrays.stream(request.getCookies())
-                                       .filter(cookie -> StringUtils.equalsIgnoreCase(CookieConfig.COOKIE_NAME_MUSIC_U, cookie.getName()))
+                                       .filter(cookie -> StringUtils.equalsIgnoreCase(CookieConstant.COOKIE_NAME_MUSIC_U, cookie.getName()))
                                        .map(Cookie::getValue)
                                        .filter(StringUtils::isNotBlank)
                                        .findFirst();
@@ -59,7 +60,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 UserUtil.setUser(userPojo);
                 UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
                         null,
-                        AuthorityUtils.createAuthorityList(userPojo.getAccountType() == 0 ? "admin" : "common"));
+                        AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

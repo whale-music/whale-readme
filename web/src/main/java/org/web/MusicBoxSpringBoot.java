@@ -19,10 +19,12 @@ import org.web.subsonic.SubsonicSpringBootApplication;
 @EnableScheduling // 开启定时任务
 public class MusicBoxSpringBoot {
     public static void main(String[] args) {
+        // AdminSpringBootApplication需要最后，方便执行run方法。
+        // 这样ApplicationRunner和CommandLineRunner这些类似的方法才会接受到参数, 而且也只会在Admin包下的包才会读取到args
         new SpringApplicationBuilder(MusicBoxSpringBoot.class)
-                .child(AdminSpringBootApplication.class)
+                .child(SubsonicSpringBootApplication.class)
                 .sibling(NeteaseCloudMusicSpringBootApplication.class)
-                .sibling(SubsonicSpringBootApplication.class)
+                .sibling(AdminSpringBootApplication.class)
                 .run(args);
     }
 }

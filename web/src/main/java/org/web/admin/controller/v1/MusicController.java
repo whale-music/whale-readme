@@ -211,6 +211,7 @@ public class MusicController {
         return R.success(maps);
     }
     
+    @AnonymousAccess
     @PostMapping("/pic/upload")
     public R uploadPic(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id, @RequestParam("type") String type) throws IOException {
         String picUrl = uploadMusic.uploadPic(uploadFile, id, type);

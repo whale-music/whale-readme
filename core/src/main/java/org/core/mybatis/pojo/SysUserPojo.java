@@ -49,6 +49,10 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField("account_type")
     private Integer accountType;
     
+    @Schema(title = "账户角色")
+    @TableField("role_name")
+    private String roleName;
+    
     @Schema(title = "最后登录IP")
     @TableField("last_login_ip")
     private String lastLoginIp;

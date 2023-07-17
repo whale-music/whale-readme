@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.VerifyAuthIdentifierConstant;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.utils.RoleUtil;
 import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 UserUtil.setUser(userPojo);
                 UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
                         null,
-                        AuthorityUtils.createAuthorityList(userPojo.getAccountType() == 0 ? "admin" : "common"));
+                        AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

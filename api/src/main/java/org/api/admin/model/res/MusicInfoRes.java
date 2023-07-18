@@ -22,7 +22,7 @@ public class MusicInfoRes implements Serializable {
     private String musicName;
     
     @ApiModelProperty("音乐别名")
-    private String musicNameAlias;
+    private String aliasName;
     
     @ApiModelProperty("封面")
     private String picUrl;

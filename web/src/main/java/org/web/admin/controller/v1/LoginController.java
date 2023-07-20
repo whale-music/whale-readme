@@ -4,6 +4,7 @@ import cn.hutool.http.Header;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
@@ -16,19 +17,19 @@ import org.core.common.result.R;
 import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.utils.RoleUtil;
 import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController(AdminConfig.ADMIN + "LoginController")
 @RequestMapping("/admin/user")
+@AllArgsConstructor
 public class LoginController {
     
-    @Autowired
-    private UserApi user;
+    private final UserApi user;
     
     /**
      * 登录接口
@@ -38,6 +39,7 @@ public class LoginController {
     public R login(@RequestBody UserReq dto, HttpServletResponse response) {
         UserRes userPojo = user.login(dto.getUsername(), dto.getPassword());
         userPojo.setExpiryTime(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        userPojo.setRoles(RoleUtil.getRoleNames(userPojo.getRoleName()));
         // 写入用户信息到Header
         response.addHeader(VerifyAuthIdentifierConstant.ADMIN_VERIFY_AUTH_IDENTIFIER, userPojo.getToken());
         return R.success(userPojo);

@@ -21,6 +21,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
+import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -84,7 +85,7 @@ public class QukuServiceImpl implements QukuService {
     
     private final Cache<Long, TbPicPojo> picCache;
     
-    private final Cache<Long, Long> picMiddleCache;
+    private final Cache<MiddleTypeModel, Long> picMiddleCache;
     
     private final DefaultInfo defaultInfo;
     
@@ -1209,16 +1210,17 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyMap();
         }
         // 通过关联ID获取封面ID
-        Map<Long, Long> picMiddle = picMiddleCache.getAll(middleIds, aLong -> {
+        List<MiddleTypeModel> middleTypeModels = middleIds.parallelStream().map(aLong -> new MiddleTypeModel(aLong, type)).toList();
+        Map<MiddleTypeModel, Long> picMiddle = picMiddleCache.getAll(middleTypeModels, aLong -> {
             List<TbMiddlePicPojo> list = middlePicService.list();
-            return list.stream().collect(Collectors.toMap(TbMiddlePicPojo::getMiddleId, TbMiddlePicPojo::getPicId));
+            return list.stream().collect(Collectors.toMap(o -> new MiddleTypeModel(o.getMiddleId(), o.getType()), TbMiddlePicPojo::getPicId));
         });
-        // 返回默认地址
+        // 没有查询到，直接返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
             return middleIds.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type), (s, s2) -> s2));
         }
         // 获取缓存中地址
-        List<Long> picIds = middleIds.parallelStream().map(picMiddle::get).filter(Objects::nonNull).toList();
+        Collection<Long> picIds = picMiddle.values();
         Map<Long, TbPicPojo> map = picCache.getAll(picIds, picId -> {
             List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
                                                                        .in(TbMiddlePicPojo::getMiddleId, middleIds)
@@ -1235,7 +1237,7 @@ public class QukuServiceImpl implements QukuService {
         });
         // 遍历ID，如果没有查找到，则返回默认数据
         return middleIds.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
-            Long picId = picMiddle.get(aLong);
+            Long picId = picMiddle.get(new MiddleTypeModel(aLong, type));
             return picId == null ? getDefaultPicUrl(type) : map.get(picId).getUrl();
         }, (s, s2) -> s2));
     }

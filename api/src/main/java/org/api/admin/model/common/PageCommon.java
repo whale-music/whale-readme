@@ -18,4 +18,7 @@ public class PageCommon implements Serializable {
     
     @ApiModelProperty("每页展示行数")
     private Integer pageNum;
+    
+    @ApiModelProperty("总页数")
+    private Integer total;
 }

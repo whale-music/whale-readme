@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * 系统用户表(SysUser)表实体类
@@ -49,6 +50,10 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField("account_type")
     private Integer accountType;
     
+    @Schema(title = "用户是否启用 1: 启用, 0: 停用")
+    @TableField("status")
+    private Boolean status;
+    
     @Schema(title = "账户角色")
     @TableField("role_name")
     private String roleName;
@@ -69,6 +74,8 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
-    
+    public boolean getIsAdmin() {
+        return Optional.ofNullable(getAccountType()).orElse(-1) == 0;
+    }
 }
 

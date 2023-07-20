@@ -14,6 +14,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
+import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -39,7 +40,7 @@ public class QukuAPI extends QukuServiceImpl {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<Long, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
         super(musicService,
                 albumService,
                 artistService,
@@ -130,6 +131,16 @@ public class QukuAPI extends QukuServiceImpl {
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateMusicPic(Long id, File file) {
         this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, file);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateAvatarPic(Long id, File file) {
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_AVATAR, file);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateBackgroundPic(Long id, File file) {
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, file);
     }
     
     /**

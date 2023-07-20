@@ -25,9 +25,18 @@ public interface AccountService extends SysUserService {
     SysUserPojo login(String username, String password);
     
     /**
-     * 查询用户信息
+     * 查询用户信息, 没有会抛出异常
+     *
      * @param username 用户名
      * @return 用户信息
      */
     SysUserPojo getUser(String username);
+    
+    /**
+     * 查询用户信息, 没有直接返回Null
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    SysUserPojo getUserByName(String username);
 }

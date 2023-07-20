@@ -11,6 +11,21 @@ import org.core.mybatis.pojo.SysUserPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class UserConvert extends SysUserPojo {
+    public UserConvert(SysUserPojo user) {
+        setId(user.getId());
+        setUsername(user.getUsername());
+        setNickname(user.getNickname());
+        setPassword(user.getPassword());
+        setSignature(user.getSignature());
+        setAccountType(user.getAccountType());
+        setStatus(user.getStatus());
+        setRoleName(user.getRoleName());
+        setLastLoginIp(user.getLastLoginIp());
+        setLastLoginTime(user.getLastLoginTime());
+        setCreateTime(user.getCreateTime());
+        setUpdateTime(user.getUpdateTime());
+    }
+    
     private String avatarUrl;
     private String backgroundPicUrl;
 }

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "sys_user")
@@ -34,6 +35,9 @@ public class SysUserEntity implements Serializable {
     @Basic
     @Column(name = "account_type", nullable = true)
     private Integer accountType;
+    @Basic
+    @Column(name = "status", nullable = true)
+    private Boolean status;
     @Basic
     @Column(name = "last_login_ip", nullable = true, length = 20)
     private String lastLoginIp;
@@ -128,6 +132,14 @@ public class SysUserEntity implements Serializable {
         this.accountType = accountType;
     }
     
+    public Boolean getStatus() {
+        return status;
+    }
+    
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+    
     public String getLastLoginIp() {
         return lastLoginIp;
     }
@@ -166,6 +178,10 @@ public class SysUserEntity implements Serializable {
     
     public void setRoleName(Timestamp roleName) {
         this.roleName = roleName;
+    }
+    
+    public boolean getIsAdmin() {
+        return Optional.ofNullable(getAccountType()).orElse(-1) == 0;
     }
     
     @Override

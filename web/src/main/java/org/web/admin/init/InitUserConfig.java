@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.NoOpLog;
+import org.core.common.constant.AccountTypeConstant;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.spring.SpringUtil;
@@ -73,6 +74,7 @@ public class InitUserConfig implements ApplicationRunner, InitializingBean {
             SysUserPojo user = new SysUserPojo();
             user.setNickname(ADMIN);
             user.setUsername(ADMIN);
+            user.setAccountType(AccountTypeConstant.ADMIN);
             user.setRoleName(ADMIN);
             user.setPassword(password);
             accountService.createAdmin(user);

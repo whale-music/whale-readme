@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -38,7 +37,6 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.utils.ExceptionUtil;
-import org.core.utils.ImageTypeUtils;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
 import org.jaudiotagger.audio.AudioFile;
@@ -61,8 +59,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.time.LocalDateTime;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -195,20 +195,6 @@ public class MusicFlowApi {
     }
     
     
-    public String uploadPicFile(MultipartFile uploadFile, String url) throws IOException {
-        File file;
-        if (StringUtils.isBlank(url)) {
-            file = FileUtil.writeBytes(uploadFile.getBytes(),
-                    new File(requestConfig.getTempPath(), LocalDateTime.now().getNano() + "-" + uploadFile.getResource().getFilename()));
-        } else {
-            byte[] bytes = HttpUtil.downloadBytes(url);
-            File fileBytes = FileUtil.writeBytes(bytes,
-                    new File(requestConfig.getTempPath(), String.valueOf(LocalDateTime.now().getNano() + RandomUtil.randomInt())));
-            file = FileUtil.touch(new File(requestConfig.getTempPath(),
-                    LocalDateTime.now().getNano() + "." + ImageTypeUtils.getPicType(new FileInputStream(fileBytes))));
-        }
-        return file.getName();
-    }
     
     private static void getLevel(TbResourcePojo entity, int rate) {
         // 标准

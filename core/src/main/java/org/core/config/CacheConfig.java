@@ -2,6 +2,7 @@ package org.core.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.core.model.MiddleTypeModel;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,7 @@ public class CacheConfig {
     }
     
     @Bean
-    public Cache<Long, Long> picMiddleCaffeineCache() {
+    public Cache<MiddleTypeModel, Long> picMiddleCaffeineCache() {
         return Caffeine.newBuilder()
                        // 设置最后一次写入或访问后经过固定时间过期
                        .expireAfterWrite(1, TimeUnit.DAYS)

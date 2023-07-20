@@ -53,6 +53,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     ALBUM_MUSIC_EXIST_ERROR("20017", "专辑有关联音乐!"),
     ARTIST_NO_EXIST_ERROR("20018", "艺术家不存在"),
     UPLOAD_MUSIC_ID_NOT_MATCH("20019", "上传歌曲文件存在于其他歌曲中"),
+    ADMIN_USER_NOT_EDIT_STATUS("20020", "管理员用户不能修改账户状态"),
+    ADMIN_CANNOT_DELETE("20021", "不能删除管理员账户"),
     
     
     /* 业务错误：30001-39999 */

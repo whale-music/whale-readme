@@ -12,7 +12,6 @@ public class MyPageUtil {
         page = Optional.ofNullable(page).orElse(new PageCommon());
         page.setPageIndex(Optional.ofNullable(page.getPageIndex()).orElse(0));
         page.setPageNum(Optional.ofNullable(page.getPageNum()).orElse(50));
-        page.setPageNum(page.getPageNum() == 0 ? 50 : page.getPageNum());
         return page;
     }
     

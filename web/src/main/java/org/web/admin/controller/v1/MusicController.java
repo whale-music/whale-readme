@@ -48,17 +48,6 @@ public class MusicController {
     }
     
     /**
-     * 上传图片临时文件
-     *
-     * @param uploadFile 临时文件
-     * @return 返回音乐数据
-     */
-    @PostMapping("/upload/pic/file")
-    public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
-        return R.success(uploadMusic.uploadPicFile(uploadFile, url));
-    }
-    
-    /**
      * 获取临时上传音乐字节数据
      *
      * @param musicTempFile 临时文件

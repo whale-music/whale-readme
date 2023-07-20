@@ -4,9 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.service.PicApi;
+import org.core.common.annotation.AnonymousAccess;
+import org.core.common.result.R;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController(AdminConfig.ADMIN + "PicController")
 @RequestMapping("/admin/pic")
@@ -24,8 +29,21 @@ public class PicController {
      * @param musicTempFile 临时文件
      * @return 字节数据
      */
+    @AnonymousAccess
     @GetMapping("/get/temp/{file}")
     public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("file") String musicTempFile) {
         return picApi.getMusicTempFile(musicTempFile);
+    }
+    
+    /**
+     * 上传图片临时文件
+     *
+     * @param uploadFile 临时文件
+     * @return 返回音乐数据
+     */
+    @AnonymousAccess
+    @PostMapping("/upload")
+    public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
+        return R.success(picApi.uploadPicFile(uploadFile, url));
     }
 }

@@ -8,6 +8,7 @@ import org.core.common.result.ResultCode;
 import org.core.mybatis.iservice.impl.SysUserServiceImpl;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
+import org.core.utils.ip.IpUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -60,9 +61,14 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
         lambdaQuery.eq(SysUserPojo::getPassword, password);
         SysUserPojo one = this.getOne(lambdaQuery);
         if (one == null) {
-            throw new BaseException(ResultCode.USER_NOT_EXIST);
+            throw new BaseException(ResultCode.USER_LOGIN_ERROR);
+        }
+        if (Boolean.FALSE.equals(one.getStatus())) {
+            throw new BaseException(ResultCode.USER_ACCOUNT_FORBIDDEN);
         }
         one.setPassword(null);
+        one.setLastLoginIp(IpUtils.getIpAddr());
+        this.updateById(one);
         return one;
     }
     
@@ -80,5 +86,16 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
         return one;
+    }
+    
+    /**
+     * 查询用户信息, 没有直接返回Null
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    @Override
+    public SysUserPojo getUserByName(String username) {
+        return this.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, username));
     }
 }

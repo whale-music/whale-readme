@@ -36,7 +36,7 @@ public class InteractivePluginTest implements ComboSearchPlugin {
      */
     @Override
     public List<PluginLabelValue> getParams() {
-        List<PluginLabelValue> values = new ArrayList<>();
+        List<PluginLabelValue> values = new ArrayList<>(3);
         PluginLabelValue e1 = new PluginLabelValue();
         e1.setLabel("搜索类型(name)");
         e1.setKey(FILTER);

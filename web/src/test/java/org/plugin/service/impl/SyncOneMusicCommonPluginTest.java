@@ -13,10 +13,11 @@ import org.plugin.service.PluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.web.MusicBoxSpringBoot;
+import org.web.admin.AdminSpringBootApplication;
 
 import java.util.List;
 
-@SpringBootTest(classes = MusicBoxSpringBoot.class)
+@SpringBootTest(classes = {AdminSpringBootApplication.class, MusicBoxSpringBoot.class})
 @Slf4j
 class SyncOneMusicCommonPluginTest {
     

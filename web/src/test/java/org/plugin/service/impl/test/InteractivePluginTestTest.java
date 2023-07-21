@@ -14,10 +14,11 @@ import org.plugin.service.impl.PluginPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.web.MusicBoxSpringBoot;
+import org.web.admin.AdminSpringBootApplication;
 
 import java.util.List;
 
-@SpringBootTest(classes = MusicBoxSpringBoot.class)
+@SpringBootTest(classes = {AdminSpringBootApplication.class, MusicBoxSpringBoot.class})
 @Slf4j
 class InteractivePluginTestTest {
     
@@ -62,8 +63,8 @@ class InteractivePluginTestTest {
               .findFirst()
               .orElseThrow(RuntimeException::new)
               .setValue(page);
-        
-        TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(405408338284677L, params, 403648304906373L);
+    
+        TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(441213820829829L, params, 424608186796165L);
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService,
                 qukuService, taskPojo.getId(), taskPojo.getUserId(), null);
         List<PluginLabelValue> search = plugin.search(params, input);

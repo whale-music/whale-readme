@@ -2,6 +2,8 @@ package org.plugin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.compiler.CompilerUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson2.JSON;
@@ -75,8 +77,8 @@ public class PluginServiceImpl implements PluginService {
             log.info("clazz: {}", clazz);
             // 实例化对象c
             Object obj = ReflectUtil.newInstance(clazz);
-            if (obj instanceof CommonPlugin) {
-                return (CommonPlugin) obj;
+            if (obj instanceof CommonPlugin obj1) {
+                return obj1;
             }
         } catch (ClassNotFoundException e) {
             log.error(e.getMessage(), e);
@@ -96,8 +98,8 @@ public class PluginServiceImpl implements PluginService {
             log.info("clazz: {}", clazz);
             // 实例化对象c
             Object obj = ReflectUtil.newInstance(clazz);
-            if (obj instanceof ComboSearchPlugin) {
-                return (ComboSearchPlugin) obj;
+            if (obj instanceof ComboSearchPlugin obj1) {
+                return obj1;
             }
         } catch (ClassNotFoundException e) {
             log.error(e.getMessage(), e);
@@ -150,6 +152,16 @@ public class PluginServiceImpl implements PluginService {
      */
     @Override
     public PluginRes saveOrUpdatePlugin(PluginReq req) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(req.getCode())) {
+            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginType.COMMON)) {
+                String code = ResourceUtil.readStr("examples/CommonPluginTest.java", CharsetUtil.CHARSET_UTF_8);
+                req.setCode(code);
+            }
+            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginType.INTERACTIVE)) {
+                String code = ResourceUtil.readStr("examples/InteractivePluginDemo.java", CharsetUtil.CHARSET_UTF_8);
+                req.setCode(code);
+            }
+        }
         req.setUserId(req.getUserId() == null ? UserUtil.getUser().getId() : req.getUserId());
         pluginService.saveOrUpdate(req);
         TbPluginPojo byId = pluginService.getById(req.getId());
@@ -322,7 +334,15 @@ public class PluginServiceImpl implements PluginService {
             queryWrapper.in(TbPluginMsgPojo::getTaskId, id);
             pluginMsgService.remove(queryWrapper);
             pluginTaskService.removeBatchByIds(id);
+            return;
+        } else if (CollUtil.isNotEmpty(id)) {
+            LambdaQueryWrapper<TbPluginMsgPojo> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.in(TbPluginMsgPojo::getTaskId, id);
+            pluginMsgService.remove(queryWrapper);
+            pluginTaskService.removeById(id.get(0));
+            return;
         }
+        throw new BaseException(ResultCode.PLUGIN_DELETE_TASK_ERROR);
     }
     
     /**
@@ -350,7 +370,7 @@ public class PluginServiceImpl implements PluginService {
     public List<PluginLabelValue> getInteractiveSearch(List<PluginLabelValue> pluginLabelValue, Long pluginId, String name) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         String code = byId.getCode();
-        ComboSearchPlugin comboSearchPlugin = runInteractiveCode(code, getClassName(byId.getCode()));
+        ComboSearchPlugin comboSearchPlugin = runInteractiveCode(code, getClassName(code));
         return comboSearchPlugin.search(pluginLabelValue, name);
     }
     
@@ -382,8 +402,11 @@ public class PluginServiceImpl implements PluginService {
             PluginTaskLogRes pluginTaskLogRes = new PluginTaskLogRes();
             pluginTaskLogRes.setPluginMsg(logs);
             pluginTaskLogRes.setHtml(sync);
+            pojo.updateById();
             return pluginTaskLogRes;
         } catch (Exception e) {
+            pojo.setStatus(TaskStatus.ERROR_STATUS);
+            pojo.updateById();
             PluginTaskLogRes pluginTaskLogRes = new PluginTaskLogRes();
             pluginTaskLogRes.setHtml(e.getMessage());
             return pluginTaskLogRes;

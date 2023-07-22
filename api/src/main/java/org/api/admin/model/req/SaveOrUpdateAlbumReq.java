@@ -11,6 +11,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class SaveOrUpdateAlbumReq extends AlbumConvert {
+    
+    private String albumGenre;
     private List<Long> artistIds;
     private String tempFile;
 }

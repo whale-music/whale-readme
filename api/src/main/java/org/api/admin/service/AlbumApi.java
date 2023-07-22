@@ -25,6 +25,7 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.TbAlbumArtistPojo;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
+import org.core.mybatis.pojo.TbTagPojo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -185,10 +186,12 @@ public class AlbumApi {
     public AlbumInfoRes getAlbumInfo(Long albumId) {
         TbAlbumPojo byId = albumService.getById(albumId);
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
+        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
         
         AlbumInfoRes albumRes = new AlbumInfoRes();
+        albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).findFirst().orElse(""));
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
@@ -207,6 +210,10 @@ public class AlbumApi {
             throw new BaseException(ResultCode.PARAM_NOT_COMPLETE);
         }
         albumService.saveOrUpdate(req);
+        // 保存或更新专辑流派
+        if (StringUtils.isNotBlank(req.getAlbumGenre())) {
+            qukuService.addAlbumGenreLabel(req.getId(), StringUtils.trim(req.getAlbumGenre()));
+        }
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
             qukuService.saveOrUpdateAlbumPic(req.getId(), file);

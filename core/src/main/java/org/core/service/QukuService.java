@@ -318,8 +318,18 @@ public interface QukuService {
      * @param ids 专辑ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelAlbum(Collection<Long> ids) {
+    default List<TbTagPojo> getLabelAlbumGenre(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, ids);
+    }
+    
+    /**
+     * 获取tag专辑
+     *
+     * @param id 专辑ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelAlbumGenre(Long id) {
+        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id));
     }
     
     /**
@@ -328,8 +338,18 @@ public interface QukuService {
      * @param ids 歌单ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelCollect(Collection<Long> ids) {
+    default List<TbTagPojo> getLabelCollectTag(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, ids);
+    }
+    
+    /**
+     * 获取tag歌单
+     *
+     * @param ids 歌单ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelCollectTag(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(ids));
     }
     
     /**
@@ -439,6 +459,10 @@ public interface QukuService {
         this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
     }
     
+    default void addCollectLabel(Long id, List<String> label) {
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
+    }
+    
     default void addMusicLabel(Long id, String label) {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
     }
@@ -447,8 +471,12 @@ public interface QukuService {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
     }
     
-    default void addAlbumLabel(Long id, List<String> labels) {
+    default void addAlbumGenreLabel(Long id, List<String> labels) {
         this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, labels);
+    }
+    
+    default void addAlbumGenreLabel(Long id, String label) {
+        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, Collections.singletonList(label));
     }
     
     default void addMusicLabel(Long id, Long labelId) {

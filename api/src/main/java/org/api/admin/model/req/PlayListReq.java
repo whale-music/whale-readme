@@ -13,6 +13,9 @@ import org.core.mybatis.pojo.TbCollectPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PlayListReq extends TbCollectPojo {
+    @ApiModelProperty("歌单tag")
+    private String collectTag;
+    
     @ApiModelProperty("分页数据")
     private PageCommon page;
 }

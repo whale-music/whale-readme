@@ -816,7 +816,7 @@ public class MusicFlowApi {
         // 保存专辑封面
         saveAlbumPic(dto, albumPojo);
         // 专辑流派
-        saveAlbumTag(dto, albumPojo);
+        saveAlbumGenre(dto, albumPojo);
     }
     
     private void saveAlbumPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
@@ -824,8 +824,8 @@ public class MusicFlowApi {
         qukuService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
     }
     
-    private void saveAlbumTag(AudioInfoReq dto, TbAlbumPojo albumPojo) {
-        qukuService.addAlbumLabel(albumPojo.getId(), dto.getAlbum().getTags());
+    private void saveAlbumGenre(AudioInfoReq dto, TbAlbumPojo albumPojo) {
+        qukuService.addAlbumGenreLabel(albumPojo.getId(), dto.getAlbum().getTags());
     }
     
     private void nameHandler(AudioInfoReq dto) {

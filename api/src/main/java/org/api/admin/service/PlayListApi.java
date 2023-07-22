@@ -9,6 +9,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
+import org.api.admin.model.res.CollectInfoRes;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.model.res.PlayListMusicRes;
 import org.api.admin.model.res.PlayListRes;
@@ -429,13 +430,15 @@ public class PlayListApi {
         return routerVos;
     }
     
-    public CollectConvert getPlayListInfo(Long id) {
+    public CollectInfoRes getPlayListInfo(Long id) {
         TbCollectPojo byId = collectService.getById(id);
-        CollectConvert convert = new CollectConvert();
-        BeanUtils.copyProperties(byId, convert);
+        List<TbTagPojo> labelCollectTag = qukuService.getLabelCollectTag(id);
+        CollectInfoRes collectInfoRes = new CollectInfoRes();
+        BeanUtils.copyProperties(byId, collectInfoRes);
+        collectInfoRes.setCollectTag(CollUtil.join(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList(), ","));
         String picUrl = qukuService.getCollectPicUrl(byId.getId());
-        convert.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
-        return convert;
+        collectInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
+        return collectInfoRes;
     }
     
     public TbCollectPojo createPlayList(String name) {
@@ -524,6 +527,9 @@ public class PlayListApi {
         }
     
         collectService.saveOrUpdate(req);
+        if (StringUtils.isNotBlank(req.getCollectTag())) {
+            qukuService.addCollectLabel(req.getId(), Arrays.stream(StringUtils.split(req.getCollectTag(), ',')).map(StringUtils::trim).toList());
+        }
         return collectService.getById(req.getId());
     }
     

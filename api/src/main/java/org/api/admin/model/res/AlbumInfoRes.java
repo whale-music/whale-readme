@@ -16,6 +16,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AlbumInfoRes extends AlbumConvert {
+    @ApiModelProperty("专辑流派")
+    private String albumGenre;
+    
     @ApiModelProperty("音乐数据")
     private List<MusicConvert> musicList;
     

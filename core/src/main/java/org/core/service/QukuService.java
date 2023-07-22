@@ -264,13 +264,73 @@ public interface QukuService {
     List<TbLyricPojo> getMusicLyric(Long musicId);
     
     /**
-     * 对歌单tag，音乐添加tag Name， 或者指定音乐流派
+     * 获取tag
      *
-     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
-     * @param id     歌单或歌曲前ID
-     * @param label  标签名
+     * @param target tag类型 0流派 1歌曲 2歌单
+     * @param ids    歌单，音乐，专辑
+     * @return tag列表
      */
-    void addLabel(Byte target, Long id, String label);
+    List<TbTagPojo> getLabel(Byte target, Collection<Long> ids);
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelMusic(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
+    }
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelMusic(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelMusicGenre(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_GENRE, Collections.singletonList(ids));
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelMusicGenre(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_GENRE, ids);
+    }
+    
+    /**
+     * 获取tag专辑
+     *
+     * @param ids 专辑ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelAlbum(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, ids);
+    }
+    
+    /**
+     * 获取tag歌单
+     *
+     * @param ids 歌单ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelCollect(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, ids);
+    }
     
     /**
      * 批量添加tag
@@ -282,13 +342,15 @@ public interface QukuService {
     void addLabel(Byte target, Long id, List<String> labels);
     
     /**
-     * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
+     * 对歌单tag，音乐添加tag Name， 或者指定音乐流派
      *
-     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
-     * @param id      歌单或歌曲前ID
-     * @param labelId 标签ID
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param label  标签名
      */
-    void addLabel(Byte target, Long id, Long labelId);
+    default void addLabel(Byte target, Long id, String label) {
+        addLabel(target, id, List.of(label));
+    }
     
     /**
      * 批量添加tag
@@ -298,6 +360,18 @@ public interface QukuService {
      * @param labelIds 标签ID
      */
     void addLabel(Byte target, Long id, Set<Long> labelIds);
+    
+    
+    /**
+     * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 标签ID
+     */
+    default void addLabel(Byte target, Long id, Long labelId) {
+        addLabel(target, id, Set.of(labelId));
+    }
     
     /**
      * 删除全部tag
@@ -387,6 +461,10 @@ public interface QukuService {
     
     default void addMusicGenreLabel(Long id, String label) {
         this.addLabel(TargetTagConstant.TARGET_GENRE, id, label);
+    }
+    
+    default void addMusicGenreLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_GENRE, id, labels);
     }
     
     /**

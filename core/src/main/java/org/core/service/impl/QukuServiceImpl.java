@@ -789,24 +789,22 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 对歌单tag，音乐添加tag， 或者指定音乐流派
+     * 获取tag
      *
-     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
-     * @param id     歌单或歌曲前ID
-     * @param label  标签名
+     * @param target tag类型 0流派 1歌曲 2歌单
+     * @param ids    歌单，音乐，专辑
+     * @return tag列表
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Byte target, Long id, String label) {
-        TbTagPojo tagPojo = tagService.getOne(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, label));
-        Optional<TbTagPojo> pojo = Optional.ofNullable(tagPojo);
-        tagPojo = pojo.orElseGet(() -> {
-            TbTagPojo entity = new TbTagPojo();
-            entity.setTagName(label);
-            tagService.saveOrUpdate(entity);
-            return entity;
-        });
-        addLabel(target, id, tagPojo.getId());
+    public List<TbTagPojo> getLabel(Byte target, Collection<Long> ids) {
+        LambdaQueryWrapper<TbMiddleTagPojo> wrapper = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                              .in(TbMiddleTagPojo::getMiddleId, ids)
+                                                              .eq(TbMiddleTagPojo::getType, target);
+        List<TbMiddleTagPojo> middleTagList = middleTagService.list(wrapper);
+        if (CollUtil.isEmpty(middleTagList)) {
+            return Collections.emptyList();
+        }
+        return tagService.listByIds(middleTagList.parallelStream().map(TbMiddleTagPojo::getTagId).toList());
     }
     
     /**
@@ -817,13 +815,15 @@ public class QukuServiceImpl implements QukuService {
      * @param labels 标签名
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addLabel(Byte target, Long id, List<String> labels) {
         // 新增tag
         List<TbTagPojo> list;
         synchronized (addLabelLock) {
-            list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, labels));
+            HashSet<String> hashSet = new HashSet<>(labels);
+            list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, hashSet));
             Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
-            for (String label : labels) {
+            for (String label : hashSet) {
                 if (collect.get(label) == null) {
                     TbTagPojo entity = new TbTagPojo();
                     entity.setTagName(label);
@@ -838,29 +838,6 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 添加歌单，音乐tag， 或者指定音乐流派
-     *
-     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
-     * @param id      歌单, 专辑或歌曲ID
-     * @param labelId 标签ID
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Byte target, Long id, Long labelId) {
-        // 添加标签
-        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
-                                                         .eq(TbMiddleTagPojo::getType, target)
-                                                         .eq(TbMiddleTagPojo::getTagId, labelId)
-                                                         .eq(TbMiddleTagPojo::getMiddleId, id);
-        TbMiddleTagPojo one = middleTagService.getOne(eq);
-        one = Optional.ofNullable(one).orElse(new TbMiddleTagPojo());
-        one.setMiddleId(id);
-        one.setTagId(labelId);
-        one.setType(target);
-        middleTagService.save(one);
-    }
-    
-    /**
      * 批量添加tag
      *
      * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
@@ -869,21 +846,21 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public void addLabel(Byte target, Long id, Set<Long> tagIds) {
-        LambdaQueryWrapper<TbMiddleTagPojo> in = Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tagIds);
+        LambdaQueryWrapper<TbMiddleTagPojo> in = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                         .eq(TbMiddleTagPojo::getTagId, target)
+                                                         .in(TbMiddleTagPojo::getMiddleId, id);
         List<TbMiddleTagPojo> list = middleTagService.list(in);
-        Map<Long, TbMiddleTagPojo> collect = list.parallelStream()
-                                                 .collect(Collectors.toMap(TbMiddleTagPojo::getTagId, tbMiddleTagPojo -> tbMiddleTagPojo));
-        List<TbMiddleTagPojo> middleTagPojos = new ArrayList<>();
-        for (Long labelId : tagIds) {
-            if (collect.get(labelId) == null) {
-                TbMiddleTagPojo entity = new TbMiddleTagPojo();
-                entity.setTagId(labelId);
-                entity.setMiddleId(id);
-                entity.setType(target);
-                middleTagPojos.add(entity);
-            }
-        }
+        List<Long> middlePicIds = list.parallelStream().map(TbMiddleTagPojo::getMiddleId).toList();
+        // 删除重新添加
+        middleTagService.removeBatchByIds(middlePicIds);
+    
+        // 添加tag关联
+        List<TbMiddleTagPojo> middleTagPojos = tagIds.parallelStream().map(aLong -> new TbMiddleTagPojo(null, id, aLong, target)).toList();
         middleTagService.saveOrUpdateBatch(middleTagPojos);
+    
+        // 删除多余tag
+        List<Long> allTagIds = tagService.list().parallelStream().map(TbTagPojo::getId).toList();
+        middleTagService.remove(Wrappers.<TbMiddleTagPojo>lambdaQuery().notIn(TbMiddleTagPojo::getTagId, allTagIds));
     }
     
     /**

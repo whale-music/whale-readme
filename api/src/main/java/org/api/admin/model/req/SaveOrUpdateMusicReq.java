@@ -15,6 +15,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class SaveOrUpdateMusicReq extends MusicConvert {
+    
+    @ApiModelProperty("音乐tag")
+    private String musicTag;
+    
+    @ApiModelProperty("音乐流派")
+    private String musicGenre;
+    
     @ApiModelProperty("歌手名ID")
     private List<Long> artistIds;
     

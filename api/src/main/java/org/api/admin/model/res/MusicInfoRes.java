@@ -24,6 +24,12 @@ public class MusicInfoRes implements Serializable {
     @ApiModelProperty("音乐别名")
     private String aliasName;
     
+    @ApiModelProperty("音乐tag")
+    private List<String> musicTag;
+    
+    @ApiModelProperty("音乐流派")
+    private String musicGenre;
+    
     @ApiModelProperty("封面")
     private String picUrl;
     

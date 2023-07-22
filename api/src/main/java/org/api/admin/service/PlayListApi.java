@@ -78,18 +78,11 @@ public class PlayListApi {
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
         switch (Optional.ofNullable(orderBy).orElse("")) {
-            case "id":
-                musicWrapper.orderBy(true, order, TbMusicPojo::getId);
-                break;
-            case "updateTime":
-                musicWrapper.orderBy(true, order, TbMusicPojo::getUpdateTime);
-                break;
-            case "createTime":
-                musicWrapper.orderBy(true, order, TbMusicPojo::getCreateTime);
-                break;
-            case "sort":
-            default:
-                musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
+            case "id" -> musicWrapper.orderBy(true, order, TbMusicPojo::getId);
+            case "updateTime" -> musicWrapper.orderBy(true, order, TbMusicPojo::getUpdateTime);
+            case "createTime" -> musicWrapper.orderBy(true, order, TbMusicPojo::getCreateTime);
+            case "sort" -> musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
+            default -> musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
         }
     }
     
@@ -288,7 +281,7 @@ public class PlayListApi {
         if (Boolean.TRUE.equals(req.getIsShowNoExist())) {
             // 无音源音乐
             Collection<Long> union;
-            List<Long> collect = musicService.list().parallelStream().map(TbMusicPojo::getId).toList();
+            List<Long> collect = new ArrayList<>(musicService.list().parallelStream().map(TbMusicPojo::getId).toList());
             List<TbResourcePojo> musicUrlPojos = musicUrlService.list();
             List<Long> collect1 = musicUrlPojos.parallelStream().map(TbResourcePojo::getMusicId).toList();
             // 数据库中没有音源数据

@@ -264,6 +264,14 @@ public interface QukuService {
     List<TbLyricPojo> getMusicLyric(Long musicId);
     
     /**
+     * 获取歌曲歌词
+     *
+     * @param musicId 歌词ID
+     * @return 歌词列表 Long -> music id
+     */
+    Map<Long, List<TbLyricPojo>> getMusicLyric(Collection<Long> musicId);
+    
+    /**
      * 获取tag
      *
      * @param target tag类型 0流派 1歌曲 2歌单
@@ -273,12 +281,21 @@ public interface QukuService {
     List<TbTagPojo> getLabel(Byte target, Collection<Long> ids);
     
     /**
+     * 获取tag Map
+     *
+     * @param target tag类型 0流派 1歌曲 2歌单
+     * @param ids    歌单，音乐，专辑
+     * @return tag列表 Long -> id
+     */
+    Map<Long, List<TbTagPojo>> getLabel(Byte target, Set<Long> ids);
+    
+    /**
      * 获取tag音乐
      *
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusic(Collection<Long> ids) {
+    default List<TbTagPojo> getLabelMusicTag(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
     }
     
@@ -288,7 +305,17 @@ public interface QukuService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusic(Long ids) {
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Set<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
+    }
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelMusicTag(Long ids) {
         return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
     }
     
@@ -309,6 +336,16 @@ public interface QukuService {
      * @return tag 列表
      */
     default List<TbTagPojo> getLabelMusicGenre(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_GENRE, ids);
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Set<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_GENRE, ids);
     }
     

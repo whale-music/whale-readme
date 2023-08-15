@@ -15,8 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.UploadMusicReq;
-import org.api.admin.model.req.upload.AlbumInfoReq;
-import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
 import org.api.admin.model.res.MusicFileRes;
@@ -237,23 +235,16 @@ public class MusicFlowApi {
                              .body(new FileSystemResource(file));
     }
     
-    private static File getMusicFile(AudioInfoReq dto, String path) throws IOException {
+    private static File getMusicFile(AudioInfoReq.AudioSource source, String path) throws IOException {
         // 检测本地是否有已上传的数据
-        if (FileUtil.isFile(path)) {
-            File file = new File(path);
-            BufferedInputStream inputStream = FileUtil.getInputStream(file);
-            String md5 = DigestUtils.md5DigestAsHex(inputStream);
-            inputStream.close();
-            if (StringUtils.equals(md5, dto.getMd5())) {
-                return file;
-            }
-        }
         File file = new File(path);
-        HttpUtil.downloadFile(dto.getMusicTemp(), file, 600000);
+        if (!FileUtil.isFile(path)) {
+            HttpUtil.downloadFile(source.getPathTemp(), file, 600000);
+        }
         BufferedInputStream inputStream = FileUtil.getInputStream(file);
         String md5 = DigestUtils.md5DigestAsHex(inputStream);
         inputStream.close();
-        if (StringUtils.equals(md5, dto.getMd5())) {
+        if (StringUtils.equals(md5, source.getMd5())) {
             return file;
         }
         throw new BaseException(ResultCode.DOWNLOAD_ERROR);
@@ -272,34 +263,34 @@ public class MusicFlowApi {
         }
         
         List<TbLyricPojo> list = new ArrayList<>();
-        if (StringUtils.isNotBlank(dto.getLyric())) {
+        if (StringUtils.isNotBlank(dto.getMusic().getLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.LYRIC);
-            entity.setLyric(dto.getLyric());
+            entity.setLyric(dto.getMusic().getLyric());
             list.add(entity);
         }
-        if (StringUtils.isNotBlank(dto.getTLyric())) {
+        if (StringUtils.isNotBlank(dto.getMusic().getTLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.T_LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.T_LYRIC);
-            entity.setLyric(dto.getTLyric());
+            entity.setLyric(dto.getMusic().getTLyric());
             list.add(entity);
         }
-        if (StringUtils.isNotBlank(dto.getKLyric())) {
+        if (StringUtils.isNotBlank(dto.getMusic().getKLyric())) {
             TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                           .eq(TbLyricPojo::getMusicId, musicPojo.getId())
                                                           .eq(TbLyricPojo::getType, LyricConfig.K_LYRIC));
             TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
             entity.setMusicId(musicPojo.getId());
             entity.setType(LyricConfig.K_LYRIC);
-            entity.setLyric(dto.getKLyric());
+            entity.setLyric(dto.getMusic().getKLyric());
             list.add(entity);
         }
         lyricService.saveOrUpdateBatch(list);
@@ -328,18 +319,18 @@ public class MusicFlowApi {
         return null;
     }
     
-    private void uploadLocalFile(AudioInfoReq dto, TbResourcePojo urlPojo) {
+    private void uploadLocalFile(AudioInfoReq.AudioSource source, TbResourcePojo urlPojo) {
         File file = null;
         String md5 = "";
         String uploadPath;
         long size;
         try {
-            if (StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
+            if (StringUtils.startsWithIgnoreCase(source.getPathTemp(), "http")) {
                 // 没有md5，取文件的md5
-                if (StringUtils.isBlank(dto.getMd5())) {
-                    File file1 = new File(requestConfig.getTempPath());
-                    HttpUtil.downloadFile(dto.getMusicTemp(), file1, requestConfig.getTimeout());
-                    File[] files = Objects.requireNonNull(file1.listFiles());
+                if (StringUtils.isBlank(source.getMd5())) {
+                    File tempPathFile = new File(requestConfig.getTempPath());
+                    HttpUtil.downloadFile(source.getPathTemp(), tempPathFile, requestConfig.getTimeout());
+                    File[] files = Objects.requireNonNull(tempPathFile.listFiles());
                     File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
                     ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
                     BufferedInputStream inputStream = FileUtil.getInputStream(lastFile);
@@ -347,14 +338,14 @@ public class MusicFlowApi {
                     inputStream.close();
                     file = FileUtil.rename(lastFile, md5, true, true);
                 } else {
-                    String pathname = requestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + dto.getMd5() + "." + dto.getType();
-                    file = getMusicFile(dto, pathname);
-                    file = FileUtil.rename(file, dto.getMd5(), true, true);
-                    md5 = dto.getMd5();
+                    String pathname = requestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + source.getMd5() + "." + source.getEncodeType();
+                    file = getMusicFile(source, pathname);
+                    file = FileUtil.rename(file, source.getMd5(), true, true);
+                    md5 = source.getMd5();
                 }
             } else {
                 // 读取本地文件
-                file = new File(requestConfig.getTempPath(), dto.getMusicTemp());
+                file = new File(requestConfig.getTempPath(), source.getPathTemp());
             }
             uploadPath = OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), file, md5);
             size = FileUtil.size(file);
@@ -365,8 +356,8 @@ public class MusicFlowApi {
         }
         // music URL 地址表
         urlPojo.setSize(size);
-        urlPojo.setRate(dto.getRate());
-        urlPojo.setLevel(dto.getLevel());
+        urlPojo.setRate(source.getRate());
+        urlPojo.setLevel(source.getLevel());
         urlPojo.setMd5(md5);
         urlPojo.setEncodeType(FileUtil.extName(file));
         urlPojo.setPath(uploadPath);
@@ -385,10 +376,10 @@ public class MusicFlowApi {
      */
     @NotNull
     private TbMusicPojo saveAndReturnMusicPojo(AudioInfoReq dto, Set<Long> artistIds, TbAlbumPojo albumPojo) {
-        String aliaNames = CollUtil.join(dto.getAliaName(), ",");
+        String aliaNames = CollUtil.join(dto.getMusic().getAliaName(), ",");
         // 如果有ID则直接更新
-        if (dto.getId() != null) {
-            TbMusicPojo musicPojo = musicService.getById(dto.getId());
+        if (dto.getMusic().getId() != null) {
+            TbMusicPojo musicPojo = musicService.getById(dto.getMusic().getId());
             return saveMusicInfoTable(dto, albumPojo, musicPojo, aliaNames);
         }
         // 判断专辑数据是否有值
@@ -397,7 +388,7 @@ public class MusicFlowApi {
             // 获取数据库中音乐数据
             TbMusicPojo musicPojo = musicService.getOne(Wrappers.<TbMusicPojo>lambdaQuery()
                                                                 .eq(TbMusicPojo::getAlbumId, albumPojo.getId())
-                                                                .eq(TbMusicPojo::getMusicName, dto.getMusicName()));
+                                                                .eq(TbMusicPojo::getMusicName, dto.getMusic().getMusicName()));
             // 如果不相等则查询数据库相同音乐中关联的歌手，一样则覆盖
             if (musicPojo == null) {
                 TbMusicPojo dto1 = getMusicPojo(dto, artistIds, albumPojo, aliaNames);
@@ -411,8 +402,8 @@ public class MusicFlowApi {
         }
         
         LambdaQueryWrapper<TbMusicPojo> musicPojoLambdaQueryWrapper = Wrappers.lambdaQuery();
-        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getMusicName()), TbMusicPojo::getMusicName, dto.getMusicName());
-        String join = StringUtils.join(dto.getAliaName(), ",");
+        musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(dto.getMusic().getMusicName()), TbMusicPojo::getMusicName, dto.getMusic().getMusicName());
+        String join = StringUtils.join(dto.getMusic().getAliaName(), ",");
         musicPojoLambdaQueryWrapper.eq(StringUtils.isNotBlank(join), TbMusicPojo::getAliasName, join);
         TbMusicPojo one = musicService.getOne(musicPojoLambdaQueryWrapper);
         return saveMusicInfoTable(dto, albumPojo, one, aliaNames);
@@ -430,7 +421,7 @@ public class MusicFlowApi {
     @Nullable
     private TbMusicPojo getMusicPojo(AudioInfoReq dto, Set<Long> artistIds, TbAlbumPojo albumPojo, String aliaNames) {
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
-                                                           .eq(TbMusicPojo::getMusicName, dto.getMusicName()));
+                                                           .eq(TbMusicPojo::getMusicName, dto.getMusic().getMusicName()));
         Set<Long> albumSets = list.parallelStream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
         if (CollUtil.isNotEmpty(albumSets)) {
             Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
@@ -442,7 +433,7 @@ public class MusicFlowApi {
                 Set<Long> tempArtistList = list1.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
                 if (CollUtil.isEqualList(tempArtistList, artistIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
                     Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
-                            StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(),
+                            StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusic().getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(),
                                     albumSet)
                     ).findFirst();
                     if (first.isPresent()) {
@@ -467,14 +458,14 @@ public class MusicFlowApi {
     private TbMusicPojo saveMusicInfoTable(AudioInfoReq dto, TbAlbumPojo albumPojo, TbMusicPojo musicPojo, String aliaNames) {
         TbMusicPojo tbMusicPojo = musicPojo == null ? new TbMusicPojo() : musicPojo;
         // music 信息表
-        tbMusicPojo.setMusicName(dto.getMusicName());
+        tbMusicPojo.setMusicName(dto.getMusic().getMusicName());
         tbMusicPojo.setAliasName(aliaNames);
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
-        tbMusicPojo.setTimeLength(dto.getTimeLength());
+        tbMusicPojo.setTimeLength(dto.getMusic().getTimeLength());
         boolean save;
         // 保存音乐表
         save = musicService.saveOrUpdate(tbMusicPojo);
-        qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getPic());
+        qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getMusic().getPic());
         // 保存错误，抛出异常
         ExceptionUtil.isNull(!save, ResultCode.SAVE_FAIL);
         return tbMusicPojo;
@@ -493,7 +484,7 @@ public class MusicFlowApi {
      */
     private TbAlbumPojo saveAndReturnAlbumPojo(AudioInfoReq dto, Set<Long> singerIds) {
         // 专辑没有值直接返回
-        AlbumInfoReq album = dto.getAlbum();
+        AudioInfoReq.AudioAlbum album = dto.getAlbum();
         if (album == null || StringUtils.isBlank(album.getAlbumName())) {
             return new TbAlbumPojo();
         }
@@ -569,7 +560,7 @@ public class MusicFlowApi {
      */
     private List<TbArtistPojo> saveAndReturnMusicAndSingList(AudioInfoReq dto) {
         // 没有歌手直接返回
-        List<ArtistInfoReq> artists = dto.getArtists();
+        List<AudioInfoReq.AudioArtist> artists = dto.getArtists();
         if (IterUtil.isEmpty(artists) || StringUtils.isBlank(artists.get(0).getArtistName())) {
             return Collections.emptyList();
         }
@@ -587,7 +578,7 @@ public class MusicFlowApi {
     
         List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
-        for (ArtistInfoReq singerReq : artists) {
+        for (AudioInfoReq.AudioArtist singerReq : artists) {
             TbArtistPojo pojo = new TbArtistPojo();
             BeanUtils.copyProperties(singerReq, pojo);
             // 覆盖数据中的数据，防止出现脏数据(多个相同的歌手)
@@ -599,7 +590,7 @@ public class MusicFlowApi {
             }
             artistService.saveOrUpdate(pojo);
             // 更新封面
-            qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPicUrl());
+            qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPic());
             saveBatch.add(pojo);
         }
         return saveBatch;
@@ -611,42 +602,55 @@ public class MusicFlowApi {
      * @param dto       前端请求数据
      * @param musicPojo 音乐表数据
      */
-    private TbResourcePojo uploadFile(AudioInfoReq dto, TbMusicPojo musicPojo) {
-        TbResourcePojo urlPojo = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, dto.getMd5()));
-        urlPojo = urlPojo == null ? new TbResourcePojo() : urlPojo;
-        urlPojo.setMusicId(musicPojo.getId());
-        Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
-        SysUserPojo byId = accountService.getById(userId);
-        ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
-        urlPojo.setUserId(byId.getId());
-        // 上传到本地时读取本地文件数据，否则使用前端传入的数据
-        if (Boolean.TRUE.equals(dto.getUploadFlag())) {
-            if (dto.getSize() == null
-                    || dto.getRate() == null
-                    || dto.getRate() == 0
-                    || StringUtils.isBlank(dto.getLevel())
-                    || StringUtils.isBlank(dto.getMd5())
-                    || StringUtils.isBlank(dto.getType())
-                    || StringUtils.isBlank(dto.getMusicTemp())) {
-                return new TbResourcePojo();
+    private List<TbResourcePojo> uploadFile(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        List<TbResourcePojo> resourceList = new ArrayList<>();
+        for (AudioInfoReq.AudioSource source : dto.getSources()) {
+            TbResourcePojo urlPojo = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, source.getMd5()));
+            urlPojo = urlPojo == null ? new TbResourcePojo() : urlPojo;
+            urlPojo.setMusicId(musicPojo.getId());
+            Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
+            SysUserPojo byId = accountService.getById(userId);
+            ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
+            urlPojo.setUserId(byId.getId());
+            // 上传到本地时读取本地文件数据，否则使用前端传入的数据
+            if (Boolean.TRUE.equals(dto.getUploadFlag())) {
+                if (source.getSize() == null
+                        || source.getRate() == null
+                        || source.getRate() == 0
+                        || StringUtils.isBlank(source.getLevel())
+                        || StringUtils.isBlank(source.getMd5())
+                        || StringUtils.isBlank(source.getEncodeType())
+                        || StringUtils.isBlank(source.getPathTemp())) {
+                    return Collections.emptyList();
+                }
+                // 只保存到数据库，不上传文件
+                urlPojo.setSize(source.getSize());
+                urlPojo.setRate(source.getRate());
+                urlPojo.setLevel(source.getLevel());
+                urlPojo.setMd5(source.getMd5());
+                urlPojo.setEncodeType(source.getEncodeType());
+                urlPojo.setPath(source.getPathTemp());
+            } else {
+                uploadLocalFile(source, urlPojo);
             }
-            // 只保存到数据库，不上传文件
-            urlPojo.setSize(dto.getSize());
-            urlPojo.setRate(dto.getRate());
-            urlPojo.setLevel(dto.getLevel());
-            urlPojo.setMd5(dto.getMd5());
-            urlPojo.setEncodeType(dto.getType());
-            urlPojo.setPath(dto.getMusicTemp());
-        } else {
-            uploadLocalFile(dto, urlPojo);
+            // 检测是否重复上传相同的MD5音乐文件
+            if (urlPojo.getId() == null) {
+                TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, urlPojo.getMd5()));
+                ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
+            }
+            resourceService.saveOrUpdate(urlPojo);
+            
+            // 保存音源来源
+            if (source.getOrigin() != null && StringUtils.isNotBlank(source.getOrigin().getOrigin())) {
+                TbOriginPojo origin = source.getOrigin();
+                origin.setMusicId(musicPojo.getId());
+                origin.setResourceId(urlPojo.getId());
+                originService.save(origin);
+            }
+            
+            resourceList.add(urlPojo);
         }
-        // 检测是否重复上传相同的MD5音乐文件
-        if (urlPojo.getId() == null) {
-            TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, urlPojo.getMd5()));
-            ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
-        }
-        resourceService.saveOrUpdate(urlPojo);
-        return urlPojo;
+        return resourceList;
     }
     
     public List<TbLyricPojo> getMusicLyric(Long musicId) {
@@ -772,10 +776,12 @@ public class MusicFlowApi {
     public MusicDetails saveMusicInfo(AudioInfoReq dto) {
         // 处理名字繁简转移
         nameHandler(dto);
-        // 检测是读取本地缓存文件， 并且是本地地址
-        if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(dto.getMusicTemp(), "http")) {
-            // 检查文件目录是否合法
-            LocalFileUtil.checkFilePath(requestConfig.getTempPath(), dto.getMusicTemp());
+        for (AudioInfoReq.AudioSource audioSource : dto.getSources()) {
+            // 检测是读取本地缓存文件， 并且是本地地址
+            if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(audioSource.getPathTemp(), "http")) {
+                // 检查文件目录是否合法
+                LocalFileUtil.checkFilePath(requestConfig.getTempPath(), audioSource.getPathTemp());
+            }
         }
         // 保存专辑歌手中间表
         List<TbArtistPojo> albumArtist = saveAndReturnMusicAndSingList(dto);
@@ -791,9 +797,8 @@ public class MusicFlowApi {
         // 保存歌词
         List<TbLyricPojo> lyricPojoList = saveLyric(dto, musicPojo);
         // 上传文件
-        TbResourcePojo resourcePojo = uploadFile(dto, musicPojo);
-        saveOriginTable(dto, musicPojo, resourcePojo);
-    
+        List<TbResourcePojo> resourcePojo = uploadFile(dto, musicPojo);
+        
         MusicDetails musicDetails = new MusicDetails();
         musicDetails.setMusic(musicPojo);
         musicDetails.setResource(resourcePojo);
@@ -801,15 +806,6 @@ public class MusicFlowApi {
         musicDetails.setSinger(albumArtist);
         musicDetails.setLyrics(lyricPojoList);
         return musicDetails;
-    }
-    
-    private void saveOriginTable(AudioInfoReq dto, TbMusicPojo musicPojo, TbResourcePojo resourcePojo) {
-        if (dto.getOrigin() != null && StringUtils.isNotBlank(dto.getOrigin().getOrigin())) {
-            TbOriginPojo origin = dto.getOrigin();
-            origin.setMusicId(musicPojo.getId());
-            origin.setResourceId(resourcePojo.getId());
-            originService.save(origin);
-        }
     }
     
     private void saveAlbumTagAndPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
@@ -825,19 +821,19 @@ public class MusicFlowApi {
     }
     
     private void saveAlbumGenre(AudioInfoReq dto, TbAlbumPojo albumPojo) {
-        qukuService.addAlbumGenreLabel(albumPojo.getId(), dto.getAlbum().getTags());
+        qukuService.addAlbumGenreLabel(albumPojo.getId(), dto.getAlbum().getGenre());
     }
     
     private void nameHandler(AudioInfoReq dto) {
         NameType music = defaultInfo.getName().getMusic();
         switch (music) {
             case CN:
-                dto.setMusicName(ZhConverterUtil.toSimple(dto.getMusicName()));
-                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toSimple).toList());
+                dto.getMusic().setMusicName(ZhConverterUtil.toSimple(dto.getMusic().getMusicName()));
+                dto.getMusic().setAliaName(dto.getMusic().getAliaName().parallelStream().map(ZhConverterUtil::toSimple).toList());
                 break;
             case TC:
-                dto.setMusicName(ZhConverterUtil.toTraditional(dto.getMusicName()));
-                dto.setAliaName(dto.getAliaName().parallelStream().map(ZhConverterUtil::toTraditional).toList());
+                dto.getMusic().setMusicName(ZhConverterUtil.toTraditional(dto.getMusic().getMusicName()));
+                dto.getMusic().setAliaName(dto.getMusic().getAliaName().parallelStream().map(ZhConverterUtil::toTraditional).toList());
                 break;
             case DEFAULT:
             default:
@@ -884,14 +880,14 @@ public class MusicFlowApi {
     public MusicInfoRes getMusicInfo(Long id) {
         // 音乐
         TbMusicPojo byId = musicService.getById(id);
-        List<TbTagPojo> labelMusic = qukuService.getLabelMusic(byId.getId());
+        List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId());
         List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId());
         // 专辑艺术家
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
         // 歌曲艺术家
         List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
         // 专辑
-        TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new AlbumInfoReq());
+        TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new AudioInfoReq.AudioAlbum());
     
         MusicInfoRes musicInfoRes = new MusicInfoRes();
         musicInfoRes.setMusicTag(labelMusic.parallelStream().map(TbTagPojo::getTagName).toList());

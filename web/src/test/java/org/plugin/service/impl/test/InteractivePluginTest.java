@@ -12,7 +12,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.converter.PluginLabelValue;
@@ -20,6 +19,7 @@ import org.plugin.service.impl.PluginPackage;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class InteractivePluginTest implements ComboSearchPlugin {
@@ -148,18 +148,28 @@ public class InteractivePluginTest implements ComboSearchPlugin {
         for (PluginLabelValue datum : data) {
             pluginPackage.logInfo(datum.getKey(), datum.getValue());
             JSONObject jsonObject = JSON.parseObject(datum.getValue());
-    
+            
             AudioInfoReq dto = new AudioInfoReq();
-            dto.setMusicName(jsonObject.getObject("title", String.class));
-            ArrayList<ArtistInfoReq> artists = new ArrayList<>();
-            ArtistInfoReq artistReq = new ArtistInfoReq();
+            
+            AudioInfoReq.AudioMusic music = new AudioInfoReq.AudioMusic();
+            music.setMusicName(jsonObject.getObject("title", String.class));
+            music.setLyric(jsonObject.getObject("lrc", String.class));
+            String pic = jsonObject.getObject("pic", String.class);
+            music.setPic(pic);
+            dto.setMusic(music);
+            
+            ArrayList<AudioInfoReq.AudioArtist> artists = new ArrayList<>();
+            AudioInfoReq.AudioArtist artistReq = new AudioInfoReq.AudioArtist();
             artistReq.setArtistName(jsonObject.getObject("author", String.class));
             artists.add(artistReq);
             dto.setArtists(artists);
-            dto.setLyric(jsonObject.getObject("lrc", String.class));
-            String pic = jsonObject.getObject("pic", String.class);
-            dto.setPic(pic);
-            dto.setMusicTemp(jsonObject.getObject("url", String.class));
+            
+            
+            LinkedList<AudioInfoReq.AudioSource> sources = new LinkedList<>();
+            AudioInfoReq.AudioSource e1 = new AudioInfoReq.AudioSource();
+            e1.setPathTemp(jsonObject.getObject("url", String.class));
+            sources.add(e1);
+            dto.setSources(sources);
             dto.setUploadFlag(false);
             try {
                 pluginPackage.saveMusic(dto);

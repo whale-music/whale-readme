@@ -98,7 +98,7 @@ save-config:
   # 账户(必须)
   access-key: admin
   # 密码(必须)
-  secret-key: h5hbCTzY
+  secret-key: LLq9quPO
 
 jwt-config:
   seed-key: ad419e9df4fe41ea1c20bee247a28dce6df8c7cd84c642qw3de5b37bf3e5ec5c
@@ -153,3 +153,7 @@ default-info:
 
 enable:
   debug: true
+#  web:
+#    admin: true
+#    neteasecloudmusic: true
+#    subsonic: false

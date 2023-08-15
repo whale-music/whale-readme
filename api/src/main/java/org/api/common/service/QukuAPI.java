@@ -154,16 +154,23 @@ public class QukuAPI extends QukuServiceImpl {
     @Override
     public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
         if (StringUtils.isBlank(pojo.getUrl())) {
-            throw new BaseException(ResultCode.PARAM_IS_INVALID);
+            return;
         }
         OSSService ossService = OSSFactory.ossFactory(config);
         // 下载封面, 保存文件名为md5
-        String randomName = System.currentTimeMillis() + "" + RandomUtils.nextLong();
+        String randomName = System.currentTimeMillis() + String.valueOf(RandomUtils.nextLong());
         String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName;
         String md5Hex;
         String upload;
         File rename = null;
-        File fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), FileUtil.touch(dirPath), httpRequestConfig.getTimeout());
+        File fileFromUrl;
+        File touch = FileUtil.touch(dirPath);
+        if (HttpUtil.isHttp(pojo.getUrl()) || HttpUtil.isHttps(pojo.getUrl())) {
+            fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), touch, httpRequestConfig.getTimeout());
+        } else {
+            byte[] bytes = Base64.getEncoder().encode(pojo.getUrl().getBytes());
+            fileFromUrl = FileUtil.writeBytes(bytes, touch);
+        }
         try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
             rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);

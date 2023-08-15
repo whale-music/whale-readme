@@ -9,8 +9,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.admin.model.req.upload.AlbumInfoReq;
-import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.api.neteasecloudmusic.service.CollectApi;
@@ -101,13 +99,13 @@ class TestSaveMusicList {
         AudioInfoReq dto = new AudioInfoReq();
         // 测试时使用用户ID
         dto.setUserId(userId);
-    
+        
         // 专辑
-        AlbumInfoReq album = new AlbumInfoReq();
+        AudioInfoReq.AudioAlbum album = new AudioInfoReq.AudioAlbum();
         JSONObject albumMap = MapUtil.get(song, "al", JSONObject.class);
         Map<String, Object> albumDto = RequestMusic163.getAlbumDto(MapUtil.getInt(albumMap, "id"), cookie);
         album.setAlbumName(MapUtil.get(albumDto, "name", String.class));
-    
+        
         String blurPicUrl = MapUtil.getStr(albumDto, "blurPicUrl");
         album.setPic(blurPicUrl);
         album.setSubType(MapUtil.getStr(albumDto, "subType"));
@@ -118,19 +116,21 @@ class TestSaveMusicList {
         }
         album.setDescription(MapUtil.getStr(albumDto, "description"));
         dto.setAlbum(album);
-    
-        dto.setMusicName(MapUtil.getStr(song, "name"));
+        
+        AudioInfoReq.AudioMusic music = new AudioInfoReq.AudioMusic();
+        music.setMusicName(MapUtil.getStr(song, "name"));
         JSONArray alia = MapUtil.get(song, "alias", JSONArray.class, new JSONArray());
-        dto.setAliaName(alia.toList(String.class));
-        dto.setTimeLength(MapUtil.getInt(song, "dt"));
-        dto.setPic(blurPicUrl);
+        music.setAliaName(alia.toList(String.class));
+        music.setTimeLength(MapUtil.getInt(song, "dt"));
+        music.setPic(blurPicUrl);
+        dto.setMusic(music);
         
         // 歌手
-        ArrayList<ArtistInfoReq> singer = new ArrayList<>();
+        ArrayList<AudioInfoReq.AudioArtist> singer = new ArrayList<>();
         JSONArray ar = MapUtil.get(song, "ar", JSONArray.class);
         for (Object arItem : ar) {
             JSONObject arItemMap = (JSONObject) arItem;
-            ArtistInfoReq artistPojo = new ArtistInfoReq();
+            AudioInfoReq.AudioArtist artistPojo = new AudioInfoReq.AudioArtist();
             Map<String, Object> data = new HashMap<>();
             Long id = MapUtil.getLong(arItemMap, "id");
             if (id != null && id != 0) {
@@ -148,7 +148,7 @@ class TestSaveMusicList {
             alias.addAll(transNames2.stream().map(String::valueOf).toList());
             artistPojo.setAliasName(CollUtil.join(alias, ","));
             // 歌手封面
-            artistPojo.setPicUrl(MapUtil.getStr(artist, "avatar"));
+            artistPojo.setPic(MapUtil.getStr(artist, "avatar"));
             // 歌手描述
             artistPojo.setIntroduction(MapUtil.getStr(artist, "briefDesc"));
             Long birthday = MapUtil.getLong(user, "birthday");
@@ -173,35 +173,41 @@ class TestSaveMusicList {
         // 歌词
         Map<String, String> lyricMap = RequestMusic163.getLyric(musicId, cookie);
         // 歌词
-        dto.setLyric(MapUtil.getStr(lyricMap, "lrc"));
+        music.setLyric(MapUtil.getStr(lyricMap, "lrc"));
         // 逐字歌词
-        dto.setKLyric(MapUtil.getStr(lyricMap, "klyric"));
+        music.setKLyric(MapUtil.getStr(lyricMap, "klyric"));
         dto.setArtists(singer);
-        TbOriginPojo origin = new TbOriginPojo();
-        origin.setMusicId(musicId);
-        origin.setOriginUrl("https://music.163.com/#/song?id=" + musicId);
-        origin.setOrigin("163Music");
-        dto.setOrigin(origin);
         // 获取歌曲md5值
         Map<String, Object> musicUrlMap = songUrlMap.get(musicId);
         String url = MapUtil.getStr(musicUrlMap, "url");
         dto.setUploadFlag(true);
+        
+        LinkedList<AudioInfoReq.AudioSource> sources = new LinkedList<>();
         if (musicUrlMap != null && StringUtils.isNotBlank(url)) {
-            dto.setRate(MapUtil.getInt(musicUrlMap, "br"));
+            AudioInfoReq.AudioSource e = new AudioInfoReq.AudioSource();
+            e.setRate(MapUtil.getInt(musicUrlMap, "br"));
             String md5 = MapUtil.getStr(musicUrlMap, "md5");
             String type = MapUtil.getStr(musicUrlMap, "type");
-            dto.setType(type);
-            dto.setMd5(md5);
-            dto.setLevel(MapUtil.getStr(musicUrlMap, "level"));
+            e.setEncodeType(type);
+            e.setMd5(md5);
+            e.setLevel(MapUtil.getStr(musicUrlMap, "level"));
             // 上传md5值，或音乐文件
-            dto.setMusicTemp(dto.getUploadFlag() ? md5 + "." + type : MapUtil.getStr(musicUrlMap, "url"));
-            dto.setSize(MapUtil.getLong(musicUrlMap, "size"));
+            e.setPathTemp(dto.getUploadFlag() ? md5 + "." + type : MapUtil.getStr(musicUrlMap, "url"));
+            e.setSize(MapUtil.getLong(musicUrlMap, "size"));
+            
+            TbOriginPojo origin = new TbOriginPojo();
+            origin.setMusicId(musicId);
+            origin.setOriginUrl("https://music.163.com/#/song?id=" + musicId);
+            origin.setOrigin("163Music");
+            e.setOrigin(origin);
+            sources.add(e);
         }
+        dto.setSources(sources);
         // true: 只存储到数据库，不上传
         // false: 读取本地数据或网络数据上传到数据库
         try {
             MusicDetails musicDetails = musicFlowApi.saveMusicInfo(dto);
-            log.info("上传成功{}:{}", musicId, dto.getMusicName());
+            log.info("上传成功{}:{}", musicId, dto.getMusic().getMusicName());
             return musicDetails;
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
@@ -232,11 +238,11 @@ class TestSaveMusicList {
             tbMusicPojo.setMusic(Optional.ofNullable(tbMusicPojo.getMusic()).orElse(new TbMusicPojo()));
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
-            tbMusicPojo.setResource(Optional.ofNullable(tbMusicPojo.getResource()).orElse(new TbResourcePojo()));
+            tbMusicPojo.setResource(Optional.ofNullable(tbMusicPojo.getResource()).orElse(new ArrayList<>()));
             
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
-            log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getResource().getPath(), tbMusicPojo.getResource().getId());
+            log.info("添加音乐下载地址：{}\t", Arrays.toString(tbMusicPojo.getResource().toArray()));
             for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
                 log.info("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }
@@ -269,11 +275,11 @@ class TestSaveMusicList {
             tbMusicPojo.setMusic(Optional.ofNullable(tbMusicPojo.getMusic()).orElse(new TbMusicPojo()));
             tbMusicPojo.setAlbum(Optional.ofNullable(tbMusicPojo.getAlbum()).orElse(new TbAlbumPojo()));
             tbMusicPojo.setSinger(Optional.ofNullable(tbMusicPojo.getSinger()).orElse(new ArrayList<>()));
-            tbMusicPojo.setResource(Optional.ofNullable(tbMusicPojo.getResource()).orElse(new TbResourcePojo()));
-    
+            tbMusicPojo.setResource(Optional.ofNullable(tbMusicPojo.getResource()).orElse(new ArrayList<>()));
+            
             log.info("添加音乐：{}\tID:{}", tbMusicPojo.getMusic().getMusicName(), tbMusicPojo.getMusic().getId());
             log.info("添加专辑：{}\tID:{}", tbMusicPojo.getAlbum().getAlbumName(), tbMusicPojo.getAlbum().getId());
-            log.info("添加音乐下载地址：{}\tID:{}", tbMusicPojo.getResource().getPath(), tbMusicPojo.getResource().getId());
+            log.info("添加音乐下载地址：{}\t", Arrays.toString(tbMusicPojo.getResource().toArray()));
             for (TbArtistPojo tbArtistPojo : tbMusicPojo.getSinger()) {
                 log.info("添加歌手：{}\tID:{}", tbArtistPojo.getArtistName(), tbArtistPojo.getId());
             }

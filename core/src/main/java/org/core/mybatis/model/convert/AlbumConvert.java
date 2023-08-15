@@ -1,5 +1,6 @@
 package org.core.mybatis.model.convert;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,5 +12,6 @@ import org.core.mybatis.pojo.TbAlbumPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AlbumConvert extends TbAlbumPojo {
-    String picUrl;
+    @ApiModelProperty("封面地址")
+    private String picUrl;
 }

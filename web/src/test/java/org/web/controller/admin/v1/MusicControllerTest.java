@@ -7,8 +7,6 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
-import org.api.admin.model.req.upload.AlbumInfoReq;
-import org.api.admin.model.req.upload.ArtistInfoReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.AlbumApi;
 import org.api.admin.service.ArtistApi;
@@ -216,46 +214,43 @@ class MusicControllerTest {
         
         Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
         AudioInfoReq dto = new AudioInfoReq();
-        dto.setMusicName(faker.name().name());
-        dto.setAliaName(Arrays.asList(faker.name().name(), faker.name().name()));
-        dto.setPic(musicImg);
-        dto.setType(faker.beer().style());
-        dto.setTimeLength(1000000);
+        dto.setMusic(new AudioInfoReq.AudioMusic());
+        AudioInfoReq.AudioMusic music1 = dto.getMusic();
+        music1.setMusicName(faker.name().name());
+        music1.setAliaName(Arrays.asList(faker.name().name(), faker.name().name()));
+        music1.setPic(musicImg);
+        music1.setTimeLength(1000000);
         
-        ArrayList<ArtistInfoReq> artists = new ArrayList<>();
+        ArrayList<AudioInfoReq.AudioArtist> artists = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            ArtistInfoReq e = new ArtistInfoReq();
+            AudioInfoReq.AudioArtist e = new AudioInfoReq.AudioArtist();
             e.setSex(RandomUtils.nextBoolean() ? "男" : "女");
             e.setBirth(faker.date().birthday().toLocalDateTime().toLocalDate());
             e.setLocation(faker.address().cityName());
             e.setAliasName(faker.artist().name());
             e.setArtistName(faker.artist().name());
             e.setIntroduction(faker.text().text());
-            e.setPicUrl(artistImg);
+            e.setPic(artistImg);
             artists.add(e);
         }
         dto.setArtists(artists);
         
-        AlbumInfoReq album = new AlbumInfoReq();
+        AudioInfoReq.AudioAlbum album = new AudioInfoReq.AudioAlbum();
         album.setPic(albumImg);
         album.setAlbumName(faker.name().name());
         album.setCompany(faker.company().name());
         album.setPublishTime(faker.date().birthday().toLocalDateTime());
         album.setDescription(faker.text().text());
-        ArrayList<String> tags = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            tags.add(faker.beer().name());
-        }
-        album.setTags(tags);
+        album.setGenre(faker.beer().name());
         dto.setAlbum(album);
         
         dto.setUploadFlag(true);
         dto.setUserId(user.getId());
         MusicDetails data = uploadMusic.saveMusicInfo(dto);
         TbMusicPojo music = data.getMusic();
-        Assertions.assertEquals(music.getMusicName(), dto.getMusicName());
-        Assertions.assertEquals(music.getAliasName(), CollUtil.join(dto.getAliaName(), ","));
-        Assertions.assertEquals(music.getTimeLength(), dto.getTimeLength());
+        Assertions.assertEquals(music.getMusicName(), dto.getMusic().getMusicName());
+        Assertions.assertEquals(music.getAliasName(), CollUtil.join(dto.getMusic().getAliaName(), ","));
+        Assertions.assertEquals(music.getTimeLength(), dto.getMusic().getTimeLength());
         
         TbAlbumPojo album1 = data.getAlbum();
         Assertions.assertEquals(album1.getAlbumName(), dto.getAlbum().getAlbumName());
@@ -264,14 +259,14 @@ class MusicControllerTest {
         Assertions.assertEquals(album1.getSubType(), dto.getAlbum().getSubType());
         
         List<TbArtistPojo> singer = data.getSinger();
-        List<ArtistInfoReq> artists1 = dto.getArtists();
+        List<AudioInfoReq.AudioArtist> artists1 = dto.getArtists();
         for (TbArtistPojo tbArtistPojo : singer) {
             boolean aliasNameFlag = false;
             boolean artistNameFlag = false;
             boolean introductionFlag = false;
             boolean locationFlag = false;
             boolean sexFlag = false;
-            for (ArtistInfoReq artistReq : artists1) {
+            for (AudioInfoReq.AudioArtist artistReq : artists1) {
                 if (StringUtils.equals(artistReq.getAliasName(), tbArtistPojo.getAliasName())) {
                     aliasNameFlag = true;
                 }

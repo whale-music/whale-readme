@@ -13,5 +13,5 @@ import org.core.mybatis.pojo.TbArtistPojo;
 @NoArgsConstructor
 public class ArtistConvert extends TbArtistPojo {
     @ApiModelProperty("封面地址")
-    String picUrl;
+    private String picUrl;
 }

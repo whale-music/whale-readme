@@ -21,6 +21,7 @@
         <module>api</module>
         <module>oss</module>
         <module>plugin</module>
+        <module>starter</module>
     </modules>
 
     <properties>
@@ -64,12 +65,6 @@
         <!--    <groupId>org.springframework.boot</groupId>-->
         <!--    <artifactId>spring-boot-starter-actuator</artifactId>-->
         <!--</dependency>-->
-
-        <!--springboot 权限认证-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
 
         <!--模拟数据-->
         <dependency>

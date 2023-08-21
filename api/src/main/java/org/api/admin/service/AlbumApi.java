@@ -191,7 +191,7 @@ public class AlbumApi {
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
         
         AlbumInfoRes albumRes = new AlbumInfoRes();
-        albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).findFirst().orElse(""));
+        albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).filter(StringUtils::isNotBlank).findFirst().orElse(""));
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);

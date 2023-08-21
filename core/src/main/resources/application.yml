@@ -91,9 +91,10 @@ save-config:
   assign-object-save: 0
   img-save:
     - /test/img
-    - /img
+  #    - /img
   assign-img-save: 0
-  # 请求地址(必须) 除非debug, 否则不要填写localhost and 127.0.0.1
+  # 请求地址(必须)
+  # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
   host: http://localhost:5244
   # 账户(必须)
   access-key: admin
@@ -150,10 +151,11 @@ default-info:
     # 用户默认背景
     user-background-pic: https://fakeimg.pl/350x200/c0392b/fff?retina=1&font=noto&text=用户默认背景
 
-
-enable:
-  debug: true
-#  web:
-#    admin: true
-#    neteasecloudmusic: true
-#    subsonic: false
+application:
+  config:
+    plugin: false
+    log: true
+  enable:
+    admin-spring-boot-application: true
+    netease-cloud-music-spring-boot-application: false
+    subsonic-spring-boot-application: false

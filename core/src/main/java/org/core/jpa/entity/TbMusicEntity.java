@@ -43,21 +43,21 @@ public class TbMusicEntity implements Serializable {
     @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
+    @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbCollectMusicEntity> tbCollectMusicsById;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
+    @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbLyricEntity> tbLyricsById;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "album_id", referencedColumnName = "id", insertable = false, updatable = false)
     private TbAlbumEntity tbAlbumByAlbumId;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
+    @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbMusicArtistEntity> tbMusicArtistsById;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
+    @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbOriginEntity> tbOriginsById;
-    @OneToMany(mappedBy = "tbMusicByMusicId")
+    @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbResourceEntity> tbResourcesById;
     
     public Long getId() {

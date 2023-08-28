@@ -23,6 +23,9 @@ public class TbTagEntity implements Serializable {
     @Column(name = "tag_name", nullable = true, length = 128)
     private String tagName;
     @Basic
+    @Column(name = "count", nullable = true)
+    private Integer count;
+    @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
     @Basic
@@ -45,6 +48,14 @@ public class TbTagEntity implements Serializable {
     
     public void setTagName(String tagName) {
         this.tagName = tagName;
+    }
+    
+    public Integer getCount() {
+        return count;
+    }
+    
+    public void setCount(Integer count) {
+        this.count = count;
     }
     
     public Timestamp getCreateTime() {

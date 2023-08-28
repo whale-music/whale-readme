@@ -47,7 +47,7 @@ public class TbAlbumEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
-    @OneToMany(mappedBy = "tbAlbumByAlbumId")
+    @OneToMany(mappedBy = "tbAlbumByAlbumId", fetch = FetchType.EAGER)
     private Collection<TbAlbumArtistEntity> tbAlbumArtistsById;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
     private Collection<TbMusicEntity> tbMusicsById;

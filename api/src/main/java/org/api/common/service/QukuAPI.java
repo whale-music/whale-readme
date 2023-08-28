@@ -80,9 +80,10 @@ public class QukuAPI extends QukuServiceImpl {
      */
     @Override
     public Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type) {
-        Map<Long, String> picUrl = super.getPicUrl(middleIds, type);
+        Map<Long, String> picUrl = super.getPicPath(middleIds, type);
         return getPicUrlList(picUrl, false);
     }
+    
     
     /**
      * 保存或更新封面
@@ -92,7 +93,7 @@ public class QukuAPI extends QukuServiceImpl {
      * @param file 封面数据
      */
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdatePic(Long id, Byte type, File file) {
+    public void saveOrUpdatePicFile(Long id, Byte type, File file) {
         OSSService ossService = OSSFactory.ossFactory(config);
         String md5Hex;
         String upload;
@@ -114,33 +115,33 @@ public class QukuAPI extends QukuServiceImpl {
         }
         TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
-        pojo.setUrl(upload);
+        pojo.setPath(upload);
         super.saveOrUpdatePic(id, type, pojo);
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateAlbumPic(Long id, File file) {
-        this.saveOrUpdatePic(id, PicTypeConstant.ALBUM, file);
+    public void saveOrUpdateAlbumPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.ALBUM, file);
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateArtistPic(Long id, File file) {
-        this.saveOrUpdatePic(id, PicTypeConstant.ARTIST, file);
+    public void saveOrUpdateArtistPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.ARTIST, file);
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateMusicPic(Long id, File file) {
-        this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, file);
+    public void saveOrUpdateMusicPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.MUSIC, file);
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateAvatarPic(Long id, File file) {
-        this.saveOrUpdatePic(id, PicTypeConstant.USER_AVATAR, file);
+    public void saveOrUpdateAvatarPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.USER_AVATAR, file);
     }
     
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateBackgroundPic(Long id, File file) {
-        this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, file);
+    public void saveOrUpdateBackgroundPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.USER_BACKGROUND, file);
     }
     
     /**
@@ -148,12 +149,12 @@ public class QukuAPI extends QukuServiceImpl {
      *
      * @param id   添加封面关联ID,
      * @param type 添加ID类型 歌曲，专辑，歌单，歌手
-     * @param pojo 封面数据
+     * @param url  封面数据
      */
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo) {
-        if (StringUtils.isBlank(pojo.getUrl())) {
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdatePicUrl(Long id, Byte type, String url) {
+        if (StringUtils.isBlank(url)) {
             return;
         }
         OSSService ossService = OSSFactory.ossFactory(config);
@@ -165,10 +166,10 @@ public class QukuAPI extends QukuServiceImpl {
         File rename = null;
         File fileFromUrl;
         File touch = FileUtil.touch(dirPath);
-        if (HttpUtil.isHttp(pojo.getUrl()) || HttpUtil.isHttps(pojo.getUrl())) {
-            fileFromUrl = HttpUtil.downloadFileFromUrl(pojo.getUrl(), touch, httpRequestConfig.getTimeout());
+        if (HttpUtil.isHttp(url) || HttpUtil.isHttps(url)) {
+            fileFromUrl = HttpUtil.downloadFileFromUrl(url, touch, httpRequestConfig.getTimeout());
         } else {
-            byte[] bytes = Base64.getEncoder().encode(pojo.getUrl().getBytes());
+            byte[] bytes = Base64.getDecoder().decode(url.getBytes());
             fileFromUrl = FileUtil.writeBytes(bytes, touch);
         }
         try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
@@ -187,8 +188,9 @@ public class QukuAPI extends QukuServiceImpl {
                 FileUtil.del(rename);
             }
         }
+        TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
-        pojo.setUrl(upload);
+        pojo.setPath(upload);
         super.saveOrUpdatePic(id, type, pojo);
     }
     
@@ -245,13 +247,13 @@ public class QukuAPI extends QukuServiceImpl {
         }
     }
     
-    public String getPicUrl(String path, boolean refresh) {
+    public String getOSSPicPath(String path, boolean refresh) {
         return StringUtils.startsWithIgnoreCase("http", path) ? path : getAddresses(refresh, path);
     }
     
-    public List<TbPicPojo> getPicList(List<TbPicPojo> picPojoList, boolean refresh) {
+    public List<TbPicPojo> getOSSPicList(List<TbPicPojo> picPojoList, boolean refresh) {
         for (TbPicPojo tbPicPojo : picPojoList) {
-            tbPicPojo.setUrl(getAddresses(refresh, tbPicPojo.getUrl()));
+            tbPicPojo.setPath(getAddresses(refresh, tbPicPojo.getPath()));
         }
         return picPojoList;
     }

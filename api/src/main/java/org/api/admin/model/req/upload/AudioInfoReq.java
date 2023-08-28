@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbOriginPojo;
@@ -49,8 +50,14 @@ public class AudioInfoReq {
         @ApiModelProperty("音乐别名")
         private List<String> aliaName;
         
+        @ApiModelProperty("音乐流派, 逗号分割(英文)")
+        private String musicGenre;
+        
+        @ApiModelProperty("音乐tag, 逗号分割(英文)")
+        private String tags;
+        
         @ApiModelProperty("音乐封面, 可以是http地址或base64")
-        private String pic;
+        private PicConvert pic;
         
         @ApiModelProperty("音乐歌词")
         private String lyric;
@@ -73,14 +80,14 @@ public class AudioInfoReq {
         private String genre;
         
         @ApiModelProperty("专辑封面, 可以是http地址或base64")
-        private String pic;
+        private PicConvert pic;
     }
     
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class AudioArtist extends TbArtistPojo {
         @ApiModelProperty("艺术家封面, 可以是http地址或base64")
-        private String pic;
+        private PicConvert pic;
     }
     
     @Data

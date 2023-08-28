@@ -10,6 +10,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -278,7 +279,7 @@ public interface QukuService {
      * @param ids    歌单，音乐，专辑
      * @return tag列表
      */
-    List<TbTagPojo> getLabel(Byte target, Collection<Long> ids);
+    Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids);
     
     /**
      * 获取tag Map
@@ -295,7 +296,7 @@ public interface QukuService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusicTag(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
     }
     
@@ -315,7 +316,7 @@ public interface QukuService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusicTag(Long ids) {
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Long ids) {
         return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
     }
     
@@ -325,7 +326,7 @@ public interface QukuService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusicGenre(Long ids) {
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Long ids) {
         return getLabel(TargetTagConstant.TARGET_GENRE, Collections.singletonList(ids));
     }
     
@@ -335,7 +336,7 @@ public interface QukuService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelMusicGenre(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_GENRE, ids);
     }
     
@@ -355,7 +356,7 @@ public interface QukuService {
      * @param ids 专辑ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelAlbumGenre(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getLabelAlbumGenre(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, ids);
     }
     
@@ -365,7 +366,7 @@ public interface QukuService {
      * @param id 专辑ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelAlbumGenre(Long id) {
+    default Map<Long, List<TbTagPojo>> getLabelAlbumGenre(Long id) {
         return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id));
     }
     
@@ -375,7 +376,7 @@ public interface QukuService {
      * @param ids 歌单ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelCollectTag(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Collection<Long> ids) {
         return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, ids);
     }
     
@@ -385,7 +386,7 @@ public interface QukuService {
      * @param ids 歌单ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelCollectTag(Long ids) {
+    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Long ids) {
         return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(ids));
     }
     
@@ -406,7 +407,7 @@ public interface QukuService {
      * @param label  标签名
      */
     default void addLabel(Byte target, Long id, String label) {
-        addLabel(target, id, List.of(label));
+        addLabel(target, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
     }
     
     /**
@@ -500,11 +501,11 @@ public interface QukuService {
         this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
     }
     
-    default void addMusicLabel(Long id, String label) {
+    default void addMusicLabelTag(Long id, String label) {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
     }
     
-    default void addMusicLabel(Long id, List<String> labels) {
+    default void addMusicLabelTag(Long id, List<String> labels) {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
     }
     
@@ -513,10 +514,10 @@ public interface QukuService {
     }
     
     default void addAlbumGenreLabel(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, Collections.singletonList(label));
+        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
     }
     
-    default void addMusicLabel(Long id, Long labelId) {
+    default void addMusicLabelTag(Long id, Long labelId) {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labelId);
     }
     
@@ -581,9 +582,222 @@ public interface QukuService {
      * @param type 关联ID类型
      * @return 封面地址
      */
-    default String getPicUrl(Long id, Byte type) {
-        Map<Long, String> picUrl = getPicUrl(Collections.singletonList(id), type);
+    default String getPicPath(Long id, Byte type) {
+        Map<Long, String> picUrl = getPicPath(Collections.singletonList(id), type);
         return MapUtil.get(picUrl, id, String.class);
+    }
+    
+    /**
+     * 获取歌音乐封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getMusicPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.MUSIC);
+    }
+    
+    /**
+     * 获取歌单封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getCollectPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.PLAYLIST);
+    }
+    
+    /**
+     * 获取专辑封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getAlbumPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.ALBUM);
+    }
+    
+    /**
+     * 获取歌手封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getArtistPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 获取用户头像封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getUserAvatarPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.USER_AVATAR);
+    }
+    
+    /**
+     * 获取用户背景封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getUserBackgroundPicPath(Long ids) {
+        return this.getPicPath(ids, PicTypeConstant.USER_BACKGROUND);
+    }
+    
+    /**
+     * 获取歌音乐封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getMusicPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.MUSIC);
+    }
+    
+    /**
+     * 获取歌单封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getCollectPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.PLAYLIST);
+    }
+    
+    /**
+     * 获取专辑封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getAlbumPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.ALBUM);
+    }
+    
+    /**
+     * 获取歌手封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getArtistPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 获取封面地址
+     *
+     * @param ids  封面关联ID
+     * @param type 关联ID类型
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    Map<Long, String> getPicPath(Collection<Long> ids, Byte type);
+    
+    
+    /**
+     * 获取用户头像封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getUserAvatarPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.USER_AVATAR);
+    }
+    
+    /**
+     * 获取用户背景封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getUserBackgroundPicPath(Collection<Long> ids) {
+        return this.getPicPath(ids, PicTypeConstant.USER_BACKGROUND);
+    }
+    
+    /**
+     * 保存封面
+     *
+     * @param id   添加封面关联ID,
+     * @param type 添加ID类型 歌曲，专辑，歌单，歌手
+     * @param pojo 封面数据
+     */
+    void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo);
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateAlbumPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.ALBUM, pojo);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateArtistPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.ARTIST, pojo);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateMusicPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, pojo);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateAvatarPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_AVATAR, pojo);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateBackgroundPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, pojo);
+    }
+    
+    /**
+     * 用户继承类实现, 从地址或base64保存数据到数据库
+     *
+     * @param id   封面ID
+     * @param type 封面类型
+     * @param url  地址或base64
+     */
+    default void saveOrUpdatePicUrl(Long id, Byte type, String url) {
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateMusicPicUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.MUSIC, url);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateAlbumPicUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.ALBUM, url);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateArtistPicUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.ARTIST, url);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateCollectPicUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.PLAYLIST, url);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateUserAvatarUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.USER_AVATAR, url);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateUserBackgroundUrl(Long id, String url) {
+        this.saveOrUpdatePicUrl(id, PicTypeConstant.USER_BACKGROUND, url);
+    }
+    
+    
+    default Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type) {
+        return Collections.emptyMap();
+    }
+    
+    default String getPicUrl(Long id, Byte type) {
+        return this.getPicUrl(Collections.singletonList(id), type).get(id);
     }
     
     /**
@@ -647,15 +861,6 @@ public interface QukuService {
     }
     
     /**
-     * 获取封面地址
-     *
-     * @param ids  封面关联ID
-     * @param type 关联ID类型
-     * @return 封面地址map long -> 关联ID, String -> 封面地址
-     */
-    Map<Long, String> getPicUrl(Collection<Long> ids, Byte type);
-    
-    /**
      * 获取歌音乐封面地址
      *
      * @param ids 封面关联ID
@@ -695,76 +900,6 @@ public interface QukuService {
         return this.getPicUrl(ids, PicTypeConstant.ARTIST);
     }
     
-    /**
-     * 获取用户头像封面地址
-     *
-     * @param ids 封面关联ID
-     * @return 封面地址map long -> 关联ID, String -> 封面地址
-     */
-    default Map<Long, String> getUserAvatarPicUrl(Collection<Long> ids) {
-        return this.getPicUrl(ids, PicTypeConstant.USER_AVATAR);
-    }
-    
-    /**
-     * 获取用户背景封面地址
-     *
-     * @param ids 封面关联ID
-     * @return 封面地址map long -> 关联ID, String -> 封面地址
-     */
-    default Map<Long, String> getUserBackgroundPicUrl(Collection<Long> ids) {
-        return this.getPicUrl(ids, PicTypeConstant.USER_BACKGROUND);
-    }
-    
-    /**
-     * 保存封面
-     *
-     * @param id   添加封面关联ID,
-     * @param type 添加ID类型 歌曲，专辑，歌单，歌手
-     * @param pojo 封面数据
-     */
-    void saveOrUpdatePic(Long id, Byte type, TbPicPojo pojo);
-    
-    default void saveOrUpdatePic(Long id, Byte type, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, type, pojo);
-    }
-    
-    default void saveOrUpdateMusicPic(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.MUSIC, pojo);
-    }
-    
-    default void saveOrUpdateAlbumPic(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.ALBUM, pojo);
-    }
-    
-    default void saveOrUpdateArtistPic(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.ARTIST, pojo);
-    }
-    
-    default void saveOrUpdateCollectPic(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.PLAYLIST, pojo);
-    }
-    
-    default void saveOrUpdateUserAvatar(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.USER_AVATAR, pojo);
-    }
-    
-    default void saveOrUpdateUserBackground(Long id, String url) {
-        TbPicPojo pojo = new TbPicPojo();
-        pojo.setUrl(url);
-        this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, pojo);
-    }
     
     /**
      * 删除封面数据, 包括文件和数据库

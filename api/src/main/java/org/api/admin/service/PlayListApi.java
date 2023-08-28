@@ -425,7 +425,7 @@ public class PlayListApi {
     
     public CollectInfoRes getPlayListInfo(Long id) {
         TbCollectPojo byId = collectService.getById(id);
-        List<TbTagPojo> labelCollectTag = qukuService.getLabelCollectTag(id);
+        List<TbTagPojo> labelCollectTag = qukuService.getLabelCollectTag(id).get(id);
         CollectInfoRes collectInfoRes = new CollectInfoRes();
         BeanUtils.copyProperties(byId, collectInfoRes);
         collectInfoRes.setCollectTag(CollUtil.join(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList(), ","));
@@ -436,7 +436,7 @@ public class PlayListApi {
     
     public TbCollectPojo createPlayList(String name) {
         CollectConvert playList = qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
-        qukuService.saveOrUpdateCollectPic(playList.getId(), defaultInfo.getPic().getPlayListPic());
+        qukuService.saveOrUpdateCollectPicUrl(playList.getId(), defaultInfo.getPic().getPlayListPic());
         playList.setPicUrl(this.qukuService.getCollectPicUrl(playList.getId()));
         return playList;
     }

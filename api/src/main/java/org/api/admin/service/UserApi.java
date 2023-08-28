@@ -104,16 +104,10 @@ public class UserApi {
     }
     
     public SaveOrUpdateUserRes saveOrUpdateUser(SaveOrUpdateUserReq saveOrUpdateUserReq) {
+        // 防止创建普通用户创建管理员
         if (UserUtil.getUser().getIsAdmin()) {
             SysUserPojo user = accountService.getUserByName(saveOrUpdateUserReq.getUsername());
-            boolean userFlag = Objects.isNull(user);
             if (Objects.isNull(saveOrUpdateUserReq.getId())) {
-                // 校验是否有用户ID
-                ExceptionUtil.isNull(Objects.isNull(saveOrUpdateUserReq.getId()), ResultCode.USER_NOT_EXIST);
-                // 防止创建普通用户创建管理员
-                ExceptionUtil.isNull(userFlag, ResultCode.USER_NOT_EXIST);
-                accountService.updateById(saveOrUpdateUserReq);
-            } else {
                 // 不允许修改管理员用户状态
                 ExceptionUtil.isNull(saveOrUpdateUserReq.getIsAdmin() && Boolean.FALSE.equals(saveOrUpdateUserReq.getStatus()),
                         ResultCode.ADMIN_USER_NOT_EDIT_STATUS);
@@ -121,18 +115,23 @@ public class UserApi {
                     throw new BaseException(ResultCode.USER_HAS_EXISTED);
                 }
                 accountService.saveOrUpdate(saveOrUpdateUserReq);
+            } else {
+                // 校验是否有用户ID
+                boolean userFlag = Objects.isNull(user);
+                ExceptionUtil.isNull(userFlag, ResultCode.USER_NOT_EXIST);
+                accountService.updateById(saveOrUpdateUserReq);
             }
             // 更新用户头像
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getAvatarTempFile())) {
                 File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getAvatarTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_EXIST);
-                qukuAPI.saveOrUpdateAvatarPic(saveOrUpdateUserReq.getId(), file);
+                qukuAPI.saveOrUpdateAvatarPicFile(saveOrUpdateUserReq.getId(), file);
             }
             // 更新用户背景
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getBackgroundTempFile())) {
                 File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getBackgroundTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_EXIST);
-                qukuAPI.saveOrUpdateBackgroundPic(saveOrUpdateUserReq.getId(), file);
+                qukuAPI.saveOrUpdateBackgroundPicFile(saveOrUpdateUserReq.getId(), file);
             }
             SaveOrUpdateUserRes res = new SaveOrUpdateUserRes();
             BeanUtils.copyProperties(saveOrUpdateUserReq, res);

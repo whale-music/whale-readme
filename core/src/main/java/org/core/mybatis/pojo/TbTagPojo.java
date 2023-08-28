@@ -32,6 +32,10 @@ public class TbTagPojo extends Model<TbTagPojo> implements Serializable {
     @TableField("tag_name")
     private String tagName;
     
+    @Schema(title = "标签关联数量")
+    @TableField("count")
+    private Integer count;
+    
     @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

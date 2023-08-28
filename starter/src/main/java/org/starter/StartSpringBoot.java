@@ -26,7 +26,7 @@ import java.util.Set;
 @EntityScan(basePackages = "org.core.jpa.entity")
 @EnableJpaRepositories(basePackages = "org.core.jpa.repository")
 // @SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss"}, excludeName = "org.web", exclude = SecurityAutoConfiguration.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "org.core")
 @EnableScheduling // 开启定时任务
 public class StartSpringBoot {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {

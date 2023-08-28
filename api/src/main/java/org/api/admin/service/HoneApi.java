@@ -96,7 +96,7 @@ public class HoneApi {
         LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
                                                           .isNotNull(TbAlbumPojo::getAlbumName)
                                                           .orderByDesc(TbAlbumPojo::getCreateTime);
-        Page<TbAlbumPojo> objectPage = new Page<>(0, 15);
+        Page<TbAlbumPojo> objectPage = new Page<>(1, 15);
         List<TbAlbumPojo> records = albumService.page(objectPage, wrapper).getRecords();
         return qukuAPI.getPicAlbumList(records);
     }

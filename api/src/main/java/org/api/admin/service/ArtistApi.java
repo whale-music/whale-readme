@@ -146,7 +146,7 @@ public class ArtistApi {
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.DATA_NONE);
-            qukuService.saveOrUpdateArtistPic(req.getId(), file);
+            qukuService.saveOrUpdateArtistPicFile(req.getId(), file);
         }
     }
 }

@@ -29,11 +29,15 @@ public class TbPicPojo extends Model<TbPicPojo> implements Serializable {
     private Long id;
     
     @Schema(title = "音乐网络地址，或路径")
-    @TableField("url")
-    private String url;
+    @TableField("path")
+    private String path;
     
     @TableField("md5")
     private String md5;
+    
+    @Schema(title = "图片关联数量")
+    @TableField("count")
+    private Integer count;
     
     @Schema(title = "更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)

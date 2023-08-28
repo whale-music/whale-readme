@@ -3,8 +3,6 @@ package org.core.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Data
 @AllArgsConstructor
@@ -25,11 +23,16 @@ public class MiddleTypeModel {
         
         MiddleTypeModel that = (MiddleTypeModel) o;
         
-        return new EqualsBuilder().append(getMiddleId(), that.getMiddleId()).append(getType(), that.getType()).isEquals();
+        if (getMiddleId() != null ? !getMiddleId().equals(that.getMiddleId()) : that.getMiddleId() != null) {
+            return false;
+        }
+        return getType() != null ? getType().equals(that.getType()) : that.getType() == null;
     }
     
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getMiddleId()).append(getType()).toHashCode();
+        int result = getMiddleId() != null ? getMiddleId().hashCode() : 0;
+        result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+        return result;
     }
 }

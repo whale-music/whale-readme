@@ -462,10 +462,16 @@ public class MusicFlowApi {
         tbMusicPojo.setAliasName(aliaNames);
         tbMusicPojo.setAlbumId(albumPojo == null ? null : albumPojo.getId());
         tbMusicPojo.setTimeLength(dto.getMusic().getTimeLength());
-        boolean save;
         // 保存音乐表
-        save = musicService.saveOrUpdate(tbMusicPojo);
-        qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getMusic().getPic());
+        boolean save = musicService.saveOrUpdate(tbMusicPojo);
+        boolean pathFlag = StringUtils.isNotBlank(dto.getMusic().getPic().getPath());
+        if (pathFlag && StringUtils.isNotBlank(dto.getMusic().getPic().getMd5())) {
+            qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getMusic().getPic());
+        } else {
+            if (pathFlag) {
+                qukuService.saveOrUpdateMusicPicUrl(tbMusicPojo.getId(), dto.getMusic().getPic().getPath());
+            }
+        }
         // 保存错误，抛出异常
         ExceptionUtil.isNull(!save, ResultCode.SAVE_FAIL);
         return tbMusicPojo;
@@ -491,8 +497,10 @@ public class MusicFlowApi {
         // 如果是数据库中已有数据，直接更新
         Long albumId = album.getId();
         if (albumId != null) {
-            if (StringUtils.isNotBlank(album.getPic())) {
+            if (StringUtils.isNotBlank(album.getPic().getPath()) && (StringUtils.isNotBlank(album.getPic().getMd5()))) {
                 qukuService.saveOrUpdateAlbumPic(albumId, album.getPic());
+            } else {
+                qukuService.saveOrUpdateAlbumPicUrl(albumId, album.getPic().getPath());
             }
             albumService.updateById(album);
             return album;
@@ -590,7 +598,11 @@ public class MusicFlowApi {
             }
             artistService.saveOrUpdate(pojo);
             // 更新封面
-            qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPic());
+            if (StringUtils.isNotBlank(singerReq.getPic().getPath()) && (StringUtils.isNotBlank(singerReq.getPic().getMd5()))) {
+                qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPic());
+            } else {
+                qukuService.saveOrUpdateArtistPicUrl(pojo.getId(), singerReq.getPic().getPath());
+            }
             saveBatch.add(pojo);
         }
         return saveBatch;
@@ -604,51 +616,53 @@ public class MusicFlowApi {
      */
     private List<TbResourcePojo> uploadFile(AudioInfoReq dto, TbMusicPojo musicPojo) {
         List<TbResourcePojo> resourceList = new ArrayList<>();
-        for (AudioInfoReq.AudioSource source : dto.getSources()) {
-            TbResourcePojo urlPojo = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, source.getMd5()));
-            urlPojo = urlPojo == null ? new TbResourcePojo() : urlPojo;
-            urlPojo.setMusicId(musicPojo.getId());
-            Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
-            SysUserPojo byId = accountService.getById(userId);
-            ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
-            urlPojo.setUserId(byId.getId());
-            // 上传到本地时读取本地文件数据，否则使用前端传入的数据
-            if (Boolean.TRUE.equals(dto.getUploadFlag())) {
-                if (source.getSize() == null
-                        || source.getRate() == null
-                        || source.getRate() == 0
-                        || StringUtils.isBlank(source.getLevel())
-                        || StringUtils.isBlank(source.getMd5())
-                        || StringUtils.isBlank(source.getEncodeType())
-                        || StringUtils.isBlank(source.getPathTemp())) {
-                    return Collections.emptyList();
+        if (Optional.ofNullable(dto.getSources()).orElse(dto.getSources()) != null) {
+            for (AudioInfoReq.AudioSource source : dto.getSources()) {
+                TbResourcePojo urlPojo = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, source.getMd5()));
+                urlPojo = urlPojo == null ? new TbResourcePojo() : urlPojo;
+                urlPojo.setMusicId(musicPojo.getId());
+                Long userId = dto.getUserId() == null ? UserUtil.getUser().getId() : dto.getUserId();
+                SysUserPojo byId = accountService.getById(userId);
+                ExceptionUtil.isNull(byId == null, ResultCode.USER_NOT_EXIST);
+                urlPojo.setUserId(byId.getId());
+                // 上传到本地时读取本地文件数据，否则使用前端传入的数据
+                if (Boolean.TRUE.equals(dto.getUploadFlag())) {
+                    if (source.getSize() == null
+                            || source.getRate() == null
+                            || source.getRate() == 0
+                            || StringUtils.isBlank(source.getLevel())
+                            || StringUtils.isBlank(source.getMd5())
+                            || StringUtils.isBlank(source.getEncodeType())
+                            || StringUtils.isBlank(source.getPathTemp())) {
+                        return Collections.emptyList();
+                    }
+                    // 只保存到数据库，不上传文件
+                    urlPojo.setSize(source.getSize());
+                    urlPojo.setRate(source.getRate());
+                    urlPojo.setLevel(source.getLevel());
+                    urlPojo.setMd5(source.getMd5());
+                    urlPojo.setEncodeType(source.getEncodeType());
+                    urlPojo.setPath(source.getPathTemp());
+                } else {
+                    uploadLocalFile(source, urlPojo);
                 }
-                // 只保存到数据库，不上传文件
-                urlPojo.setSize(source.getSize());
-                urlPojo.setRate(source.getRate());
-                urlPojo.setLevel(source.getLevel());
-                urlPojo.setMd5(source.getMd5());
-                urlPojo.setEncodeType(source.getEncodeType());
-                urlPojo.setPath(source.getPathTemp());
-            } else {
-                uploadLocalFile(source, urlPojo);
+                // 检测是否重复上传相同的MD5音乐文件
+                if (urlPojo.getId() == null) {
+                    TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, urlPojo.getMd5()));
+                    ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
+                }
+                resourceService.saveOrUpdate(urlPojo);
+                
+                // 保存音源来源
+                if (source.getOrigin() != null && StringUtils.isNotBlank(source.getOrigin().getOrigin())) {
+                    TbOriginPojo origin = source.getOrigin();
+                    origin.setMusicId(musicPojo.getId());
+                    origin.setResourceId(urlPojo.getId());
+                    originService.save(origin);
+                }
+                
+                resourceList.add(urlPojo);
             }
-            // 检测是否重复上传相同的MD5音乐文件
-            if (urlPojo.getId() == null) {
-                TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, urlPojo.getMd5()));
-                ExceptionUtil.isNull(one != null, ResultCode.OSS_MD5_REPEAT);
-            }
-            resourceService.saveOrUpdate(urlPojo);
-            
-            // 保存音源来源
-            if (source.getOrigin() != null && StringUtils.isNotBlank(source.getOrigin().getOrigin())) {
-                TbOriginPojo origin = source.getOrigin();
-                origin.setMusicId(musicPojo.getId());
-                origin.setResourceId(urlPojo.getId());
-                originService.save(origin);
-            }
-            
-            resourceList.add(urlPojo);
         }
         return resourceList;
     }
@@ -731,13 +745,13 @@ public class MusicFlowApi {
         }
         // 音乐tag
         if (StringUtils.isNotBlank(req.getMusicTag())) {
-            qukuService.addMusicLabel(req.getId(), List.of(StringUtils.split(req.getMusicTag(), ',')).parallelStream().map(StringUtils::trim).toList());
+            qukuService.addMusicLabelTag(req.getId(), List.of(StringUtils.split(req.getMusicTag(), ',')).parallelStream().map(StringUtils::trim).toList());
         }
         // 更新封面
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
             File file = new File(requestConfig.getTempPath(), req.getTempPicFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_EXIST);
-            qukuService.saveOrUpdateMusicPic(req.getId(), file);
+            qukuService.saveOrUpdateMusicPicFile(req.getId(), file);
         }
         // 如果是更新则删除原有数据
         TbMusicPojo byId = musicService.getById(req.getId());
@@ -776,7 +790,7 @@ public class MusicFlowApi {
     public MusicDetails saveMusicInfo(AudioInfoReq dto) {
         // 处理名字繁简转移
         nameHandler(dto);
-        for (AudioInfoReq.AudioSource audioSource : dto.getSources()) {
+        for (AudioInfoReq.AudioSource audioSource : Optional.ofNullable(dto.getSources()).orElse(new ArrayList<>())) {
             // 检测是读取本地缓存文件， 并且是本地地址
             if (Boolean.FALSE.equals(dto.getUploadFlag()) && !StringUtils.startsWithIgnoreCase(audioSource.getPathTemp(), "http")) {
                 // 检查文件目录是否合法
@@ -792,6 +806,8 @@ public class MusicFlowApi {
         saveAlbumTagAndPic(dto, albumPojo);
         // 保存音乐表
         TbMusicPojo musicPojo = saveAndReturnMusicPojo(dto, artistIds, albumPojo);
+        // 保存音乐Tag和流派
+        saveMusicTagAndGenre(dto, musicPojo);
         // 保存歌手音乐表
         saveRandReturnArtistList(artistIds, musicPojo);
         // 保存歌词
@@ -808,16 +824,43 @@ public class MusicFlowApi {
         return musicDetails;
     }
     
+    private void saveMusicTagAndGenre(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        saveMusicGenre(dto, musicPojo);
+        saveMusicTag(dto, musicPojo);
+    }
+    
+    private void saveMusicTag(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        String tags = dto.getMusic().getTags();
+        if (StringUtils.isNotBlank(tags)) {
+            List<String> list = Arrays.asList(tags.split(","));
+            qukuService.addMusicLabelTag(musicPojo.getId(), list);
+        }
+    }
+    
+    private void saveMusicGenre(AudioInfoReq dto, TbMusicPojo musicPojo) {
+        String musicGenre = dto.getMusic().getMusicGenre();
+        if (StringUtils.isNotBlank(musicGenre)) {
+            List<String> list = Arrays.asList(musicGenre.split(","));
+            qukuService.addMusicGenreLabel(musicPojo.getId(), list);
+        }
+    }
+    
     private void saveAlbumTagAndPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
-        // 保存专辑封面
-        saveAlbumPic(dto, albumPojo);
-        // 专辑流派
-        saveAlbumGenre(dto, albumPojo);
+        if (Objects.nonNull(albumPojo) && Objects.nonNull(albumPojo.getId())) {
+            // 保存专辑封面
+            saveAlbumPic(dto, albumPojo);
+            // 专辑流派
+            saveAlbumGenre(dto, albumPojo);
+        }
     }
     
     private void saveAlbumPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
-        // 更新或新增封面
-        qukuService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
+        // 更新封面
+        if (StringUtils.isNotBlank(dto.getAlbum().getPic().getPath()) && (StringUtils.isNotBlank(dto.getAlbum().getPic().getMd5()))) {
+            qukuService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
+        } else {
+            qukuService.saveOrUpdateAlbumPicUrl(albumPojo.getId(), dto.getAlbum().getPic().getPath());
+        }
     }
     
     private void saveAlbumGenre(AudioInfoReq dto, TbAlbumPojo albumPojo) {
@@ -880,15 +923,15 @@ public class MusicFlowApi {
     public MusicInfoRes getMusicInfo(Long id) {
         // 音乐
         TbMusicPojo byId = musicService.getById(id);
-        List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId());
-        List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId());
+        List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId()).get(id);
+        List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId()).get(id);
         // 专辑艺术家
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
         // 歌曲艺术家
         List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
         // 专辑
         TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new AudioInfoReq.AudioAlbum());
-    
+        
         MusicInfoRes musicInfoRes = new MusicInfoRes();
         musicInfoRes.setMusicTag(labelMusic.parallelStream().map(TbTagPojo::getTagName).toList());
         musicInfoRes.setMusicGenre(musicGenre.parallelStream().map(TbTagPojo::getTagName).findFirst().orElse(""));
@@ -1027,7 +1070,7 @@ public class MusicFlowApi {
             case "userBackground" -> tempType = PicTypeConstant.USER_BACKGROUND;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
-        qukuService.saveOrUpdatePic(id, tempType, file);
-        return qukuService.getPicUrl(id, tempType);
+        qukuService.saveOrUpdatePicFile(id, tempType, file);
+        return qukuService.getPicPath(id, tempType);
     }
 }

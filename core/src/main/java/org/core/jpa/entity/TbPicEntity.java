@@ -20,11 +20,13 @@ public class TbPicEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "url", nullable = false, length = 512)
-    private String url;
+    @Column(name = "path", nullable = false, length = 512)
+    private String path;
     @Basic
     @Column(name = "md5", nullable = false, length = 32)
     private String md5;
+    @Column(name = "count", nullable = false)
+    private Integer count;
     @Basic
     @Column(name = "update_time", nullable = false)
     private Timestamp updateTime;
@@ -42,12 +44,12 @@ public class TbPicEntity implements Serializable {
         this.id = id;
     }
     
-    public String getUrl() {
-        return url;
+    public String getPath() {
+        return path;
     }
     
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPath(String path) {
+        this.path = path;
     }
     
     public String getMd5() {
@@ -56,6 +58,14 @@ public class TbPicEntity implements Serializable {
     
     public void setMd5(String md5) {
         this.md5 = md5;
+    }
+    
+    public Integer getCount() {
+        return count;
+    }
+    
+    public void setCount(Integer count) {
+        this.count = count;
     }
     
     public Timestamp getUpdateTime() {
@@ -83,13 +93,13 @@ public class TbPicEntity implements Serializable {
             return false;
         }
         TbPicEntity that = (TbPicEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(url, that.url) && Objects.equals(md5,
+        return Objects.equals(id, that.id) && Objects.equals(path, that.path) && Objects.equals(md5,
                 that.md5) && Objects.equals(updateTime, that.updateTime) && Objects.equals(createTime, that.createTime);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, url, md5, updateTime, createTime);
+        return Objects.hash(id, path, md5, updateTime, createTime);
     }
     
     public Collection<TbMiddlePicEntity> getTbMiddlePicsById() {

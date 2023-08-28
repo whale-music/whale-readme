@@ -14,12 +14,12 @@ public class TargetTagConstant {
     /**
      * 专辑流派
      */
-    public static final Byte TARGET_ALBUM_GENRE = 0;
+    public static final Byte TARGET_ALBUM_GENRE = 2;
     
     /**
      * 歌单tag
      */
-    public static final Byte TARGET_COLLECT_TAG = 2;
+    public static final Byte TARGET_COLLECT_TAG = 3;
     
     private TargetTagConstant() {
     }

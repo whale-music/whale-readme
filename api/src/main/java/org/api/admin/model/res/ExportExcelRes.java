@@ -18,7 +18,7 @@ public class ExportExcelRes {
     @NoArgsConstructor
     public static class MusicInfo {
         
-        @ColumnWidth(14)
+        @ColumnWidth(20)
         @ExcelProperty(value = "歌曲名", index = 0)
         private String musicName;
         
@@ -26,9 +26,9 @@ public class ExportExcelRes {
         @ExcelProperty(value = "歌曲别名", index = 1)
         private String musicAlias;
         
-        @ColumnWidth(10)
-        @ExcelProperty(value = "音乐封面Base64", index = 2)
-        private String musicPicBase64;
+        @ColumnWidth(20)
+        @ExcelProperty(value = "音乐封面ID", index = 2)
+        private String musicPicId;
         
         @ColumnWidth(15)
         @ExcelProperty(value = "音乐流派", index = 3)
@@ -67,7 +67,7 @@ public class ExportExcelRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AlbumInfo {
-        @ColumnWidth(15)
+        @ColumnWidth(20)
         @ExcelProperty(value = "专辑ID", index = 0)
         private String albumId;
         
@@ -76,8 +76,8 @@ public class ExportExcelRes {
         private String albumName;
         
         @ColumnWidth(12)
-        @ExcelProperty(value = "专辑封面Base64", index = 2)
-        private String albumPicBase64;
+        @ExcelProperty(value = "专辑封面ID", index = 2)
+        private String albumPicId;
         
         @ColumnWidth(15)
         @ExcelProperty(value = "专辑流派", index = 3)
@@ -108,7 +108,7 @@ public class ExportExcelRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ArtistInfo {
-        @ColumnWidth(14)
+        @ColumnWidth(20)
         @ExcelProperty(value = "艺术家ID", index = 0)
         private String artistId;
         
@@ -125,8 +125,8 @@ public class ExportExcelRes {
         private String artistSex;
         
         @ColumnWidth(10)
-        @ExcelProperty(value = "艺术家头像Base64", index = 4)
-        private String artistPicBase64;
+        @ExcelProperty(value = "艺术家头像ID", index = 4)
+        private String artistPicId;
         
         @ColumnWidth(18)
         @ExcelProperty(value = "出生年月", index = 5)
@@ -149,11 +149,11 @@ public class ExportExcelRes {
         @ExcelProperty(value = "音源ID", index = 0)
         private String sourceId;
         
-        @ColumnWidth(30)
+        @ColumnWidth(38)
         @ExcelProperty(value = "音源MD5", index = 1)
         private String sourceMd5;
         
-        @ColumnWidth(30)
+        @ColumnWidth(40)
         @ExcelProperty(value = "音源音乐地址, 存储相对路径", index = 2)
         private String sourcePath;
         
@@ -173,5 +173,23 @@ public class ExportExcelRes {
         @ExcelProperty(value = "音源文件大小", index = 6)
         private String sourceSize;
     }
+    
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PicInfo {
+        @ColumnWidth(25)
+        @ExcelProperty(value = "封面ID")
+        private String picId;
+        
+        @ColumnWidth(40)
+        @ExcelProperty(value = "封面路径")
+        private String picPath;
+        
+        @ColumnWidth(40)
+        @ExcelProperty(value = "封面MD5")
+        private String picMd5;
+    }
+    
 }
 

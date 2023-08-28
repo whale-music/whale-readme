@@ -13,7 +13,8 @@ create table if not exists sys_dict_data
     create_time datetime                                  null comment '创建时间',
     update_time datetime                                  null comment '更新时间'
 )
-    comment '字典数据表' engine = InnoDB;
+    comment '字典数据表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create table if not exists sys_dict_type
 (
@@ -30,7 +31,8 @@ create table if not exists sys_dict_type
     constraint dict_type
         unique (dict_type)
 )
-    comment '字典类型表' engine = InnoDB;
+    comment '字典类型表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create table if not exists sys_user
 (
@@ -52,7 +54,8 @@ create table if not exists sys_user
     constraint username
         unique (username)
 )
-    comment '系统用户表' engine = InnoDB;
+    comment '系统用户表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create index sys_user_nickname_index
     on sys_user (nickname);
@@ -76,7 +79,8 @@ create table if not exists tb_album
         foreign key (user_id) references sys_user (id)
             on update cascade on delete set null
 )
-    comment '歌曲专辑表' engine = InnoDB;
+    comment '歌曲专辑表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create index tb_album_album_name_index
     on tb_album (album_name);
@@ -98,7 +102,8 @@ create table if not exists tb_artist
         foreign key (user_id) references sys_user (id)
             on update cascade on delete set null
 )
-    comment '歌手表' engine = InnoDB;
+    comment '歌手表' row_format = DYNAMIC
+                     engine = InnoDB;
 
 create table if not exists tb_album_artist
 (
@@ -112,7 +117,8 @@ create table if not exists tb_album_artist
         foreign key (artist_id) references tb_artist (id)
             on update cascade on delete cascade
 )
-    comment '歌手和专辑中间表' engine = InnoDB;
+    comment '歌手和专辑中间表' row_format = DYNAMIC
+                               engine = InnoDB;
 
 create table if not exists tb_collect
 (
@@ -129,7 +135,8 @@ create table if not exists tb_collect
         foreign key (user_id) references sys_user (id)
             on update cascade on delete cascade
 )
-    comment '歌单列表' engine = InnoDB;
+    comment '歌单列表' row_format = DYNAMIC
+                       engine = InnoDB;
 
 create index tb_collect_play_list_name_index
     on tb_collect (play_list_name);
@@ -152,7 +159,8 @@ create table if not exists tb_history
         foreign key (user_id) references sys_user (id)
             on update cascade on delete cascade
 )
-    comment '音乐播放历史(包括歌单，音乐，专辑）' engine = InnoDB;
+    comment '音乐播放历史(包括歌单，音乐，专辑）' row_format = DYNAMIC
+                                               engine = InnoDB;
 
 create index tb_rank_sys_user_id_fk
     on tb_history (user_id);
@@ -180,7 +188,8 @@ create table if not exists tb_music
         foreign key (album_id) references tb_album (id)
             on update cascade on delete set null
 )
-    comment '所有音乐列表' engine = InnoDB;
+    comment '所有音乐列表' row_format = DYNAMIC
+                           engine = InnoDB;
 
 create table if not exists tb_collect_music
 (
@@ -195,7 +204,8 @@ create table if not exists tb_collect_music
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
 )
-    comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐' engine = InnoDB;
+    comment '歌单和音乐的中间表，用于记录歌单中的每一个音乐' row_format = DYNAMIC
+                                                            engine = InnoDB;
 
 create table if not exists tb_lyric
 (
@@ -212,7 +222,8 @@ create table if not exists tb_lyric
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
 )
-    comment '歌词表' engine = InnoDB;
+    comment '歌词表' row_format = DYNAMIC
+                     engine = InnoDB;
 
 create index tb_music_alia_name_index
     on tb_music (alias_name);
@@ -232,7 +243,8 @@ create table if not exists tb_music_artist
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
 )
-    comment '音乐与歌手中间表' engine = InnoDB;
+    comment '音乐与歌手中间表' row_format = DYNAMIC
+                               engine = InnoDB;
 
 create table if not exists tb_pic
 (
@@ -247,7 +259,8 @@ create table if not exists tb_pic
     constraint md5
         unique (md5)
 )
-    comment '音乐专辑歌单封面表' engine = InnoDB;
+    comment '音乐专辑歌单封面表' row_format = DYNAMIC
+                                 engine = InnoDB;
 
 create table if not exists tb_middle_pic
 (
@@ -285,7 +298,8 @@ create table if not exists tb_plugin
         foreign key (user_id) references sys_user (id)
             on update cascade on delete cascade
 )
-    comment '插件表' engine = InnoDB;
+    comment '插件表' row_format = DYNAMIC
+                     engine = InnoDB;
 
 create table if not exists tb_plugin_task
 (
@@ -306,7 +320,8 @@ create table if not exists tb_plugin_task
         foreign key (plugin_id) references tb_plugin (id)
             on update cascade on delete cascade
 )
-    comment '插件任务表' engine = InnoDB;
+    comment '插件任务表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create table if not exists tb_plugin_msg
 (
@@ -331,7 +346,8 @@ create table if not exists tb_plugin_msg
         foreign key (task_id) references tb_plugin_task (id)
             on update cascade on delete cascade
 )
-    comment '插件消息表' engine = InnoDB;
+    comment '插件消息表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create index tb_plugin_msg_task_id_user_id_index
     on tb_plugin_msg (task_id, user_id);
@@ -361,7 +377,8 @@ create table if not exists tb_resource
         foreign key (music_id) references tb_music (id)
             on update cascade on delete cascade
 )
-    comment '存储地址' engine = InnoDB;
+    comment '存储地址' row_format = DYNAMIC
+                       engine = InnoDB;
 
 create table if not exists tb_mv
 (
@@ -449,7 +466,8 @@ create table if not exists tb_schedule_task
         foreign key (plugin_id) references tb_plugin (id)
             on update cascade on delete cascade
 )
-    comment '定时任务表' engine = InnoDB;
+    comment '定时任务表' row_format = DYNAMIC
+                         engine = InnoDB;
 
 create table if not exists tb_tag
 (
@@ -461,7 +479,8 @@ create table if not exists tb_tag
     constraint id
         unique (id)
 )
-    comment '标签表（风格）' engine = InnoDB;
+    comment '标签表（风格）' row_format = DYNAMIC
+                           engine = InnoDB;
 
 create table if not exists tb_middle_tag
 (
@@ -469,12 +488,13 @@ create table if not exists tb_middle_tag
         primary key,
     middle_id bigint  not null comment '中间ID, 包括歌曲，歌单，专辑',
     tag_id    bigint  not null comment 'tag ID',
-    type      tinyint not null comment '0: 流派, 1: 歌曲tag, 2: 歌单tag, 3: mv标签',
+    type      tinyint not null comment '0: 流派, 1: 歌曲tag, 2: 专辑流派, 3: mv标签',
     constraint tb_collect_tag_tb_tag_id_fk
         foreign key (tag_id) references tb_tag (id)
             on update cascade on delete cascade
 )
-    comment '歌单风格中间表' engine = InnoDB;
+    comment '歌单风格中间表' row_format = DYNAMIC
+                             engine = InnoDB;
 
 create index tb_middle_tag_pk
     on tb_middle_tag (middle_id, type, tag_id);
@@ -491,7 +511,8 @@ create table if not exists tb_user_album
         foreign key (album_id) references tb_album (id)
             on update cascade on delete cascade
 )
-    comment '用户收藏专辑表' engine = InnoDB;
+    comment '用户收藏专辑表' row_format = DYNAMIC
+                             engine = InnoDB;
 
 create table if not exists tb_user_artist
 (
@@ -505,7 +526,8 @@ create table if not exists tb_user_artist
         foreign key (artist_id) references tb_artist (id)
             on update cascade on delete cascade
 )
-    comment '用户关注歌曲家' engine = InnoDB;
+    comment '用户关注歌曲家' row_format = DYNAMIC
+                             engine = InnoDB;
 
 create table if not exists tb_user_collect
 (

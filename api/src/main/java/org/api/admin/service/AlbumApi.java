@@ -186,7 +186,7 @@ public class AlbumApi {
     public AlbumInfoRes getAlbumInfo(Long albumId) {
         TbAlbumPojo byId = albumService.getById(albumId);
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
-        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
+        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId).get(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
         
@@ -216,7 +216,7 @@ public class AlbumApi {
         }
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
-            qukuService.saveOrUpdateAlbumPic(req.getId(), file);
+            qukuService.saveOrUpdateAlbumPicFile(req.getId(), file);
         }
         // 如果是更新专辑关联歌手数据则删除原来的，重新添加
         albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, req.getId()));

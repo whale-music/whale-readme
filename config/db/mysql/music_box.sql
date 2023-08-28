@@ -248,12 +248,13 @@ create table if not exists tb_music_artist
 
 create table if not exists tb_pic
 (
-    id          bigint       not null
+    id          bigint        not null
         primary key,
-    url         varchar(512) not null comment '音乐网络地址，或路径',
-    md5         char(32)     not null,
-    update_time datetime     not null comment '更新时间',
-    create_time datetime     not null comment '创建时间',
+    path        varchar(512)  not null comment '音乐网络地址，或路径',
+    md5         char(32)      not null,
+    count       int default 0 not null comment '图片关联数量',
+    create_time datetime      not null comment '创建时间',
+    update_time datetime      not null comment '更新时间',
     constraint id
         unique (id),
     constraint md5
@@ -471,11 +472,12 @@ create table if not exists tb_schedule_task
 
 create table if not exists tb_tag
 (
-    id          bigint       not null
+    id          bigint        not null
         primary key,
-    tag_name    varchar(128) null comment '风格（标签）',
-    create_time datetime     null comment '创建时间',
-    update_time datetime     null comment '修改时间',
+    tag_name    varchar(128)  null comment '风格（标签）',
+    count       int default 0 not null comment '标签关联数量',
+    create_time datetime      null comment '创建时间',
+    update_time datetime      null comment '修改时间',
     constraint id
         unique (id)
 )

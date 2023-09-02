@@ -10,7 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RouterVo {
+    private String name;
     private String path;
+    private String component;
+    private String redirect;
     private Meta meta;
     private List<Children> children;
 }

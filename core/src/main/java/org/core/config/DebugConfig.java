@@ -5,27 +5,38 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DebugConfig {
-    private static Boolean debug;
+    private static Boolean DEBUG;
+    
+    @Value("${application.config.plugin}")
+    private Boolean enablePlugin;
     
     @Value("${application.config.log}")
-    private boolean logEnable;
+    private Boolean logEnable;
     
     @Value("${application.enable.admin-spring-boot-application}")
-    private boolean enableAdminSpringBootApplication;
+    private Boolean enableAdminSpringBootApplication;
     
     @Value("${application.enable.netease-cloud-music-spring-boot-application}")
-    private boolean enableNeteaseCloudMusicSpringBootApplication;
+    private Boolean enableNeteaseCloudMusicSpringBootApplication;
     
     @Value("${application.enable.subsonic-spring-boot-application}")
-    private boolean enableSubsonicSpringBootApplication;
+    private Boolean enableSubsonicSpringBootApplication;
     
     public static Boolean getDebug() {
-        return debug;
+        return DEBUG;
     }
     
     @Value("${application.config.log}")
     public void setDebug(Boolean debug) {
-        DebugConfig.debug = debug;
+        DebugConfig.DEBUG = debug;
+    }
+    
+    public Boolean getEnablePlugin() {
+        return enablePlugin;
+    }
+    
+    public void setEnablePlugin(Boolean enablePlugin) {
+        this.enablePlugin = enablePlugin;
     }
     
     public boolean isLogEnable() {

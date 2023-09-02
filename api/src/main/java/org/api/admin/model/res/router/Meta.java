@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public
-class Meta {
+public class Meta {
     private String title;
     private String icon;
     private Integer rank;
+    private Boolean showLink;
 }

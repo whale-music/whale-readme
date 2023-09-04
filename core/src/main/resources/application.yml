@@ -159,3 +159,4 @@ application:
     admin-spring-boot-application: true
     netease-cloud-music-spring-boot-application: false
     subsonic-spring-boot-application: false
+    web-dav-spring-boot-application: true

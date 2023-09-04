@@ -1,8 +1,14 @@
 package org.core.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Configuration
 public class DebugConfig {
     private static Boolean DEBUG;
@@ -22,6 +28,9 @@ public class DebugConfig {
     @Value("${application.enable.subsonic-spring-boot-application}")
     private Boolean enableSubsonicSpringBootApplication;
     
+    @Value("${application.enable.web-dav-spring-boot-application}")
+    private Boolean webDavSpringBootApplication;
+    
     public static Boolean getDebug() {
         return DEBUG;
     }
@@ -29,45 +38,5 @@ public class DebugConfig {
     @Value("${application.config.log}")
     public void setDebug(Boolean debug) {
         DebugConfig.DEBUG = debug;
-    }
-    
-    public Boolean getEnablePlugin() {
-        return enablePlugin;
-    }
-    
-    public void setEnablePlugin(Boolean enablePlugin) {
-        this.enablePlugin = enablePlugin;
-    }
-    
-    public boolean isLogEnable() {
-        return logEnable;
-    }
-    
-    public void setLogEnable(boolean logEnable) {
-        this.logEnable = logEnable;
-    }
-    
-    public boolean isEnableAdminSpringBootApplication() {
-        return enableAdminSpringBootApplication;
-    }
-    
-    public void setEnableAdminSpringBootApplication(boolean enableAdminSpringBootApplication) {
-        this.enableAdminSpringBootApplication = enableAdminSpringBootApplication;
-    }
-    
-    public boolean isEnableNeteaseCloudMusicSpringBootApplication() {
-        return enableNeteaseCloudMusicSpringBootApplication;
-    }
-    
-    public void setEnableNeteaseCloudMusicSpringBootApplication(boolean enableNeteaseCloudMusicSpringBootApplication) {
-        this.enableNeteaseCloudMusicSpringBootApplication = enableNeteaseCloudMusicSpringBootApplication;
-    }
-    
-    public boolean isEnableSubsonicSpringBootApplication() {
-        return enableSubsonicSpringBootApplication;
-    }
-    
-    public void setEnableSubsonicSpringBootApplication(boolean enableSubsonicSpringBootApplication) {
-        this.enableSubsonicSpringBootApplication = enableSubsonicSpringBootApplication;
     }
 }

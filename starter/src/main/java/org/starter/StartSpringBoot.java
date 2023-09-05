@@ -1,6 +1,7 @@
 package org.starter;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.extra.spring.EnableSpringUtil;
 import org.api.config.ApplicationStartup;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,6 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+// 启用Hutool Spring
+@EnableSpringUtil
 @EntityScan(basePackages = "org.core.jpa.entity")
 @EnableJpaRepositories(basePackages = "org.core.jpa.repository")
 // @SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss"}, excludeName = "org.web", exclude = SecurityAutoConfiguration.class)

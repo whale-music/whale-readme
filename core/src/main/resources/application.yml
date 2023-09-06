@@ -14,6 +14,7 @@ logging:
     org.api: debug
     org.oss: debug
     org.web: debug
+    io.milton.common: off
   pattern:
     # 控制输出的格式
     #格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符

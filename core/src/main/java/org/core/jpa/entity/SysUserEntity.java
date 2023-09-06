@@ -46,7 +46,7 @@ public class SysUserEntity implements Serializable {
     private Timestamp lastLoginTime;
     @Basic
     @Column(name = "role_name", nullable = true)
-    private Timestamp roleName;
+    private String roleName;
     @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
@@ -172,11 +172,11 @@ public class SysUserEntity implements Serializable {
         this.updateTime = updateTime;
     }
     
-    public Timestamp getRoleName() {
+    public String getRoleName() {
         return roleName;
     }
     
-    public void setRoleName(Timestamp roleName) {
+    public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
     

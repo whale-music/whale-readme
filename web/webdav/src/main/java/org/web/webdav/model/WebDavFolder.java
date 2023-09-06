@@ -16,21 +16,49 @@ import java.util.Date;
  * Webdav 文件夹
  */
 public class WebDavFolder implements Resource {
+    private String uniqueId;
     private String name;
     private Date createdDate;
-    private Collection<Resource> list;
+    private Collection<? extends Resource> resources;
+    
+    private Collection<? extends Resource> folders;
     
     public WebDavFolder(String name) {
+        this.uniqueId = name;
         this.name = name;
     }
     
+    public WebDavFolder(String uniqueId, String name) {
+        this.uniqueId = uniqueId;
+        this.name = name;
+    }
+    
+    public WebDavFolder(String uniqueId, String name, Collection<? extends Resource> folders, Collection<? extends Resource> resources) {
+        this.uniqueId = uniqueId;
+        this.name = name;
+        this.folders = folders;
+        this.resources = resources;
+    }
+    
+    @UniqueId
     @Override
     public String getUniqueId() {
-        return null;
+        return uniqueId;
+    }
+    
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+    
+    public Collection<? extends Resource> getFolders() {
+        return folders;
+    }
+    
+    public void setFolders(Collection<? extends Resource> folders) {
+        this.folders = folders;
     }
     
     @Name
-    @UniqueId
     public String getName() {
         return name;
     }
@@ -48,12 +76,12 @@ public class WebDavFolder implements Resource {
         this.createdDate = createdDate;
     }
     
-    public Collection<Resource> getList() {
-        return list;
+    public Collection<? extends Resource> getResources() {
+        return resources;
     }
     
-    public void setList(Collection<Resource> list) {
-        this.list = list;
+    public void setResources(Collection<Resource> resources) {
+        this.resources = resources;
     }
     
     @Override

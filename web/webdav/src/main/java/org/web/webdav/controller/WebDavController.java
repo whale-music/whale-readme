@@ -1,20 +1,46 @@
 package org.web.webdav.controller;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.http.HttpException;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import io.milton.annotations.*;
+import io.milton.resource.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.api.common.service.QukuAPI;
+import org.api.webdav.model.CollectTypeList;
+import org.api.webdav.model.PlayListRes;
+import org.api.webdav.service.WebdavApi;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
+import org.jetbrains.annotations.Nullable;
 import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @ResourceController
 @Slf4j
 public class WebDavController {
+    
+    private static final String LIKE = "like";
+    private static final String RECOMMEND = "recommend";
+    private static final String COMMON = "common";
+    
+    @Nullable
+    private static ArrayList<WebDavFolder> getWebDavFolders(WebDavFolder webDavFolder, String type) {
+        if (StringUtils.equals(webDavFolder.getUniqueId(), type)) {
+            ArrayList<WebDavFolder> list = new ArrayList<>();
+            for (Resource resource : webDavFolder.getFolders()) {
+                list.add(new WebDavFolder(resource.getUniqueId(), resource.getName()));
+            }
+            return list;
+        }
+        return null;
+    }
     
     /**
      * 获取Webdav根目录
@@ -22,66 +48,136 @@ public class WebDavController {
      * @return this
      */
     @Root
-    public WebDavController getRoot() {
-        return this;
+    public CollectTypeList getRoot() {
+        return SpringUtil.getBean(WebdavApi.class).getUserPlayList(424608186796165L);
     }
     
     @ChildrenOf
-    public List<WebDavFolder> getWebDavFolders(WebDavController root) {
-        ArrayList<WebDavFolder> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            list.add(new WebDavFolder(String.valueOf(i)));
-        }
+    public List<WebDavFolder> getWebDavFolders(CollectTypeList root) {
+        List<WebDavFolder> list = new ArrayList<>();
+        Collection<WebDavFolder> like = root.getLikeCollect()
+                                            .parallelStream()
+                                            .map(tbCollectPojo -> new WebDavFolder(Objects.toString(tbCollectPojo.getId()),
+                                                    tbCollectPojo.getPlayListName()))
+                                            .toList();
+        
+        Collection<WebDavFolder> ordinary = root.getOrdinaryCollect()
+                                                .parallelStream()
+                                                .map(tbCollectPojo -> new WebDavFolder(Objects.toString(tbCollectPojo.getId()),
+                                                        tbCollectPojo.getPlayListName()))
+                                                .toList();
+        
+        Collection<WebDavFolder> recommend = root.getRecommendCollect()
+                                                 .parallelStream()
+                                                 .map(tbCollectPojo -> new WebDavFolder(Objects.toString(tbCollectPojo.getId()),
+                                                         tbCollectPojo.getPlayListName()))
+                                                 .toList();
+        String likeStr = "喜爱歌单";
+        list.add(new WebDavFolder(LIKE, likeStr, like, null));
+        String common = "普通歌单";
+        list.add(new WebDavFolder(COMMON, common, ordinary, null));
+        String recommendStr = "推荐歌单";
+        list.add(new WebDavFolder(RECOMMEND, recommendStr, recommend, null));
         return list;
     }
     
     @ChildrenOf
-    public Collection<WebDavResource> getWebDavFiles(WebDavFolder webDavFolder) {
-        ArrayList<WebDavResource> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            String name = i + ".txt";
-            list.add(new WebDavResource(name, new Date(), new Date(), Long.parseLong(String.valueOf(String.valueOf(i).length()))));
+    public Collection<? extends Resource> getWebDavFiles(WebDavFolder webDavFolder) {
+        // 普通歌单
+        List<WebDavFolder> commonList = getWebDavFolders(webDavFolder, COMMON);
+        if (commonList != null) {
+            return commonList;
         }
-        return list;
+        // 喜爱歌单
+        List<WebDavFolder> likeList = getWebDavFolders(webDavFolder, LIKE);
+        if (likeList != null) {
+            return likeList;
+        }
+        // 推荐歌单
+        List<WebDavFolder> recommendList = getWebDavFolders(webDavFolder, RECOMMEND);
+        if (recommendList != null) {
+            return recommendList;
+        }
+        
+        ArrayList<Resource> resources = new ArrayList<>();
+        List<PlayListRes> playListMusic = SpringUtil.getBean(WebdavApi.class).getPlayListMusic(Long.parseLong(webDavFolder.getUniqueId()));
+        for (PlayListRes playListRes : playListMusic) {
+            resources.add(new WebDavResource(playListRes.getMusicName() + "." + FileUtil.getSuffix(playListRes.getPath()),
+                    playListRes.getMd5(),
+                    playListRes.getPath(),
+                    playListRes.getSize(),
+                    playListRes.getResourceList()));
+        }
+        return resources;
     }
     
     @Get
     public InputStream getChild(WebDavResource webDavFolder) {
         String name = webDavFolder.getName();
         log.info("output file: {}", name);
-        return new ByteArrayInputStream(name.getBytes());
+        Map<String, Map<String, String>> address = SpringUtil.getBean(QukuAPI.class).getAddressByMd5(webDavFolder.getMd5(), false);
+        String url = address.get(webDavFolder.getPath()).get("url");
+        log.info("url download: {}", url);
+        try (HttpResponse execute = HttpRequest.get(url).execute()) {
+            return execute.bodyStream();
+        } catch (HttpException e) {
+            throw new BaseException(ResultCode.DOWNLOAD_ERROR);
+        }
     }
     
-    
+    /**
+     * 显示文件名 (必须唯一)
+     *
+     * @param webDavResource 资源数据
+     * @return 文件名
+     */
     @Name
     public String getWebDavResource(WebDavResource webDavResource) {
-        String name = webDavResource.getName();
-        log.info("文件名: {}", name);
-        return name;
+        return webDavResource.getName();
     }
     
+    /**
+     * 标记返回资源显示名称
+     *
+     * @param webDavResource 文件资源数据
+     * @return 资源名称
+     */
     @DisplayName
     public String getDisplayName(WebDavResource webDavResource) {
         return webDavResource.getName();
     }
     
+    /**
+     * 标记返回该资源的唯一标识符的方法。
+     *
+     * @param webDavResource 文件资源数据
+     * @return 唯一标识
+     */
     @UniqueId
     public String getUniqueId(WebDavResource webDavResource) {
-        return webDavResource.getName();
+        return webDavResource.getUniqueId();
     }
     
+    /**
+     * 文件修改时间
+     *
+     * @param webDavResource 文件资源数据
+     * @return 文件修改时间
+     */
     @ModifiedDate
     public Date getModifiedDate(WebDavResource webDavResource) {
-        Date modifiedDate = webDavResource.getModifiedDate();
-        log.info("文件修改时间: {}", modifiedDate);
-        return modifiedDate;
+        return webDavResource.getModifiedDate();
     }
     
+    /**
+     * 文件创建时间
+     *
+     * @param webDavResource 文件资源数据
+     * @return 文件修改时间
+     */
     @CreatedDate
     public Date getCreatedDate(WebDavResource webDavResource) {
-        Date createdDate = webDavResource.getCreatedDate();
-        log.info("文件修改时间: {}", createdDate);
-        return createdDate;
+        return webDavResource.getCreatedDate();
     }
     
 }

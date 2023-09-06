@@ -138,11 +138,14 @@ public class AListOSSServiceImpl implements OSSService {
         }
     }
     
+    public static final String SIZE = "size";
+    public static final String URL = "url";
+    
     private void getPathMap(HashMap<String, Map<String, String>> map, ContentItem contentItem) {
         String path = getPath(contentItem);
         HashMap<String, String> value = new HashMap<>();
-        value.put("size", String.valueOf(contentItem.getSize()));
-        value.put("url", path);
+        value.put(SIZE, String.valueOf(contentItem.getSize()));
+        value.put(URL, path);
         map.put(contentItem.getName(), value);
     }
     

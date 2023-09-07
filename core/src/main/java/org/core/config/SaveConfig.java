@@ -1,14 +1,12 @@
 package org.core.config;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Configuration
@@ -39,4 +37,72 @@ public class SaveConfig {
     
     // 访问密钥(密码)
     private String secretKey;
+    
+    public String getSaveMode() {
+        return saveMode;
+    }
+    
+    public void setSaveMode(String saveMode) {
+        this.saveMode = saveMode;
+    }
+    
+    public String getHost() {
+        if (host.charAt(host.length() - 1) == '/') {
+            return host.substring(0, host.length() - 1);
+        } else {
+            return host;
+        }
+    }
+    
+    public void setHost(String host) {
+        this.host = host;
+    }
+    
+    public List<String> getObjectSave() {
+        return objectSave;
+    }
+    
+    public void setObjectSave(List<String> objectSave) {
+        this.objectSave = objectSave;
+    }
+    
+    public Integer getAssignObjectSave() {
+        return assignObjectSave;
+    }
+    
+    public void setAssignObjectSave(Integer assignObjectSave) {
+        this.assignObjectSave = assignObjectSave;
+    }
+    
+    public List<String> getImgSave() {
+        return imgSave;
+    }
+    
+    public void setImgSave(List<String> imgSave) {
+        this.imgSave = imgSave;
+    }
+    
+    public Integer getAssignImgSave() {
+        return assignImgSave;
+    }
+    
+    public void setAssignImgSave(Integer assignImgSave) {
+        this.assignImgSave = assignImgSave;
+    }
+    
+    public String getAccessKey() {
+        return accessKey;
+    }
+    
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
+    
+    public String getSecretKey() {
+        return secretKey;
+    }
+    
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
 }

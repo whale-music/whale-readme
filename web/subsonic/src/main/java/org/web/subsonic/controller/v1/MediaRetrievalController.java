@@ -17,13 +17,13 @@ public class MediaRetrievalController {
     @Autowired
     private MediaRetrievalApi mediaRetrievalApi;
     
-    @GetMapping("/getCoverArt.view")
+    @GetMapping({"/getCoverArt.view", "/getCoverArt"})
     public RedirectView getCoverArt(SubsonicCommonReq req, @RequestParam(value = "id") Long id) {
         String picUrl = mediaRetrievalApi.getCoverArt(req, id);
         return new RedirectView(picUrl);
     }
     
-    @GetMapping("/stream.view")
+    @GetMapping({"/stream.view", "/stream"})
     public RedirectView stream(SubsonicCommonReq req, @RequestParam(value = "id") Long id) {
         String musicUrl = mediaRetrievalApi.stream(req, id);
         return new RedirectView(musicUrl);

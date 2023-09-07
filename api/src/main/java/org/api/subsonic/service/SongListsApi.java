@@ -3,6 +3,7 @@ package org.api.subsonic.service;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.api.common.service.QukuAPI;
+import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.req.albumlist2.AlbumReq;
 import org.api.subsonic.model.res.albumlist2.AlbumItem;
@@ -59,5 +60,9 @@ public class SongListsApi {
         albumList2.setAlbum(albumArrayList);
         albumRes.setAlbumList2(albumList2);
         return albumRes;
+    }
+    
+    public void scrobble(SubsonicCommonReq req) {
+    
     }
 }

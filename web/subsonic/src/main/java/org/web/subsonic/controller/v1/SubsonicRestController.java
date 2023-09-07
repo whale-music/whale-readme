@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest")
 @Slf4j
 @CrossOrigin(origins = "*")
-public class SystemController {
+public class SubsonicRestController {
     
-    @GetMapping(value = "/ping.view")
+    @GetMapping(value = {"/ping.view", "/ping"})
     @ManualSerialize
     public Object ping(SubsonicCommonReq req) {
         return new SubsonicResult().success();

@@ -98,7 +98,7 @@ save-config:
   assign-img-save: 0
   # 请求地址(必须)
   # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
-  host: http://localhost:5244
+  host: https://s.f3.ttkt.cc/
   # 账户(必须)
   access-key: admin
   # 密码(必须)
@@ -161,5 +161,5 @@ application:
   enable:
     admin-spring-boot-application: true
     netease-cloud-music-spring-boot-application: false
-    subsonic-spring-boot-application: false
+    subsonic-spring-boot-application: true
     web-dav-spring-boot-application: true

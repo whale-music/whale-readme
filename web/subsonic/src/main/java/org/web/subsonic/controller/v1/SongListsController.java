@@ -4,6 +4,7 @@ package org.web.subsonic.controller.v1;
 import lombok.extern.slf4j.Slf4j;
 import org.api.subsonic.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
+import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.req.albumlist2.AlbumReq;
 import org.api.subsonic.model.res.albumlist2.AlbumList2Res;
@@ -30,5 +31,12 @@ public class SongListsController {
         albumReq.setOffset(albumReq.getOffset() == null ? 0 : albumReq.getOffset() / albumReq.getSize());
         AlbumList2Res res = songListsApi.getAlbumList2(albumReq);
         return res.success();
+    }
+    
+    @GetMapping("/scrobble")
+    @ManualSerialize
+    public Object scrobble(SubsonicCommonReq req) {
+        songListsApi.scrobble(req);
+        return new SubsonicResult().success();
     }
 }

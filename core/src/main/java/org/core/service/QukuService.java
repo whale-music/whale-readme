@@ -910,4 +910,12 @@ public interface QukuService {
      * 批量根据ID删除封面数据
      */
     void removePicIds(List<Long> picIds);
+    
+    /**
+     * 获取歌曲专辑
+     *
+     * @param list 专辑ID
+     * @return key 歌曲ID value 专辑信息
+     */
+    Map<Long, AlbumConvert> getMusicAlbumByMusicIdToMap(List<Long> list);
 }

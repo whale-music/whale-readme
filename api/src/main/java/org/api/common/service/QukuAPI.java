@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -16,6 +17,7 @@ import org.core.config.HttpRequestConfig;
 import org.core.config.SaveConfig;
 import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
+import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
@@ -23,6 +25,7 @@ import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.ImageTypeUtils;
 import org.oss.factory.OSSFactory;
 import org.oss.service.OSSService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service("QukuAPI")
 @Slf4j
@@ -39,6 +43,9 @@ public class QukuAPI extends QukuServiceImpl {
     private final SaveConfig config;
     
     private final HttpRequestConfig httpRequestConfig;
+    
+    @Autowired
+    private TbMiddlePicService tbMiddlePicService;
     
     public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
         super(musicService,
@@ -288,4 +295,29 @@ public class QukuAPI extends QukuServiceImpl {
         return OSSFactory.ossFactory(config).getAddressByMd5(null, refresh);
     }
     
+    /**
+     * 获取封面ID
+     *
+     * @param middleId 中间ID
+     * @param type     封面类型
+     * @return 封面ID
+     */
+    public Map<Long, Long> getPicIds(List<Long> middleId, Byte type) {
+        List<TbMiddlePicPojo> list = tbMiddlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
+                                                                     .in(TbMiddlePicPojo::getMiddleId, middleId)
+                                                                     .eq(Objects.nonNull(type), TbMiddlePicPojo::getType, type));
+        return list.parallelStream().collect(Collectors.toMap(TbMiddlePicPojo::getMiddleId, TbMiddlePicPojo::getPicId));
+    }
+    
+    public Map<Long, Long> getMusicPicIds(List<Long> middleId) {
+        return getPicIds(middleId, PicTypeConstant.MUSIC);
+    }
+    
+    public Map<Long, Long> getArtistPicIds(List<Long> middleId) {
+        return getPicIds(middleId, PicTypeConstant.ARTIST);
+    }
+    
+    public Map<Long, Long> getAlbumPicIds(List<Long> middleId) {
+        return getPicIds(middleId, PicTypeConstant.ALBUM);
+    }
 }

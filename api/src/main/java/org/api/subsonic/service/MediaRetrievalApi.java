@@ -26,7 +26,7 @@ public class MediaRetrievalApi {
     
     public String getCoverArt(SubsonicCommonReq req, Long id) {
         log.debug(req.toString());
-        String picUrl = qukuService.getPicPath(id, null);
+        String picUrl = qukuService.getPicUrl(id, null);
         if (StringUtils.isNotBlank(picUrl)) {
             return picUrl;
         }

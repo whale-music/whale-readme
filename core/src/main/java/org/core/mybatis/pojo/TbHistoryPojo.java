@@ -36,7 +36,7 @@ public class TbHistoryPojo extends Model<TbHistoryPojo> implements Serializable 
     @TableField("middle_id")
     private Long middleId;
     
-    @Schema(title = "播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑, 3mv")
+    @Schema(title = "播放类型可能是音乐，歌单，专辑,0为音乐, 1为专辑, 2为歌手, 3为歌单, 4mv")
     @TableField("type")
     private Byte type;
     

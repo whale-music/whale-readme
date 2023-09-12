@@ -186,7 +186,7 @@ public class AlbumApi {
     public AlbumInfoRes getAlbumInfo(Long albumId) {
         TbAlbumPojo byId = albumService.getById(albumId);
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
-        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId).get(albumId);
+        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
         

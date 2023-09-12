@@ -1,22 +1,33 @@
 package org.api.subsonic.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @JacksonXmlRootElement(localName = "subsonic-response")
 @JsonRootName("subsonic-response")
-public class SubsonicResult {
+@JsonIgnoreProperties({"headers", "body"})
+public class SubsonicResult extends HttpEntity<SubsonicResult> implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     
-    // @JacksonXmlProperty(isAttribute = true)
-    // private String xmlns = "http://subsonic.org/restapi";
+    @JacksonXmlProperty(isAttribute = true)
+    private String xmlns = "http://subsonic.org/restapi";
     
     @JacksonXmlProperty(isAttribute = true)
     private String status = "ok";
@@ -30,14 +41,14 @@ public class SubsonicResult {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Error error;
     
-    public SubsonicResult success() {
+    public ResponseEntity<SubsonicResult> success() {
         this.status = "ok";
-        return this;
+        return ResponseEntity.ok(this);
     }
     
-    public SubsonicResult error(ErrorEnum error) {
+    public ResponseEntity<SubsonicResult> error(ErrorEnum error) {
         this.status = "failed";
         this.error = error.error();
-        return this;
+        return ResponseEntity.ok(this);
     }
 }

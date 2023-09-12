@@ -69,12 +69,17 @@ public interface QukuService {
      *
      * @param musicId 音乐ID
      */
-    Map<Long, List<TbResourcePojo>> getMusicMapUrl(Collection<Long> musicId);
+    Map<Long, List<TbResourcePojo>> getMusicPathMap(Collection<Long> musicId);
     
     /**
      * 随即获取曲库中的一条数据
      */
     MusicConvert randomMusic();
+    
+    /**
+     * 随即获取曲库中的多条数据
+     */
+    List<MusicConvert> randomMusicList(int count);
     
     /**
      * 随机获取一条专辑
@@ -149,9 +154,16 @@ public interface QukuService {
     /**
      * 通过歌手ID获取专辑列表
      *
-     * @param ids 歌手ID
+     * @param artistIds 歌手ID
      */
-    List<AlbumConvert> getAlbumListByArtistIds(List<Long> ids);
+    List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
+    
+    /**
+     * 通过歌手ID获取专辑列表
+     *
+     * @param artistIds 歌手ID
+     */
+    // Map<Long,List<AlbumConvert>> getAlbumMapByArtistIds(List<Long> artistIds);
     
     /**
      * 获取用户收藏专辑
@@ -174,7 +186,16 @@ public interface QukuService {
      *
      * @param id 歌手ID
      */
-    Integer getAlbumCountBySingerId(Long id);
+    Integer getArtistAlbumCountBySingerId(Long id);
+    
+    
+    /**
+     * 获取歌手所有专辑数量
+     *
+     * @param artistIds 歌手ID
+     * @return 歌手下的所有专辑
+     */
+    Map<Long, Integer> getArtistAlbumCount(List<Long> artistIds);
     
     /**
      * 根据专辑ID查找音乐
@@ -191,6 +212,14 @@ public interface QukuService {
     List<MusicConvert> getMusicListByAlbumId(Collection<Long> ids);
     
     /**
+     * 根据专辑ID查找音乐
+     *
+     * @param ids 专辑ID
+     * @return key 专辑ID value music list
+     */
+    Map<Long, List<MusicConvert>> getMusicMapByAlbumId(Collection<Long> ids);
+    
+    /**
      * 根据歌手名查找音乐
      *
      * @param name 歌手
@@ -205,6 +234,14 @@ public interface QukuService {
     List<MusicConvert> getMusicListByArtistId(Long id);
     
     /**
+     * 获取歌手下的所有音乐
+     *
+     * @param artistIds 歌手ID
+     * @return key:artistId value: musicList
+     */
+    Map<Long, List<TbMusicPojo>> getMusicMapByArtistId(List<Long> artistIds);
+    
+    /**
      * 随机获取歌手
      *
      * @param count 获取数量
@@ -212,14 +249,14 @@ public interface QukuService {
     List<ArtistConvert> randomSinger(int count);
     
     /**
-     * 添加音乐到歌单
+     * 添加或删除音乐到歌单
      *
      * @param userID    用户ID
      * @param collectId 歌单数据
      * @param songIds   歌曲列表
      * @param flag      删除还是添加 true add, false remove
      */
-    void addMusicToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag);
+    void addOrRemoveMusicToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag);
     
     /**
      * 添加歌单
@@ -327,7 +364,7 @@ public interface QukuService {
      * @return tag 列表
      */
     default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Long ids) {
-        return getLabel(TargetTagConstant.TARGET_GENRE, Collections.singletonList(ids));
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, Collections.singletonList(ids));
     }
     
     /**
@@ -337,7 +374,7 @@ public interface QukuService {
      * @return tag 列表
      */
     default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Collection<Long> ids) {
-        return getLabel(TargetTagConstant.TARGET_GENRE, ids);
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
     }
     
     /**
@@ -347,7 +384,7 @@ public interface QukuService {
      * @return tag 列表
      */
     default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Set<Long> ids) {
-        return getLabel(TargetTagConstant.TARGET_GENRE, ids);
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
     }
     
     /**
@@ -366,8 +403,8 @@ public interface QukuService {
      * @param id 专辑ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelAlbumGenre(Long id) {
-        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id));
+    default List<TbTagPojo> getLabelAlbumGenre(Long id) {
+        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id)).get(id);
     }
     
     /**
@@ -431,6 +468,7 @@ public interface QukuService {
         addLabel(target, id, Set.of(labelId));
     }
     
+    // TODO: 2023/9/12 需要重构, 这个删除tag不完善
     /**
      * 删除全部tag
      *
@@ -522,15 +560,15 @@ public interface QukuService {
     }
     
     default void addMusicGenreLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConstant.TARGET_GENRE, id, labelId);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labelId);
     }
     
     default void addMusicGenreLabel(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_GENRE, id, label);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, label);
     }
     
     default void addMusicGenreLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConstant.TARGET_GENRE, id, labels);
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labels);
     }
     
     /**
@@ -914,8 +952,34 @@ public interface QukuService {
     /**
      * 获取歌曲专辑
      *
-     * @param list 专辑ID
+     * @param musicIds 专辑ID
      * @return key 歌曲ID value 专辑信息
      */
-    Map<Long, AlbumConvert> getMusicAlbumByMusicIdToMap(List<Long> list);
+    Map<Long, AlbumConvert> getMusicAlbumByMusicIdToMap(List<Long> musicIds);
+    
+    /**
+     * 获取歌曲专辑
+     *
+     * @param albumIds 专辑ID
+     * @return key 歌曲ID value 专辑信息
+     */
+    Map<Long, AlbumConvert> getMusicAlbumByAlbumIdToMap(Collection<Long> albumIds);
+    
+    /**
+     * 获取专辑所有音乐时长
+     *
+     * @param albumIds 专辑ID
+     * @return 专辑时长
+     */
+    Map<Long, Integer> getAlbumDurationCount(List<Long> albumIds);
+    
+    
+    /**
+     * 专辑下所有音乐数量
+     *
+     * @param albumIds 专辑ID
+     * @return 专辑音乐数量
+     */
+    Map<Long, Integer> getAlbumMusicCountByMapAlbumId(Collection<Long> albumIds);
+    
 }

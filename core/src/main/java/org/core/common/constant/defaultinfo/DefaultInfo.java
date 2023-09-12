@@ -24,9 +24,9 @@ public class DefaultInfo implements Serializable {
     public static class Name implements Serializable {
         public static final long serialVersionUID = 1905122241950251207L;
         
-        private NameType artist = NameType.DEFAULT;
-        private NameType music = NameType.DEFAULT;
-        private NameType album = NameType.DEFAULT;
+        private EnumNameType artist = EnumNameType.DEFAULT;
+        private EnumNameType music = EnumNameType.DEFAULT;
+        private EnumNameType album = EnumNameType.DEFAULT;
     }
     
     @Data

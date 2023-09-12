@@ -103,6 +103,10 @@ public class Song {
 	@JacksonXmlProperty(isAttribute = true)
 	private String contentType;
 	
+	@JsonProperty("discNumber")
+	@JacksonXmlProperty(isAttribute = true)
+	private String discNumber;
+	
 	@JsonProperty("isDir")
 	@JacksonXmlProperty(isAttribute = true)
 	private Boolean isDir;

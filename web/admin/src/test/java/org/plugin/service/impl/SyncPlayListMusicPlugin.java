@@ -139,7 +139,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         pluginPackage.logInfo("创建歌单成功: {}", playName);
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(musicIds)) {
-            pluginPackage.getQukuService().addMusicToCollect(localUserId, collectApiPlayList.getId(), musicIds, true);
+            pluginPackage.getQukuService().addOrRemoveMusicToCollect(localUserId, collectApiPlayList.getId(), musicIds, true);
             pluginPackage.logInfo("添加到用户歌单成功");
         }
         for (MusicDetails tbMusicPojo : musicPojoList) {

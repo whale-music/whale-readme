@@ -56,7 +56,8 @@ springdoc:
     #自定义swagger前端请求路径，输入http：127.0.0.1:8080/docs会自动重定向到swagger页面
     path: /docs
   #包扫描路径
-  packages-to-scan: org.web.controller
+  packages-to-scan: org.web
+  pre-loading-enabled: true
 
 # mybatis-plus相关配置
 mybatis-plus:
@@ -98,7 +99,7 @@ save-config:
   assign-img-save: 0
   # 请求地址(必须)
   # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
-  host: https://s.f3.ttkt.cc/
+  host: http://localhost:5244/
   # 账户(必须)
   access-key: admin
   # 密码(必须)
@@ -159,7 +160,23 @@ application:
     plugin: false
     log: true
   enable:
-    admin-spring-boot-application: true
+    admin-spring-boot-application: false
     netease-cloud-music-spring-boot-application: false
     subsonic-spring-boot-application: true
-    web-dav-spring-boot-application: true
+    web-dav-spring-boot-application: false
+
+# subsonic 资源多个资源返回策略:
+# first:第一个 last: 最后一个
+# bitRateMax:最大比特率 bitRateMin:最小比特率
+# sizeMax:最大文件 sizeMin:最小文件
+subsonic:
+  resource:
+    returnPlan: first
+
+# webdav 资源多个资源返回策略:
+# first:第一个 last: 最后一个
+# bitRateMax:最大比特率 bitRateMin:最小比特率
+# sizeMax:最大文件 sizeMin:最小文件
+webdav:
+  resource:
+    returnPlan: first

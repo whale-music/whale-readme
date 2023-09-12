@@ -5,6 +5,7 @@ import org.api.common.service.QukuAPI;
 import org.api.webdav.config.WebdavConfig;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
+import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.config.PlayListTypeConfig;
 import org.core.jpa.entity.TbMusicEntity;
 import org.core.jpa.repository.TbMusicEntityRepository;
@@ -39,6 +40,9 @@ public class WebdavApi {
     @Autowired
     private TbResourceService tbResourceService;
     
+    @Autowired
+    private WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
+    
     
     public CollectTypeList getUserPlayList(Long id) {
         List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.ORDINARY);
@@ -62,7 +66,7 @@ public class WebdavApi {
         Set<TbMusicEntity> allMusicEntityList = tbMusicEntityRepository.findByIdIn(allMusicIds);
         Map<Long, TbMusicEntity> musicMaps = allMusicEntityList.parallelStream()
                                                                .collect(Collectors.toMap(TbMusicEntity::getId, tbMusicEntity -> tbMusicEntity));
-        Map<Long, List<TbResourcePojo>> resourceListMap = tbResourceService.getResourceList(allMusicIds);
+        Map<Long, List<TbResourcePojo>> resourceListMap = tbResourceService.getResourceMap(allMusicIds);
         for (Long likeMusicId : allMusicIds) {
             PlayListRes e = new PlayListRes();
             TbMusicEntity tbMusicEntity = musicMaps.get(likeMusicId);
@@ -70,7 +74,7 @@ public class WebdavApi {
             
             List<TbResourcePojo> tbResourcePojos = resourceListMap.get(likeMusicId);
             if (CollUtil.isNotEmpty(tbResourcePojos)) {
-                TbResourcePojo tbResourcePojo = tbResourcePojos.get(0);
+                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(tbResourcePojos);
                 e.setMd5(tbResourcePojo.getMd5());
                 e.setPath(tbResourcePojo.getPath());
                 e.setSize(tbResourcePojo.getSize());

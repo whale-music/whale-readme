@@ -306,7 +306,7 @@ public class CollectApi {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         QukuServiceImpl.checkUserAuth(userID, tbCollectPojo);
         try {
-            qukuService.addMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
+            qukuService.addOrRemoveMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
         } catch (BaseException e) {
             if (StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 NeteaseResult r = new NeteaseResult();

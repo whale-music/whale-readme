@@ -7,15 +7,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
+import org.api.subsonic.model.res.createplaylist.CreatePlaylistRes;
 import org.api.subsonic.model.res.playlist.EntryItem;
 import org.api.subsonic.model.res.playlist.PlayList;
 import org.api.subsonic.model.res.playlist.PlaylistRes;
 import org.api.subsonic.model.res.playlists.PlayLists;
 import org.api.subsonic.model.res.playlists.PlaylistItem;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
-import org.api.subsonic.model.res.starred2.Starred2;
-import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
@@ -25,6 +25,7 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -111,7 +112,12 @@ public class PlaylistApi {
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
             e.setType("music");
-            e.setContentType("audio/mpeg");
+            if (StringUtils.equalsIgnoreCase(tbMusicUrlPojo.getEncodeType(), "mp3")) {
+                e.setContentType("audio/mpeg");
+            } else {
+                e.setContentType("audio/" + tbMusicUrlPojo.getEncodeType());
+            }
+            
             e.setParent(tbMusicUrlPojo.getPath());
             e.setPlayCount(0);
             
@@ -144,138 +150,63 @@ public class PlaylistApi {
         return playlistRes1;
     }
     
+    public CreatePlaylistRes createPlaylist(SubsonicCommonReq req, Long playlistId, String name, Long songId) {
+        CreatePlaylistRes res = new CreatePlaylistRes();
+        CollectConvert playList = new CollectConvert();
+        // 添加歌单
+        if (Objects.isNull(playlistId)) {
+            if (StringUtils.isBlank(name)) {
+                throw new BaseException(ResultCode.PLAT_LIST_EXIST);
+            }
+            String userName = req.getU();
+            SysUserPojo userByName = Optional.ofNullable(accountService.getUserByName(userName)).orElse(new SysUserPojo());
+            playList = qukuApi.createPlayList(userByName.getId(), name, PlayListTypeConfig.ORDINARY);
+        } else {
+            // 更新
+            TbCollectPojo byId = collectService.getById(playlistId);
+            BeanUtils.copyProperties(byId, playList);
+            playList.setPicUrl(qukuApi.getCollectPicUrl(byId.getId()));
+            byId.setPlayListName(name);
+            collectService.updateById(byId);
+            
+        }
+        if (Objects.nonNull(songId)) {
+            qukuApi.addOrRemoveMusicToCollect(playList.getUserId(), playList.getId(), Collections.singletonList(songId), true);
+        }
+        CreatePlaylistRes.Playlist playlist = new CreatePlaylistRes.Playlist();
+        playlist.setPublicFlag(false);
+        playlist.setId(String.valueOf(playList.getId()));
+        playlist.setCreated(Date.from(playList.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+        playlist.setName(playList.getPlayListName());
+        playlist.setChanged(Date.from(playList.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+        playlist.setSongCount(0);
+        playlist.setCoverArt(String.valueOf(playList.getId()));
+        playlist.setDuration(0);
+        
+        res.setPlaylist(playlist);
+        return res;
+    }
     
-    public Starred2Res getStarred2(SubsonicCommonReq req) {
-        SysUserPojo userByName = accountService.getUserByName(req.getU());
-        List<CollectConvert> userPlayList = qukuApi.getUserPlayList(userByName.getId(), Collections.singletonList(PlayListTypeConfig.LIKE));
-        if (CollUtil.isEmpty(userPlayList) || userPlayList.size() != 1) {
-            throw new BaseException();
+    public void updatePlaylist(SubsonicCommonReq req, Long playlistId, String name, String comment, Boolean publicFlag, List<Long> songIdToAdd, List<Long> songIndexToRemove) {
+        TbCollectPojo entity = new TbCollectPojo();
+        entity.setId(playlistId);
+        entity.setPlayListName(name);
+        entity.setDescription(comment);
+        collectService.updateById(entity);
+        
+        if (CollUtil.isNotEmpty(songIdToAdd)) {
+            qukuApi.addOrRemoveMusicToCollect(entity.getUserId(), entity.getId(), songIdToAdd, true);
         }
-        Starred2Res starred2Res = new Starred2Res();
         
-        Starred2 starred2 = new Starred2();
-        ArrayList<Starred2.Song> songList = new ArrayList<>();
-        CollectConvert likeCollect = userPlayList.get(0);
-        List<TbMusicPojo> likeMusicList = playListService.getPlayListAllMusic(likeCollect.getId());
-        // 歌手
-        List<Long> musicIds = likeMusicList.parallelStream().map(TbMusicPojo::getId).toList();
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getMusicArtistByMusicIdToMap(musicIds);
-        // 专辑
-        Map<Long, AlbumConvert> musicAlbumByMusicIdToMap = qukuApi.getMusicAlbumByMusicIdToMap(likeMusicList.parallelStream()
-                                                                                                            .map(TbMusicPojo::getAlbumId)
-                                                                                                            .toList());
-        
-        // 音乐资源
-        Map<Long, List<TbResourcePojo>> resourceList = tbResourceService.getResourceList(musicIds);
-        for (TbMusicPojo tbMusicPojo : likeMusicList) {
-            Starred2.Song song = new Starred2.Song();
-            song.setId(String.valueOf(tbMusicPojo.getId()));
-            song.setDir(false);
-            song.setTitle(tbMusicPojo.getMusicName());
-            song.setTrack(0);
-            song.setStarred(Date.from(tbMusicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
-            song.setDuration(tbMusicPojo.getTimeLength());
-            song.setPlayCount(1);
-            song.setPlayed(new Date());
-            song.setDiscNumber(1);
-            song.setType("music");
-            song.setUserRating(0);
-            song.setVideo(false);
-            // 封面
-            song.setCoverArt(String.valueOf(tbMusicPojo.getId()));
-            
-            // 音乐资源
-            List<TbResourcePojo> collection = resourceList.get(tbMusicPojo.getId());
-            if (CollUtil.isNotEmpty(collection)) {
-                TbResourcePojo tbResourcePojo = collection.get(0);
-                song.setSize(tbResourcePojo.getSize());
-                song.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                song.setSuffix(tbResourcePojo.getEncodeType());
-                song.setBitRate(tbResourcePojo.getRate());
-                song.setPath(tbResourcePojo.getPath());
-            }
-            
-            AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(tbMusicPojo.getAlbumId());
-            // 专辑
-            if (Objects.nonNull(albumConvert)) {
-                song.setAlbum(albumConvert.getAlbumName());
-                song.setAlbumId(String.valueOf(albumConvert.getId()));
-                song.setYear(Optional.ofNullable(albumConvert.getPublishTime()).orElse(LocalDateTime.now()).getYear());
-                song.setParent(String.valueOf(albumConvert.getId()));
-            }
-            
-            List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(tbMusicPojo.getId());
-            // 歌手信息
-            if (CollUtil.isNotEmpty(artistConverts)) {
-                ArtistConvert artistConvert = artistConverts.get(0);
-                song.setArtistId(String.valueOf(artistConvert.getId()));
-                song.setArtist(artistConvert.getArtistName());
-            }
-            
-            songList.add(song);
+        if (CollUtil.isNotEmpty(songIndexToRemove)) {
+            qukuApi.addOrRemoveMusicToCollect(entity.getUserId(), entity.getId(), songIndexToRemove, false);
         }
-        starred2.setSong(songList);
-        ArrayList<Starred2.Album> album = new ArrayList<>();
-        List<Long> albumIds = musicAlbumByMusicIdToMap.values().parallelStream().filter(Objects::nonNull).map(TbAlbumPojo::getId).toList();
-        Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
         
-        Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getAlbumArtistMapByAlbumIds(albumIds);
-        for (AlbumConvert value : musicAlbumByMusicIdToMap.values()) {
-            Starred2.Album e = new Starred2.Album();
-            e.setId(String.valueOf(value.getId()));
-            e.setDir(true);
-            e.setTitle(value.getAlbumName());
-            e.setAlbum(value.getAlbumName());
-            e.setYear(Optional.ofNullable(value.getPublishTime()).orElse(LocalDateTime.now()).getYear());
-            e.setCoverArt(String.valueOf(value.getId()));
-            e.setStarred(Date.from(value.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
-            // 专辑所有音乐时长
-            e.setDuration(0);
-            e.setPlayCount(0);
-            e.setPlayed(new Date());
-            e.setCreated(Date.from(value.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
-            e.setUserRating(0);
-            e.setSongCount(qukuApi.getAlbumMusicCountByAlbumId(value.getId()));
-            e.setVideo(false);
-            
-            List<TbTagPojo> tbTagPojos = labelAlbumGenre.get(value.getId());
-            if (CollUtil.isNotEmpty(tbTagPojos)) {
-                e.setGenre(tbTagPojos.get(0).getTagName());
-            }
-            
-            // 歌手
-            List<ArtistConvert> collection = albumArtistMapByAlbumIds.get(value.getId());
-            if (CollUtil.isNotEmpty(collection)) {
-                ArtistConvert artistConvert = collection.get(0);
-                e.setParent(String.valueOf(artistConvert.getId()));
-                e.setArtist(artistConvert.getArtistName());
-                e.setArtistId(String.valueOf(artistConvert.getId()));
-            }
-            
-            album.add(e);
-        }
-        starred2.setAlbum(album);
-        
-        ArrayList<Starred2.Artist> artist = new ArrayList<>();
-        
-        HashSet<ArtistConvert> artistConverts = new HashSet<>();
-        for (List<ArtistConvert> value : musicArtistByMusicIdToMap.values()) {
-            artistConverts.addAll(value);
-        }
-        for (ArtistConvert artistConvert : artistConverts) {
-            Starred2.Artist e = new Starred2.Artist();
-            e.setId(String.valueOf(artistConvert.getId()));
-            e.setCoverArt(String.valueOf(artistConvert.getId()));
-            e.setName(artistConvert.getArtistName());
-            e.setUserRating(0);
-            e.setArtistImageUrl(artistConvert.getPicUrl());
-            e.setAlbumCount(qukuApi.getAlbumCountBySingerId(artistConvert.getId()));
-            e.setStarred(Date.from(artistConvert.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
-            artist.add(e);
-        }
-        starred2.setArtist(artist);
-        
-        starred2Res.setStarred2(starred2);
-        return starred2Res;
+    }
+    
+    public void deletePlaylist(SubsonicCommonReq req, Long id) {
+        String userName = req.getU();
+        SysUserPojo userByName = accountService.getUserByName(userName);
+        qukuApi.removePlayList(userByName.getId(), Collections.singleton(id));
     }
 }

@@ -60,7 +60,7 @@ public class ArtistApi {
             String singerAlias = Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("");
             e.setAlias(Arrays.asList(singerAlias.split(",")));
             e.setPicUrl(tbArtistPojo.getPicUrl());
-            e.setAlbumSize(qukuService.getAlbumCountBySingerId(e.getId()));
+            e.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(e.getId()));
             e.setMvSize(0);
             data.add(e);
         }
@@ -84,7 +84,7 @@ public class ArtistApi {
         artist.setPicIdStr(picUrl);
         artist.setPicUrl(picUrl);
         artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
-        artist.setAlbumSize(qukuService.getAlbumCountBySingerId(singerPojo.getId()));
+        artist.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(singerPojo.getId()));
     
         ArtistsItem e1 = new ArtistsItem();
         e1.setPicUrl(picUrl);

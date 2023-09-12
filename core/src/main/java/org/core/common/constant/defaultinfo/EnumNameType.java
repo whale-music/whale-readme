@@ -1,6 +1,6 @@
 package org.core.common.constant.defaultinfo;
 
-public enum NameType {
+public enum EnumNameType {
     DEFAULT,
     CN,
     TC

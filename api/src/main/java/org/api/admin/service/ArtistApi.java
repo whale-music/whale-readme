@@ -82,7 +82,7 @@ public class ArtistApi {
         BeanUtils.copyProperties(page, singerResPage);
         singerResPage.setRecords(new ArrayList<>());
         for (TbArtistPojo singerPojo : page.getRecords()) {
-            long albumSize = qukuService.getAlbumCountBySingerId(singerPojo.getId());
+            long albumSize = qukuService.getArtistAlbumCountBySingerId(singerPojo.getId());
             long musicSize = qukuService.getMusicCountBySingerId(singerPojo.getId());
     
             ArtistRes artistRes = new ArtistRes();

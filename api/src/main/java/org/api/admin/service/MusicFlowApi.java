@@ -22,7 +22,7 @@ import org.api.admin.model.res.MusicInfoRes;
 import org.api.common.service.QukuAPI;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
-import org.core.common.constant.defaultinfo.NameType;
+import org.core.common.constant.defaultinfo.EnumNameType;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
@@ -868,7 +868,7 @@ public class MusicFlowApi {
     }
     
     private void nameHandler(AudioInfoReq dto) {
-        NameType music = defaultInfo.getName().getMusic();
+        EnumNameType music = defaultInfo.getName().getMusic();
         switch (music) {
             case CN:
                 dto.getMusic().setMusicName(ZhConverterUtil.toSimple(dto.getMusic().getMusicName()));
@@ -883,7 +883,7 @@ public class MusicFlowApi {
                 break;
         }
         
-        NameType artist = defaultInfo.getName().getArtist();
+        EnumNameType artist = defaultInfo.getName().getArtist();
         switch (artist) {
             case CN:
                 dto.getArtists().parallelStream().forEach(
@@ -906,7 +906,7 @@ public class MusicFlowApi {
                 break;
         }
         
-        NameType album = defaultInfo.getName().getAlbum();
+        EnumNameType album = defaultInfo.getName().getAlbum();
         switch (album) {
             case CN:
                 dto.getAlbum().setAlbumName(ZhConverterUtil.toSimple(dto.getAlbum().getAlbumName()));

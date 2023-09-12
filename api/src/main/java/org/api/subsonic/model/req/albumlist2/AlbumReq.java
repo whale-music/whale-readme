@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

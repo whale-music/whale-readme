@@ -4,7 +4,7 @@ public class TargetTagConstant {
     /**
      * 流派
      */
-    public static final Byte TARGET_GENRE = 0;
+    public static final Byte TARGET_MUSIC_GENRE = 0;
     
     /**
      * 歌曲tag

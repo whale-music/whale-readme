@@ -32,7 +32,7 @@ public class TbResourceServiceImpl extends ServiceImpl<TbResourceMapper, TbResou
      * @return 音乐地址
      */
     @Override
-    public Map<Long, List<TbResourcePojo>> getResourceList(Collection<Long> musicIds) {
+    public Map<Long, List<TbResourcePojo>> getResourceMap(Collection<Long> musicIds) {
         List<TbResourcePojo> list = this.list(Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicIds));
         return list.parallelStream().collect(Collectors.toMap(TbResourcePojo::getMusicId, ListUtil::toList, (o1, o2) -> {
             o2.addAll(o1);

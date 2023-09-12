@@ -1,18 +1,19 @@
 package org.api.subsonic.service;
 
 
-import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
+import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service(SubsonicConfig.SUBSONIC + "MediaRetrievalApi")
 @Slf4j
@@ -24,7 +25,10 @@ public class MediaRetrievalApi {
     @Autowired
     private DefaultInfo defaultInfo;
     
-    public String getCoverArt(SubsonicCommonReq req, Long id) {
+    @Autowired
+    private SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    
+    public String getCoverArt(SubsonicCommonReq req, Long id, Long size) {
         log.debug(req.toString());
         String picUrl = qukuService.getPicUrl(id, null);
         if (StringUtils.isNotBlank(picUrl)) {
@@ -33,9 +37,9 @@ public class MediaRetrievalApi {
         return defaultInfo.getPic().getDefaultPic();
     }
     
-    public String stream(SubsonicCommonReq req, Long id) {
-        log.debug(req.toString());
+    public String stream(SubsonicCommonReq req, Long id, Long maxBitRate, String format, Long timeOffset, Long size, Long estimateContentLength, Long converted) {
         List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
-        return CollUtil.isEmpty(musicUrlByMusicId) ? "" : musicUrlByMusicId.get(0).getPath();
+        TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrlByMusicId);
+        return Optional.ofNullable(tbResourcePojo).orElse(new TbResourcePojo()).getPath();
     }
 }

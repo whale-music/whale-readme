@@ -23,6 +23,6 @@ public interface TbResourceService extends IService<TbResourcePojo> {
      * @param musicIds 音乐ID
      * @return 音乐地址
      */
-    Map<Long, List<TbResourcePojo>> getResourceList(Collection<Long> musicIds);
+    Map<Long, List<TbResourcePojo>> getResourceMap(Collection<Long> musicIds);
     
 }

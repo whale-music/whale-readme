@@ -176,7 +176,7 @@ public class RecommendApi {
                 artist.setPicUrl(tbArtistPojo.getPicUrl());
                 artist.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
                 artist.setMusicSize(qukuService.getMusicCountBySingerId(tbArtistPojo.getId()));
-                artist.setAlbumSize(qukuService.getAlbumCountBySingerId(tbMusicPojo.getId()));
+                artist.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(tbMusicPojo.getId()));
                 artists.add(artist);
             }
             dailySongsItem.setAr(ar);
@@ -228,7 +228,7 @@ public class RecommendApi {
         for (AlbumConvert albumPojo : albumPojoList.getRecords()) {
             RecommendAlbumNewRes recommendAlbumNewRes = new RecommendAlbumNewRes();
             recommendAlbumNewRes.setId(albumPojo.getId());
-            recommendAlbumNewRes.setSize(qukuService.getAlbumCountBySingerId(albumPojo.getId()));
+            recommendAlbumNewRes.setSize(qukuService.getArtistAlbumCountBySingerId(albumPojo.getId()));
             recommendAlbumNewRes.setPublishTime((long) albumPojo.getCreateTime().getNano());
             recommendAlbumNewRes.setName(albumPojo.getAlbumName());
             recommendAlbumNewRes.setPicUrl(albumPojo.getPicUrl());

@@ -1,6 +1,7 @@
 package org.api.subsonic.model.res.album;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 public class Album {
     
     @JsonProperty("song")
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlElementWrapper(useWrapping = false)
     private List<SongItem> song;
     
     @JsonProperty("artist")

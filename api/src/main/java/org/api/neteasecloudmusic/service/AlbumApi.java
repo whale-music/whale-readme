@@ -164,7 +164,7 @@ public class AlbumApi {
         Artist artist = new Artist();
         artist.setId(tbArtistPojo.getId());
         artist.setName(tbAlbumPojo.getAlbumName());
-        artist.setAlbumSize(qukuService.getAlbumCountBySingerId(tbAlbumPojo.getId()));
+        artist.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(tbAlbumPojo.getId()));
         artist.setPicUrl(tbArtistPojo.getPicUrl());
         artist.setImg1v1Url(tbArtistPojo.getPicUrl());
         album.setArtist(artist);

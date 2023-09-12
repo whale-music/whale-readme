@@ -66,6 +66,7 @@ public class ManualSerializeAspect {
     private ResponseEntity<String> getStringResponseEntity(ProceedingJoinPoint proceedingJoinPoint, String from, String user, String password, String version, String token, String salt) {
         try {
             authenticate(user, password, token, salt, version);
+            // 执行目标方法
             Object obj = proceedingJoinPoint.proceed();
             // 成功返回
             return returnStr(obj, from);
@@ -85,15 +86,18 @@ public class ManualSerializeAspect {
     
     private ResponseEntity<String> returnStr(Object result, String isJson) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        boolean json = StringUtils.equals(isJson, "json");
+        boolean json = StringUtils.equalsIgnoreCase(isJson, "json");
         if (json) {
             httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         } else {
             httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
         }
-        return new ResponseEntity<>(SerializeUtil.serialize(result, json),
-                httpHeaders,
-                HttpStatus.OK);
+        if (result instanceof ResponseEntity<?> res) {
+            return new ResponseEntity<>(SerializeUtil.serialize(res.getBody(), json),
+                    httpHeaders,
+                    HttpStatus.OK);
+        }
+        throw new BaseException(ResultCode.SERIALIZATION_ERROR);
     }
     
     private void authenticate(String user, String password, String token, String salt, String version) {
@@ -101,7 +105,7 @@ public class ManualSerializeAspect {
         // 目标API版本为1.12.0或更低版本，则通过以明文或十六进制编码的形式发送密码来执行身份验证。示例：
         // http://your-server/rest/ping.view?u=joe&p=sesame&v=1.12.0&c=myapp
         // http://your-server/rest/ping.view?u=joe&p=enc:736573616d65&v=1.12.0&c=myapp
-        String tempPassword = "";
+        String tempPassword;
         if (compare <= 0 && StringUtils.isNotBlank(password) && !StringUtils.equals("null", password)) {
             if (StringUtils.startsWithIgnoreCase(password, "enc:")) {
                 String replace = StringUtils.replace(password, "enc:", "");

@@ -37,7 +37,7 @@ public class MediaRetrievalApi {
         return defaultInfo.getPic().getDefaultPic();
     }
     
-    public String stream(SubsonicCommonReq req, Long id, Long maxBitRate, String format, Long timeOffset, Long size, Long estimateContentLength, Long converted) {
+    public String stream(SubsonicCommonReq req, Long id, String maxBitRate, String format, String timeOffset, String size, String estimateContentLength, String converted) {
         List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
         TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrlByMusicId);
         return Optional.ofNullable(tbResourcePojo).orElse(new TbResourcePojo()).getPath();

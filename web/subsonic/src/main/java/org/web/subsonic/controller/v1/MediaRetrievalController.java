@@ -40,7 +40,7 @@ public class MediaRetrievalController {
                                     @RequestParam(value = "id") Long id,
                                     
                                     @Parameter(description = "如果指定，将图像缩放到此大小", deprecated = true)
-                                    @RequestParam(value = "size") Long size
+                                        @RequestParam(value = "size", required = false) Long size
     ) {
         String picUrl = mediaRetrievalApi.getCoverArt(req, id, size);
         return new RedirectView(picUrl);
@@ -56,27 +56,27 @@ public class MediaRetrievalController {
     @GetMapping({"/stream.view", "/stream"})
     public RedirectView stream(SubsonicCommonReq req,
                                @Parameter(description = "唯一标识要流传输的文件的字符串。通过调用getMusicDirectory获得")
-                               @RequestParam(value = "id") Long id,
+                               @RequestParam(value = "id") String id,
                                
                                @Parameter(description = "（从1.2.0开始）如果指定，服务器将尝试将比特率限制在此值，以千比特每秒为单位。如果设置为零，则不施加限制。", deprecated = true)
-                               @RequestParam(value = "maxBitRate", required = false) Long maxBitRate,
+                                   @RequestParam(value = "maxBitRate", required = false) String maxBitRate,
                                
                                @Parameter(description = "（从1.6.0开始）指定首选的目标格式（例如，“mp3”或“flv”），以在存在多个适用的转码的情况下。从1.9.0开始，您可以使用特殊值“raw”来禁用转码。", deprecated = true)
-                               @RequestParam(value = "format", required = false) String format,
+                                   @RequestParam(value = "format", required = false) String format,
                                
                                @Parameter(description = "仅适用于视频流。如果指定，则以给定偏移量（秒）开始流式传输到视频中。通常用于实现视频跳过。", deprecated = true)
-                               @RequestParam(value = "timeOffset", required = false) Long timeOffset,
+                                   @RequestParam(value = "timeOffset", required = false) String timeOffset,
                                
                                @Parameter(description = "（从1.6.0开始）仅适用于视频流。请求的视频大小指定为WxH，例如“640x480”。", deprecated = true)
-                               @RequestParam(value = "size", required = false) Long size,
+                                   @RequestParam(value = "size", required = false) String size,
                                
                                @Parameter(description = "（从1.8.0开始）。如果设置为“true”，则内容长度HTTP报头将被设置为转码或下采样媒体的估计值。", deprecated = true)
-                               @RequestParam(value = "estimateContentLength", required = false) Long estimateContentLength,
+                                   @RequestParam(value = "estimateContentLength", required = false) String estimateContentLength,
                                
                                @Parameter(description = "（自1.14.0起）仅适用于视频流。Subsonic可以通过将视频转换为MP4来优化流媒体。如果所讨论的视频存在转换，则将此参数设置为“true”将导致返回转换后的视频而不是原始视频。", deprecated = true)
-                               @RequestParam(value = "converted", required = false) Long converted
+                                   @RequestParam(value = "converted", required = false) String converted
     ) {
-        String musicUrl = mediaRetrievalApi.stream(req, id, maxBitRate, format, timeOffset, size, estimateContentLength, converted);
+        String musicUrl = mediaRetrievalApi.stream(req, Long.valueOf(id), maxBitRate, format, timeOffset, size, estimateContentLength, converted);
         return new RedirectView(musicUrl);
     }
 }

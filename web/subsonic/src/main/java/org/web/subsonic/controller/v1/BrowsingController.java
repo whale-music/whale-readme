@@ -137,8 +137,8 @@ public class BrowsingController {
     )
     @GetMapping({"/getAlbum.view", "/getAlbum"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbum(SubsonicCommonReq req, @RequestParam("id") Long id) {
-        AlbumRes res = browsingApi.getAlbum(id);
+    public ResponseEntity<SubsonicResult> getAlbum(SubsonicCommonReq req, @RequestParam("id") String id) {
+        AlbumRes res = browsingApi.getAlbum(Long.valueOf(id));
         return res.success();
     }
     

@@ -35,8 +35,8 @@ public class SearchingController {
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SearchRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SearchRes.class))
                  }
     )
     @GetMapping({"/search.view", "/search"})
@@ -71,8 +71,8 @@ public class SearchingController {
     @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Search2Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Search2Res.class))
                  }
     )
     @GetMapping({"/search2.view", "/search2"})
@@ -111,8 +111,8 @@ public class SearchingController {
     @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Search3Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Search3Res.class))
                  }
     )
     @GetMapping({"/search3.view", "/search3"})

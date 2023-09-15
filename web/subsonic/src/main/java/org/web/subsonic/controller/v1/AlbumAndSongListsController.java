@@ -40,8 +40,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回一个随机的，最新的，最高评级等列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumListRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumListRes.class))
                  }
     )
     @GetMapping({"/getAlbumList.view", "/getAlbumList"})
@@ -86,8 +86,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getAlbumList ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumList2Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumList2Res.class))
                  }
     )
     @GetMapping({"/getAlbumList2.view", "/getAlbumList2"})
@@ -131,8 +131,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回符合给定条件的随机歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = RandomSongsRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RandomSongsRes.class))
                  }
     )
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
@@ -151,8 +151,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回给定流派的歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SongsByGenreRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SongsByGenreRes.class))
                  }
     )
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
@@ -170,8 +170,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回所有用户当前正在播放的内容。不需要额外的参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = NowPlayingRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NowPlayingRes.class))
                  }
     )
     @GetMapping({"/getNowPlaying.view", "/getNowPlaying"})
@@ -184,8 +184,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = StarredRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = StarredRes.class))
                  }
     )
     @GetMapping({"/getStarred.view", "/getStarred"})
@@ -198,8 +198,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getStarred ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Starred2Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Starred2Res.class))
                  }
     )
     @GetMapping({"/getStarred2.view", "/getStarred2"})
@@ -213,6 +213,12 @@ public class AlbumAndSongListsController {
                description = "如果用户已在Subsonic服务器上配置了他/她的last.fm凭证（Settings > Personal），则会“滚动”last.fm上的媒体文件。" +
                        "更新媒体文件的播放次数和上次播放时间戳。（自1.11.0版起）" +
                        "使媒体文件显示在Web应用程序的“正在播放”页面中，并显示在 getNowPlaying （自1.11.0起）返回的歌曲列表中"
+    )
+    @ApiResponse(responseCode = HttpStatusStr.OK,
+                 content = {
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                 }
     )
     @GetMapping({"/scrobble.view", "/scrobble"})
     @ManualSerialize

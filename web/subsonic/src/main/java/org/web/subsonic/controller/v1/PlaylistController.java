@@ -35,8 +35,8 @@ public class PlaylistController {
     @Operation(summary = "返回允许用户播放的所有播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = PlaylistsRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PlaylistsRes.class))
                  }
     )
     @GetMapping({"/getPlaylists.view", "/getPlaylists"})
@@ -49,8 +49,8 @@ public class PlaylistController {
     @Operation(summary = "返回已保存播放列表中的文件列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = PlaylistRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PlaylistRes.class))
                  }
     )
     @GetMapping({"/getPlaylist.view", "/getPlaylist"})
@@ -63,8 +63,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = CreatePlaylistRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreatePlaylistRes.class))
                  }
     )
     @GetMapping({"/createPlaylist.view", "/createPlaylist"})
@@ -81,8 +81,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class))
                  }
     )
     @GetMapping({"/updatePlaylist.view", "/updatePlaylist"})
@@ -102,8 +102,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, contentSchema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class))
                  }
     )
     @GetMapping({"/deletePlaylist.view", "/deletePlaylist"})

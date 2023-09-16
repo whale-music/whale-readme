@@ -49,19 +49,6 @@ public class SubsonicResult implements Serializable {
         return getResponseEntity(isJson);
     }
     
-    @NotNull
-    private ResponseEntity<String> getResponseEntity(boolean isJson) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        if (isJson) {
-            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        } else {
-            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
-        }
-        return new ResponseEntity<>(SerializeUtil.serialize(this, isJson),
-                httpHeaders,
-                HttpStatus.OK);
-    }
-    
     public ResponseEntity<String> error(SubsonicCommonReq req, ErrorEnum error) {
         this.status = "failed";
         this.error = error.error();
@@ -75,4 +62,18 @@ public class SubsonicResult implements Serializable {
         this.error = error.error();
         return getResponseEntity(isJson);
     }
+    
+    @NotNull
+    private ResponseEntity<String> getResponseEntity(boolean isJson) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        if (isJson) {
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        } else {
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+        }
+        return new ResponseEntity<>(SerializeUtil.serialize(this, isJson),
+                httpHeaders,
+                HttpStatus.OK);
+    }
+    
 }

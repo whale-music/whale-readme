@@ -36,12 +36,11 @@ public class AlbumAndSongListsController {
     @Autowired
     private SongListsApi songListsApi;
     
-    // TODO: 2021/7/21 未实现请求中的一些字段
     @Operation(summary = "返回一个随机的，最新的，最高评级等列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumListRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumListRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumListRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumListRes.class))
                  }
     )
     @GetMapping({"/getAlbumList.view", "/getAlbumList"})
@@ -66,18 +65,18 @@ public class AlbumAndSongListsController {
                                                
                                                @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用。")
                                                @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
-                                                       
-                                                       @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。")
-                                                       @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
-                                                       
-                                                       @Parameter(description = "最后一年在范围内。")
-                                                       @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
-                                                       
-                                                       @Parameter(description = "流派的名称，例如，“摇滚”")
-                                                       @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
-                                                       
-                                                       @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。")
-                                                       @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
+                                               
+                                               @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。", deprecated = true)
+                                               @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
+                                               
+                                               @Parameter(description = "最后一年在范围内。", deprecated = true)
+                                               @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
+                                               
+                                               @Parameter(description = "流派的名称，例如，“摇滚”", deprecated = true)
+                                               @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
+                                               
+                                               @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。", deprecated = true)
+                                               @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumListRes res = songListsApi.getAlbumList(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
         return res.success(req);
@@ -86,8 +85,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getAlbumList ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumList2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumList2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumList2Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumList2Res.class))
                  }
     )
     @GetMapping({"/getAlbumList2.view", "/getAlbumList2"})
@@ -113,16 +112,16 @@ public class AlbumAndSongListsController {
                                                 @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
                                                 
                                                 @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表")
-                                                        @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
-                                                        
-                                                        @Parameter(description = "最后一年在范围内。")
-                                                        @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
-                                                        
-                                                        @Parameter(description = "流派的名称，例如，“摇滚”")
-                                                        @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
-                                                        
-                                                        @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders ")
-                                                        @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
+                                                @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
+                                                
+                                                @Parameter(description = "最后一年在范围内。")
+                                                @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
+                                                
+                                                @Parameter(description = "流派的名称，例如，“摇滚”")
+                                                @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
+                                                
+                                                @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders ")
+                                                @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumList2Res res = songListsApi.getAlbumList2(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
         return res.success(req);
@@ -131,8 +130,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回符合给定条件的随机歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = RandomSongsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RandomSongsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RandomSongsRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = RandomSongsRes.class))
                  }
     )
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
@@ -151,8 +150,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回给定流派的歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SongsByGenreRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SongsByGenreRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SongsByGenreRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SongsByGenreRes.class))
                  }
     )
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
@@ -170,8 +169,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回所有用户当前正在播放的内容。不需要额外的参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = NowPlayingRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NowPlayingRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NowPlayingRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = NowPlayingRes.class))
                  }
     )
     @GetMapping({"/getNowPlaying.view", "/getNowPlaying"})
@@ -184,8 +183,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = StarredRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = StarredRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = StarredRes.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = StarredRes.class))
                  }
     )
     @GetMapping({"/getStarred.view", "/getStarred"})
@@ -198,8 +197,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getStarred ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Starred2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Starred2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Starred2Res.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Starred2Res.class))
                  }
     )
     @GetMapping({"/getStarred2.view", "/getStarred2"})
@@ -216,8 +215,8 @@ public class AlbumAndSongListsController {
     )
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class))
                  }
     )
     @GetMapping({"/scrobble.view", "/scrobble"})

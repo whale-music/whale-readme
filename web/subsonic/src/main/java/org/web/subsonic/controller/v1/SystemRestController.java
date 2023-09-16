@@ -33,8 +33,8 @@ public class SystemRestController {
                  }
     )
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> ping(SubsonicCommonReq req) {
-        return new SubsonicResult().success();
+    public ResponseEntity<String> ping(SubsonicCommonReq req) {
+        return new SubsonicResult().success(req);
     }
     
     @GetMapping(value = {"/getLicense.view", "/getLicense"})
@@ -45,9 +45,9 @@ public class SystemRestController {
                  }
     )
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> license(SubsonicCommonReq req) {
+    public ResponseEntity<String> license(SubsonicCommonReq req) {
         LicenseRes licenseRes = new LicenseRes();
         licenseRes.setLicense(new LicenseRes.License(true));
-        return licenseRes.success();
+        return licenseRes.success(req);
     }
 }

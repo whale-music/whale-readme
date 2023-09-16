@@ -15,14 +15,9 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
-import org.core.utils.SerializeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanMap;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -63,41 +58,23 @@ public class ManualSerializeAspect {
     }
     
     @NotNull
-    private ResponseEntity<String> getStringResponseEntity(ProceedingJoinPoint proceedingJoinPoint, String from, String user, String password, String version, String token, String salt) {
+    private Object getStringResponseEntity(ProceedingJoinPoint proceedingJoinPoint, String from, String user, String password, String version, String token, String salt) {
         try {
             authenticate(user, password, token, salt, version);
             // 执行目标方法
-            Object obj = proceedingJoinPoint.proceed();
-            // 成功返回
-            return returnStr(obj, from);
+            return proceedingJoinPoint.proceed();
         } catch (BaseException e) {
             log.error(e.getResultMsg(), e);
             // 用户登录错误
             if (StringUtils.equals(e.getCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getCode(),
                     ResultCode.PASSWORD_ERROR.getCode())) {
-                return returnStr(new SubsonicResult().error(ErrorEnum.WRONG_USERNAME_OR_PASSWORD), from);
+                return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.WRONG_USERNAME_OR_PASSWORD);
             }
             throw new BaseException();
         } catch (Throwable e) {
             e.printStackTrace();
-            return returnStr(new SubsonicResult().error(ErrorEnum.A_GENERIC_ERROR), from);
+            return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.A_GENERIC_ERROR);
         }
-    }
-    
-    private ResponseEntity<String> returnStr(Object result, String isJson) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        boolean json = StringUtils.equalsIgnoreCase(isJson, "json");
-        if (json) {
-            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        } else {
-            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
-        }
-        if (result instanceof ResponseEntity<?> res) {
-            return new ResponseEntity<>(SerializeUtil.serialize(res.getBody(), json),
-                    httpHeaders,
-                    HttpStatus.OK);
-        }
-        throw new BaseException(ResultCode.SERIALIZATION_ERROR);
     }
     
     private void authenticate(String user, String password, String token, String salt, String version) {

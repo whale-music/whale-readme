@@ -46,26 +46,26 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getAlbumList.view", "/getAlbumList"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbumList(SubsonicCommonReq req,
-                                                       @Parameter(description = "列表类型",
-                                                                  content = {
-                                                                          @Content(schema = @Schema(name = "random", description = "随机播放")),
-                                                                          @Content(schema = @Schema(name = "random", description = "随机播放")),
-                                                                          @Content(schema = @Schema(name = "newest", description = "最新添加")),
-                                                                          @Content(schema = @Schema(name = "frequent", description = "播放最多")),
-                                                                          @Content(schema = @Schema(name = "recent", description = "最近播放")),
-                                                                          @Content(schema = @Schema(name = "starred", description = "收藏")),
-                                                                          @Content(schema = @Schema(name = "alphabeticalByName", description = "按姓名字母顺序排列")),
-                                                                          @Content(schema = @Schema(name = "alphabeticalByArtist", description = "按艺术家字母排序")),
-                                                                  }
-                                                       )
-                                                       @RequestParam("type") String type,
-                                                       
-                                                       @Parameter(description = "要返回的相册数。最多五百")
-                                                       @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
-                                                       
-                                                       @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用。")
-                                                       @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
+    public ResponseEntity<String> getAlbumList(SubsonicCommonReq req,
+                                               @Parameter(description = "列表类型",
+                                                          content = {
+                                                                  @Content(schema = @Schema(name = "random", description = "随机播放")),
+                                                                  @Content(schema = @Schema(name = "random", description = "随机播放")),
+                                                                  @Content(schema = @Schema(name = "newest", description = "最新添加")),
+                                                                  @Content(schema = @Schema(name = "frequent", description = "播放最多")),
+                                                                  @Content(schema = @Schema(name = "recent", description = "最近播放")),
+                                                                  @Content(schema = @Schema(name = "starred", description = "收藏")),
+                                                                  @Content(schema = @Schema(name = "alphabeticalByName", description = "按姓名字母顺序排列")),
+                                                                  @Content(schema = @Schema(name = "alphabeticalByArtist", description = "按艺术家字母排序")),
+                                                          }
+                                               )
+                                               @RequestParam("type") String type,
+                                               
+                                               @Parameter(description = "要返回的相册数。最多五百")
+                                               @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
+                                               
+                                               @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用。")
+                                               @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
                                                        
                                                        @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。")
                                                        @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
@@ -80,7 +80,7 @@ public class AlbumAndSongListsController {
                                                        @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumListRes res = songListsApi.getAlbumList(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "类似于 getAlbumList ，但根据ID3标签组织音乐")
@@ -92,27 +92,27 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getAlbumList2.view", "/getAlbumList2"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbumList2(SubsonicCommonReq req,
-                                                        @Parameter(description = "列表类型",
-                                                                   examples = {
-                                                                           @ExampleObject(value = "random", description = "随机播放"),
-                                                                           @ExampleObject(value = "newest", description = "最新添加"),
-                                                                           @ExampleObject(value = "frequent", description = "播放最多"),
-                                                                           @ExampleObject(value = "recent", description = "最近播放"),
-                                                                           @ExampleObject(value = "starred", description = "收藏"),
-                                                                           @ExampleObject(value = "alphabeticalByName", description = "按姓名字母顺序排列"),
-                                                                           @ExampleObject(value = "alphabeticalByArtist", description = "按艺术家字母排序"),
-                                                                   }
-                                                        )
-                                                        @RequestParam("type") String type,
-                                                        
-                                                        @Parameter(description = "要返回的相册数。最多五百")
-                                                        @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
-                                                        
-                                                        @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用")
-                                                        @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
-                                                        
-                                                        @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表")
+    public ResponseEntity<String> getAlbumList2(SubsonicCommonReq req,
+                                                @Parameter(description = "列表类型",
+                                                           examples = {
+                                                                   @ExampleObject(value = "random", description = "随机播放"),
+                                                                   @ExampleObject(value = "newest", description = "最新添加"),
+                                                                   @ExampleObject(value = "frequent", description = "播放最多"),
+                                                                   @ExampleObject(value = "recent", description = "最近播放"),
+                                                                   @ExampleObject(value = "starred", description = "收藏"),
+                                                                   @ExampleObject(value = "alphabeticalByName", description = "按姓名字母顺序排列"),
+                                                                   @ExampleObject(value = "alphabeticalByArtist", description = "按艺术家字母排序"),
+                                                           }
+                                                )
+                                                @RequestParam("type") String type,
+                                                
+                                                @Parameter(description = "要返回的相册数。最多五百")
+                                                @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
+                                                
+                                                @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用")
+                                                @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
+                                                
+                                                @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表")
                                                         @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
                                                         
                                                         @Parameter(description = "最后一年在范围内。")
@@ -125,7 +125,7 @@ public class AlbumAndSongListsController {
                                                         @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumList2Res res = songListsApi.getAlbumList2(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回符合给定条件的随机歌曲")
@@ -137,15 +137,15 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getRandomSongs(SubsonicCommonReq req,
-                                                         @RequestParam(value = "size", defaultValue = "10", required = false) Long size,
-                                                         @RequestParam(value = "genre", required = false) Long genre,
-                                                         @RequestParam(value = "fromYear", required = false) Long fromYear,
-                                                         @RequestParam(value = "toYear", required = false) Long toYear,
-                                                         @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
+    public ResponseEntity<String> getRandomSongs(SubsonicCommonReq req,
+                                                 @RequestParam(value = "size", defaultValue = "10", required = false) Long size,
+                                                 @RequestParam(value = "genre", required = false) Long genre,
+                                                 @RequestParam(value = "fromYear", required = false) Long fromYear,
+                                                 @RequestParam(value = "toYear", required = false) Long toYear,
+                                                 @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
     ) {
         RandomSongsRes res = songListsApi.getRandomSongs(req, size, genre, fromYear, toYear, musicFolderId);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回给定流派的歌曲")
@@ -157,14 +157,14 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getSongsByGenre(SubsonicCommonReq req,
-                                                          @RequestParam(value = "genre") Long genre,
-                                                          @RequestParam(value = "musicFolderId", required = false) Long musicFolderId,
-                                                          @RequestParam(value = "count", defaultValue = "10", required = false) Long count,
-                                                          @RequestParam(value = "offset", required = false) Long offset
+    public ResponseEntity<String> getSongsByGenre(SubsonicCommonReq req,
+                                                  @RequestParam(value = "genre") Long genre,
+                                                  @RequestParam(value = "musicFolderId", required = false) Long musicFolderId,
+                                                  @RequestParam(value = "count", defaultValue = "10", required = false) Long count,
+                                                  @RequestParam(value = "offset", required = false) Long offset
     ) {
         SongsByGenreRes res = songListsApi.getSongsByGenre(req, genre, musicFolderId, count, offset);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有用户当前正在播放的内容。不需要额外的参数")
@@ -176,9 +176,9 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getNowPlaying.view", "/getNowPlaying"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getNowPlaying(SubsonicCommonReq req) {
+    public ResponseEntity<String> getNowPlaying(SubsonicCommonReq req) {
         NowPlayingRes res = songListsApi.getNowPlaying(req);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
@@ -190,9 +190,9 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getStarred.view", "/getStarred"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getStarred(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
+    public ResponseEntity<String> getStarred(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
         StarredRes res = songListsApi.getStarred(req, musicFolderId);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "类似于 getStarred ，但根据ID3标签组织音乐")
@@ -204,9 +204,9 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getStarred2.view", "/getStarred2"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getStarred2(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
+    public ResponseEntity<String> getStarred2(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
         Starred2Res res = songListsApi.getStarred2(req, musicFolderId);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "注册一个或多个媒体文件的本地回放。通常在播放缓存在客户端上的媒体时使用。此操作包括以下内容：",
@@ -222,8 +222,8 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/scrobble.view", "/scrobble"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> scrobble(SubsonicCommonReq req, @RequestParam("id") Long id, Long timeStamp, @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
+    public ResponseEntity<String> scrobble(SubsonicCommonReq req, @RequestParam("id") Long id, Long timeStamp, @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
         songListsApi.scrobble(req, id, timeStamp, submission);
-        return new SubsonicResult().success();
+        return new SubsonicResult().success(req);
     }
 }

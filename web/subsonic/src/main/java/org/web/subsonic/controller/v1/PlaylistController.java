@@ -41,9 +41,9 @@ public class PlaylistController {
     )
     @GetMapping({"/getPlaylists.view", "/getPlaylists"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getPlaylists(SubsonicCommonReq req, String username) {
+    public ResponseEntity<String> getPlaylists(SubsonicCommonReq req, String username) {
         PlaylistsRes playlists = playlistApi.getPlaylists(req, username);
-        return playlists.success();
+        return playlists.success(req);
     }
     
     @Operation(summary = "返回已保存播放列表中的文件列表")
@@ -55,9 +55,9 @@ public class PlaylistController {
     )
     @GetMapping({"/getPlaylist.view", "/getPlaylist"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getPlaylist(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getPlaylist(SubsonicCommonReq req, @RequestParam("id") Long id) {
         PlaylistRes playlists = playlistApi.getPlaylist(id);
-        return playlists.success();
+        return playlists.success(req);
     }
     
     @Operation(summary = "创建（或更新）播放列表")
@@ -69,13 +69,13 @@ public class PlaylistController {
     )
     @GetMapping({"/createPlaylist.view", "/createPlaylist"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> createPlaylist(SubsonicCommonReq req,
-                                                         @RequestParam(value = "playlistId", required = false) Long playlistId,
-                                                         @RequestParam(value = "name", required = false) String name,
-                                                         @RequestParam(value = "songId", required = false) Long songId
+    public ResponseEntity<String> createPlaylist(SubsonicCommonReq req,
+                                                 @RequestParam(value = "playlistId", required = false) Long playlistId,
+                                                 @RequestParam(value = "name", required = false) String name,
+                                                 @RequestParam(value = "songId", required = false) Long songId
     ) {
         CreatePlaylistRes playlists = playlistApi.createPlaylist(req, playlistId, name, songId);
-        return playlists.success();
+        return playlists.success(req);
     }
     
     @Operation(summary = "创建（或更新）播放列表")
@@ -87,16 +87,16 @@ public class PlaylistController {
     )
     @GetMapping({"/updatePlaylist.view", "/updatePlaylist"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> updatePlaylist(SubsonicCommonReq req,
-                                                         @RequestParam(value = "playlistId") Long playlistId,
-                                                         @RequestParam(value = "name", required = false) String name,
-                                                         @RequestParam(value = "comment", required = false) String comment,
-                                                         @RequestParam(value = "public", required = false) Boolean publicFlag,
-                                                         @RequestParam(value = "songIdToAdd", required = false) List<Long> songIdToAdd,
-                                                         @RequestParam(value = "songIndexToRemove", required = false) List<Long> songIndexToRemove
+    public ResponseEntity<String> updatePlaylist(SubsonicCommonReq req,
+                                                 @RequestParam(value = "playlistId") Long playlistId,
+                                                 @RequestParam(value = "name", required = false) String name,
+                                                 @RequestParam(value = "comment", required = false) String comment,
+                                                 @RequestParam(value = "public", required = false) Boolean publicFlag,
+                                                 @RequestParam(value = "songIdToAdd", required = false) List<Long> songIdToAdd,
+                                                 @RequestParam(value = "songIndexToRemove", required = false) List<Long> songIndexToRemove
     ) {
         playlistApi.updatePlaylist(req, playlistId, name, comment, publicFlag, songIdToAdd, songIndexToRemove);
-        return new SubsonicResult().success();
+        return new SubsonicResult().success(req);
     }
     
     @Operation(summary = "创建（或更新）播放列表")
@@ -108,10 +108,10 @@ public class PlaylistController {
     )
     @GetMapping({"/deletePlaylist.view", "/deletePlaylist"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> deletePlaylist(SubsonicCommonReq req,
-                                                         @RequestParam(value = "id") Long id
+    public ResponseEntity<String> deletePlaylist(SubsonicCommonReq req,
+                                                 @RequestParam(value = "id") Long id
     ) {
         playlistApi.deletePlaylist(req, id);
-        return new SubsonicResult().success();
+        return new SubsonicResult().success(req);
     }
 }

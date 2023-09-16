@@ -1,15 +1,18 @@
 package org.api.subsonic.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpEntity;
+import org.apache.commons.lang3.StringUtils;
+import org.core.utils.SerializeUtil;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.Serial;
@@ -18,11 +21,9 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @JacksonXmlRootElement(localName = "subsonic-response")
 @JsonRootName("subsonic-response")
-@JsonIgnoreProperties({"headers", "body"})
-public class SubsonicResult extends HttpEntity<SubsonicResult> implements Serializable {
+public class SubsonicResult implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     
@@ -41,14 +42,37 @@ public class SubsonicResult extends HttpEntity<SubsonicResult> implements Serial
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Error error;
     
-    public ResponseEntity<SubsonicResult> success() {
+    public ResponseEntity<String> success(SubsonicCommonReq req) {
         this.status = "ok";
-        return ResponseEntity.ok(this);
+        String json = req.getF();
+        boolean isJson = StringUtils.equalsIgnoreCase(json, "json");
+        return getResponseEntity(isJson);
     }
     
-    public ResponseEntity<SubsonicResult> error(ErrorEnum error) {
+    @NotNull
+    private ResponseEntity<String> getResponseEntity(boolean isJson) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        if (isJson) {
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        } else {
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+        }
+        return new ResponseEntity<>(SerializeUtil.serialize(this, isJson),
+                httpHeaders,
+                HttpStatus.OK);
+    }
+    
+    public ResponseEntity<String> error(SubsonicCommonReq req, ErrorEnum error) {
         this.status = "failed";
         this.error = error.error();
-        return ResponseEntity.ok(this);
+        String json = req.getF();
+        boolean isJson = StringUtils.equalsIgnoreCase(json, "json");
+        return getResponseEntity(isJson);
+    }
+    
+    public ResponseEntity<String> error(boolean isJson, ErrorEnum error) {
+        this.status = "failed";
+        this.error = error.error();
+        return getResponseEntity(isJson);
     }
 }

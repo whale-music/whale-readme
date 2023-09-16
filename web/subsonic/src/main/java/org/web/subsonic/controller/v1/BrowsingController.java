@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.api.subsonic.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
-import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.album.AlbumRes;
 import org.api.subsonic.model.res.albuminfo.AlbumInfoRes;
@@ -53,9 +52,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getMusicFolders.view", "/getMusicFolders"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getMusicFolders(SubsonicCommonReq req) {
+    public ResponseEntity<String> getMusicFolders(SubsonicCommonReq req) {
         MusicFoldersRes res = browsingApi.getMusicFolders(req);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数")
@@ -67,9 +66,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getIndexes.view", "/getIndexes"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getIndexes(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) String musicFolderId, @RequestParam(value = "ifModifiedSince", required = false) String ifModifiedSince) {
+    public ResponseEntity<String> getIndexes(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) String musicFolderId, @RequestParam(value = "ifModifiedSince", required = false) String ifModifiedSince) {
         IndexesRes res = browsingApi.getIndexes(req, musicFolderId, ifModifiedSince);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数. 暂时未实现")
@@ -81,9 +80,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getMusicDirectory.view", "/getMusicDirectory"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getMusicDirectory(SubsonicCommonReq req) {
+    public ResponseEntity<String> getMusicDirectory(SubsonicCommonReq req) {
         MusicDirectoryRes res = browsingApi.getMusicDirectory(req);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有流派", description = "返回音乐和专辑流派")
@@ -95,9 +94,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getGenres.view", "/getGenres"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getGenres(SubsonicCommonReq req) {
+    public ResponseEntity<String> getGenres(SubsonicCommonReq req) {
         GenresRes res = browsingApi.getGenres(req);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "与'/getIndexes'类似，但根据 ID3 标签组织音乐")
@@ -109,9 +108,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getArtists.view", "/getArtists"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getArtists(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) String musicFolderId) {
+    public ResponseEntity<String> getArtists(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) String musicFolderId) {
         ArtistsRes res = browsingApi.getArtists(req);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回艺术家的详细信息，包括唱片集列表。此方法根据ID3标签组织音乐")
@@ -123,9 +122,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getArtist.view", "/getArtist"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getArtist(SubsonicCommonReq req, @RequestParam(value = "id", required = false) String id) {
+    public ResponseEntity<String> getArtist(SubsonicCommonReq req, @RequestParam(value = "id", required = false) String id) {
         ArtistRes res = browsingApi.getArtist(req, id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回专辑的详细信息，包括歌曲列表。此方法根据ID3标签组织音乐")
@@ -137,9 +136,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getAlbum.view", "/getAlbum"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbum(SubsonicCommonReq req, @RequestParam("id") String id) {
+    public ResponseEntity<String> getAlbum(SubsonicCommonReq req, @RequestParam("id") String id) {
         AlbumRes res = browsingApi.getAlbum(Long.valueOf(id));
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回歌曲的详细信息")
@@ -151,9 +150,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getSong.view", "/getSong"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getSong(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getSong(SubsonicCommonReq req, @RequestParam("id") Long id) {
         SongRes res = browsingApi.getSong(id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有视频文件", description = "未实现")
@@ -165,9 +164,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getVideos.view", "/getSong"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getVideos(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getVideos(SubsonicCommonReq req, @RequestParam("id") Long id) {
         VideosRes res = browsingApi.getVideos(id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "返回所有视频文件", description = "未实现")
@@ -179,9 +178,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getVideoInfo.view", "/getVideoInfo"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getVideoInfo(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getVideoInfo(SubsonicCommonReq req, @RequestParam("id") Long id) {
         VideoInfoRes res = browsingApi.getVideoInfo(id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "艺术家信息", description = "返回带有传记、图像 URL 和类似艺术家的艺术家信息。")
@@ -193,9 +192,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getArtistInfo.view", "/getArtistInfo"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getArtistInfo(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "20", required = false) Integer count, @RequestParam(value = "includeNotPresent", defaultValue = "false", required = false) Boolean includeNotPresent) {
+    public ResponseEntity<String> getArtistInfo(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "20", required = false) Integer count, @RequestParam(value = "includeNotPresent", defaultValue = "false", required = false) Boolean includeNotPresent) {
         ArtistInfoRes res = browsingApi.getArtistInfo(req, id, count, includeNotPresent);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "类似于 '/getArtistInfo'", description = "类似于 getArtistInfo ，但根据ID3标签组织音乐。")
@@ -207,9 +206,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getArtistInfo2.view", "/getArtistInfo2"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getArtistInfo2(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "20", required = false) Integer count, @RequestParam(value = "includeNotPresent", defaultValue = "false", required = false) Boolean includeNotPresent) {
+    public ResponseEntity<String> getArtistInfo2(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "20", required = false) Integer count, @RequestParam(value = "includeNotPresent", defaultValue = "false", required = false) Boolean includeNotPresent) {
         ArtistInfo2Res res = browsingApi.getArtistInfo2(req, id, count, includeNotPresent);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
@@ -221,9 +220,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getAlbumInfo.view", "/getAlbumInfo"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbumInfo(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getAlbumInfo(SubsonicCommonReq req, @RequestParam("id") Long id) {
         AlbumInfoRes res = browsingApi.getAlbumInfo(req, id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
@@ -235,9 +234,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getAlbumInfo2.view", "/getAlbumInfo2"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getAlbumInfo2(SubsonicCommonReq req, @RequestParam("id") Long id) {
+    public ResponseEntity<String> getAlbumInfo2(SubsonicCommonReq req, @RequestParam("id") Long id) {
         AlbumInfo2Res res = browsingApi.getAlbumInfo2(req, id);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
@@ -249,9 +248,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getSimilarSongs.view", "/getSimilarSongs"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getSimilarSongs(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
+    public ResponseEntity<String> getSimilarSongs(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
         SimilarSongsRes res = browsingApi.getSimilarSongs(req, id, count);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
@@ -263,9 +262,9 @@ public class BrowsingController {
     )
     @GetMapping({"/getSimilarSongs2.view", "/getSimilarSongs2"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getSimilarSongs2(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
+    public ResponseEntity<String> getSimilarSongs2(SubsonicCommonReq req, @RequestParam("id") Long id, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
         SimilarSongs2Res res = browsingApi.getSimilarSongs2(req, id, count);
-        return res.success();
+        return res.success(req);
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
@@ -277,8 +276,8 @@ public class BrowsingController {
     )
     @GetMapping({"/getTopSongs.view", "/getTopSongs"})
     @ManualSerialize
-    public ResponseEntity<SubsonicResult> getTopSongs(SubsonicCommonReq req, @RequestParam("artist") String artist, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
+    public ResponseEntity<String> getTopSongs(SubsonicCommonReq req, @RequestParam("artist") String artist, @RequestParam(value = "count", defaultValue = "50", required = false) Integer count) {
         TopSongsRes res = browsingApi.getTopSongs(req, artist, count);
-        return res.success();
+        return res.success(req);
     }
 }

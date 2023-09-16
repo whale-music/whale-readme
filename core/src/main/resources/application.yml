@@ -20,10 +20,26 @@ logging:
     #格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} %clr(%5p) %clr(%C.%M[%line]){cyan} [%thread] %msg%n"
     # 文件输出的格式
-    file: "[file]===%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n"
+  file:
+    # 日志文件名
+    #    path: logs
+    name: logs/${spring.application.name}.log
+  logback:
+    rollingpolicy:
+      # 根据文件大小归档，超过5MB自动归档，次日启动服务时也会自动归档
+      file-name-pattern: logs/%d{yyyy_MM_dd}/${spring.application.name}.out.log.%d{yyyy-MM-dd}.%i.gz
+      # 日志最大大小
+      max-file-size: 5MB
+      # 要保留的日志备份的总大小
+      total-size-cap: 200MB
+      # 保存存档日志文件的最大天数(默认为7天)
+      max-history: 7
 
 #spring
 spring:
+  application:
+    name: whale
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   output:

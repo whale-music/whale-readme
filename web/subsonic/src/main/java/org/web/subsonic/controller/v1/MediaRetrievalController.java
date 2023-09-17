@@ -2,6 +2,7 @@ package org.web.subsonic.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class MediaRetrievalController {
     private MediaRetrievalApi mediaRetrievalApi;
     
     @Operation(summary = "返回封面艺术图像")
-    @ApiResponse(responseCode = HttpStatusStr.MOVED_TEMP)
+    @ApiResponse(responseCode = HttpStatusStr.MOVED_TEMP, content = @Content)
     @GetMapping({"/getCoverArt.view", "/getCoverArt"})
     public RedirectView getCoverArt(SubsonicCommonReq req,
                                     @Parameter(description = "歌曲、专辑或艺术家的ID")
@@ -38,7 +39,7 @@ public class MediaRetrievalController {
     }
     
     @Operation(summary = "流式传输给定的媒体文件, 实际是返回302重定向地址")
-    @ApiResponse(responseCode = HttpStatusStr.MOVED_TEMP)
+    @ApiResponse(responseCode = HttpStatusStr.MOVED_TEMP, content = @Content)
     @GetMapping({"/stream.view", "/stream"})
     public RedirectView stream(SubsonicCommonReq req,
                                @Parameter(description = "唯一标识要流传输的文件的字符串。通过调用getMusicDirectory获得")

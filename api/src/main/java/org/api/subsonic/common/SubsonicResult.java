@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @JacksonXmlRootElement(localName = "subsonic-response")
 @JsonRootName("subsonic-response")
+@Schema(title = "公共返回类, 所有返回类都会继承此类")
 public class SubsonicResult implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -42,23 +44,37 @@ public class SubsonicResult implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Error error;
     
+    private static final String FAILED = "failed";
+    private static final String OK = "ok";
+    
+    public SubsonicResult success() {
+        this.status = OK;
+        return this;
+    }
+    
     public ResponseEntity<String> success(SubsonicCommonReq req) {
-        this.status = "ok";
+        this.status = OK;
         String json = req.getF();
         boolean isJson = StringUtils.equalsIgnoreCase(json, "json");
         return getResponseEntity(isJson);
     }
     
     public ResponseEntity<String> error(SubsonicCommonReq req, ErrorEnum error) {
-        this.status = "failed";
+        this.status = FAILED;
         this.error = error.error();
         String json = req.getF();
         boolean isJson = StringUtils.equalsIgnoreCase(json, "json");
         return getResponseEntity(isJson);
     }
     
+    public SubsonicResult error(ErrorEnum error) {
+        this.status = FAILED;
+        this.error = error.error();
+        return this;
+    }
+    
     public ResponseEntity<String> error(boolean isJson, ErrorEnum error) {
-        this.status = "failed";
+        this.status = FAILED;
         this.error = error.error();
         return getResponseEntity(isJson);
     }

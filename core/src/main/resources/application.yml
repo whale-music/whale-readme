@@ -193,7 +193,7 @@ application:
 # sizeMax:最大文件 sizeMin:最小文件
 subsonic:
   resource:
-    returnPlan: first
+    return-plan: first
 
 # webdav 资源多个资源返回策略:
 # first:第一个 last: 最后一个
@@ -201,4 +201,4 @@ subsonic:
 # sizeMax:最大文件 sizeMin:最小文件
 webdav:
   resource:
-    returnPlan: first
+    return-plan: first

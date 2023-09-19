@@ -2,7 +2,6 @@ package org.web.subsonic.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +45,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有已配置的顶级音乐文件夹。不带额外的参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MusicFoldersRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = MusicFoldersRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getMusicFolders.view", "/getMusicFolders"})
@@ -60,8 +59,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = IndexesRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = IndexesRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getIndexes.view", "/getIndexes"})
@@ -74,8 +73,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数. 暂时未实现")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MusicDirectoryRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = MusicDirectoryRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getMusicDirectory.view", "/getMusicDirectory"})
@@ -88,8 +87,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有流派", description = "返回音乐和专辑流派")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = GenresRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = GenresRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getGenres.view", "/getGenres"})
@@ -102,8 +101,8 @@ public class BrowsingController {
     @Operation(summary = "与'/getIndexes'类似，但根据 ID3 标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ArtistsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = ArtistsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getArtists.view", "/getArtists"})
@@ -116,8 +115,8 @@ public class BrowsingController {
     @Operation(summary = "返回艺术家的详细信息，包括唱片集列表。此方法根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ArtistRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = ArtistRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getArtist.view", "/getArtist"})
@@ -130,8 +129,8 @@ public class BrowsingController {
     @Operation(summary = "返回专辑的详细信息，包括歌曲列表。此方法根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getAlbum.view", "/getAlbum"})
@@ -144,8 +143,8 @@ public class BrowsingController {
     @Operation(summary = "返回歌曲的详细信息")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SongRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SongRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getSong.view", "/getSong"})
@@ -158,8 +157,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有视频文件", description = "未实现")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = VideosRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = VideosRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getVideos.view", "/getSong"})
@@ -172,8 +171,8 @@ public class BrowsingController {
     @Operation(summary = "返回所有视频文件", description = "未实现")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = VideoInfoRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = VideoInfoRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getVideoInfo.view", "/getVideoInfo"})
@@ -186,8 +185,8 @@ public class BrowsingController {
     @Operation(summary = "艺术家信息", description = "返回带有传记、图像 URL 和类似艺术家的艺术家信息。")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ArtistInfoRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = ArtistInfoRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getArtistInfo.view", "/getArtistInfo"})
@@ -200,8 +199,8 @@ public class BrowsingController {
     @Operation(summary = "类似于 '/getArtistInfo'", description = "类似于 getArtistInfo ，但根据ID3标签组织音乐。")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ArtistInfo2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = ArtistInfo2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getArtistInfo2.view", "/getArtistInfo2"})
@@ -214,8 +213,8 @@ public class BrowsingController {
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumInfoRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumInfoRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getAlbumInfo.view", "/getAlbumInfo"})
@@ -228,8 +227,8 @@ public class BrowsingController {
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumInfo2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumInfo2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getAlbumInfo2.view", "/getAlbumInfo2"})
@@ -242,8 +241,8 @@ public class BrowsingController {
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SimilarSongsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SimilarSongsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getSimilarSongs.view", "/getSimilarSongs"})
@@ -256,8 +255,8 @@ public class BrowsingController {
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SimilarSongs2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SimilarSongs2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getSimilarSongs2.view", "/getSimilarSongs2"})
@@ -270,8 +269,8 @@ public class BrowsingController {
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = TopSongsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = TopSongsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getTopSongs.view", "/getTopSongs"})

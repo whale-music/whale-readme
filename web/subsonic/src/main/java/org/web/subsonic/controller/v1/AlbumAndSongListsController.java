@@ -39,8 +39,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回一个随机的，最新的，最高评级等列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumListRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumListRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getAlbumList.view", "/getAlbumList"})
@@ -85,8 +85,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getAlbumList ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AlbumList2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = AlbumList2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getAlbumList2.view", "/getAlbumList2"})
@@ -130,8 +130,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回符合给定条件的随机歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RandomSongsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = RandomSongsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
@@ -150,8 +150,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回给定流派的歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SongsByGenreRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SongsByGenreRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
@@ -169,8 +169,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回所有用户当前正在播放的内容。不需要额外的参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NowPlayingRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = NowPlayingRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getNowPlaying.view", "/getNowPlaying"})
@@ -183,8 +183,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = StarredRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = StarredRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getStarred.view", "/getStarred"})
@@ -197,8 +197,8 @@ public class AlbumAndSongListsController {
     @Operation(summary = "类似于 getStarred ，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Starred2Res.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = Starred2Res.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getStarred2.view", "/getStarred2"})
@@ -215,8 +215,8 @@ public class AlbumAndSongListsController {
     )
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/scrobble.view", "/scrobble"})

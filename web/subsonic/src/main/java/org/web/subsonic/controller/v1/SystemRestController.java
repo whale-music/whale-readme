@@ -1,7 +1,6 @@
 package org.web.subsonic.controller.v1;
 
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +27,8 @@ public class SystemRestController {
     @GetMapping(value = {"/ping.view", "/ping"})
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @ManualSerialize
@@ -40,8 +39,8 @@ public class SystemRestController {
     @GetMapping(value = {"/getLicense.view", "/getLicense"})
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = LicenseRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = LicenseRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @ManualSerialize

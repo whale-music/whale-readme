@@ -2,7 +2,6 @@ package org.web.subsonic.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +34,8 @@ public class PlaylistController {
     @Operation(summary = "返回允许用户播放的所有播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PlaylistsRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = PlaylistsRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getPlaylists.view", "/getPlaylists"})
@@ -49,8 +48,8 @@ public class PlaylistController {
     @Operation(summary = "返回已保存播放列表中的文件列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = PlaylistRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = PlaylistRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/getPlaylist.view", "/getPlaylist"})
@@ -63,8 +62,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CreatePlaylistRes.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = CreatePlaylistRes.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/createPlaylist.view", "/createPlaylist"})
@@ -81,8 +80,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/updatePlaylist.view", "/updatePlaylist"})
@@ -102,8 +101,8 @@ public class PlaylistController {
     @Operation(summary = "创建（或更新）播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
-                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = SubsonicResult.class)),
-                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE, schema = @Schema(implementation = SubsonicResult.class))
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
     @GetMapping({"/deletePlaylist.view", "/deletePlaylist"})

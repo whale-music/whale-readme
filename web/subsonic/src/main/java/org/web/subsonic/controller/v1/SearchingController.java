@@ -30,7 +30,7 @@ public class SearchingController {
     @Autowired
     private SearchingApi searchingApi;
     
-    @Operation(summary = "返回明星歌曲，专辑和艺术家")
+    @Operation(summary = "返回明星歌曲，专辑和艺术家", description = "该功能未实现", deprecated = true)
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
@@ -66,7 +66,7 @@ public class SearchingController {
         return res.success(req);
     }
     
-    @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
+    @Operation(summary = "搜索2", description = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
@@ -94,19 +94,19 @@ public class SearchingController {
                                           
                                           @Parameter(description = "返回的最大歌曲数")
                                           @RequestParam(value = "songCount", required = false, defaultValue = "20") Long songCount,
-                                                  
-                                                  @Parameter(description = "歌曲的搜索结果偏移量。用于分页。自1970年以来以毫秒计")
-                                                  @RequestParam(value = "songOffset", required = false, defaultValue = "0") Long songOffset,
-                                                  
-                                                  @Parameter(description = "从1.12.0开始）仅返回具有给定ID的音乐文件夹中的结果。参见 getMusicFolders ")
-                                                  @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
+                                          
+                                          @Parameter(description = "歌曲的搜索结果偏移量。用于分页。自1970年以来以毫秒计")
+                                          @RequestParam(value = "songOffset", required = false, defaultValue = "0") Long songOffset,
+                                          
+                                          @Parameter(description = "从1.12.0开始）仅返回具有给定ID的音乐文件夹中的结果。参见 getMusicFolders ", deprecated = true)
+                                          @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
     
     ) {
         Search2Res res = searchingApi.search2(req, query, artistCount, artistOffset, albumCount, albumOffset, songCount, songOffset, musicFolderId);
         return res.success(req);
     }
     
-    @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
+    @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页", description = "类似于`/search2`，但根据ID3标签组织音乐")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
@@ -134,12 +134,12 @@ public class SearchingController {
                                           
                                           @Parameter(description = "返回的最大歌曲数")
                                           @RequestParam(value = "songCount", required = false, defaultValue = "20") Long songCount,
-                                                  
-                                                  @Parameter(description = "歌曲的搜索结果偏移量。用于分页。自1970年以来以毫秒计")
-                                                  @RequestParam(value = "songOffset", required = false, defaultValue = "0") Long songOffset,
-                                                  
-                                                  @Parameter(description = "从1.12.0开始）仅返回具有给定ID的音乐文件夹中的结果。参见 getMusicFolders ")
-                                                  @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
+                                          
+                                          @Parameter(description = "歌曲的搜索结果偏移量。用于分页。自1970年以来以毫秒计")
+                                          @RequestParam(value = "songOffset", required = false, defaultValue = "0") Long songOffset,
+                                          
+                                          @Parameter(description = "从1.12.0开始）仅返回具有给定ID的音乐文件夹中的结果。参见 getMusicFolders ", deprecated = true)
+                                          @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
     
     ) {
         Search3Res res = searchingApi.search3(req, query, artistCount, artistOffset, albumCount, albumOffset, songCount, songOffset, musicFolderId);

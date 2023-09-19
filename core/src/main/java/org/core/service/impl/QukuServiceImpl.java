@@ -354,16 +354,37 @@ public class QukuServiceImpl implements QukuService {
         return convert;
     }
     
+    
     /**
      * 随即获取曲库中的多条数据
+     *
+     * @param count    歌曲数量
+     * @param genre    歌曲流派
+     * @param fromYear 仅返回今年之后或今年内发布的歌曲。
+     * @param toYear   只返回今年之前或今年出版的歌曲
      */
     @Override
-    public List<MusicConvert> randomMusicList(int count) {
+    public List<MusicConvert> randomMusicList(int count, String genre, Long fromYear, Long toYear) {
         long sumCount = musicService.count();
         int pageCount = PageUtil.totalPage((int) sumCount, count);
         long randomOffset = RandomUtils.nextLong(0, pageCount);
         Page<TbMusicPojo> page = new Page<>(RandomUtil.randomLong(0, randomOffset), count);
-        musicService.page(page);
+        boolean genreFlag = StringUtils.isNotBlank(genre);
+        
+        if (genreFlag) {
+            LambdaQueryWrapper<TbTagPojo> eq = Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, genre);
+            List<TbTagPojo> list = tagService.list(eq);
+            List<Long> tagIds = list.parallelStream().map(TbTagPojo::getId).toList();
+            if (CollUtil.isNotEmpty(tagIds)) {
+                List<TbMiddleTagPojo> middleList = middleTagService.list(Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tagIds));
+                if (CollUtil.isNotEmpty(middleList)) {
+                    List<Long> middleTagIds = middleList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
+                    musicService.page(page, Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, middleTagIds));
+                }
+            }
+        } else {
+            musicService.page(page);
+        }
         List<TbMusicPojo> tbMusicPojos = Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>());
         return getMusicConvertList(tbMusicPojos, getMusicPicUrl(tbMusicPojos.parallelStream().map(TbMusicPojo::getId).toList()));
     }

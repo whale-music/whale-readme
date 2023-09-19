@@ -61,22 +61,22 @@ public class AlbumAndSongListsController {
                                                @RequestParam("type") String type,
                                                
                                                @Parameter(description = "要返回的相册数。最多五百")
-                                               @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
+                                                   @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
                                                
                                                @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用。")
-                                               @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
+                                                   @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
                                                
-                                               @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。", deprecated = true)
-                                               @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
+                                               @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。")
+                                                   @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
                                                
-                                               @Parameter(description = "最后一年在范围内。", deprecated = true)
-                                               @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
+                                               @Parameter(description = "最后一年在范围内。")
+                                                   @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
                                                
                                                @Parameter(description = "流派的名称，例如，“摇滚”", deprecated = true)
-                                               @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
+                                                   @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
                                                
-                                               @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。", deprecated = true)
-                                               @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
+                                               @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。(该参数无效)", deprecated = true)
+                                                   @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumListRes res = songListsApi.getAlbumList(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
         return res.success(req);
@@ -109,24 +109,25 @@ public class AlbumAndSongListsController {
                                                 @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
                                                 
                                                 @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用")
-                                                @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
+                                                    @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
                                                 
                                                 @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表")
-                                                @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
+                                                    @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
                                                 
                                                 @Parameter(description = "最后一年在范围内。")
-                                                @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
+                                                    @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
                                                 
-                                                @Parameter(description = "流派的名称，例如，“摇滚”")
-                                                @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
+                                                @Parameter(description = "流派的名称，例如，“摇滚”", deprecated = true)
+                                                    @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
                                                 
-                                                @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders ")
-                                                @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
+                                                @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders ", deprecated = true)
+                                                    @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId
     ) {
         AlbumList2Res res = songListsApi.getAlbumList2(req, type, size, offset, fromYear, toYear, genre, musicFolderId);
         return res.success(req);
     }
     
+    // TODO: 添加歌曲发布时间
     @Operation(summary = "返回符合给定条件的随机歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
@@ -137,10 +138,19 @@ public class AlbumAndSongListsController {
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
     @ManualSerialize
     public ResponseEntity<String> getRandomSongs(SubsonicCommonReq req,
+                                                 @Parameter(description = "要返回的歌曲数。最多10")
                                                  @RequestParam(value = "size", defaultValue = "10", required = false) Long size,
-                                                 @RequestParam(value = "genre", required = false) Long genre,
+                                                 
+                                                 @Parameter(description = "歌曲流派")
+                                                 @RequestParam(value = "genre", required = false) String genre,
+                                                 
+                                                 @Parameter(description = "仅返回今年之后或今年内发布的歌曲。", deprecated = true)
                                                  @RequestParam(value = "fromYear", required = false) Long fromYear,
+                                                 
+                                                 @Parameter(description = "只返回今年之前或今年出版的歌曲", deprecated = true)
                                                  @RequestParam(value = "toYear", required = false) Long toYear,
+                                                 
+                                                 @Parameter(description = "仅返回音乐文件夹中具有给定ID的歌曲。参见 getMusicFolders ", deprecated = true)
                                                  @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
     ) {
         RandomSongsRes res = songListsApi.getRandomSongs(req, size, genre, fromYear, toYear, musicFolderId);
@@ -157,10 +167,17 @@ public class AlbumAndSongListsController {
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
     @ManualSerialize
     public ResponseEntity<String> getSongsByGenre(SubsonicCommonReq req,
+                                                  @Parameter(description = "流派的名称，例如，“摇滚”")
                                                   @RequestParam(value = "genre") Long genre,
-                                                  @RequestParam(value = "musicFolderId", required = false) Long musicFolderId,
-                                                  @RequestParam(value = "count", defaultValue = "10", required = false) Long count,
-                                                  @RequestParam(value = "offset", required = false) Long offset
+                                                  
+                                                  @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的歌曲。参见 getMusicFolders 。", deprecated = true)
+                                                      @RequestParam(value = "musicFolderId", required = false) Long musicFolderId,
+                                                  
+                                                  @Parameter(description = "要返回的歌曲数。最多10")
+                                                      @RequestParam(value = "count", defaultValue = "10", required = false) Long count,
+                                                  
+                                                  @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用。")
+                                                      @RequestParam(value = "offset", required = false) Long offset
     ) {
         SongsByGenreRes res = songListsApi.getSongsByGenre(req, genre, musicFolderId, count, offset);
         return res.success(req);
@@ -189,7 +206,10 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getStarred.view", "/getStarred"})
     @ManualSerialize
-    public ResponseEntity<String> getStarred(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
+    public ResponseEntity<String> getStarred(SubsonicCommonReq req,
+                                             @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的歌曲。参见 getMusicFolders 。", deprecated = true)
+                                             @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
+    ) {
         StarredRes res = songListsApi.getStarred(req, musicFolderId);
         return res.success(req);
     }
@@ -203,11 +223,16 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/getStarred2.view", "/getStarred2"})
     @ManualSerialize
-    public ResponseEntity<String> getStarred2(SubsonicCommonReq req, @RequestParam(value = "musicFolderId", required = false) Long musicFolderId) {
+    public ResponseEntity<String> getStarred2(SubsonicCommonReq req,
+                                              @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的歌曲。参见 getMusicFolders 。", deprecated = true)
+                                              @RequestParam(value = "musicFolderId", required = false) Long musicFolderId
+    ) {
         Starred2Res res = songListsApi.getStarred2(req, musicFolderId);
         return res.success(req);
     }
     
+    
+    // TODO: 历史播放音乐，添加当前已播放时间
     @Operation(summary = "注册一个或多个媒体文件的本地回放。通常在播放缓存在客户端上的媒体时使用。此操作包括以下内容：",
                description = "如果用户已在Subsonic服务器上配置了他/她的last.fm凭证（Settings > Personal），则会“滚动”last.fm上的媒体文件。" +
                        "更新媒体文件的播放次数和上次播放时间戳。（自1.11.0版起）" +
@@ -221,7 +246,15 @@ public class AlbumAndSongListsController {
     )
     @GetMapping({"/scrobble.view", "/scrobble"})
     @ManualSerialize
-    public ResponseEntity<String> scrobble(SubsonicCommonReq req, @RequestParam("id") Long id, Long timeStamp, @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
+    public ResponseEntity<String> scrobble(SubsonicCommonReq req,
+                                           @Parameter(description = "要标记为已播放的媒体文件的ID。")
+                                           @RequestParam("id") Long id,
+                                           
+                                           @Parameter(description = "（自1.8.0起）歌曲被收听的时间（自1970年1月1日起，以毫秒为单位）", deprecated = true)
+                                           @RequestParam(value = "time", required = false) Long timeStamp,
+                                           
+                                           @Parameter(description = "无论这是“提交”还是“正在播放”通知", deprecated = true)
+                                           @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
         songListsApi.scrobble(req, id, timeStamp, submission);
         return new SubsonicResult().success(req);
     }

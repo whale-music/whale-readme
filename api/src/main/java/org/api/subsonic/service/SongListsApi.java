@@ -87,8 +87,21 @@ public class SongListsApi {
     private TbUserArtistService tbUserArtistService;
     
     
+    /**
+     * 返回一个随机的，最新的，最高评级等列表
+     *
+     * @param req           通用请求
+     * @param type          随机的，最新的，最高评级等
+     * @param size          分页返回的数量
+     * @param offset        分页偏移量
+     * @param fromYear      范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。
+     * @param toYear        结束年份
+     * @param genre         流派的名称，例如，“摇滚”
+     * @param musicFolderId （自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。
+     * @return 返回一个随机的，最新的，最高评级等列表
+     */
     public AlbumList2Res getAlbumList2(SubsonicCommonReq req, String type, Long size, Long offset, Long fromYear, Long toYear, Long genre, Long musicFolderId) {
-        List<TbAlbumPojo> albumList = handleAlbums(req, type, offset, size);
+        List<TbAlbumPojo> albumList = handleAlbums(req, type, offset, size, fromYear, toYear);
         if (CollUtil.isEmpty(albumList)) {
             return new AlbumList2Res();
         }
@@ -124,14 +137,22 @@ public class SongListsApi {
     }
     
     @NotNull
-    private List<TbAlbumPojo> handleAlbums(SubsonicCommonReq req, String type, Long offset, Long size) {
+    private List<TbAlbumPojo> handleAlbums(SubsonicCommonReq req, String type, Long offset, Long size, Long fromYear, Long toYear) {
         Page<TbAlbumPojo> page = new Page<>(offset, size);
         String userName = req.getU();
+        boolean yearFlag = Objects.nonNull(fromYear) && Objects.nonNull(toYear);
         SysUserPojo userByName = accountService.getUserByName(userName);
         switch (type) {
             // 最新添加
             case "newest":
-                albumService.page(page, Wrappers.<TbAlbumPojo>lambdaQuery().orderByDesc(TbAlbumPojo::getCreateTime));
+                LambdaQueryWrapper<TbAlbumPojo> between = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                                  .between(yearFlag, TbAlbumPojo::getPublishTime, new Date(fromYear), new Date(fromYear));
+                if (fromYear > toYear) {
+                    between.orderByDesc(TbAlbumPojo::getCreateTime);
+                } else {
+                    between.orderByAsc(TbAlbumPojo::getCreateTime);
+                }
+                albumService.page(page, between);
                 break;
             // 播放最多
             case "frequent":
@@ -171,7 +192,8 @@ public class SongListsApi {
                 break;
             // 按专辑字母顺序排列
             case "alphabeticalByName":
-                albumService.page(page, Wrappers.<TbAlbumPojo>lambdaQuery().orderByDesc(TbAlbumPojo::getAlbumName));
+                LambdaQueryWrapper<TbAlbumPojo> queryWrapper = Wrappers.<TbAlbumPojo>lambdaQuery().orderByDesc(TbAlbumPojo::getAlbumName);
+                albumService.page(page, queryWrapper);
                 break;
             // 按艺术家字母排序, 这个功能后面循环中实现实现
             case "alphabeticalByArtist":
@@ -183,7 +205,17 @@ public class SongListsApi {
                 long count = albumService.count();
                 int pageCount = PageUtil.totalPage(Math.toIntExact(count), Math.toIntExact(size));
                 long randomOffset = RandomUtils.nextLong(0, pageCount);
-                page = albumService.page(new Page<>(randomOffset, size));
+                LambdaQueryWrapper<TbAlbumPojo> randomQueryWrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
+                                                                             .between(yearFlag,
+                                                                                     TbAlbumPojo::getPublishTime,
+                                                                                     new Date(fromYear),
+                                                                                     new Date(fromYear));
+                if (fromYear > toYear) {
+                    randomQueryWrapper.orderByDesc(TbAlbumPojo::getPublishTime);
+                } else {
+                    randomQueryWrapper.orderByAsc(TbAlbumPojo::getPublishTime);
+                }
+                page = albumService.page(new Page<>(randomOffset, size), randomQueryWrapper);
                 Collections.shuffle(page.getRecords());
         }
         return page.getRecords();
@@ -249,8 +281,21 @@ public class SongListsApi {
         return false;
     }
     
+    /**
+     * 返回一个随机的，最新的，最高评级等列表
+     *
+     * @param req           通用请求
+     * @param type          随机的，最新的，最高评级等
+     * @param size          分页返回的数量
+     * @param offset        分页偏移量
+     * @param fromYear      范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表。
+     * @param toYear        结束年份
+     * @param genre         流派的名称，例如，“摇滚”
+     * @param musicFolderId （自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders 。
+     * @return 返回一个随机的，最新的，最高评级等列表
+     */
     public AlbumListRes getAlbumList(SubsonicCommonReq req, String type, Long size, Long offset, Long fromYear, Long toYear, Long genre, Long musicFolderId) {
-        List<TbAlbumPojo> albumList = handleAlbums(req, type, offset, size);
+        List<TbAlbumPojo> albumList = handleAlbums(req, type, offset, size, fromYear, toYear);
         if (CollUtil.isEmpty(albumList)) {
             return new AlbumListRes();
         }
@@ -285,10 +330,10 @@ public class SongListsApi {
         return albumRes;
     }
     
-    public RandomSongsRes getRandomSongs(SubsonicCommonReq req, Long size, Long genre, Long fromYear, Long toYear, Long musicFolderId) {
+    public RandomSongsRes getRandomSongs(SubsonicCommonReq req, Long size, String genre, Long fromYear, Long toYear, Long musicFolderId) {
         RandomSongsRes res = new RandomSongsRes();
         
-        List<MusicConvert> musicListByAlbumId = qukuService.randomMusicList(Math.toIntExact(size));
+        List<MusicConvert> musicListByAlbumId = qukuService.randomMusicList(size.intValue(), genre, fromYear, toYear);
         
         List<Long> musicIds = musicListByAlbumId.parallelStream()
                                                 .map(TbMusicPojo::getId)

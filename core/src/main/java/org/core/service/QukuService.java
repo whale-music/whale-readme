@@ -79,7 +79,14 @@ public interface QukuService {
     /**
      * 随即获取曲库中的多条数据
      */
-    List<MusicConvert> randomMusicList(int count);
+    default List<MusicConvert> randomMusicList(int count) {
+        return randomMusicList(count, null, null, null);
+    }
+    
+    /**
+     * 随即获取曲库中的多条数据
+     */
+    List<MusicConvert> randomMusicList(int count, String genre, Long fromYear, Long toYear);
     
     /**
      * 随机获取一条专辑
@@ -158,12 +165,6 @@ public interface QukuService {
      */
     List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
     
-    /**
-     * 通过歌手ID获取专辑列表
-     *
-     * @param artistIds 歌手ID
-     */
-    // Map<Long,List<AlbumConvert>> getAlbumMapByArtistIds(List<Long> artistIds);
     
     /**
      * 获取用户收藏专辑

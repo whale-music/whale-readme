@@ -73,6 +73,9 @@ public class BrowsingApi {
     @Autowired
     private SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
+    @Autowired
+    private TbMusicArtistService tbMusicArtistService;
+    
     @NotNull
     private static Character getCharacterFirstLetter(String name) {
         switch (Optional.ofNullable(name).orElse("").charAt(0)) {
@@ -431,7 +434,7 @@ public class BrowsingApi {
         return artistsRes;
     }
     
-    public VideosRes getVideos(Long id) {
+    public VideosRes getVideos() {
         return new VideosRes();
     }
     
@@ -443,39 +446,126 @@ public class BrowsingApi {
         ArtistInfoRes artistInfoRes = new ArtistInfoRes();
         ArtistInfoRes.ArtistInfo artistInfo = new ArtistInfoRes.ArtistInfo();
         TbArtistPojo artistPojo = tbArtistService.getById(id);
-        artistInfo.setLastFmUrl("https://www.last.fm");
-        artistInfo.setBiography(artistPojo.getIntroduction());
-        artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfoRes.setArtistInfo(artistInfo);
+        if (Objects.nonNull(artistPojo)) {
+            artistInfo.setLastFmUrl("https://www.last.fm");
+            artistInfo.setBiography(artistPojo.getIntroduction());
+            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfoRes.setArtistInfo(artistInfo);
+            return artistInfoRes;
+        }
+        TbAlbumPojo albumPojo = albumService.getById(id);
+        if (Objects.nonNull(albumPojo)) {
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            if (CollUtil.isNotEmpty(albumArtistListByAlbumIds)) {
+                ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
+                artistInfo.setLastFmUrl("https://www.last.fm");
+                artistInfo.setBiography(artistConvert.getIntroduction());
+                artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfoRes.setArtistInfo(artistInfo);
+                return artistInfoRes;
+            }
+        }
+        TbMusicPojo byId = musicService.getById(id);
+        List<TbMusicArtistPojo> list = tbMusicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery()
+                                                                         .eq(TbMusicArtistPojo::getMusicId, byId.getId()));
+        if (CollUtil.isNotEmpty(list)) {
+            TbMusicArtistPojo tbMusicArtistPojo = list.get(0);
+            TbArtistPojo tbArtistPojo = tbArtistService.getById(tbMusicArtistPojo.getArtistId());
+            artistInfo.setLastFmUrl("https://www.last.fm");
+            artistInfo.setBiography(tbArtistPojo.getIntroduction());
+            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfoRes.setArtistInfo(artistInfo);
+            return artistInfoRes;
+        }
         return artistInfoRes;
     }
     
     public ArtistInfo2Res getArtistInfo2(SubsonicCommonReq req, Long id, Integer count, Boolean includeNotPresent) {
-        ArtistInfo2Res artistInfo2Res = new ArtistInfo2Res();
+        ArtistInfo2Res artistInfoRes = new ArtistInfo2Res();
         ArtistInfo2Res.ArtistInfo2 artistInfo = new ArtistInfo2Res.ArtistInfo2();
         TbArtistPojo artistPojo = tbArtistService.getById(id);
-        artistInfo.setLastFmUrl("https://www.last.fm");
-        artistInfo.setBiography(artistPojo.getIntroduction());
-        artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-        artistInfo2Res.setArtistInfo2(artistInfo);
-        return artistInfo2Res;
+        if (Objects.nonNull(artistPojo)) {
+            artistInfo.setLastFmUrl("https://www.last.fm");
+            artistInfo.setBiography(artistPojo.getIntroduction());
+            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfoRes.setArtistInfo2(artistInfo);
+            return artistInfoRes;
+        }
+        TbAlbumPojo albumPojo = albumService.getById(id);
+        if (Objects.nonNull(albumPojo)) {
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            if (CollUtil.isNotEmpty(albumArtistListByAlbumIds)) {
+                ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
+                artistInfo.setLastFmUrl("https://www.last.fm");
+                artistInfo.setBiography(artistConvert.getIntroduction());
+                artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfoRes.setArtistInfo2(artistInfo);
+                return artistInfoRes;
+            }
+        }
+        TbMusicPojo byId = musicService.getById(id);
+        List<TbMusicArtistPojo> list = tbMusicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery()
+                                                                         .eq(TbMusicArtistPojo::getMusicId, byId.getId()));
+        if (CollUtil.isNotEmpty(list)) {
+            TbMusicArtistPojo tbMusicArtistPojo = list.get(0);
+            TbArtistPojo tbArtistPojo = tbArtistService.getById(tbMusicArtistPojo.getArtistId());
+            artistInfo.setLastFmUrl("https://www.last.fm");
+            artistInfo.setBiography(tbArtistPojo.getIntroduction());
+            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfoRes.setArtistInfo2(artistInfo);
+            return artistInfoRes;
+        }
+        return artistInfoRes;
     }
     
+    /**
+     * 专辑信息
+     *
+     * @param req 通用请求
+     * @param id  专辑或歌曲ID
+     * @return 专辑信息
+     */
     public AlbumInfoRes getAlbumInfo(SubsonicCommonReq req, Long id) {
         AlbumInfoRes res = new AlbumInfoRes();
         AlbumInfoRes.AlbumInfo albumInfo = new AlbumInfoRes.AlbumInfo();
         TbAlbumPojo albumPojo = albumService.getById(id);
-        albumInfo.setNotes(albumPojo.getDescription());
-        albumInfo.setLastFmUrl("http://www.last.fm");
-        String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
-        albumInfo.setLargeImageUrl(albumPicUrl);
-        albumInfo.setSmallImageUrl(albumPicUrl);
-        albumInfo.setMediumImageUrl(albumPicUrl);
-        res.setAlbumInfo(albumInfo);
+        if (Objects.nonNull(albumPojo)) {
+            albumInfo.setNotes(albumPojo.getDescription());
+            albumInfo.setLastFmUrl("http://www.last.fm");
+            String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
+            albumInfo.setLargeImageUrl(albumPicUrl);
+            albumInfo.setSmallImageUrl(albumPicUrl);
+            albumInfo.setMediumImageUrl(albumPicUrl);
+            res.setAlbumInfo(albumInfo);
+            return res;
+        }
+        TbMusicPojo byId = musicService.getById(id);
+        if (Objects.nonNull(byId)) {
+            Long albumId = byId.getAlbumId();
+            if (Objects.nonNull(albumId)) {
+                TbAlbumPojo albumPojo1 = albumService.getById(albumId);
+                albumInfo.setNotes(albumPojo1.getDescription());
+                albumInfo.setLastFmUrl("http://www.last.fm");
+                String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo1.getId());
+                albumInfo.setLargeImageUrl(albumPicUrl);
+                albumInfo.setSmallImageUrl(albumPicUrl);
+                albumInfo.setMediumImageUrl(albumPicUrl);
+                res.setAlbumInfo(albumInfo);
+                return res;
+            }
+        }
         return res;
     }
     
@@ -483,13 +573,31 @@ public class BrowsingApi {
         AlbumInfo2Res res = new AlbumInfo2Res();
         AlbumInfo2Res.AlbumInfo albumInfo = new AlbumInfo2Res.AlbumInfo();
         TbAlbumPojo albumPojo = albumService.getById(id);
-        albumInfo.setNotes(albumPojo.getDescription());
-        albumInfo.setLastFmUrl("http://www.last.fm");
-        String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
-        albumInfo.setLargeImageUrl(albumPicUrl);
-        albumInfo.setSmallImageUrl(albumPicUrl);
-        albumInfo.setMediumImageUrl(albumPicUrl);
-        res.setAlbumInfo(albumInfo);
+        if (Objects.nonNull(albumPojo)) {
+            albumInfo.setNotes(albumPojo.getDescription());
+            albumInfo.setLastFmUrl("http://www.last.fm");
+            String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
+            albumInfo.setLargeImageUrl(albumPicUrl);
+            albumInfo.setSmallImageUrl(albumPicUrl);
+            albumInfo.setMediumImageUrl(albumPicUrl);
+            res.setAlbumInfo(albumInfo);
+            return res;
+        }
+        TbMusicPojo byId = musicService.getById(id);
+        if (Objects.nonNull(byId)) {
+            Long albumId = byId.getAlbumId();
+            if (Objects.nonNull(albumId)) {
+                TbAlbumPojo albumPojo1 = albumService.getById(albumId);
+                albumInfo.setNotes(albumPojo1.getDescription());
+                albumInfo.setLastFmUrl("http://www.last.fm");
+                String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo1.getId());
+                albumInfo.setLargeImageUrl(albumPicUrl);
+                albumInfo.setSmallImageUrl(albumPicUrl);
+                albumInfo.setMediumImageUrl(albumPicUrl);
+                res.setAlbumInfo(albumInfo);
+                return res;
+            }
+        }
         return res;
     }
     
@@ -620,7 +728,8 @@ public class BrowsingApi {
     public TopSongsRes getTopSongs(SubsonicCommonReq req, String artistName, Integer count) {
         TopSongsRes res = new TopSongsRes();
         Page<TbArtistPojo> page = new Page<>(1, count);
-        tbArtistService.page(page, Wrappers.<TbArtistPojo>lambdaQuery().like(TbArtistPojo::getArtistName, artistName));
+        tbArtistService.page(page,
+                Wrappers.<TbArtistPojo>lambdaQuery().orderByDesc(TbArtistPojo::getCreateTime).like(TbArtistPojo::getArtistName, artistName));
         Map<Long, List<TbMusicPojo>> musicMap = qukuService.getMusicMapByArtistId(page.getRecords().parallelStream().map(TbArtistPojo::getId).toList());
         Map<Long, TbArtistPojo> artistMap = page.getRecords()
                                                 .parallelStream()

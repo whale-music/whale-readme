@@ -66,7 +66,7 @@ springdoc:
   api-docs:
     #是否开启文档功能
     enabled: true
-    #swagger后端请求地址
+    #swagger后端请求地址, 最好保持默认。knife4j不然会出现一些问题
     path: /v3/api-docs
   swagger-ui:
     #自定义swagger前端请求路径，输入http：127.0.0.1:8080/docs会自动重定向到swagger页面

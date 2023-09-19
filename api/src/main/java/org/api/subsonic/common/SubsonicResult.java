@@ -16,18 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JacksonXmlRootElement(localName = "subsonic-response")
 @JsonRootName("subsonic-response")
 @Schema(title = "公共返回类, 所有返回类都会继承此类")
-public class SubsonicResult implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SubsonicResult {
     
     @JacksonXmlProperty(isAttribute = true)
     private String xmlns = "http://subsonic.org/restapi";

@@ -53,6 +53,10 @@ public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable {
     @TableField("time_length")
     private Integer timeLength;
     
+    @Schema(title = "歌曲发布时间")
+    @TableField("publish_time")
+    private LocalDateTime publishTime;
+    
     @Schema(title = "更新时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;

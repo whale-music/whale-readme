@@ -147,8 +147,9 @@ create table if not exists tb_history
         primary key,
     user_id     bigint        not null comment '用户ID',
     middle_id   bigint        not null comment '播放ID，可能是歌曲，专辑，歌单，mv',
-    type        tinyint       null comment '播放类型可能是音乐，歌单，专辑,0为音乐，1为歌单，2为专辑, 3mv',
+    type        tinyint       null comment '播放类型可能是音乐，歌单，专辑,0为音乐, 1为专辑, 2为歌手, 3为歌单, 4mv',
     count       int default 0 null comment '歌曲播放次数',
+    played_time mediumtext    null comment '歌曲或MV已播放时间',
     create_time datetime      null comment '创建时间',
     update_time datetime      null comment '更新时间',
     constraint id
@@ -167,16 +168,17 @@ create index tb_rank_sys_user_id_fk
 
 create table if not exists tb_music
 (
-    id          bigint       not null comment '音乐ID'
+    id           bigint       not null comment '音乐ID'
         primary key,
-    music_name  varchar(128) null comment '音乐名',
-    alias_name  varchar(512) null comment '歌曲别名，数组则使用逗号分割',
-    album_id    bigint       null comment '专辑ID',
-    sort        bigint auto_increment comment '排序字段',
-    user_id     bigint       null comment '上传用户ID',
-    time_length int          null comment '歌曲时长',
-    update_time datetime     null comment '更新时间',
-    create_time datetime     null comment '创建时间',
+    music_name   varchar(128) null comment '音乐名',
+    alias_name   varchar(512) null comment '歌曲别名，数组则使用逗号分割',
+    album_id     bigint       null comment '专辑ID',
+    sort         bigint auto_increment comment '排序字段',
+    user_id      bigint       null comment '上传用户ID',
+    time_length  int          null comment '歌曲时长',
+    publish_time date         null comment '歌曲发布时间',
+    create_time  datetime     null comment '创建时间',
+    update_time  datetime     null comment '更新时间',
     constraint tb_music_id_music_name_alias_name_album_id_uindex
         unique (id, music_name, alias_name, album_id),
     constraint tb_music_pk

@@ -38,6 +38,9 @@ public class TbMusicEntity implements Serializable {
     @Column(name = "time_length", nullable = true)
     private Integer timeLength;
     @Basic
+    @Column(name = "publish_time", nullable = true)
+    private Timestamp publishTime;
+    @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
     @Basic
@@ -114,6 +117,14 @@ public class TbMusicEntity implements Serializable {
     
     public void setTimeLength(Integer timeLength) {
         this.timeLength = timeLength;
+    }
+    
+    public Timestamp getPublishTime() {
+        return publishTime;
+    }
+    
+    public void setPublishTime(Timestamp publishTime) {
+        this.publishTime = publishTime;
     }
     
     public Timestamp getUpdateTime() {

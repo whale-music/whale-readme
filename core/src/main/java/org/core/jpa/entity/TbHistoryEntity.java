@@ -6,7 +6,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 @Entity
 @Table(name = "tb_history")
@@ -30,6 +29,9 @@ public class TbHistoryEntity implements Serializable {
     @Basic
     @Column(name = "count", nullable = true)
     private Integer count;
+    @Basic
+    @Column(name = "played_time", nullable = true)
+    private Long playedTime;
     @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
@@ -80,6 +82,14 @@ public class TbHistoryEntity implements Serializable {
         this.count = count;
     }
     
+    public Long getPlayedTime() {
+        return playedTime;
+    }
+    
+    public void setPlayedTime(Long playedTime) {
+        this.playedTime = playedTime;
+    }
+    
     public Timestamp getCreateTime() {
         return createTime;
     }
@@ -104,16 +114,48 @@ public class TbHistoryEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbHistoryEntity that = (TbHistoryEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(userId, that.userId) && Objects.equals(middleId,
-                that.middleId) && Objects.equals(type, that.type) && Objects.equals(count, that.count) && Objects.equals(
-                createTime,
-                that.createTime) && Objects.equals(updateTime, that.updateTime);
+        
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
+            return false;
+        }
+        if (getUserId() != null ? !getUserId().equals(that.getUserId()) : that.getUserId() != null) {
+            return false;
+        }
+        if (getMiddleId() != null ? !getMiddleId().equals(that.getMiddleId()) : that.getMiddleId() != null) {
+            return false;
+        }
+        if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) {
+            return false;
+        }
+        if (getCount() != null ? !getCount().equals(that.getCount()) : that.getCount() != null) {
+            return false;
+        }
+        if (getPlayedTime() != null ? !getPlayedTime().equals(that.getPlayedTime()) : that.getPlayedTime() != null) {
+            return false;
+        }
+        if (getCreateTime() != null ? !getCreateTime().equals(that.getCreateTime()) : that.getCreateTime() != null) {
+            return false;
+        }
+        if (getUpdateTime() != null ? !getUpdateTime().equals(that.getUpdateTime()) : that.getUpdateTime() != null) {
+            return false;
+        }
+        return getSysUserByUserId() != null ? getSysUserByUserId().equals(that.getSysUserByUserId()) : that.getSysUserByUserId() == null;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, middleId, type, count, createTime, updateTime);
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getUserId() != null ? getUserId().hashCode() : 0);
+        result = 31 * result + (getMiddleId() != null ? getMiddleId().hashCode() : 0);
+        result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+        result = 31 * result + (getCount() != null ? getCount().hashCode() : 0);
+        result = 31 * result + (getPlayedTime() != null ? getPlayedTime().hashCode() : 0);
+        result = 31 * result + (getCreateTime() != null ? getCreateTime().hashCode() : 0);
+        result = 31 * result + (getUpdateTime() != null ? getUpdateTime().hashCode() : 0);
+        result = 31 * result + (getSysUserByUserId() != null ? getSysUserByUserId().hashCode() : 0);
+        return result;
     }
     
     public SysUserEntity getSysUserByUserId() {

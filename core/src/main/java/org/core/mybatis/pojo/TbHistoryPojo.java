@@ -44,6 +44,10 @@ public class TbHistoryPojo extends Model<TbHistoryPojo> implements Serializable 
     @TableField("count")
     private Integer count;
     
+    @Schema(title = "歌曲或MV已播放时间, 单位是秒")
+    @TableField("played_time")
+    private Long playedTime;
+    
     @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

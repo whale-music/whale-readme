@@ -469,7 +469,6 @@ public interface QukuService {
         addLabel(target, id, Set.of(labelId));
     }
     
-    // TODO: 2023/9/12 需要重构, 这个删除tag不完善
     /**
      * 删除全部tag
      *
@@ -478,7 +477,7 @@ public interface QukuService {
     void removeLabelAll(Long id);
     
     /**
-     * 删除歌单或音乐中的tag
+     * 删除歌单或音乐中的tag, 根据ID
      *
      * @param target       指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
      * @param id           歌单或歌曲前ID
@@ -487,7 +486,7 @@ public interface QukuService {
     void removeLabelById(Byte target, Long id, Collection<Long> labelBatchId);
     
     /**
-     * 删除歌单或音乐中的tag
+     * 删除歌单或音乐中的tag, 根据tag name
      *
      * @param target         指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
      * @param id             歌单或歌曲前ID

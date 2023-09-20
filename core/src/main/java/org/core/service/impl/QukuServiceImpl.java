@@ -1071,28 +1071,42 @@ public class QukuServiceImpl implements QukuService {
     public void removeLabelAll(Long id) {
         synchronized (removeLabelLock) {
             LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
-            List<TbMiddleTagPojo> tagPojoList = middleTagService.list(eq);
-            if (CollUtil.isEmpty(tagPojoList)) {
+            // 查询出所有tag关联数据
+            List<TbMiddleTagPojo> tbMiddleTagPojoList = middleTagService.list(eq);
+            if (CollUtil.isEmpty(tbMiddleTagPojoList)) {
                 return;
             }
-            Map<Long, ArrayList<TbMiddleTagPojo>> arrayListMap = tagPojoList.parallelStream()
-                                                                            .collect(Collectors.toMap(TbMiddleTagPojo::getId,
-                                                                                    ListUtil::toList,
-                                                                                    (objects, objects2) -> {
-                                                                                        objects2.addAll(objects);
-                                                                                        return objects2;
-                                                                                    }));
-            ArrayList<Long> tagIds = new ArrayList<>();
-            for (Map.Entry<Long, ArrayList<TbMiddleTagPojo>> longArrayListEntry : arrayListMap.entrySet()) {
-                // 无关联的tag直接删除
-                if (longArrayListEntry.getValue().size() == 1) {
-                    tagIds.add(longArrayListEntry.getValue().get(0).getTagId());
-                }
-            }
-            middleTagService.remove(eq);
-            tagService.removeByIds(tagIds);
+            // 根据相同tag分组, 然后查询出对于的tag表, 然后根据每个要删除的数量进行计算, 等于或小于0时删除tag
+            voteToRemoveTag(tbMiddleTagPojoList);
         }
         
+    }
+    
+    /**
+     * 删除关联tag数据，根据投票制
+     * 如果关联数据为0时，删除tag
+     *
+     * @param tbMiddleTagPojoList 关联数据
+     */
+    private void voteToRemoveTag(List<TbMiddleTagPojo> tbMiddleTagPojoList) {
+        Map<Long, Integer> map = tbMiddleTagPojoList.parallelStream()
+                                                    .collect(Collectors.toMap(TbMiddleTagPojo::getTagId,
+                                                            tbMiddleTagPojo -> 1,
+                                                            Integer::sum));
+        List<TbTagPojo> tagList = tagService.listByIds(map.keySet());
+        ArrayList<Long> tagIds = new ArrayList<>();
+        for (TbTagPojo tbTagPojo : tagList) {
+            Integer integer = map.get(tbTagPojo.getId());
+            int count = tbTagPojo.getCount() - integer;
+            // 关联tag数量小于等于0时删除
+            if (count <= 0) {
+                tagIds.add(tbTagPojo.getId());
+            }
+        }
+        middleTagService.removeBatchByIds(tbMiddleTagPojoList);
+        if (CollUtil.isNotEmpty(tagIds)) {
+            tagService.removeByIds(tagIds);
+        }
     }
     
     /**
@@ -1105,11 +1119,17 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeLabelById(Byte target, Long id, Collection<Long> labelBatchId) {
-        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
-                                                         .eq(TbMiddleTagPojo::getType, target)
-                                                         .eq(TbMiddleTagPojo::getMiddleId, id)
-                                                         .in(TbMiddleTagPojo::getTagId, labelBatchId);
-        middleTagService.remove(eq);
+        synchronized (lock) {
+            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                             .eq(TbMiddleTagPojo::getType, target)
+                                                             .eq(TbMiddleTagPojo::getMiddleId, id)
+                                                             .in(TbMiddleTagPojo::getTagId, labelBatchId);
+            List<TbMiddleTagPojo> list = middleTagService.list(eq);
+            if (CollUtil.isEmpty(list)) {
+                return;
+            }
+            voteToRemoveTag(list);
+        }
     }
     
     /**

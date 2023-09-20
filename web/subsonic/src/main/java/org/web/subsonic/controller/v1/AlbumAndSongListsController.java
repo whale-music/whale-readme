@@ -105,8 +105,8 @@ public class AlbumAndSongListsController {
                                                 )
                                                 @RequestParam("type") String type,
                                                 
-                                                @Parameter(description = "要返回的相册数。最多五百")
-                                                @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
+                                                @Parameter(description = "要返回的相册数。默认20")
+                                                    @RequestParam(value = "size", defaultValue = "20", required = false) Long size,
                                                 
                                                 @Parameter(description = "列表偏移量。例如，如果您想浏览最新专辑列表，则很有用")
                                                     @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
@@ -127,7 +127,6 @@ public class AlbumAndSongListsController {
         return res.success(req);
     }
     
-    // TODO: 添加歌曲发布时间
     @Operation(summary = "返回符合给定条件的随机歌曲")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
@@ -232,7 +231,6 @@ public class AlbumAndSongListsController {
     }
     
     
-    // TODO: 历史播放音乐，添加当前已播放时间
     @Operation(summary = "注册一个或多个媒体文件的本地回放。通常在播放缓存在客户端上的媒体时使用。此操作包括以下内容：",
                description = "如果用户已在Subsonic服务器上配置了他/她的last.fm凭证（Settings > Personal），则会“滚动”last.fm上的媒体文件。" +
                        "更新媒体文件的播放次数和上次播放时间戳。（自1.11.0版起）" +

@@ -224,12 +224,20 @@ public class SongListsApi {
     public void scrobble(SubsonicCommonReq req, Long id, Long timeStamp, Boolean submission) {
         String userName = req.getU();
         SysUserPojo userByName = accountService.getUserByName(userName);
-        if (updateHistory(tbMusicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, id)), userByName, id, HistoryConstant.MUSIC)) {
+        if (updateHistory(tbMusicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, id)),
+                userByName,
+                id,
+                HistoryConstant.MUSIC,
+                timeStamp)) {
             return;
         }
         
         // 专辑
-        if (updateHistory(albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getId, id)), userByName, id, HistoryConstant.ALBUM)) {
+        if (updateHistory(albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getId, id)),
+                userByName,
+                id,
+                HistoryConstant.ALBUM,
+                timeStamp)) {
             return;
         }
         
@@ -237,7 +245,8 @@ public class SongListsApi {
         if (updateHistory(tbArtistService.count(Wrappers.<TbArtistPojo>lambdaQuery().eq(TbArtistPojo::getId, id)),
                 userByName,
                 id,
-                HistoryConstant.ARTIST)) {
+                HistoryConstant.ARTIST,
+                timeStamp)) {
             return;
         }
         
@@ -245,7 +254,8 @@ public class SongListsApi {
         if (updateHistory(tbCollectService.count(Wrappers.<TbCollectPojo>lambdaQuery().eq(TbCollectPojo::getId, id)),
                 userByName,
                 id,
-                HistoryConstant.PLAYLIST)) {
+                HistoryConstant.PLAYLIST,
+                timeStamp)) {
             return;
         }
         
@@ -253,24 +263,26 @@ public class SongListsApi {
         if (updateHistory(tbMvService.count(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getId, id)),
                 userByName,
                 id,
-                HistoryConstant.MV)) {
+                HistoryConstant.MV,
+                timeStamp)) {
             return;
         }
     }
     
-    private boolean updateHistory(long count, SysUserPojo userByName, Long id, Byte music) {
+    private boolean updateHistory(long count, SysUserPojo userByName, Long id, Byte type, Long playTime) {
         // 音乐
         if (count > 0) {
             TbHistoryPojo historyPojo = tbHistoryService.getOne(Wrappers.<TbHistoryPojo>lambdaQuery()
                                                                         .eq(TbHistoryPojo::getUserId, userByName.getId())
                                                                         .eq(TbHistoryPojo::getMiddleId, id)
-                                                                        .eq(TbHistoryPojo::getType, music));
+                                                                        .eq(TbHistoryPojo::getType, type));
             if (Objects.isNull(historyPojo)) {
                 TbHistoryPojo entity = new TbHistoryPojo();
                 entity.setCount(1);
                 entity.setMiddleId(id);
                 entity.setUserId(userByName.getId());
-                entity.setType(music);
+                entity.setPlayedTime(playTime);
+                entity.setType(type);
                 tbHistoryService.save(entity);
             } else {
                 historyPojo.setCount(historyPojo.getCount() + 1);

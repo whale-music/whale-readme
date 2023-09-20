@@ -379,11 +379,18 @@ public class QukuServiceImpl implements QukuService {
                 List<TbMiddleTagPojo> middleList = middleTagService.list(Wrappers.<TbMiddleTagPojo>lambdaQuery().in(TbMiddleTagPojo::getTagId, tagIds));
                 if (CollUtil.isNotEmpty(middleList)) {
                     List<Long> middleTagIds = middleList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
-                    musicService.page(page, Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, middleTagIds));
+                    LambdaQueryWrapper<TbMusicPojo> wrappers = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                                       .in(TbMusicPojo::getId, middleTagIds)
+                                                                       .le(Objects.nonNull(toYear), TbMusicPojo::getPublishTime, new Date(toYear))
+                                                                       .ge(Objects.nonNull(fromYear), TbMusicPojo::getPublishTime, new Date(fromYear));
+                    musicService.page(page, wrappers);
                 }
             }
         } else {
-            musicService.page(page);
+            LambdaQueryWrapper<TbMusicPojo> wrappers = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                               .le(Objects.nonNull(toYear), TbMusicPojo::getPublishTime, new Date(toYear))
+                                                               .ge(Objects.nonNull(fromYear), TbMusicPojo::getPublishTime, new Date(fromYear));
+            musicService.page(page, wrappers);
         }
         List<TbMusicPojo> tbMusicPojos = Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>());
         return getMusicConvertList(tbMusicPojos, getMusicPicUrl(tbMusicPojos.parallelStream().map(TbMusicPojo::getId).toList()));

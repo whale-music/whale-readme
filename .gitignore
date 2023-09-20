@@ -43,3 +43,4 @@ build/
 /core/src/main/resources/static/web/
 /.jpb/
 logs/
+/.env

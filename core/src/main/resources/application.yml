@@ -185,9 +185,9 @@ application:
     plugin: false
     log: true
   enable:
-    admin-spring-boot-application: false
+    admin-spring-boot-application: true
     netease-cloud-music-spring-boot-application: false
-    subsonic-spring-boot-application: true
+    subsonic-spring-boot-application: false
     web-dav-spring-boot-application: false
 
 # subsonic 资源多个资源返回策略:

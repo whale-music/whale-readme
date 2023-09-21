@@ -44,3 +44,4 @@ build/
 /.jpb/
 logs/
 /.env
+/.mvn/maven-repository/

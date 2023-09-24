@@ -45,3 +45,4 @@ core/target/
 logs/
 /.env
 /.mvn/maven-repository/
+/config/db/db_data.mv.db

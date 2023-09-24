@@ -18,18 +18,20 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH=$MAVEN_HOME/bin:$PATH
 
 # Download web front-end projects
-curl -fsSLO $WEB_URL_PATH
+if ! curl -fsSLO $WEB_URL_PATH; then
+  echo "\033[31mDownload failed\033[0m"
+  exit 1
+fi
 # Unzip and delete
 tar xzf dist.tar.gz && rm dist.tar.gz
 mkdir -p "${WEB_DIR}"
 mv dist/* "${WEB_DIR}"
 rm -rf dist/
 
-
 # 构建项目, 检查构建是否成功
 if ! sh "$ROOT_PATH/mvnw" -B -f "$ROOT_PATH/pom.xml" -s "$ROOT_PATH/.mvn/settings-mirror.xml" clean package -Dmaven.test.skip=true; then
   echo "-------------------------"
-  echo "build failed"
+  echo "\033[31mBuild failed\033[0m"
 fi
 
 # Delete after successful build

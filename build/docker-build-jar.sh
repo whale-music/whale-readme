@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # 获取脚本所在目录的绝对路径
-# 获取脚本的绝对路径
 SCRIPT_PATH=$(readlink -f "$0")
 # 获取脚本所在目录的绝对路径
 CURRENT_DIR=$(dirname "$SCRIPT_PATH")

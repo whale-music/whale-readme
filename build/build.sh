@@ -24,7 +24,7 @@ rm -rf dist/
 cd .. || exit
 
 # 构建项目, 检查构建是否成功
-if ! ./mvnw -s .mvn/settings-mirror.xml clean package -Dmaven.test.skip=true; then
+if ! ./mvnw -B -s .mvn/settings-mirror.xml clean package -Dmaven.test.skip=true; then
   echo "-------------------------"
   echo "build failed"
 fi

@@ -27,7 +27,7 @@ rm -rf dist/
 
 
 # 构建项目, 检查构建是否成功
-if ! "$ROOT_PATH/mvnw" -B -s "$ROOT_PATH/.mvn/settings-mirror.xml" clean package -Dmaven.test.skip=true; then
+if ! sh "$ROOT_PATH/mvnw" -B -f "$ROOT_PATH/pom.xml" -s "$ROOT_PATH/.mvn/settings-mirror.xml" clean package -Dmaven.test.skip=true; then
   echo "-------------------------"
   echo "build failed"
 fi

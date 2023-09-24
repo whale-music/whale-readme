@@ -1,0 +1,50 @@
+name: "Build Project"
+# 触发工作流的条件
+on:
+  # 手动触发工作流
+  workflow_dispatch: ~
+  # 推送到存储库时触发工作流
+  push:
+    paths:
+      - "**.java"
+    branches:
+      - "master"
+      - "beta"
+  pull_request:
+    paths:
+      - "**.java"
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  Build-Server-Jar:
+    # 运行平台
+    runs-on: ubuntu-latest
+    steps:
+      # Pull code
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Setup java environment
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      # 缓存 Maven 依赖
+      - name: Cache maven files
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      # 下载前端, 打包
+      - name: Run Maven
+        run: bash build/build.sh
+      # 上传构建jar包
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: WhaleMusic
+          path: whale-music-*.jar

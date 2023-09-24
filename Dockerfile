@@ -4,7 +4,7 @@ LABEL authors="WhaleMusic"
 
 WORKDIR /
 
-COPY starter/target/whale-.*.jar /whale.jar
+COPY starter/target/whale-music*.jar /whale.jar
 
 EXPOSE 6780
 EXPOSE 6781

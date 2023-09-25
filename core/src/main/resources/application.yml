@@ -128,9 +128,9 @@ save-config:
   # 请求地址(必须)
   # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
   host: http://localhost:5244/
-  # 账户(必须)
+  # 账户(根据使用模式填写)
   access-key: admin
-  # 密码(必须)
+  # 密码(根据使用模式填写)
   secret-key: LLq9quPO
 
 jwt-config:

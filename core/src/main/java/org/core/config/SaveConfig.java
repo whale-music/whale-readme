@@ -2,6 +2,8 @@ package org.core.config;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -59,6 +61,9 @@ public class SaveConfig {
     }
     
     public List<String> getObjectSave() {
+        if (objectSave.get(getAssignObjectSave()) == null) {
+            throw new BaseException(ResultCode.STORAGE_PATH_DOES_NOT_EXIST);
+        }
         return objectSave;
     }
     
@@ -71,7 +76,7 @@ public class SaveConfig {
     }
     
     public void setAssignObjectSave(Integer assignObjectSave) {
-        this.assignObjectSave = assignObjectSave;
+        this.assignObjectSave = assignObjectSave == null ? 0 : assignObjectSave;
     }
     
     public List<String> getImgSave() {
@@ -87,7 +92,7 @@ public class SaveConfig {
     }
     
     public void setAssignImgSave(Integer assignImgSave) {
-        this.assignImgSave = assignImgSave;
+        this.assignImgSave = assignImgSave == null ? 0 : assignImgSave;
     }
     
     public String getAccessKey() {

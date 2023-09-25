@@ -32,6 +32,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     SCHEDULED_NO_EXIST_EXISTED("10015", "定时任务不存在"),
     CRON_ERROR("10016", "Cron表达式错误, 请检查重试"),
     PLAT_LIST_LIKE("10017", "歌单已收藏"),
+    STORAGE_PATH_DOES_NOT_EXIST("10018", "存储路径不存在"),
     
     
     /* 用户错误：20001-29999*/

@@ -81,8 +81,7 @@ public class PlayListApi {
             case "id" -> musicWrapper.orderBy(true, order, TbMusicPojo::getId);
             case "updateTime" -> musicWrapper.orderBy(true, order, TbMusicPojo::getUpdateTime);
             case "createTime" -> musicWrapper.orderBy(true, order, TbMusicPojo::getCreateTime);
-            case "sort" -> musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
-            default -> musicWrapper.orderBy(true, order, TbMusicPojo::getSort);
+            default -> musicWrapper.orderBy(true, order, TbMusicPojo::getUpdateTime);
         }
     }
     

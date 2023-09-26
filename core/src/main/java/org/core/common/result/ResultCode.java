@@ -56,6 +56,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     UPLOAD_MUSIC_ID_NOT_MATCH("20019", "上传歌曲文件存在于其他歌曲中"),
     ADMIN_USER_NOT_EDIT_STATUS("20020", "管理员用户不能修改账户状态"),
     ADMIN_CANNOT_DELETE("20021", "不能删除管理员账户"),
+    FILE_SIZE_CANNOT_BE_ZERO("20022", "文件大小不能为零"),
     
     
     /* 业务错误：30001-39999 */

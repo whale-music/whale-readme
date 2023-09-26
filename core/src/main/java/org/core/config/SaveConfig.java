@@ -7,6 +7,7 @@ import org.core.common.result.ResultCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,13 +24,13 @@ public class SaveConfig {
     private String host;
     
     // 对象地址
-    private List<String> objectSave;
+    private List<String> objectSave = new ArrayList<>();
     
     // 保存地址，必须是对象地址中的值，顺序从0开始
     private Integer assignObjectSave;
     
     // 图片存储地址
-    private List<String> imgSave;
+    private List<String> imgSave = new ArrayList<>();
     
     // 上传图片,从0开始
     private Integer assignImgSave;

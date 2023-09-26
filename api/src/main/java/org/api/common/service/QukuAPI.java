@@ -115,11 +115,13 @@ public class QukuAPI extends QukuServiceImpl {
             throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
-        } finally {
-            log.debug("删除缓存文件{}", rename == null ? "" : rename.getName());
-            FileUtil.del(rename);
-            FileUtil.del(file);
         }
+        // TODO: 自动删除缓存文件
+        // finally {
+        //     log.debug("删除缓存文件{}", rename == null ? "" : rename.getName());
+        //     FileUtil.del(rename);
+        //     FileUtil.del(file);
+        // }
         TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
         pojo.setPath(upload);

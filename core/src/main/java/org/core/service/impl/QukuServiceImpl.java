@@ -1264,9 +1264,6 @@ public class QukuServiceImpl implements QukuService {
         } else {
             throw new BaseException(ResultCode.COLLECT_MUSIC_ERROR);
         }
-        
-        // 删除歌曲
-        musicService.removeBatchByIds(musicId);
         // 删除音源
         LambdaQueryWrapper<TbResourcePojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(TbResourcePojo::getMusicId, musicId);
@@ -1274,7 +1271,9 @@ public class QukuServiceImpl implements QukuService {
         // 删除Tag
         musicId.forEach(this::removeLabelAll);
         // 删除封面
-        removePicIds(musicId);
+        this.removePicIds(musicId);
+        // 删除歌曲
+        musicService.removeBatchByIds(musicId);
     }
     
     
@@ -1539,7 +1538,8 @@ public class QukuServiceImpl implements QukuService {
             return;
         }
         synchronized (lock) {
-            List<TbMiddlePicPojo> middlePicList = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getMiddleId, ids));
+            Wrapper<TbMiddlePicPojo> middlePicWrapper = Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getMiddleId, ids);
+            List<TbMiddlePicPojo> middlePicList = middlePicService.list(middlePicWrapper);
             if (CollUtil.isNotEmpty(middlePicList)) {
                 List<Long> picIds = middlePicList.parallelStream().map(TbMiddlePicPojo::getPicId).toList();
                 List<TbPicPojo> picPojoList = picService.listByIds(picIds);
@@ -1553,6 +1553,7 @@ public class QukuServiceImpl implements QukuService {
                     }
                 }
                 picService.updateBatchById(updatePicPojoList);
+                middlePicService.removeBatchByIds(middlePicList);
                 // 删除所有没有引用封面
                 if (CollectionUtils.isNotEmpty(removePicIds)) {
                     picService.removeByIds(removePicIds);

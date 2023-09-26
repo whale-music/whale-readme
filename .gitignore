@@ -45,5 +45,5 @@ core/target/
 logs/
 /.env
 /.mvn/maven-repository/
-/config/db/db_data.mv.db
-/config/db/db_data.trace.db
+/data/db/db_data.mv.db
+/data/db/db_data.trace.db

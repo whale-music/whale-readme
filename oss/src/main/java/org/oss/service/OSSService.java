@@ -1,5 +1,6 @@
 package org.oss.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.core.config.SaveConfig;
 
 import java.io.File;
@@ -10,15 +11,36 @@ import java.util.Map;
 
 public interface OSSService {
     
-    // 检测是否是当前存储地址
-    boolean isCurrentOSS(String serviceName);
+    /**
+     * 检测是否是当前存储地址
+     *
+     * @param serviceName 服务名
+     * @return 是否相同
+     */
+    default boolean isCurrentOSS(String serviceName) {
+        return StringUtils.equalsIgnoreCase(this.getMode(), serviceName);
+    }
     
+    /**
+     * 返回当前服务名
+     *
+     * @return 服务名
+     */
     String getMode();
     
-    // 检查访问存储地址
+    /**
+     * 检查访问存储地址
+     *
+     * @param config 服务配置
+     * @return 是否可以连接
+     */
     boolean isConnected(SaveConfig config);
     
-    // 存储文件是否存在
+    /**
+     * 存储文件是否存在
+     *
+     * @param name 文件名
+     */
     void isExist(String name);
     
     /**
@@ -63,7 +85,12 @@ public interface OSSService {
      */
     String upload(List<String> paths, Integer index, File srcFile, String md5);
     
-    // 删除文件
+    /**
+     * 删除文件
+     *
+     * @param name 文件名
+     * @return 是否删除成功
+     */
     boolean delete(List<String> name);
     
     default boolean delete(String name) {

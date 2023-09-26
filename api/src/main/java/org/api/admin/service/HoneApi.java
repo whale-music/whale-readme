@@ -113,7 +113,7 @@ public class HoneApi {
         // 本月
         Date date = new Date();
         LambdaQueryWrapper<TbMusicPojo> ge = Wrappers.<TbMusicPojo>lambdaQuery()
-                                                     .ge(TbMusicPojo::getCreateTime, DateUtil.month(date))
+                                                     .ge(TbMusicPojo::getCreateTime, date)
                                                      .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
         long localMonth = musicService.count(ge);
         
@@ -133,7 +133,7 @@ public class HoneApi {
         // 本月
         Date date = new Date();
         Wrapper<TbAlbumPojo> ge = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                          .ge(TbAlbumPojo::getCreateTime, DateUtil.month(date))
+                                          .ge(TbAlbumPojo::getCreateTime, date)
                                           .lt(TbAlbumPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
         long localMonth = albumService.count(ge);
         
@@ -153,7 +153,7 @@ public class HoneApi {
         // 本月
         Date date = new Date();
         Wrapper<TbArtistPojo> ge = Wrappers.<TbArtistPojo>lambdaQuery()
-                                           .ge(TbArtistPojo::getCreateTime, DateUtil.month(date))
+                                           .ge(TbArtistPojo::getCreateTime, date)
                                            .lt(TbArtistPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
         long localMonth = artistService.count(ge);
         

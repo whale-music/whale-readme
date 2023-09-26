@@ -41,10 +41,6 @@ public class AListOSSServiceImpl implements OSSService {
         musicUrltimedCache.schedulePrune(1000);
     }
     
-    @Override
-    public boolean isCurrentOSS(String serviceName) {
-        return StringUtils.equals(SERVICE_NAME, serviceName);
-    }
     
     @Override
     public String getMode() {
@@ -59,10 +55,7 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public boolean isConnected(SaveConfig config) {
         this.config = config;
-        config.setAssignObjectSave(config.getAssignObjectSave() == null ? 0 : config.getAssignObjectSave());
-        if (config.getObjectSave().get(config.getAssignObjectSave()) == null) {
-            throw new BaseException(ResultCode.PARAM_IS_INVALID);
-        }
+        this.config.setAssignObjectSave(config.getAssignObjectSave() == null ? 0 : config.getAssignObjectSave());
         String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
         if (StringUtils.isBlank(loginCacheStr)) {
             String login = login(config.getHost(), config.getAccessKey(), config.getSecretKey());
@@ -194,6 +187,13 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public String upload(List<String> paths, Integer index, File srcFile, String md5) {
         try {
+            if (FileUtil.isDirectory(srcFile)) {
+                throw new BaseException(ResultCode.FILENAME_INVALID);
+            }
+            long size = FileUtil.size(srcFile);
+            if (size == 0) {
+                throw new BaseException(ResultCode.FILE_SIZE_CANNOT_BE_ZERO);
+            }
             String musicAddresses;
             if (StringUtils.isEmpty(md5)) {
                 BufferedInputStream inputStream = FileUtil.getInputStream(srcFile);

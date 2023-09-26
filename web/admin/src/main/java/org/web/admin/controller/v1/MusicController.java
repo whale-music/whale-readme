@@ -153,6 +153,7 @@ public class MusicController {
      * @return 成功信息
      */
     @PostMapping("/auto/upload")
+    @AnonymousAccess
     public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) {
         uploadMusic.uploadAutoMusicFile(userId, uploadFile, musicId);
         return R.success();

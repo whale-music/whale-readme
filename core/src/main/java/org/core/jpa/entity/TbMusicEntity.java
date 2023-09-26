@@ -29,9 +29,6 @@ public class TbMusicEntity implements Serializable {
     @Column(name = "album_id", nullable = true)
     private Long albumId;
     @Basic
-    @Column(name = "sort", nullable = false)
-    private Long sort;
-    @Basic
     @Column(name = "user_id", nullable = true)
     private Long userId;
     @Basic
@@ -95,14 +92,6 @@ public class TbMusicEntity implements Serializable {
         this.albumId = albumId;
     }
     
-    public Long getSort() {
-        return sort;
-    }
-    
-    public void setSort(Long sort) {
-        this.sort = sort;
-    }
-    
     public Long getUserId() {
         return userId;
     }
@@ -153,7 +142,7 @@ public class TbMusicEntity implements Serializable {
         }
         TbMusicEntity that = (TbMusicEntity) o;
         return Objects.equals(id, that.id) && Objects.equals(musicName, that.musicName) && Objects.equals(aliasName,
-                that.aliasName) && Objects.equals(albumId, that.albumId) && Objects.equals(sort, that.sort) && Objects.equals(
+                that.aliasName) && Objects.equals(albumId, that.albumId) && Objects.equals(
                 userId,
                 that.userId) && Objects.equals(timeLength, that.timeLength) && Objects.equals(updateTime,
                 that.updateTime) && Objects.equals(createTime, that.createTime);
@@ -161,7 +150,7 @@ public class TbMusicEntity implements Serializable {
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, musicName, aliasName, albumId, sort, userId, timeLength, updateTime, createTime);
+        return Objects.hash(id, musicName, aliasName, albumId, userId, timeLength, updateTime, createTime);
     }
     
     public Collection<TbCollectMusicEntity> getTbCollectMusicsById() {

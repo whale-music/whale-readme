@@ -41,10 +41,6 @@ public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable {
     @TableField("album_id")
     private Long albumId;
     
-    @Schema(title = "排序字段")
-    @TableField("sort")
-    private Long sort;
-    
     @Schema(title = "上传用户ID")
     @TableField("user_id")
     private Long userId;

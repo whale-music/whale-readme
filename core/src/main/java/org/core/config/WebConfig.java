@@ -1,9 +1,11 @@
 package org.core.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -12,6 +14,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 // @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
+    
+    public static final String PUBLIC_URL = "/common/static/**";
+    
+    private final SaveConfig saveConfig;
+    
+    public WebConfig(SaveConfig saveConfig) {
+        this.saveConfig = saveConfig;
+    }
+    
+    @Override
+    public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
+        registry.addResourceHandler(PUBLIC_URL)
+                .addResourceLocations("file:" + saveConfig.getHost());
+    }
     
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {

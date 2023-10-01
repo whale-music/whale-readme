@@ -1,5 +1,6 @@
 package org.web.admin.security;
 
+import org.core.config.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -47,7 +48,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         Set<String> passUrls = adminPermitAllUrlProperties.getRequestMappingUrls(mapping);
-        passUrls.add("/");
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它
@@ -58,12 +58,16 @@ public class SecurityConfig {
                         // 登录放行
                         .requestMatchers(passUrls.toArray(new String[]{})).permitAll()
                         // 忽略静态资源
-                        .requestMatchers("/web/assets/**",
+                        .requestMatchers(
+                                "/",
+                                "/web/assets/**",
                                 "/web/static/**",
                                 "/web/favicon.ico",
                                 "/web/index.html",
                                 "/web/logo.svg",
-                                "/web/serverConfig.json").permitAll()
+                                "/web/serverConfig.json",
+                                WebConfig.PUBLIC_URL
+                        ).permitAll()
                         // 其他的所有都需要认证
                         .anyRequest().authenticated());
         // 异常处理(权限拒绝、登录失效等)

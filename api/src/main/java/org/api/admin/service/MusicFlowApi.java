@@ -186,7 +186,7 @@ public class MusicFlowApi {
         audioInfoRes.setOriginFileName(uploadFile == null || uploadFile.getOriginalFilename() == null ? "" : uploadFile.getOriginalFilename());
         audioInfoRes.setArtists(Collections.singletonList(read.getTag().getFirst(FieldKey.ARTIST)));
         audioInfoRes.setAlbum(read.getTag().getFirst(FieldKey.ALBUM));
-        audioInfoRes.setTimeLength(read.getAudioHeader().getTrackLength());
+        audioInfoRes.setTimeLength(read.getAudioHeader().getTrackLength() * 1000);
         audioInfoRes.setSize(read.getFile().length());
         audioInfoRes.setMusicFileTemp(path.getName());
         return audioInfoRes;

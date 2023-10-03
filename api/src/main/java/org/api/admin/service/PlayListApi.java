@@ -304,7 +304,7 @@ public class PlayListApi {
         }
         pageOrderBy(req.getOrder(), req.getOrderBy(), wrapper);
         musicService.page(page, wrapper);
-        List<MusicConvert> converts = page.getRecords().parallelStream().map(tbMusicPojo -> {
+        List<MusicConvert> converts = page.getRecords().stream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
             convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));

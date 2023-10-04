@@ -108,7 +108,8 @@ public class LocalOSSServiceImpl implements OSSService {
         
         for (String parentFileName : list) {
             File file = new File(config.getHost(), parentFileName);
-            List<String> files = FileUtil.listFileNames(file.getPath());
+            FileUtil.mkdir(file);
+            List<String> files = FileUtil.listFileNames(file.getAbsolutePath());
             if (CollUtil.isEmpty(files)) {
                 continue;
             }
@@ -117,7 +118,7 @@ public class LocalOSSServiceImpl implements OSSService {
                 FileMetadata meta = new FileMetadata();
                 String md5 = FileUtil.mainName(filename);
                 meta.setFullPath(item.getPath());
-                String uri = parentFileName = parentFileName.charAt(parentFileName.length() - 1) == '/' ? parentFileName : parentFileName + "/";
+                String uri = parentFileName = parentFileName.charAt(parentFileName.length() - 1) == '/' ? parentFileName : parentFileName + '/';
                 meta.setUri(uri + filename);
                 meta.setFileMd5(md5);
                 meta.setSize(FileUtil.size(item));

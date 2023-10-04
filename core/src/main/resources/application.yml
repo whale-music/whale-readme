@@ -40,7 +40,7 @@ logging:
 spring:
   application:
     name: whale
-   # config:
+    # config:
     # Development properties (also used for docker-compose)
     # import: optional:file:.env[.properties]
   autoconfigure:
@@ -51,7 +51,7 @@ spring:
   datasource:
     #引用项目中的数据库文件
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:./config/db/db_data
+    url: jdbc:h2:file:./data/db/db_data
     username: root
     password: root
   jpa:
@@ -112,22 +112,22 @@ pagehelper:
 # 对象存储
 save-config:
   # 保存模式
-  save-mode: AList
+  save-mode: Local
   # 请求对象地址 (必须)
   # 可以使用多个地址，程序会自动合并成
   object-save:
-    #    - /test/music
+    # - /test/music
     - /music
   # 保存地址，必须是对象地址中的值，顺序从0开始
   # 没有实现随机存储和自动选择最少对象的地址存储，因为存储的上传接口极其不稳定。最后放弃
   assign-object-save: 0
   img-save:
-    #    - /test/img
+    # - /test/img
     - /img
   assign-img-save: 0
   # 请求地址(必须)
   # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
-  host: http://localhost:5244/
+  host: ./data/storage
   # 账户(根据使用模式填写)
   access-key: admin
   # 密码(根据使用模式填写)

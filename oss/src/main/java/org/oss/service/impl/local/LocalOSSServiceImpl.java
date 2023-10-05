@@ -262,7 +262,7 @@ public class LocalOSSServiceImpl implements OSSService {
             throw new BaseException(e.getMessage());
         }
         String pathname = paths.get(index);
-        pathname = pathname.charAt(pathname.length() - 1) == '/' ? pathname : pathname + FileUtil.FILE_SEPARATOR;
+        pathname = StringUtils.startsWith(pathname, "/") ? pathname : pathname + FileUtil.FILE_SEPARATOR;
         pathname = StringUtils.replace(pathname, "/", FileUtil.FILE_SEPARATOR);
         pathname = StringUtils.replace(pathname, "\\", FileUtil.FILE_SEPARATOR);
         

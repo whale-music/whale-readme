@@ -143,7 +143,7 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     private String getPath(ContentItem contentItem) {
-        String path = contentItem.getPath().charAt(0) == '/' ? StringUtils.substring(contentItem.getPath(), 1) : contentItem.getPath();
+        String path = StringUtils.startsWith(contentItem.getPath(), "/") ? StringUtils.substring(contentItem.getPath(), 1) : contentItem.getPath();
         return String.format("%s/d/%s/%s?sign=%s",
                 config.getHost(),
                 path,

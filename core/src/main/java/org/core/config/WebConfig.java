@@ -1,5 +1,6 @@
 package org.core.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +26,10 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(PUBLIC_URL)
-                .addResourceLocations("file:" + saveConfig.getHost());
+        if (StringUtils.equalsIgnoreCase(saveConfig.getSaveMode(), "Local") && !registry.hasMappingForPattern(PUBLIC_URL)) {
+            registry.addResourceHandler(PUBLIC_URL)
+                    .addResourceLocations(saveConfig.getHost());
+        }
     }
     
     @Override

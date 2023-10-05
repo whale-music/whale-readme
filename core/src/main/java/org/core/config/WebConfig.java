@@ -1,5 +1,6 @@
 package org.core.config;
 
+import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +28,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
         if (StringUtils.equalsIgnoreCase(saveConfig.getSaveMode(), "Local") && !registry.hasMappingForPattern(PUBLIC_URL)) {
+            String replace = StringUtils.replace(saveConfig.getHost(), "/", FileUtil.FILE_SEPARATOR);
+            String host = StringUtils.replace(replace, "\\", FileUtil.FILE_SEPARATOR);
+            saveConfig.setHost(host);
+            // 映射本地文件夹路径时，结尾必须以"\ or \\"结尾, 否则访问404
+            if (!StringUtils.endsWith(saveConfig.getHost(), FileUtil.FILE_SEPARATOR)) {
+                saveConfig.setHost(saveConfig.getHost() + FileUtil.FILE_SEPARATOR);
+            }
             registry.addResourceHandler(PUBLIC_URL)
-                    .addResourceLocations(saveConfig.getHost());
+                    .addResourceLocations("file:" + saveConfig.getHost());
         }
     }
     

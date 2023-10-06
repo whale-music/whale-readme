@@ -66,6 +66,16 @@ spring:
       max-request-size: 200MB
       # 设置上传文件位置
       # location: ./
+  messages:
+    encoding: UTF-8
+    basename: i18n/messages
+    # 使用本地系统对应资源文件
+    fallback-to-system-locale: true
+    # 设置本地默认语言
+    # local: 读取本地语言
+    # zh-cn: 中文-简
+    # en-us: 英语-美
+    default-language: local
 
 # 文档配置
 springdoc:

@@ -32,7 +32,7 @@ public class DebugConfig {
     private Boolean webDavSpringBootApplication;
     
     public static Boolean getDebug() {
-        return DEBUG;
+        return Boolean.TRUE.equals(DEBUG);
     }
     
     @Value("${application.config.log}")

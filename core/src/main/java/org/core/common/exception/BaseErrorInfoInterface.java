@@ -1,7 +1,7 @@
 package org.core.common.exception;
 
 /**
- * &#064;description:  服务接口类
+ * 服务接口类
  */
 public interface BaseErrorInfoInterface {
     

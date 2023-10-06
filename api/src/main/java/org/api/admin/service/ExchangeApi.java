@@ -233,7 +233,7 @@ public class ExchangeApi {
     
     public void importExcel(MultipartFile file) throws IOException {
         if (file == null) {
-            throw new BaseException(ResultCode.FILENAME_EXIST);
+            throw new BaseException(ResultCode.FILENAME_NO_EXIST);
         }
         File dest = new File(requestConfig.getTempPath(), Objects.requireNonNull(file.getOriginalFilename()));
         dest = FileUtil.writeBytes(file.getBytes(), dest);

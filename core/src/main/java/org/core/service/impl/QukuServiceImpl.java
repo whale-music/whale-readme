@@ -742,7 +742,7 @@ public class QukuServiceImpl implements QukuService {
             long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                            .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                            .in(TbCollectMusicPojo::getMusicId, songIds));
-            ExceptionUtil.isNull(count > 0, ResultCode.PLAT_LIST_MUSIC_EXIST);
+            ExceptionUtil.isNull(count > 0, ResultCode.PLAY_LIST_MUSIC_EXIST);
             
             // 添加
             List<TbMusicPojo> tbMusicPojo = musicService.listByIds(songIds);

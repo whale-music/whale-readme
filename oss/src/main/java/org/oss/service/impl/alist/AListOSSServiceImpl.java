@@ -86,7 +86,7 @@ public class AListOSSServiceImpl implements OSSService {
             }
             // 没有找到文件直接抛出异常
             if (item == null || StringUtils.isBlank(item.getPath())) {
-                throw new BaseException(ResultCode.DATA_NONE.getCode(), ResultCode.DATA_NONE.getResultMsg() + ": " + name);
+                throw new BaseException(ResultCode.DATA_NONE_FOUND.getCode(), ResultCode.DATA_NONE_FOUND.getResultMsg() + ": " + name);
             }
             return getPath(item);
         } catch (BaseException e) {

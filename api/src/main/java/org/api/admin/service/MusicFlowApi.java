@@ -750,7 +750,7 @@ public class MusicFlowApi {
         // 更新封面
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
             File file = new File(requestConfig.getTempPath(), req.getTempPicFile());
-            ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_EXIST);
+            ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
             qukuService.saveOrUpdateMusicPicFile(req.getId(), file);
         }
         // 如果是更新则删除原有数据

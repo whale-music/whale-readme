@@ -180,7 +180,7 @@ public class PluginServiceImpl implements PluginService {
     public PluginRunParamsRes getPluginParams(Long pluginId) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
-            throw new BaseException(ResultCode.PLUGIN_EXISTED);
+            throw new BaseException(ResultCode.PLUGIN_NO_EXISTED);
         }
         String script = byId.getCode();
         if (org.apache.commons.lang3.StringUtils.isBlank(script)) {
@@ -260,7 +260,7 @@ public class PluginServiceImpl implements PluginService {
     public List<TbPluginMsgPojo> onLineExecPluginTask(List<PluginLabelValue> req, Long pluginId, TbPluginTaskPojo task) {
         TbPluginPojo byId = pluginService.getById(pluginId);
         if (byId == null) {
-            throw new BaseException(ResultCode.PLUGIN_EXISTED);
+            throw new BaseException(ResultCode.PLUGIN_NO_EXISTED);
         }
         CommonPlugin func = runCommonCode(byId.getCode(), getClassName(byId.getCode()));
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi,

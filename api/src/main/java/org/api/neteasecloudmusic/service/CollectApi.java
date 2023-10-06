@@ -230,7 +230,7 @@ public class CollectApi {
      */
     public void subscribePlayList(Long userId, Long collectId, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
-        ExceptionUtil.isNull(tbCollectPojo == null, ResultCode.PLAT_LIST_EXIST);
+        ExceptionUtil.isNull(tbCollectPojo == null, ResultCode.PLAY_LIST_NO_EXIST);
         // 需要收藏歌单存在，并且用户不一样, 不等于为true
         boolean userFlag = !Objects.equals(tbCollectPojo.getUserId(), userId);
         
@@ -239,7 +239,7 @@ public class CollectApi {
                                                            .eq(TbUserCollectPojo::getUserId, userId);
         TbUserCollectPojo one = userCollectService.getOne(eq);
         // 防止重复收藏
-        ExceptionUtil.isNull(one == null, ResultCode.PLAT_LIST_LIKE);
+        ExceptionUtil.isNull(one == null, ResultCode.PLAY_LIST_LIKE);
         // 收藏
         if (userFlag && flag) {
             TbUserCollectPojo entity = new TbUserCollectPojo();

@@ -471,7 +471,7 @@ public class PlayListApi {
      */
     public void addMusicToPlayList(Long userId, Long pid, List<Long> id, Boolean flag) {
         TbCollectPojo byId = collectService.getById(pid);
-        ExceptionUtil.isNull(byId == null, ResultCode.PLAT_LIST_LIKE);
+        ExceptionUtil.isNull(byId == null, ResultCode.PLAY_LIST_LIKE);
         qukuService.addOrRemoveMusicToCollect(userId, byId.getId(), id, flag);
     }
     

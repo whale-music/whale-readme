@@ -156,7 +156,7 @@ public class PlaylistApi {
         // 添加歌单
         if (Objects.isNull(playlistId)) {
             if (StringUtils.isBlank(name)) {
-                throw new BaseException(ResultCode.PLAT_LIST_EXIST);
+                throw new BaseException(ResultCode.PLAY_LIST_NO_EXIST);
             }
             String userName = req.getU();
             SysUserPojo userByName = Optional.ofNullable(accountService.getUserByName(userName)).orElse(new SysUserPojo());

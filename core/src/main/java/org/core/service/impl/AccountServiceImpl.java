@@ -61,7 +61,7 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
         lambdaQuery.eq(SysUserPojo::getPassword, password);
         SysUserPojo one = this.getOne(lambdaQuery);
         if (one == null) {
-            throw new BaseException(ResultCode.USER_LOGIN_ERROR);
+            throw new BaseException(ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD);
         }
         if (Boolean.FALSE.equals(one.getStatus())) {
             throw new BaseException(ResultCode.USER_ACCOUNT_FORBIDDEN);

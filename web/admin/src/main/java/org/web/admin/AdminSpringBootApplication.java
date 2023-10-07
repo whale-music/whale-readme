@@ -12,16 +12,16 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@EntityScan(basePackages = "org.core.jpa.entity")
-@EnableJpaRepositories(basePackages = "org.core.jpa.repository")
 @EnablePluginServer
 @EnableApiServer
-@SpringBootApplication
-@PropertySource(value = "classpath:application-admin.yml", factory = YamlPropertySourceFactory.class)
-@PropertySource(value = "classpath:application-admin.properties")
 // 开启安全校验
 @EnableWebSecurity
 @EnableMethodSecurity
 @EnableAsync
+@EntityScan(basePackages = "org.core.jpa.entity")
+@EnableJpaRepositories(basePackages = "org.core.jpa.repository")
+@PropertySource(value = "classpath:application-admin.yml", factory = YamlPropertySourceFactory.class)
+@PropertySource(value = "classpath:application-admin.properties")
+@SpringBootApplication
 public class AdminSpringBootApplication implements ApplicationStartup {
 }

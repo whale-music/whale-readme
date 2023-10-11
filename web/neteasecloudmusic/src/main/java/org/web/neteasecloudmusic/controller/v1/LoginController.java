@@ -1,6 +1,7 @@
 package org.web.neteasecloudmusic.controller.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.Cookie;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.web.neteasecloudmusic.controller.BaseController;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -59,7 +61,12 @@ public class LoginController extends BaseController {
      */
     @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
-    public NeteaseResult loginMail(HttpServletResponse response, String email, String password) {
+    public NeteaseResult loginMail(HttpServletResponse response, @RequestParam Map<String, String> req) {
+        if (CollUtil.isEmpty(req)) {
+            return new NeteaseResult().success();
+        }
+        String email = req.get("email");
+        String password = req.get("password");
         String account = StringUtils.split(email, "@")[0];
         UserConvert userPojo = user.login(account, password);
         UserVo userVo = getUserVo(userPojo);
@@ -108,6 +115,7 @@ public class LoginController extends BaseController {
     }
     
     @RequestMapping(value = "/login/qr/key", method = {RequestMethod.GET, RequestMethod.POST})
+    @AnonymousAccess
     public NeteaseResult qrKey() {
         UUID uuid = UUID.randomUUID();
         GlobeDataUtil.setData(uuid.toString(), uuid.toString());
@@ -149,7 +157,8 @@ public class LoginController extends BaseController {
     }
     
     @GetMapping("/login/qr/check")
-    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key, HttpSession session) {
+    @AnonymousAccess
+    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
@@ -223,9 +232,11 @@ public class LoginController extends BaseController {
     
     /**
      * 登出接口
+     *
+     * @param allParam 所有方法
      */
-    @GetMapping("/logout")
-    public NeteaseResult userLogout(HttpServletResponse response, HttpSession session) {
+    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult userLogout(HttpServletResponse response, HttpSession session, @RequestParam Map<String, String> allParam) {
         return super.logout(response, session);
     }
     

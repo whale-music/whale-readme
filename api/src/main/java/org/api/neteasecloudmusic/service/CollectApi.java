@@ -340,7 +340,10 @@ public class CollectApi {
      * @return 返回歌曲数组
      */
     public List<Long> likelist(Long uid) {
-        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, uid));
+        List<TbCollectPojo> userCollect = collectService.getUserCollect(uid, PlayListTypeConfig.LIKE);
+        List<Long> collectIds = userCollect.parallelStream().map(TbCollectPojo::getId).toList();
+        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                         .in(TbCollectMusicPojo::getCollectId, collectIds));
         return list.stream().map(TbCollectMusicPojo::getMusicId).toList();
     }
     

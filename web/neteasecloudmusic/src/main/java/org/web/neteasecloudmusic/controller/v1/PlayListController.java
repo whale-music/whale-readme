@@ -9,6 +9,7 @@ import org.api.neteasecloudmusic.model.vo.createplatlist.Playlist;
 import org.api.neteasecloudmusic.model.vo.playlistallsong.*;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
+import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
@@ -154,7 +155,7 @@ public class PlayListController {
         List<Long> musicIds = playListAllSong.getRecords()
                                              .stream()
                                              .map(TbMusicPojo::getId)
-                                             .collect(Collectors.toList());
+                                             .toList();
         List<TbResourcePojo> musicInfos = collect.getMusicInfo(musicIds);
         List<SongsItem> songs = new ArrayList<>();
         for (MusicConvert musicPojo : playListAllSong.getRecords()) {
@@ -286,6 +287,7 @@ public class PlayListController {
      * @return ID
      */
     @RequestMapping(value = "/playlist/detail", method = {RequestMethod.GET, RequestMethod.POST})
+    @AnonymousAccess
     public NeteaseResult playlistDetail(@RequestParam("id") Long id) {
         PlayListDetailRes res = collect.playlistDetail(id);
         NeteaseResult r = new NeteaseResult();

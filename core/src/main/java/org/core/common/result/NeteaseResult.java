@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.core.common.exception.BaseErrorInfoInterface;
 
 import java.util.HashMap;
 
@@ -25,7 +26,7 @@ public class NeteaseResult extends HashMap<String, Object> {
         this.code = ResultCode.SUCCESS.getCode();
         this.message = ResultCode.SUCCESS.getResultMsg();
         put("code", Integer.valueOf(code));
-        put("message", message);
+        put("msg", message);
         return this;
     }
     
@@ -37,7 +38,7 @@ public class NeteaseResult extends HashMap<String, Object> {
         this.message = ResultCode.SUCCESS.getResultMsg();
         put("data", o);
         put("code", code);
-        put("message", message);
+        put("msg", message);
         return this;
     }
     
@@ -57,14 +58,14 @@ public class NeteaseResult extends HashMap<String, Object> {
         this.code = code;
         this.message = message;
         put("code", Integer.valueOf(code));
-        put("message ", message);
+        put("msg", message);
         return this;
     }
     
     /**
      * 失败
      */
-    public NeteaseResult error(ResultCode resultCode) {
+    public NeteaseResult error(BaseErrorInfoInterface resultCode) {
         return error(resultCode.getCode(), resultCode.getResultMsg());
     }
 }

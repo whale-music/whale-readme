@@ -48,8 +48,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         Set<String> passUrls = permitAllUrlProperties.getRequestMappingUrls(mapping);
         // 放行本地资源
-        passUrls.add("/assets/**");
-        passUrls.add(WebConfig.PUBLIC_URL);
+        passUrls.addAll(WebConfig.getPublicList());
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它

@@ -13,13 +13,26 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 手动创建 TaskExecutor. 防止使用自定义配置占用太多内存
+ *
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     
-    public static final String PUBLIC_URL = "/common/static/**";
+    public static final String PUBLIC_STATIC_URL = "/common/static/**";
+    public static final String PUBLIC_ASSETS_URL = "/assets/**";
+    public static final String PUBLIC_LOGIN_KEY_URL = "/login-key/**";
+    
+    private static final List<String> PUBLIC_LIST = new ArrayList<>();
+    
+    static {
+        PUBLIC_LIST.add(PUBLIC_STATIC_URL);
+        PUBLIC_LIST.add(PUBLIC_ASSETS_URL);
+        PUBLIC_LIST.add(PUBLIC_LOGIN_KEY_URL);
+    }
     
     private final SaveConfig saveConfig;
     
@@ -27,9 +40,13 @@ public class WebConfig implements WebMvcConfigurer {
         this.saveConfig = saveConfig;
     }
     
+    public static List<String> getPublicList() {
+        return PUBLIC_LIST;
+    }
+    
     @Override
     public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
-        if (StringUtils.equalsIgnoreCase(saveConfig.getSaveMode(), "Local") && !registry.hasMappingForPattern(PUBLIC_URL)) {
+        if (StringUtils.equalsIgnoreCase(saveConfig.getSaveMode(), "Local") && !registry.hasMappingForPattern(PUBLIC_STATIC_URL)) {
             String replace = StringUtils.replace(saveConfig.getHost(), "/", FileUtil.FILE_SEPARATOR);
             String host = StringUtils.replace(replace, "\\", FileUtil.FILE_SEPARATOR);
             saveConfig.setHost(host);
@@ -37,7 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
             if (!StringUtils.endsWith(saveConfig.getHost(), FileUtil.FILE_SEPARATOR)) {
                 saveConfig.setHost(saveConfig.getHost() + FileUtil.FILE_SEPARATOR);
             }
-            registry.addResourceHandler(PUBLIC_URL)
+            registry.addResourceHandler(PUBLIC_STATIC_URL)
                     .addResourceLocations("file:" + saveConfig.getHost());
         }
     }
@@ -52,17 +69,18 @@ public class WebConfig implements WebMvcConfigurer {
      * {@link CorsConfiguration#combine(CorsConfiguration) combined} * 与在控制器上定义的本地 CORS 配置相结合。
      * 与控制器方法上定义的本地 CORS 配置相结合。
      *
-     * @param registry
      * @see CorsRegistry
      * @see CorsConfiguration#combine(CorsConfiguration)
      * @since 4.2
      */
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping(PUBLIC_URL) // 映射到静态资源的路径
-                .allowedOriginPatterns("*") // 允许来自此来源的跨域请求
-                .allowedMethods("*") // 允许的HTTP方法
-                .allowCredentials(true); // 允许跨域请求携带凭据（如Cookie）
+    public void addCorsMappings(@NotNull CorsRegistry registry) {
+        for (String s : getPublicList()) {
+            registry.addMapping(s) // 映射到静态资源的路径
+                    .allowedOriginPatterns("*") // 允许来自此来源的跨域请求
+                    .allowedMethods("*") // 允许的HTTP方法
+                    .allowCredentials(true); // 允许跨域请求携带凭据（如Cookie）
+        }
     }
     
     @Override
@@ -70,6 +88,11 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.setTaskExecutor(taskExecutor());
     }
     
+    /**
+     * 手动创建 TaskExecutor. 防止使用自定义配置占用太多内存
+     *
+     * @return ThreadPoolTaskExecutor
+     */
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

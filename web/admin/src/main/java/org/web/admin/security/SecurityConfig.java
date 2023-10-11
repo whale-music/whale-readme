@@ -48,6 +48,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         Set<String> passUrls = adminPermitAllUrlProperties.getRequestMappingUrls(mapping);
+        passUrls.addAll(WebConfig.getPublicList());
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它
@@ -65,9 +66,7 @@ public class SecurityConfig {
                                 "/web/favicon.ico",
                                 "/web/index.html",
                                 "/web/logo.svg",
-                                "/web/serverConfig.json",
-                                "/assets/**",
-                                WebConfig.PUBLIC_URL
+                                "/web/serverConfig.json"
                         ).permitAll()
                         // 其他的所有都需要认证
                         .anyRequest().authenticated());

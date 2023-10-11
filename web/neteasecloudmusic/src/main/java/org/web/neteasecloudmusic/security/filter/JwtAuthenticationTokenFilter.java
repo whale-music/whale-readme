@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.web.neteasecloudmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
 
@@ -42,7 +43,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         // 放行运行匿名访问的地址
         // 注意: 如果匿名访问地址中的接口中，获取用户属性则会报错
-        if (permitAllUrlProperties.getUrls().contains(request.getRequestURI())) {
+        if (permitAllUrlProperties.getUrls().contains(request.getRequestURI()) || PatternMatchUtils.simpleMatch(permitAllUrlProperties.getUrls()
+                                                                                                                                      .toArray(String[]::new),
+                request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }

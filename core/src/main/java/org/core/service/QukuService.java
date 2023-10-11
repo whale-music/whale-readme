@@ -178,9 +178,9 @@ public interface QukuService {
     /**
      * 获取用户关注歌手
      *
-     * @param user 用户信息
+     * @param uid 用户信息
      */
-    List<ArtistConvert> getUserLikeSingerList(SysUserPojo user);
+    List<ArtistConvert> getUserLikeSingerList(Long uid);
     
     /**
      * 获取歌手所有专辑数量

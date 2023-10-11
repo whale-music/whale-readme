@@ -598,12 +598,12 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 获取用户关注歌手
      *
-     * @param user 用户信息
+     * @param uid 用户信息
      */
     @Override
-    public List<ArtistConvert> getUserLikeSingerList(SysUserPojo user) {
+    public List<ArtistConvert> getUserLikeSingerList(Long uid) {
         List<TbUserArtistPojo> userLikeSinger = userSingerService.list(Wrappers.<TbUserArtistPojo>lambdaQuery()
-                                                                               .eq(TbUserArtistPojo::getUserId, user.getId()));
+                                                                               .eq(TbUserArtistPojo::getUserId, uid));
         if (CollUtil.isEmpty(userLikeSinger)) {
             return Collections.emptyList();
         }

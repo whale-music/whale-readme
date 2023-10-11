@@ -6,7 +6,6 @@ import org.core.common.result.ResultCode;
 import org.core.config.DebugConfig;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -15,11 +14,12 @@ import java.util.Optional;
 
 /**
  * 全局异常处理
+ * core模块中异常处理类不能使用，会与其他的web模块下的异常处理冲突
  *
  * @author Sakura
  * @since 2022-10-22
  */
-@ControllerAdvice
+// @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     public static final String THROW_STR = "Throwable: ";

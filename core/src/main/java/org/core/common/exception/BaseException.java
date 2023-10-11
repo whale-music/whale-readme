@@ -3,7 +3,7 @@ package org.core.common.exception;
 import java.io.Serial;
 
 /**
- * &#064;Deprecated  异常类
+ * 异常类
  *
  * @author Sakura
  */

@@ -20,18 +20,18 @@ public class ListItem{
 	private Object englishTitle;
 	private Object recommendInfo;
 	private Integer totalDuration;
-	private boolean ordered;
+	private Boolean ordered;
 	private Object creator;
 	private List<Object> subscribers;
 	private Object backgroundCoverUrl;
-	private boolean opRecommend;
-	private boolean highQuality;
+	private Boolean opRecommend;
+	private Boolean highQuality;
 	private String commentThreadId;
 	private Long updateTime;
 	private Long trackUpdateTime;
 	private Integer userId;
 	private Object tracks;
-	private boolean anonimous;
+	private Boolean anonimous;
 	private List<Object> tags;
 	private Integer titleImage;
 	private String coverImgUrl;
@@ -42,9 +42,9 @@ public class ListItem{
 	private String name;
 	private Integer backgroundCoverId;
 	private Integer subscribedCount;
-	private Object titleImageUrl;
+	private String titleImageUrl;
 	private String updateFrequency;
-	private boolean newImported;
+	private Boolean newImported;
 	private Integer status;
 	private String toplistType;
 }

@@ -1,5 +1,6 @@
 package org.web.neteasecloudmusic.security;
 
+import org.core.config.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
@@ -46,6 +47,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         Set<String> passUrls = permitAllUrlProperties.getRequestMappingUrls(mapping);
+        // 放行本地资源
+        passUrls.add("/assets/**");
+        passUrls.add(WebConfig.PUBLIC_URL);
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它

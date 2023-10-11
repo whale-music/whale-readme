@@ -66,6 +66,7 @@ public class SecurityConfig {
                                 "/web/index.html",
                                 "/web/logo.svg",
                                 "/web/serverConfig.json",
+                                "/assets/**",
                                 WebConfig.PUBLIC_URL
                         ).permitAll()
                         // 其他的所有都需要认证

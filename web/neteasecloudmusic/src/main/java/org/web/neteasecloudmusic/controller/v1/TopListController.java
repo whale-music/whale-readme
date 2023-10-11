@@ -7,6 +7,7 @@ import org.api.neteasecloudmusic.model.vo.toplist.artist.TopListArtistRes;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
 import org.api.neteasecloudmusic.service.TopListApi;
+import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,7 @@ public class TopListController {
     }
     
     @GetMapping("/toplist/artist")
+    @AnonymousAccess
     public NeteaseResult artist(String type) {
         TopListArtistRes res = topListApi.artist(type);
         NeteaseResult r = new NeteaseResult();

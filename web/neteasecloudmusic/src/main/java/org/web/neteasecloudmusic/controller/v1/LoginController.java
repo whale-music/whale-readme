@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
@@ -51,15 +52,31 @@ public class LoginController extends BaseController {
     @Autowired
     private LoginApi loginApi;
     
+    /**
+     * 登录接口, 邮箱
+     *
+     * @return 返回登录结果
+     */
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
+    @AnonymousAccess
+    public NeteaseResult loginMail(HttpServletResponse response, String email, String password) {
+        String account = StringUtils.split(email, "@")[0];
+        UserConvert userPojo = user.login(account, password);
+        UserVo userVo = getUserVo(userPojo);
+        // 生成sign
+        NeteaseResult r = getNeteaseResult(response, userPojo);
+        r.putAll(BeanUtil.beanToMap(userVo));
+        return r.success();
+    }
     
     /**
-     * 登录接口
+     * 登录接口, 手机
      *
      * @return 返回登录结果
      */
     @AnonymousAccess
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult login(HttpServletResponse response, HttpSession session, String phone, String password) {
+    public NeteaseResult loginPhone(HttpServletResponse response, String phone, String password) {
         UserConvert userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
@@ -118,6 +135,7 @@ public class LoginController extends BaseController {
     }
     
     @GetMapping("/login/sure")
+    @AnonymousAccess
     public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) {
         String data = GlobeDataUtil.getData(codekey);
         NeteaseResult r = new NeteaseResult();

@@ -6,7 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,7 +17,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 手动创建 TaskExecutor. 防止使用自定义配置占用太多内存
  */
 @Configuration
-// @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
     
     public static final String PUBLIC_URL = "/common/static/**";
@@ -38,6 +40,29 @@ public class WebConfig implements WebMvcConfigurer {
             registry.addResourceHandler(PUBLIC_URL)
                     .addResourceLocations("file:" + saveConfig.getHost());
         }
+    }
+    
+    /**
+     * 配置 "全局 "跨源请求处理。配置的 CORS
+     * 映射适用于注释控制器、功能端点和静态
+     * 资源。
+     * <p> 注解控制器可通过以下方式进一步声明更精细的配置
+     * {@link CrossOrigin @CrossOrigin}。
+     * 在这种情况下，此处声明的 "全局 "CORS 配置为
+     * {@link CorsConfiguration#combine(CorsConfiguration) combined} * 与在控制器上定义的本地 CORS 配置相结合。
+     * 与控制器方法上定义的本地 CORS 配置相结合。
+     *
+     * @param registry
+     * @see CorsRegistry
+     * @see CorsConfiguration#combine(CorsConfiguration)
+     * @since 4.2
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping(PUBLIC_URL) // 映射到静态资源的路径
+                .allowedOriginPatterns("*") // 允许来自此来源的跨域请求
+                .allowedMethods("*") // 允许的HTTP方法
+                .allowCredentials(true); // 允许跨域请求携带凭据（如Cookie）
     }
     
     @Override

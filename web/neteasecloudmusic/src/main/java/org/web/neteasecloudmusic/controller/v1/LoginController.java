@@ -113,9 +113,16 @@ public class LoginController extends BaseController {
         return r.success();
     }
     
+    /**
+     * 创建二维码登录uuid
+     * 在原有基础上增加返回qr url, 用于获取二维码登录地址
+     *
+     * @param request HttpServlet
+     * @return NeteaseResult
+     */
     @RequestMapping(value = "/login/qr/key", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
-    public NeteaseResult qrKey() {
+    public NeteaseResult qrKey(HttpServletRequest request) {
         UUID uuid = UUID.randomUUID();
         GlobeDataUtil.setData(uuid.toString(), uuid.toString());
         
@@ -123,6 +130,12 @@ public class LoginController extends BaseController {
         HashMap<String, Object> map = new HashMap<>();
         map.put("code", 200);
         map.put("unikey", uuid.toString());
+        
+        String localhost = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        String value = "/login-key/index.html?key=" + uuid;
+        String qrUrl = localhost + value;
+        r.put("qrurl", qrUrl);
+        r.put("qrimg", Base64Util.encode(qrUrl));
         return r.success(map);
     }
     
@@ -136,8 +149,9 @@ public class LoginController extends BaseController {
         }
         String localhost = request.getServerName() + ":" + request.getServerPort();
         String value = "/login-key/index.html?key=" + data;
-        r.put("qrurl", localhost + value);
-        r.put("qrimg", Base64Util.encode(value));
+        String qrUrl = localhost + value;
+        r.put("qrurl", qrUrl);
+        r.put("qrimg", Base64Util.encode(qrUrl));
         return r;
     }
     

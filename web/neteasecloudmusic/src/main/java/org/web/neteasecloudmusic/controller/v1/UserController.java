@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.web.neteasecloudmusic.controller.BaseController;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,7 +44,6 @@ public class UserController extends BaseController {
      *
      * @return 返回用户信息
      */
-    @AnonymousAccess
     @GetMapping("/user/account")
     public NeteaseResult getUser() {
         SysUserPojo userPojo = UserUtil.getUser();
@@ -61,6 +61,7 @@ public class UserController extends BaseController {
      * 初始化用户昵称
      */
     @GetMapping("/activate/init/profile")
+    @AnonymousAccess
     public NeteaseResult initUser(@RequestParam("nickname") String nickname) {
         SysUserPojo userPojo = UserUtil.getUser();
         userPojo.setNickname(nickname);
@@ -120,8 +121,9 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      */
     @GetMapping("/user/record")
-    public NeteaseResult userRecord(@RequestParam("uid") Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
-        List<UserRecordRes> res = user.userRecord(uid, type);
+    public NeteaseResult userRecord(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
+        Long userId = Objects.isNull(uid) ? UserUtil.getUser().getId() : uid;
+        List<UserRecordRes> res = user.userRecord(userId, type);
         NeteaseResult r = new NeteaseResult();
         if (type == 1) {
             r.put("weekData", res);

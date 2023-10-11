@@ -50,8 +50,9 @@ public class ArtistApi {
     private TbArtistService singerService;
     
     public ArtistSubListRes artistSublist(SysUserPojo user) {
+        user = Optional.ofNullable(user).orElse(new SysUserPojo());
         ArtistSubListRes res = new ArtistSubListRes();
-        List<ArtistConvert> userPojoList = qukuService.getUserLikeSingerList(user);
+        List<ArtistConvert> userPojoList = qukuService.getUserLikeSingerList(user.getId());
         ArrayList<DataItem> data = new ArrayList<>();
         for (ArtistConvert tbArtistPojo : userPojoList) {
             DataItem e = new DataItem();

@@ -7,7 +7,6 @@ import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Base64Util;
@@ -236,8 +235,8 @@ public class LoginController extends BaseController {
      * @param allParam 所有方法
      */
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult userLogout(HttpServletResponse response, HttpSession session, @RequestParam Map<String, String> allParam) {
-        return super.logout(response, session);
+    public NeteaseResult userLogout(HttpServletResponse response, @RequestParam Map<String, String> allParam) {
+        return this.logout(response);
     }
     
 }

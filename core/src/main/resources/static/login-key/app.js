@@ -1,13 +1,13 @@
 const sign_in_btn = document.querySelector("#sign-in-btn");
-const sign_up_btn = document.querySelector("#sign-up-btn");
+// const sign_up_btn = document.querySelector("#sign-up-btn");
 const container = document.querySelector(".container");
 const button = document.querySelector('form.sign-in-form > input')
 const accountDoc = document.querySelector('form.sign-in-form > div:nth-child(2) > input[type=text]')
 const passwordDoc = document.querySelector('form.sign-in-form > div:nth-child(3) > input[type=password]')
 
-sign_up_btn.addEventListener("click", () => {
-    container.classList.add("sign-up-mode");
-});
+// sign_up_btn.addEventListener("click", () => {
+//     container.classList.add("sign-up-mode");
+// });
 
 sign_in_btn.addEventListener("click", () => {
     container.classList.remove("sign-up-mode");

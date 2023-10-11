@@ -7,6 +7,7 @@ import org.api.neteasecloudmusic.model.vo.song.lyric.SongLyricRes;
 import org.api.neteasecloudmusic.model.vo.songdetail.SongDetailRes;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.api.neteasecloudmusic.service.MusicApi;
+import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ public class SongController {
      * 获取歌曲详情
      */
     @RequestMapping(value = "/song/detail", method = {RequestMethod.GET, RequestMethod.POST})
+    @AnonymousAccess
     public NeteaseResult songDetail(@RequestParam("ids") List<Long> ids) {
         SongDetailRes res = musicApi.songDetail(ids);
         NeteaseResult r = new NeteaseResult();
@@ -53,6 +55,7 @@ public class SongController {
     }
     
     @RequestMapping(value = "/lyric", method = {RequestMethod.GET, RequestMethod.POST})
+    @AnonymousAccess
     public NeteaseResult lyric(@RequestParam("id") Long id) {
         SongLyricRes res = musicApi.lyric(id);
         NeteaseResult r = new NeteaseResult();

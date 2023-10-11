@@ -175,9 +175,7 @@ default-info:
     music: default
     album: default
   pic:
-    # 如果封面没有值则返回此链接
-    # http://p3.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
-    # https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg
+    # 如果封面没有值则返回此链接, 支持http和本地资源
     # 冗余默认封面地址
     default-pic: https://i.ibb.co/NLGThpw/wallhaven-9mjoy1.png
     # 音乐没有封面则默认使用此链接
@@ -189,7 +187,7 @@ default-info:
     # 歌手默认封面
     artist-pic: https://fakeimg.pl/350x200/c0392b/fff?retina=1&font=noto&text=艺术家
     # 用户默认头像
-    user-avatar-pic: https://fakeimg.pl/350x200/c0392b/fff?retina=1&font=noto&text=默认头像
+    user-avatar-pic: /assets/user.png
     # 用户默认背景
     user-background-pic: https://fakeimg.pl/350x200/c0392b/fff?retina=1&font=noto&text=用户默认背景
 

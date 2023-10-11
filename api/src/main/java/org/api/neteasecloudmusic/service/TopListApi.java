@@ -11,18 +11,22 @@ import org.api.neteasecloudmusic.model.vo.toplist.playlist.PlaylistsItem;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.ListItem;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
+import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbArtistService;
 import org.core.mybatis.iservice.TbCollectService;
+import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.service.AccountService;
 import org.core.utils.AliasUtil;
+import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -64,13 +68,15 @@ public class TopListApi {
     
     public TopListRes toplist() {
         TopListRes res = new TopListRes();
-        List<TbCollectPojo> playList = collectService.list();
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singleton(PlayListTypeConfig.RECOMMEND));
         ArrayList<ListItem> list = new ArrayList<>();
-        for (TbCollectPojo tbCollectPojo : playList) {
+        for (CollectConvert tbCollectPojo : userPlayList) {
             ListItem e = new ListItem();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
             e.setCreateTime((long) tbCollectPojo.getCreateTime().getNano());
+            e.setTitleImageUrl(tbCollectPojo.getPicUrl());
+            e.setCoverImgUrl(tbCollectPojo.getPicUrl());
             list.add(e);
         }
         res.setList(list);
@@ -95,6 +101,7 @@ public class TopListApi {
             // 播放次数
             e.setPlayCount(0);
             e.setDescription(tbCollectPojo.getDescription());
+            e.setCoverImgUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
     
             SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
             Creator creator = new Creator();

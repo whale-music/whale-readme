@@ -1,5 +1,6 @@
 package org.web.admin.controller.v1;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +15,9 @@ import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController(AdminConfig.ADMIN + "PlayListController")
@@ -80,9 +83,21 @@ public class PlayListController {
         return R.success(collectPojoList);
     }
     
-    @GetMapping("/tracks")
-    public R addMusicToPlayList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam("pid") Long pid, @RequestParam("musicIds") List<Long> musicIds, @RequestParam(value = "flag", required = false, defaultValue = "true") Boolean flag) {
-        playList.addMusicToPlayList(Optional.ofNullable(userId).orElse(UserUtil.getUser().getId()), pid, musicIds, flag);
+    @RequestMapping(value = "/tracks", method = {RequestMethod.GET, RequestMethod.POST})
+    public R addMusicToPlayList(
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam("pid") Long pid,
+            @RequestParam(value = "musicIds", required = false) List<Long> musicIds,
+            @RequestBody(required = false) Map<String, List<Long>> mapMusicIds,
+            @RequestParam(value = "flag", required = false, defaultValue = "true") Boolean flag
+    ) {
+        LinkedList<Long> ids = new LinkedList<>();
+        if (CollUtil.isEmpty(musicIds)) {
+            ids.addAll(mapMusicIds.get("musicIds"));
+        } else {
+            ids.addAll(musicIds);
+        }
+        playList.addMusicToPlayList(Optional.ofNullable(userId).orElse(UserUtil.getUser().getId()), pid, ids, flag);
         return R.success();
     }
     

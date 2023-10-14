@@ -445,7 +445,7 @@ public class PlayListApi {
     }
     
     public List<PlayListRes> getUserPlayList(Long userId) {
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userId, Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userId, Arrays.asList(PlayListTypeConfig.LIKE, PlayListTypeConfig.ORDINARY));
         List<PlayListRes> playListRes = new ArrayList<>();
         collectFillUpCount(userPlayList, playListRes);
         return playListRes;

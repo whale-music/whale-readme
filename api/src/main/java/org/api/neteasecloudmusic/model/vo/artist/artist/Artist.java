@@ -7,20 +7,20 @@ import java.util.List;
 @Data
 public class Artist {
     private String img1v1Url;
-    private long publishTime;
+    private Long publishTime;
     private String picIdStr;
     private Long musicSize;
     private String img1v1IdStr;
-    private long img1v1Id;
-    private int mvSize;
-    private boolean followed;
-    private int albumSize;
+    private Long img1v1Id;
+    private Integer mvSize;
+    private Boolean followed;
+    private Integer albumSize;
     private String picUrl;
-    private int topicPerson;
+    private Integer topicPerson;
     private String briefDesc;
     private String name;
     private List<String> alias;
     private Long id;
-    private long picId;
+    private Long picId;
     private String trans;
 }

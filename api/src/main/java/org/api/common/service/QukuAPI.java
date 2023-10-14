@@ -117,11 +117,6 @@ public class QukuAPI extends QukuServiceImpl {
             throw new BaseException(e.getMessage());
         }
         // TODO: 自动删除缓存文件
-        // finally {
-        //     log.debug("删除缓存文件{}", rename == null ? "" : rename.getName());
-        //     FileUtil.del(rename);
-        //     FileUtil.del(file);
-        // }
         TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
         pojo.setPath(upload);
@@ -210,10 +205,10 @@ public class QukuAPI extends QukuServiceImpl {
      * @param consumer 删除文件
      */
     @Override
-    protected void removePicFile(Collection<Long> ids, Consumer<List<String>> consumer) {
+    protected void removePicFile(Collection<Long> ids, Collection<Byte> types, Consumer<List<String>> consumer) {
         // 删除歌曲文件
         OSSService ossService = OSSFactory.ossFactory(config);
-        super.removePicFile(ids, ossService::delete);
+        super.removePicFile(ids, types, ossService::delete);
     }
     
     public List<TbResourcePojo> getMusicUrlByMusicId(Long musicId, boolean refresh) {

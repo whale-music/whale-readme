@@ -14,17 +14,16 @@ import org.api.neteasecloudmusic.model.vo.song.lyric.Tlyric;
 import org.api.neteasecloudmusic.model.vo.songdetail.*;
 import org.api.neteasecloudmusic.model.vo.songurl.DataItem;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
+import org.core.common.constant.HistoryConstant;
 import org.core.config.LyricConfig;
-import org.core.mybatis.iservice.TbAlbumService;
-import org.core.mybatis.iservice.TbCollectService;
-import org.core.mybatis.iservice.TbHistoryService;
-import org.core.mybatis.iservice.TbMusicService;
+import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +47,12 @@ public class MusicApi {
     
     @Autowired
     private TbCollectService collectService;
+    
+    @Autowired
+    private TbArtistService tbArtistService;
+    
+    @Autowired
+    private TbMvService tbMvService;
     
     
     public SongUrlRes songUrl(List<Long> id, Integer br) {
@@ -171,19 +176,23 @@ public class MusicApi {
      * @param sourceid 歌单或者专辑ID
      * @param time     歌曲播放时间
      */
-    public void scrobble(Long id, Long sourceid, Integer time) {
+    @Transactional(rollbackFor = Exception.class)
+    public void scrobble(Long id, Long sourceid, Long time) {
         Long userId = UserUtil.getUser().getId();
         
-        LambdaQueryWrapper<TbHistoryPojo> musicWrapper = Wrappers.<TbHistoryPojo>lambdaQuery().eq(TbHistoryPojo::getUserId, userId).eq(TbHistoryPojo::getId, id);
+        LambdaQueryWrapper<TbHistoryPojo> musicWrapper = Wrappers.<TbHistoryPojo>lambdaQuery()
+                                                                 .eq(TbHistoryPojo::getUserId, userId)
+                                                                 .eq(TbHistoryPojo::getId, id);
         TbHistoryPojo musicRank = historyService.getOne(musicWrapper);
         ArrayList<TbHistoryPojo> entityList = new ArrayList<>();
         // 没有数据则添加数据到表中
         if (musicRank == null) {
             TbHistoryPojo musicRankPojo = new TbHistoryPojo();
-            musicRankPojo.setId(id);
             musicRankPojo.setUserId(userId);
             musicRankPojo.setCount(1);
-            musicRankPojo.setCount(0);
+            musicRankPojo.setMiddleId(id);
+            musicRankPojo.setPlayedTime(time);
+            musicRankPojo.setType(HistoryConstant.MUSIC);
             entityList.add(musicRankPojo);
         } else {
             Integer broadcastCount = musicRank.getCount();
@@ -194,32 +203,50 @@ public class MusicApi {
         
         // 专辑或歌单
         LambdaQueryWrapper<TbHistoryPojo> sourceWrapper = Wrappers.<TbHistoryPojo>lambdaQuery()
-                                                               .eq(TbHistoryPojo::getUserId, userId)
-                                                               .eq(TbHistoryPojo::getId, sourceid);
+                                                                  .eq(TbHistoryPojo::getUserId, userId)
+                                                                  .eq(TbHistoryPojo::getMiddleId, sourceid);
         TbHistoryPojo sourcePojo = historyService.getOne(sourceWrapper);
         if (sourcePojo == null) {
             // 专辑或歌单ID
             TbHistoryPojo rankPojo = new TbHistoryPojo();
             rankPojo.setUserId(userId);
-            rankPojo.setId(sourceid);
+            rankPojo.setMiddleId(sourceid);
+            rankPojo.setPlayedTime(time);
             rankPojo.setCount(1);
-    
+            
             TbCollectPojo collectPojo = collectService.getById(sourceid);
-            if (collectPojo != null) {
-                rankPojo.setCount(1);
-            } else {
+            if (collectPojo == null) {
                 TbAlbumPojo albumPojo = albumService.getById(sourceid);
                 if (albumPojo != null) {
-                    rankPojo.setType((byte) 2);
+                    rankPojo.setType(HistoryConstant.ALBUM);
+                } else {
+                    TbArtistPojo artistPojo = tbArtistService.getById(sourceid);
+                    if (Objects.nonNull(artistPojo)) {
+                        rankPojo.setType(HistoryConstant.ARTIST);
+                    } else {
+                        TbMvPojo mvPojo = tbMvService.getById(sourceid);
+                        if (Objects.nonNull(mvPojo)) {
+                            rankPojo.setType(HistoryConstant.MV);
+                        }
+                    }
                 }
+            } else {
+                rankPojo.setType(HistoryConstant.PLAYLIST);
             }
             entityList.add(rankPojo);
         } else {
+            // 歌单或专辑播放数量
             Integer broadcastCount = sourcePojo.getCount();
             broadcastCount = broadcastCount + 1;
             sourcePojo.setCount(broadcastCount);
+            Long playedTime = sourcePojo.getPlayedTime();
+            // 增加歌单歌曲播放总时间
+            long sumPlaytime = playedTime + time;
+            sourcePojo.setPlayedTime(sumPlaytime);
             historyService.update(sourcePojo, sourceWrapper);
         }
-        historyService.saveBatch(entityList);
+        if (CollUtil.isNotEmpty(entityList)) {
+            historyService.saveBatch(entityList);
+        }
     }
 }

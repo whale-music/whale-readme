@@ -64,8 +64,8 @@ public class SongController {
     }
     
     @GetMapping("/scrobble")
-    public NeteaseResult scrobble(@RequestParam("id") Long id, @RequestParam("sourceid") Long sourceid, @RequestParam(value = "time", required = false) Integer time) {
-        musicApi.scrobble(id,sourceid,time);
+    public NeteaseResult scrobble(@RequestParam("id") Long id, @RequestParam("sourceid") Long sourceid, @RequestParam(value = "time", required = false) Long time) {
+        musicApi.scrobble(id, sourceid, time);
         NeteaseResult r = new NeteaseResult();
         return r.success();
     }

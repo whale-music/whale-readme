@@ -484,7 +484,7 @@ public class PlayListApi {
                 req.getPage().getPageNum().longValue(),
                 req.getType());
     
-        List<CollectConvert> converts = playList.getRecords().parallelStream().map(collectPojo -> {
+        List<CollectConvert> converts = playList.getRecords().stream().map(collectPojo -> {
             CollectConvert convert = new CollectConvert();
             BeanUtils.copyProperties(collectPojo, convert);
             convert.setPicUrl(qukuService.getCollectPicUrl(collectPojo.getId()));

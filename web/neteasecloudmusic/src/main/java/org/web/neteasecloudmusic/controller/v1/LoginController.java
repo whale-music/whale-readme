@@ -113,6 +113,14 @@ public class LoginController extends BaseController {
         return r.success();
     }
     
+    private static void getQrUrl(HttpServletRequest request, String uuidString, Map<String, Object> r) {
+        String localhost = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        String value = "/login-key/index.html?key=" + uuidString;
+        String qrUrl = localhost + value;
+        r.put("qrurl", qrUrl);
+        r.put("qrimg", Base64Util.encode(qrUrl));
+    }
+    
     /**
      * 创建二维码登录uuid
      * 在原有基础上增加返回qr url, 用于获取二维码登录地址
@@ -124,35 +132,29 @@ public class LoginController extends BaseController {
     @AnonymousAccess
     public NeteaseResult qrKey(HttpServletRequest request) {
         UUID uuid = UUID.randomUUID();
-        GlobeDataUtil.setData(uuid.toString(), uuid.toString());
+        String uuidString = uuid.toString();
+        GlobeDataUtil.setData(uuidString, uuidString);
         
         NeteaseResult r = new NeteaseResult();
         HashMap<String, Object> map = new HashMap<>();
         map.put("code", 200);
-        map.put("unikey", uuid.toString());
+        map.put("unikey", uuidString);
         
-        String localhost = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String value = "/login-key/index.html?key=" + uuid;
-        String qrUrl = localhost + value;
-        r.put("qrurl", qrUrl);
-        r.put("qrimg", Base64Util.encode(qrUrl));
+        getQrUrl(request, uuidString, r);
         return r.success(map);
     }
     
     @GetMapping("/login/qr/create")
+    @AnonymousAccess
     public NeteaseResult qrCreate(HttpServletRequest request, @RequestParam("key") String key) {
-        String data = GlobeDataUtil.getData(key);
         NeteaseResult r = new NeteaseResult();
+        Map<String, Object> map = new HashMap<>();
+        String data = GlobeDataUtil.getData(key);
         if (data == null) {
-            r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error(ResultCode.QR_ERROR);
         }
-        String localhost = request.getServerName() + ":" + request.getServerPort();
-        String value = "/login-key/index.html?key=" + data;
-        String qrUrl = localhost + value;
-        r.put("qrurl", qrUrl);
-        r.put("qrimg", Base64Util.encode(qrUrl));
-        return r;
+        getQrUrl(request, data, map);
+        return r.success(map);
     }
     
     @GetMapping("/login/sure")

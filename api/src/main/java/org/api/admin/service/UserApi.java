@@ -106,12 +106,12 @@ public class UserApi {
     public SaveOrUpdateUserRes saveOrUpdateUser(SaveOrUpdateUserReq saveOrUpdateUserReq) {
         // 防止创建普通用户创建管理员
         if (UserUtil.getUser().getIsAdmin()) {
+            // 不允许修改管理员用户状态
+            ExceptionUtil.isNull(saveOrUpdateUserReq.getIsAdmin() && Boolean.FALSE.equals(saveOrUpdateUserReq.getStatus()),
+                    ResultCode.ADMIN_USER_NOT_EDIT_STATUS);
             SysUserPojo user = accountService.getUserByName(saveOrUpdateUserReq.getUsername());
             if (Objects.isNull(saveOrUpdateUserReq.getId())) {
-                // 不允许修改管理员用户状态
-                ExceptionUtil.isNull(saveOrUpdateUserReq.getIsAdmin() && Boolean.FALSE.equals(saveOrUpdateUserReq.getStatus()),
-                        ResultCode.ADMIN_USER_NOT_EDIT_STATUS);
-                if (Objects.nonNull(user) && Objects.isNull(saveOrUpdateUserReq.getId())) {
+                if (Objects.nonNull(user)) {
                     throw new BaseException(ResultCode.USER_HAS_EXISTED);
                 }
                 accountService.saveOrUpdate(saveOrUpdateUserReq);

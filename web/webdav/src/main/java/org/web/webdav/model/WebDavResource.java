@@ -57,7 +57,7 @@ public class WebDavResource implements Resource {
     
     @Override
     public String getUniqueId() {
-        return null;
+        return getMd5();
     }
     
     @Name

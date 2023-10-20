@@ -5,6 +5,7 @@ import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -101,6 +102,36 @@ public class LocalOSSServiceImpl implements OSSService {
         }
     }
     
+    /**
+     * 获取音乐地址列表
+     *
+     * @param name    音乐集合
+     * @param refresh 是否刷新缓存
+     * @return 音乐地址集合
+     */
+    @Override
+    public Set<String> getAddresses(Collection<String> name, boolean refresh) {
+        try {
+            // 音乐地址URL缓存
+            Set<FileMetadata> collect = name.parallelStream().map(MUSIC_PATH_CACHE::get).collect(Collectors.toSet());
+            // 没有地址便刷新缓存,获取所有文件保存到缓存中
+            // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+            if ((refresh && CollUtil.isEmpty(collect)) || MUSIC_PATH_CACHE.isEmpty() || MUSIC_PATH_CACHE.size() != initMusicAllCount) {
+                refreshMusicCache();
+                // 更新初始化音乐数量
+                this.initMusicAllCount = MUSIC_PATH_CACHE.size();
+                collect = name.parallelStream().map(MUSIC_PATH_CACHE::get).collect(Collectors.toSet());
+            }
+            // 没有找到文件直接抛出异常
+            if (CollUtil.isEmpty(collect)) {
+                throw new BaseException(ResultCode.DATA_NONE_FOUND.getCode(), ResultCode.DATA_NONE_FOUND.getResultMsg() + ": " + name);
+            }
+            return collect.stream().map(this::getPath).collect(Collectors.toSet());
+        } catch (BaseException e) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
+        }
+    }
+    
     private void refreshMusicCache() {
         ArrayList<String> list = new ArrayList<>();
         list.addAll(config.getObjectSave());
@@ -141,7 +172,8 @@ public class LocalOSSServiceImpl implements OSSService {
     
     private String getPath(FileMetadata contentItem) {
         String path = contentItem.getUri().charAt(0) == '/' ? StringUtils.substring(contentItem.getUri(), 1) : contentItem.getUri();
-        String remoteHost = ServletUtils.getRequest().getRemoteHost();
+        // 不能使用ServletUtils.getRequest().getRemoteHost(), 因为有时访问localhost,却返回ipv6. 所以直接返回访问域名
+        String remoteHost = URLUtil.url(ServletUtils.getRequest().getRequestURL().toString()).getHost();
         int serverPort = ServletUtils.getRequest().getServerPort();
         String scheme = ServletUtils.getRequest().getScheme();
         // 127.0.0.1:6780/d/music/7694f4a66316e53c8cdd9d9954bd611d.mp3

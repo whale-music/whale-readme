@@ -288,6 +288,14 @@ public class QukuAPI extends QukuServiceImpl {
         return OSSFactory.ossFactory(config).getAddressByMd5(md5, refresh);
     }
     
+    public String getAddresses(String md5, boolean refresh) {
+        return OSSFactory.ossFactory(config).getAddresses(md5, refresh);
+    }
+    
+    public Set<String> getAddresses(Collection<String> md5, boolean refresh) {
+        return OSSFactory.ossFactory(config).getAddresses(md5, refresh);
+    }
+    
     public Map<String, Map<String, String>> getAddressByMd5(boolean refresh) {
         return OSSFactory.ossFactory(config).getAddressByMd5(null, refresh);
     }

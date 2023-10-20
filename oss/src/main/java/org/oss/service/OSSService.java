@@ -4,10 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.config.SaveConfig;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface OSSService {
     
@@ -51,6 +48,15 @@ public interface OSSService {
      * @return 音乐地址
      */
     String getAddresses(String name, boolean refresh);
+    
+    /**
+     * 获取音乐地址列表
+     *
+     * @param name    音乐集合
+     * @param refresh 是否刷新缓存
+     * @return 音乐地址集合
+     */
+    Set<String> getAddresses(Collection<String> name, boolean refresh);
     
     /**
      * 获取音乐地址

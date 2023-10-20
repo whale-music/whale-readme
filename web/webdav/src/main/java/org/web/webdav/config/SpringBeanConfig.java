@@ -1,7 +1,6 @@
 package org.web.webdav.config;
 
 import io.milton.http.annotated.AnnotationResourceFactory;
-import io.milton.servlet.MiltonFilter;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +18,9 @@ import org.web.webdav.controller.WebDavController;
 public class SpringBeanConfig {
     
     @Bean
-    public FilterRegistrationBean<Filter> someFilterRegistration() {
+    public FilterRegistrationBean<Filter> someFilterRegistration(WebdavFilter webdavFilter) {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new MiltonFilter());
+        registration.setFilter(webdavFilter);
         registration.setName("MiltonFilter");
         registration.addUrlPatterns("/*");
         registration.addInitParameter("resource.factory.class", AnnotationResourceFactory.class.getName());

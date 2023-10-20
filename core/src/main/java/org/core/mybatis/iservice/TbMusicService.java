@@ -12,5 +12,15 @@ import org.core.mybatis.pojo.TbMusicPojo;
  * @since 2023-06-28
  */
 public interface TbMusicService extends IService<TbMusicPojo> {
-
+    
+    
+    /**
+     * 通过音乐名获取音乐
+     * 获取时必须保证音乐名和数据库中音乐一致，并且只有一条数据
+     *
+     * @param name  音乐名
+     * @param alias 音乐别名, 可为空
+     * @return 音乐数据
+     */
+    TbMusicPojo getMusicByName(String name, String alias);
 }

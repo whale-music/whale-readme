@@ -95,6 +95,37 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     /**
+     * 获取音乐地址列表
+     *
+     * @param name    音乐集合
+     * @param refresh 是否刷新缓存
+     * @return 音乐地址集合
+     */
+    @Override
+    public Set<String> getAddresses(Collection<String> name, boolean refresh) {
+        try {
+            String loginCacheStr = getLoginJwtCache(config);
+            // 音乐地址URL缓存
+            Set<ContentItem> collect = name.parallelStream().map(musicUrltimedCache::get).collect(Collectors.toSet());
+            // 没有地址便刷新缓存,获取所有文件保存到缓存中
+            // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+            if ((refresh && CollUtil.isEmpty(collect)) || musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
+                refreshMusicCache(loginCacheStr);
+                // 更新初始化音乐数量
+                this.initMusicAllCount = musicUrltimedCache.size();
+                collect = name.parallelStream().map(musicUrltimedCache::get).collect(Collectors.toSet());
+            }
+            // 没有找到文件直接抛出异常
+            if (CollUtil.isEmpty(collect)) {
+                throw new BaseException(ResultCode.DATA_NONE_FOUND.getCode(), ResultCode.DATA_NONE_FOUND.getResultMsg() + ": " + name);
+            }
+            return collect.stream().map(this::getPath).collect(Collectors.toSet());
+        } catch (BaseException e) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
+        }
+    }
+    
+    /**
      * 获取音乐地址
      *
      * @param md5     音乐文件文件MD5

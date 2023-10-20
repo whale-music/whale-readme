@@ -33,6 +33,7 @@ import org.core.mybatis.pojo.TbLyricPojo;
 import org.core.mybatis.pojo.TbOriginPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbTagPojo;
+import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,7 +120,7 @@ public class ExchangeApi {
                     String musicArtistJoin = CollUtil.join(tbMusicArtistEntities.stream()
                                                                                 .map(TbMusicArtistEntity::getArtistId)
                                                                                 .filter(Objects::nonNull)
-                                                                                .collect(Collectors.toList()), ",");
+                                                                                .toList(), ",");
                     musicInfo.setMusicArtist(musicArtistJoin);
                 }
                 musicInfo.setAlbum(String.valueOf(tbMusicEntity.getAlbumId()));
@@ -340,7 +341,7 @@ public class ExchangeApi {
                 album.setPublishTime(LocalDateTimeUtil.of(Long.parseLong(albumInfo.getAlbumPublicTime())));
             }
             dto.setAlbum(album);
-            dto.setUserId(424608186796165L);
+            dto.setUserId(UserUtil.getUser().getId());
             dto.setUploadFlag(true);
             musicFlowApi.saveMusicInfo(dto);
         }

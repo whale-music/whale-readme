@@ -16,13 +16,16 @@ import org.api.webdav.service.WebdavApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
 
 import java.io.InputStream;
 import java.util.*;
 
-@ResourceController
+// @ResourceController
+@Component
 @Slf4j
 public class WebDavController {
     
@@ -30,14 +33,13 @@ public class WebDavController {
     private static final String RECOMMEND = "recommend";
     private static final String COMMON = "common";
     
+    @Autowired
+    private WebdavApi webdavApi;
+    
     @Nullable
-    private static ArrayList<WebDavFolder> getWebDavFolders(WebDavFolder webDavFolder, String type) {
+    private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {
         if (StringUtils.equals(webDavFolder.getUniqueId(), type)) {
-            ArrayList<WebDavFolder> list = new ArrayList<>();
-            for (Resource resource : webDavFolder.getFolders()) {
-                list.add(new WebDavFolder(resource.getUniqueId(), resource.getName()));
-            }
-            return list;
+            return webDavFolder.getFolders().parallelStream().map(resource -> new WebDavFolder(resource.getUniqueId(), resource.getName())).toList();
         }
         return null;
     }
@@ -49,7 +51,7 @@ public class WebDavController {
      */
     @Root
     public CollectTypeList getRoot() {
-        return SpringUtil.getBean(WebdavApi.class).getUserPlayList(464931079446661L);
+        return webdavApi.getUserPlayList(464931079446661L);
     }
     
     @ChildrenOf
@@ -82,25 +84,25 @@ public class WebDavController {
     }
     
     @ChildrenOf
-    public Collection<? extends Resource> getWebDavFiles(WebDavFolder webDavFolder) {
+    public List<? extends Resource> getWebDavFiles(WebDavFolder webDavFolder) {
         // 普通歌单
-        List<WebDavFolder> commonList = getWebDavFolders(webDavFolder, COMMON);
+        List<? extends Resource> commonList = getWebDavFolders(webDavFolder, COMMON);
         if (commonList != null) {
             return commonList;
         }
         // 喜爱歌单
-        List<WebDavFolder> likeList = getWebDavFolders(webDavFolder, LIKE);
+        List<? extends Resource> likeList = getWebDavFolders(webDavFolder, LIKE);
         if (likeList != null) {
             return likeList;
         }
         // 推荐歌单
-        List<WebDavFolder> recommendList = getWebDavFolders(webDavFolder, RECOMMEND);
+        List<? extends Resource> recommendList = getWebDavFolders(webDavFolder, RECOMMEND);
         if (recommendList != null) {
             return recommendList;
         }
         
         ArrayList<Resource> resources = new ArrayList<>();
-        List<PlayListRes> playListMusic = SpringUtil.getBean(WebdavApi.class).getPlayListMusic(Long.parseLong(webDavFolder.getUniqueId()));
+        List<PlayListRes> playListMusic = webdavApi.getPlayListMusic(Long.parseLong(webDavFolder.getUniqueId()));
         for (PlayListRes playListRes : playListMusic) {
             resources.add(new WebDavResource(playListRes.getMusicName() + "." + FileUtil.getSuffix(playListRes.getPath()),
                     playListRes.getMd5(),

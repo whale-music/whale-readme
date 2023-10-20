@@ -2,12 +2,12 @@ package org.web.webdav.config;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.URLDecoder;
+import cn.hutool.extra.spring.SpringUtil;
 import io.milton.common.Path;
-import io.milton.servlet.MiltonFilter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import io.milton.http.HttpManager;
+import io.milton.servlet.FilterConfigWrapper;
+import io.milton.servlet.SpringMiltonFilter;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class WebdavFilter extends MiltonFilter {
+public class WebdavFilter extends SpringMiltonFilter {
     
     private final QukuAPI qukuApi;
     
@@ -41,14 +41,30 @@ public class WebdavFilter extends MiltonFilter {
     
     private final TbResourceService tbResourceService;
     
-    public WebdavFilter(QukuAPI qukuApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil, TbMusicService tbMusicService, TbResourceService tbResourceService) {
+    private final MiltonConfig miltonConfig;
+    
+    public WebdavFilter(QukuAPI qukuApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil, TbMusicService tbMusicService, TbResourceService tbResourceService, MiltonConfig miltonConfig) {
         this.qukuApi = qukuApi;
         this.webdavResourceReturnStrategyUtil = webdavResourceReturnStrategyUtil;
         this.tbMusicService = tbMusicService;
         this.tbResourceService = tbResourceService;
+        this.miltonConfig = miltonConfig;
     }
     
     /**
+     * @param fc The configuration information associated with the filter instance being initialised
+     */
+    @Override
+    public void init(FilterConfig fc) throws ServletException {
+        // 注册Webdav, 然后注入到容器中
+        HttpManager configure = miltonConfig.configure(new FilterConfigWrapper(fc));
+        SpringUtil.registerBean("milton.http.manager", configure);
+        super.init(fc);
+    }
+    
+    /**
+     * 对下载文件进行重定向, 其他请求直接放行
+     *
      * @param req  处理请求
      * @param resp 与请求相关的响应
      * @param fc   提供对链中下一个过滤器的访问，以便该过滤器将请求和响应传递给, 以作进一步处理

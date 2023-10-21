@@ -22,7 +22,6 @@ import org.api.webdav.service.WebdavApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.core.service.AccountService;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,9 +42,6 @@ public class WebDavController {
     
     @Autowired
     private WebdavApi webdavApi;
-    
-    @Autowired
-    private AccountService accountService;
     
     @Nullable
     private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {
@@ -68,9 +64,9 @@ public class WebDavController {
             return new CollectTypeList();
         }
         if (Objects.equals(Auth.Scheme.BASIC, authorization.getScheme())) {
-            String user = authorization.getUser();
+            String userId = authorization.getUser();
             String password = authorization.getPassword();
-            SysUserPojo userByName = accountService.getUserByName(user);
+            SysUserPojo userByName = webdavApi.getUserByName(userId);
             if (StringUtils.equals(userByName.getPassword(), password)) {
                 return webdavApi.getUserPlayList(userByName.getId());
             }
@@ -88,7 +84,7 @@ public class WebDavController {
             );
             DigestGenerator digestGenerator = new DigestGenerator();
             String user = authorization.getUser();
-            SysUserPojo userByName = accountService.getUserByName(user);
+            SysUserPojo userByName = webdavApi.getUserByName(user);
             if (Objects.isNull(userByName)) {
                 return null;
             }

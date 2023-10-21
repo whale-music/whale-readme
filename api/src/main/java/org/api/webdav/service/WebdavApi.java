@@ -13,11 +13,14 @@ import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.model.convert.CollectConvert;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.service.AccountService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,7 +46,10 @@ public class WebdavApi {
     @Autowired
     private WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
+    @Autowired
+    private AccountService accountService;
     
+    @Cacheable(value = "webdav-collect-type-list", key = "#id")
     public CollectTypeList getUserPlayList(Long id) {
         List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.ORDINARY);
         List<TbCollectPojo> likeCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.LIKE);
@@ -55,6 +61,7 @@ public class WebdavApi {
         return collectTypeList;
     }
     
+    @Cacheable(value = "webdav-play-list", key = "#id")
     public List<PlayListRes> getPlayListMusic(Long id) {
         List<PlayListRes> res = new LinkedList<>();
         List<TbCollectMusicPojo> collectIds = collectMusicService.getCollectIds(Collections.singleton(id));
@@ -93,5 +100,10 @@ public class WebdavApi {
         List<Long> likeUserIds = likeUserPlayList.parallelStream().map(TbCollectPojo::getId).toList();
         List<TbCollectMusicPojo> likeCollectPojoList = collectMusicService.getCollectIds(likeUserIds);
         return likeCollectPojoList.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
+    }
+    
+    @Cacheable(value = "webdav-user-pojo", key = "#userName")
+    public SysUserPojo getUserByName(String userName) {
+        return accountService.getUserByName(userName);
     }
 }

@@ -4,9 +4,9 @@ import io.milton.http.fs.SimpleSecurityManager;
 import io.milton.http.http11.auth.DigestGenerator;
 import io.milton.http.http11.auth.DigestResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.api.webdav.service.WebdavApi;
 import org.core.common.constant.AccountTypeConstant;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.core.service.AccountService;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -14,13 +14,14 @@ import java.util.Objects;
 @Component
 public class WebdavSecurityManager extends SimpleSecurityManager {
     public static final String REALM = "webdav";
-    private final AccountService accountService;
+    
+    private final WebdavApi webdavApi;
     private final DigestGenerator digestGenerator;
     
     
-    public WebdavSecurityManager(AccountService accountService) {
-        this.accountService = accountService;
+    public WebdavSecurityManager(WebdavApi webdavApi) {
         this.digestGenerator = new DigestGenerator();
+        this.webdavApi = webdavApi;
     }
     
     
@@ -40,7 +41,7 @@ public class WebdavSecurityManager extends SimpleSecurityManager {
      */
     @Override
     public Object authenticate(String user, String password) {
-        SysUserPojo userByName = accountService.getUserByName(user);
+        SysUserPojo userByName = webdavApi.getUserByName(user);
         if (Objects.nonNull(userByName) && StringUtils.equals(userByName.getPassword(), password)) {
             this.setRealm(AccountTypeConstant.getAccountType(userByName.getAccountType()));
             return user;
@@ -56,7 +57,7 @@ public class WebdavSecurityManager extends SimpleSecurityManager {
     @Override
     public Object authenticate(DigestResponse digestRequest) {
         String user = digestRequest.getUser();
-        SysUserPojo userByName = accountService.getUserByName(user);
+        SysUserPojo userByName = webdavApi.getUserByName(user);
         if (Objects.isNull(userByName)) {
             return null;
         }

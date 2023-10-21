@@ -153,7 +153,9 @@ public class WebDavController {
         ArrayList<Resource> resources = new ArrayList<>();
         List<PlayListRes> playListMusic = webdavApi.getPlayListMusic(Long.parseLong(webDavFolder.getUniqueId()));
         for (PlayListRes playListRes : playListMusic) {
-            resources.add(new WebDavResource(playListRes.getMusicName() + "." + FileUtil.getSuffix(playListRes.getPath()),
+            // 修复路径读取问题,使用/会造成路径读取问题
+            // 使用字符 - 替换 /
+            resources.add(new WebDavResource(StringUtils.replace(playListRes.getMusicName(), "/", "-") + "." + FileUtil.getSuffix(playListRes.getPath()),
                     playListRes.getMd5(),
                     playListRes.getPath(),
                     playListRes.getSize(),

@@ -83,7 +83,10 @@ public class WebdavFilter extends SpringMiltonFilter {
             // 获取url地址, 分割并获取文件名
             Path path = Path.path(httpServletRequest.getRequestURI());
             String name = path.getName();
-            TbMusicPojo musicByName = tbMusicService.getMusicByName(URLDecoder.decode(FileUtil.mainName(name), StandardCharsets.UTF_8), null);
+            String nameDecode = URLDecoder.decode(FileUtil.mainName(name), StandardCharsets.UTF_8);
+            // 修复路径读取问题,使用/会造成路径读取问题
+            // 使用字符 - 替换 /
+            TbMusicPojo musicByName = tbMusicService.getMusicByName(StringUtils.replace(nameDecode, "-", "/"), null);
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(Collections.singleton(musicByName.getId()));
             List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicByName.getId());
             TbResourcePojo tbResourcePojo = webdavResourceReturnStrategyUtil.handleResource(tbResourcePojos);

@@ -35,7 +35,7 @@ public class SpringBeanConfig {
         // registration.addInitParameter("controllerPackagesToScan", WebDavController.class.getPackageName());
         // 不使用默认new创建类，使用spring boot注入该Bean
         // registration.addInitParameter("milton.configurator", MiltonConfig.class.getName());
-        registration.setOrder(1);
+        // registration.setOrder(1);
         return registration;
     }
     

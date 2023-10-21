@@ -1,9 +1,7 @@
 package org.web.webdav.config;
 
 import cn.hutool.core.collection.CollUtil;
-import io.milton.http.fs.NullSecurityManager;
 import io.milton.servlet.DefaultMiltonConfigurator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web.webdav.controller.WebDavController;
 
@@ -14,18 +12,19 @@ import java.util.ArrayList;
  */
 @Component
 public class MiltonConfig extends DefaultMiltonConfigurator {
-    private final NullSecurityManager securityManager;
+    private final WebdavSecurityManager webdavSecurityManager;
     
-    @Autowired
-    private WebDavController webDavController;
+    private final WebDavController webDavController;
     
-    public MiltonConfig() {
-        this.securityManager = new NullSecurityManager();
+    public MiltonConfig(WebdavSecurityManager webdavSecurityManager, WebDavController webDavController) {
+        this.webdavSecurityManager = webdavSecurityManager;
+        this.webDavController = webDavController;
     }
+    
     
     @Override
     protected void build() {
-        builder.setSecurityManager(securityManager);
+        builder.setSecurityManager(webdavSecurityManager);
         if (CollUtil.isEmpty(builder.getControllers())) {
             builder.setControllers(new ArrayList<>());
         }

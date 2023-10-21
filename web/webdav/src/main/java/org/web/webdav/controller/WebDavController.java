@@ -1,11 +1,17 @@
 package org.web.webdav.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import io.milton.annotations.*;
+import io.milton.http.Auth;
+import io.milton.http.HttpManager;
+import io.milton.http.Request;
+import io.milton.http.http11.auth.DigestGenerator;
+import io.milton.http.http11.auth.DigestResponse;
 import io.milton.resource.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +21,8 @@ import org.api.webdav.model.PlayListRes;
 import org.api.webdav.service.WebdavApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.mybatis.pojo.SysUserPojo;
+import org.core.service.AccountService;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +44,9 @@ public class WebDavController {
     @Autowired
     private WebdavApi webdavApi;
     
+    @Autowired
+    private AccountService accountService;
+    
     @Nullable
     private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {
         if (StringUtils.equals(webDavFolder.getUniqueId(), type)) {
@@ -51,11 +62,53 @@ public class WebDavController {
      */
     @Root
     public CollectTypeList getRoot() {
-        return webdavApi.getUserPlayList(464931079446661L);
+        Request request = HttpManager.request();
+        Auth authorization = request.getAuthorization();
+        if (Objects.isNull(authorization)) {
+            return new CollectTypeList();
+        }
+        if (Objects.equals(Auth.Scheme.BASIC, authorization.getScheme())) {
+            String user = authorization.getUser();
+            String password = authorization.getPassword();
+            SysUserPojo userByName = accountService.getUserByName(user);
+            if (StringUtils.equals(userByName.getPassword(), password)) {
+                return webdavApi.getUserPlayList(userByName.getId());
+            }
+        }
+        if (Objects.equals(Auth.Scheme.DIGEST, authorization.getScheme())) {
+            DigestResponse digestResponse = new DigestResponse(request.getMethod(),
+                    authorization.getUser(),
+                    authorization.getRealm(),
+                    authorization.getNonce(),
+                    authorization.getUri(),
+                    authorization.getResponseDigest(),
+                    authorization.getQop(),
+                    authorization.getNc(),
+                    authorization.getCnonce()
+            );
+            DigestGenerator digestGenerator = new DigestGenerator();
+            String user = authorization.getUser();
+            SysUserPojo userByName = accountService.getUserByName(user);
+            if (Objects.isNull(userByName)) {
+                return null;
+            }
+            String serverResponse = digestGenerator.generateDigest(digestResponse, userByName.getPassword());
+            String clientResponse = authorization.getResponseDigest();
+            
+            if (serverResponse.equals(clientResponse)) {
+                return webdavApi.getUserPlayList(userByName.getId());
+            } else {
+                throw new BaseException(ResultCode.USER_NOT_EXIST);
+            }
+        }
+        throw new BaseException(ResultCode.USER_NOT_EXIST);
     }
     
     @ChildrenOf
     public List<WebDavFolder> getWebDavFolders(CollectTypeList root) {
+        if (CollUtil.isEmpty(root.getLikeCollect()) && CollUtil.isEmpty(root.getRecommendCollect()) && CollUtil.isEmpty(root.getOrdinaryCollect())) {
+            return Collections.emptyList();
+        }
         List<WebDavFolder> list = new ArrayList<>();
         Collection<WebDavFolder> like = root.getLikeCollect()
                                             .parallelStream()

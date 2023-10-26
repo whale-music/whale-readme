@@ -22,8 +22,10 @@ import org.api.webdav.service.WebdavApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.utils.i18n.I18nUtil;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
@@ -42,6 +44,9 @@ public class WebDavController {
     
     @Autowired
     private WebdavApi webdavApi;
+    
+    @Autowired
+    private MessageSource messageSource;
     
     @Nullable
     private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {
@@ -123,11 +128,11 @@ public class WebDavController {
                                                  .map(tbCollectPojo -> new WebDavFolder(Objects.toString(tbCollectPojo.getId()),
                                                          tbCollectPojo.getPlayListName()))
                                                  .toList();
-        String likeStr = "喜爱歌单";
+        String likeStr = I18nUtil.getMsg("webdav.playlist.like_playlist");
         list.add(new WebDavFolder(LIKE, likeStr, like, null));
-        String common = "普通歌单";
+        String common = I18nUtil.getMsg("webdav.playlist.saved_playlist");
         list.add(new WebDavFolder(COMMON, common, ordinary, null));
-        String recommendStr = "推荐歌单";
+        String recommendStr = I18nUtil.getMsg("webdav.playlist.recommended_playlist");
         list.add(new WebDavFolder(RECOMMEND, recommendStr, recommend, null));
         return list;
     }

@@ -7,7 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 
 @Entity
@@ -44,6 +43,9 @@ public class SysUserEntity implements Serializable {
     @Basic
     @Column(name = "last_login_time", nullable = true)
     private Timestamp lastLoginTime;
+    @Basic
+    @Column(name = "login_device", nullable = true)
+    private String loginDevice;
     @Basic
     @Column(name = "role_name", nullable = true)
     private String roleName;
@@ -180,6 +182,14 @@ public class SysUserEntity implements Serializable {
         this.roleName = roleName;
     }
     
+    public String getLoginDevice() {
+        return loginDevice;
+    }
+    
+    public void setLoginDevice(String loginDevice) {
+        this.loginDevice = loginDevice;
+    }
+    
     public boolean getIsAdmin() {
         return Optional.ofNullable(getAccountType()).orElse(-1) == 0;
     }
@@ -192,17 +202,124 @@ public class SysUserEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         SysUserEntity that = (SysUserEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(username, that.username) && Objects.equals(nickname,
-                that.nickname) && Objects.equals(password, that.password) && Objects.equals(signature,
-                that.signature) && Objects.equals(accountType, that.accountType) && Objects.equals(lastLoginIp,
-                that.lastLoginIp) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(createTime,
-                that.createTime) && Objects.equals(updateTime, that.updateTime);
+        
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) {
+            return false;
+        }
+        if (getUsername() != null ? !getUsername().equals(that.getUsername()) : that.getUsername() != null) {
+            return false;
+        }
+        if (getNickname() != null ? !getNickname().equals(that.getNickname()) : that.getNickname() != null) {
+            return false;
+        }
+        if (getPassword() != null ? !getPassword().equals(that.getPassword()) : that.getPassword() != null) {
+            return false;
+        }
+        if (getSignature() != null ? !getSignature().equals(that.getSignature()) : that.getSignature() != null) {
+            return false;
+        }
+        if (getAccountType() != null ? !getAccountType().equals(that.getAccountType()) : that.getAccountType() != null) {
+            return false;
+        }
+        if (getStatus() != null ? !getStatus().equals(that.getStatus()) : that.getStatus() != null) {
+            return false;
+        }
+        if (getLastLoginIp() != null ? !getLastLoginIp().equals(that.getLastLoginIp()) : that.getLastLoginIp() != null) {
+            return false;
+        }
+        if (getLastLoginTime() != null ? !getLastLoginTime().equals(that.getLastLoginTime()) : that.getLastLoginTime() != null) {
+            return false;
+        }
+        if (getLoginDevice() != null ? !getLoginDevice().equals(that.getLoginDevice()) : that.getLoginDevice() != null) {
+            return false;
+        }
+        if (getRoleName() != null ? !getRoleName().equals(that.getRoleName()) : that.getRoleName() != null) {
+            return false;
+        }
+        if (getCreateTime() != null ? !getCreateTime().equals(that.getCreateTime()) : that.getCreateTime() != null) {
+            return false;
+        }
+        if (getUpdateTime() != null ? !getUpdateTime().equals(that.getUpdateTime()) : that.getUpdateTime() != null) {
+            return false;
+        }
+        if (getTbAlbumsById() != null ? !getTbAlbumsById().equals(that.getTbAlbumsById()) : that.getTbAlbumsById() != null) {
+            return false;
+        }
+        if (getTbArtistsById() != null ? !getTbArtistsById().equals(that.getTbArtistsById()) : that.getTbArtistsById() != null) {
+            return false;
+        }
+        if (getTbCollectsById() != null ? !getTbCollectsById().equals(that.getTbCollectsById()) : that.getTbCollectsById() != null) {
+            return false;
+        }
+        if (getTbHistoriesById() != null ? !getTbHistoriesById().equals(that.getTbHistoriesById()) : that.getTbHistoriesById() != null) {
+            return false;
+        }
+        if (getTbMusicsById() != null ? !getTbMusicsById().equals(that.getTbMusicsById()) : that.getTbMusicsById() != null) {
+            return false;
+        }
+        if (getTbMvsById() != null ? !getTbMvsById().equals(that.getTbMvsById()) : that.getTbMvsById() != null) {
+            return false;
+        }
+        if (getTbPluginsById() != null ? !getTbPluginsById().equals(that.getTbPluginsById()) : that.getTbPluginsById() != null) {
+            return false;
+        }
+        if (getTbPluginMsgsById() != null ? !getTbPluginMsgsById().equals(that.getTbPluginMsgsById()) : that.getTbPluginMsgsById() != null) {
+            return false;
+        }
+        if (getTbPluginTasksById() != null ? !getTbPluginTasksById().equals(that.getTbPluginTasksById()) : that.getTbPluginTasksById() != null) {
+            return false;
+        }
+        if (getTbResourcesById() != null ? !getTbResourcesById().equals(that.getTbResourcesById()) : that.getTbResourcesById() != null) {
+            return false;
+        }
+        if (getTbScheduleTasksById() != null ? !getTbScheduleTasksById().equals(that.getTbScheduleTasksById()) : that.getTbScheduleTasksById() != null) {
+            return false;
+        }
+        if (getTbUserAlbumsById() != null ? !getTbUserAlbumsById().equals(that.getTbUserAlbumsById()) : that.getTbUserAlbumsById() != null) {
+            return false;
+        }
+        if (getTbUserArtistsById() != null ? !getTbUserArtistsById().equals(that.getTbUserArtistsById()) : that.getTbUserArtistsById() != null) {
+            return false;
+        }
+        if (getTbUserCollectsById() != null ? !getTbUserCollectsById().equals(that.getTbUserCollectsById()) : that.getTbUserCollectsById() != null) {
+            return false;
+        }
+        return getTbUserMvsById() != null ? getTbUserMvsById().equals(that.getTbUserMvsById()) : that.getTbUserMvsById() == null;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, nickname, password, signature, accountType, lastLoginIp, lastLoginTime, createTime, updateTime);
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getUsername() != null ? getUsername().hashCode() : 0);
+        result = 31 * result + (getNickname() != null ? getNickname().hashCode() : 0);
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + (getSignature() != null ? getSignature().hashCode() : 0);
+        result = 31 * result + (getAccountType() != null ? getAccountType().hashCode() : 0);
+        result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
+        result = 31 * result + (getLastLoginIp() != null ? getLastLoginIp().hashCode() : 0);
+        result = 31 * result + (getLastLoginTime() != null ? getLastLoginTime().hashCode() : 0);
+        result = 31 * result + (getLoginDevice() != null ? getLoginDevice().hashCode() : 0);
+        result = 31 * result + (getRoleName() != null ? getRoleName().hashCode() : 0);
+        result = 31 * result + (getCreateTime() != null ? getCreateTime().hashCode() : 0);
+        result = 31 * result + (getUpdateTime() != null ? getUpdateTime().hashCode() : 0);
+        result = 31 * result + (getTbAlbumsById() != null ? getTbAlbumsById().hashCode() : 0);
+        result = 31 * result + (getTbArtistsById() != null ? getTbArtistsById().hashCode() : 0);
+        result = 31 * result + (getTbCollectsById() != null ? getTbCollectsById().hashCode() : 0);
+        result = 31 * result + (getTbHistoriesById() != null ? getTbHistoriesById().hashCode() : 0);
+        result = 31 * result + (getTbMusicsById() != null ? getTbMusicsById().hashCode() : 0);
+        result = 31 * result + (getTbMvsById() != null ? getTbMvsById().hashCode() : 0);
+        result = 31 * result + (getTbPluginsById() != null ? getTbPluginsById().hashCode() : 0);
+        result = 31 * result + (getTbPluginMsgsById() != null ? getTbPluginMsgsById().hashCode() : 0);
+        result = 31 * result + (getTbPluginTasksById() != null ? getTbPluginTasksById().hashCode() : 0);
+        result = 31 * result + (getTbResourcesById() != null ? getTbResourcesById().hashCode() : 0);
+        result = 31 * result + (getTbScheduleTasksById() != null ? getTbScheduleTasksById().hashCode() : 0);
+        result = 31 * result + (getTbUserAlbumsById() != null ? getTbUserAlbumsById().hashCode() : 0);
+        result = 31 * result + (getTbUserArtistsById() != null ? getTbUserArtistsById().hashCode() : 0);
+        result = 31 * result + (getTbUserCollectsById() != null ? getTbUserCollectsById().hashCode() : 0);
+        result = 31 * result + (getTbUserMvsById() != null ? getTbUserMvsById().hashCode() : 0);
+        return result;
     }
     
     public Collection<TbAlbumEntity> getTbAlbumsById() {

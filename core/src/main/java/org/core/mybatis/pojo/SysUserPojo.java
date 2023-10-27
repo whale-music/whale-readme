@@ -66,6 +66,10 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
     
+    @Schema(title = "最后登录设备")
+    @TableField("login_device")
+    private String loginDevice;
+    
     @Schema(title = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;

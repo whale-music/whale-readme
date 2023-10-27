@@ -20,6 +20,7 @@ public class PageUserRes extends SysUserPojo {
                 user.getRoleName(),
                 user.getLastLoginIp(),
                 user.getLastLoginTime(),
+                user.getLoginDevice(),
                 user.getCreateTime(),
                 user.getUpdateTime());
     }

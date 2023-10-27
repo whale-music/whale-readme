@@ -12,7 +12,6 @@ import org.core.jpa.repository.TbMusicEntityRepository;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
-import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
@@ -20,6 +19,7 @@ import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,11 @@ public class WebdavApi {
     @Autowired
     private AccountService accountService;
     
-    @Cacheable(value = "webdav-collect-type-list", key = "#id")
+    public static final String WEBDAV_COLLECT_TYPE_LIST = "webdav-collect-type-list";
+    public static final String WEBDAV_PLAY_LIST = "webdav-play-list";
+    public static final String WEBDAV_USER_POJO = "webdav-user-pojo";
+    
+    @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
     public CollectTypeList getUserPlayList(Long id) {
         List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.ORDINARY);
         List<TbCollectPojo> likeCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.LIKE);
@@ -92,18 +96,13 @@ public class WebdavApi {
         return res;
     }
     
-    private List<Long> getPlayListMusicIds(Long id, byte type) {
-        List<CollectConvert> likeUserPlayList = qukuApi.getUserPlayList(id, Collections.singleton(type));
-        if (CollUtil.isEmpty(likeUserPlayList)) {
-            return Collections.emptyList();
-        }
-        List<Long> likeUserIds = likeUserPlayList.parallelStream().map(TbCollectPojo::getId).toList();
-        List<TbCollectMusicPojo> likeCollectPojoList = collectMusicService.getCollectIds(likeUserIds);
-        return likeCollectPojoList.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
-    }
-    
     @Cacheable(value = "webdav-user-pojo", key = "#userName")
     public SysUserPojo getUserByName(String userName) {
         return accountService.getUserByName(userName);
+    }
+    
+    @CacheEvict(value = {WEBDAV_COLLECT_TYPE_LIST, WEBDAV_PLAY_LIST, WEBDAV_USER_POJO}, allEntries = true)
+    public void refreshAllCache() {
+        // refresh webdav all cache
     }
 }

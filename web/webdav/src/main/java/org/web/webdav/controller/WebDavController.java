@@ -2,7 +2,6 @@ package org.web.webdav.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -41,9 +40,13 @@ public class WebDavController {
     private static final String LIKE = "like";
     private static final String RECOMMEND = "recommend";
     private static final String COMMON = "common";
+    private static final String REFRESH = "refresh";
     
     @Autowired
     private WebdavApi webdavApi;
+    
+    @Autowired
+    private QukuAPI qukuApi;
     
     @Autowired
     private MessageSource messageSource;
@@ -134,6 +137,8 @@ public class WebDavController {
         list.add(new WebDavFolder(COMMON, common, ordinary, null));
         String recommendStr = I18nUtil.getMsg("webdav.playlist.recommended_playlist");
         list.add(new WebDavFolder(RECOMMEND, recommendStr, recommend, null));
+        String refreshStr = I18nUtil.getMsg("webdav.playlist.refresh");
+        list.add(new WebDavFolder(REFRESH, refreshStr, Collections.emptyList(), null));
         return list;
     }
     
@@ -154,13 +159,17 @@ public class WebDavController {
         if (recommendList != null) {
             return recommendList;
         }
-        
+        if (StringUtils.equals(webDavFolder.getUniqueId(), REFRESH)) {
+            webdavApi.refreshAllCache();
+            return Collections.emptyList();
+        }
         ArrayList<Resource> resources = new ArrayList<>();
         List<PlayListRes> playListMusic = webdavApi.getPlayListMusic(Long.parseLong(webDavFolder.getUniqueId()));
         for (PlayListRes playListRes : playListMusic) {
             // 修复路径读取问题,使用/会造成路径读取问题
             // 使用字符 - 替换 /
-            resources.add(new WebDavResource(StringUtils.replace(playListRes.getMusicName(), "/", "-") + "." + FileUtil.getSuffix(playListRes.getPath()),
+            String musicName = StringUtils.replace(playListRes.getMusicName(), "/", "-") + "." + FileUtil.getSuffix(playListRes.getPath());
+            resources.add(new WebDavResource(musicName,
                     playListRes.getMd5(),
                     playListRes.getPath(),
                     playListRes.getSize(),
@@ -173,7 +182,7 @@ public class WebDavController {
     public InputStream getChild(WebDavResource webDavFolder) {
         String name = webDavFolder.getName();
         log.info("output file: {}", name);
-        Map<String, Map<String, String>> address = SpringUtil.getBean(QukuAPI.class).getAddressByMd5(webDavFolder.getMd5(), false);
+        Map<String, Map<String, String>> address = qukuApi.getAddressByMd5(webDavFolder.getMd5(), false);
         String url = address.get(webDavFolder.getPath()).get("url");
         log.info("url download: {}", url);
         try (HttpResponse execute = HttpRequest.get(url).execute()) {

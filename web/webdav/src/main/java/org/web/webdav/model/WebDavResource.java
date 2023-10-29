@@ -4,7 +4,7 @@ import io.milton.annotations.*;
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.resource.Resource;
-import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.jpa.entity.TbResourceEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +16,7 @@ public class WebDavResource implements Resource {
     private String name;
     private String md5;
     private String path;
-    private List<TbResourcePojo> resource;
+    private List<TbResourceEntity> resource;
     private Date createdDate;
     private Date modifiedDate;
     private Long contentLength;
@@ -28,7 +28,7 @@ public class WebDavResource implements Resource {
         this.contentLength = contentLength;
     }
     
-    public WebDavResource(String name, String md5, String path, Long contentLength, List<TbResourcePojo> resource) {
+    public WebDavResource(String name, String md5, String path, Long contentLength, List<TbResourceEntity> resource) {
         this.name = name;
         this.md5 = md5;
         this.path = path;
@@ -66,11 +66,11 @@ public class WebDavResource implements Resource {
         return name;
     }
     
-    public List<TbResourcePojo> getResource() {
+    public List<TbResourceEntity> getResource() {
         return resource;
     }
     
-    public void setResource(List<TbResourcePojo> resource) {
+    public void setResource(List<TbResourceEntity> resource) {
         this.resource = resource;
     }
     

@@ -1,6 +1,7 @@
 package org.web.webdav.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
@@ -20,6 +21,9 @@ import org.api.webdav.model.PlayListRes;
 import org.api.webdav.service.WebdavApi;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.jpa.entity.TbAlbumEntity;
+import org.core.jpa.entity.TbArtistEntity;
+import org.core.jpa.entity.TbMusicArtistEntity;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.i18n.I18nUtil;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +34,7 @@ import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
 
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.*;
 
 // @ResourceController
@@ -168,12 +173,24 @@ public class WebDavController {
         for (PlayListRes playListRes : playListMusic) {
             // 修复路径读取问题,使用/会造成路径读取问题
             // 使用字符 - 替换 /
-            String musicName = StringUtils.replace(playListRes.getMusicName(), "/", "-") + "." + FileUtil.getSuffix(playListRes.getPath());
+            String replace = StringUtils.replace(playListRes.getMusicName(), "/", "-");
+            TbAlbumEntity albumConvert = playListRes.getTbAlbumByAlbumId();
+            Collection<TbMusicArtistEntity> musicArtistsById = playListRes.getTbMusicArtistsById();
+            List<TbArtistEntity> artistEntities = musicArtistsById.parallelStream().map(TbMusicArtistEntity::getTbArtistByArtistId).toList();
+            List<String> artistNameList = CollUtil.isEmpty(artistEntities) ? Collections.emptyList() : artistEntities.parallelStream()
+                                                                                                                     .map(TbArtistEntity::getArtistName)
+                                                                                                                     .toList();
+            String format = MessageFormat.format("{0}_alias:[{1}]_album:[{2}]_artist:[{3}]",
+                    replace,
+                    StringUtils.defaultString(playListRes.getAliasName(), "no alias"),
+                    Objects.isNull(albumConvert) ? "no album" : StringUtils.defaultString(albumConvert.getAlbumName(), "no album"),
+                    CollUtil.isEmpty(artistEntities) ? "no artist" : StringUtils.join(artistNameList, ","));
+            String musicName = format + "." + FileUtil.getSuffix(playListRes.getPath());
             resources.add(new WebDavResource(musicName,
                     playListRes.getMd5(),
                     playListRes.getPath(),
                     playListRes.getSize(),
-                    playListRes.getResourceList()));
+                    ListUtil.toList(playListRes.getTbResourcesById())));
         }
         return resources;
     }

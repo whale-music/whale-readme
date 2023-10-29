@@ -1,6 +1,7 @@
 package org.api.webdav.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import org.api.common.service.QukuAPI;
 import org.api.webdav.config.WebdavConfig;
 import org.api.webdav.model.CollectTypeList;
@@ -8,6 +9,7 @@ import org.api.webdav.model.PlayListRes;
 import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.config.PlayListTypeConfig;
 import org.core.jpa.entity.TbMusicEntity;
+import org.core.jpa.entity.TbResourceEntity;
 import org.core.jpa.repository.TbMusicEntityRepository;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
@@ -15,7 +17,6 @@ import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
-import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,19 +78,16 @@ public class WebdavApi {
         Set<TbMusicEntity> allMusicEntityList = tbMusicEntityRepository.findByIdIn(allMusicIds);
         Map<Long, TbMusicEntity> musicMaps = allMusicEntityList.parallelStream()
                                                                .collect(Collectors.toMap(TbMusicEntity::getId, tbMusicEntity -> tbMusicEntity));
-        Map<Long, List<TbResourcePojo>> resourceListMap = tbResourceService.getResourceMap(allMusicIds);
         for (Long likeMusicId : allMusicIds) {
             PlayListRes e = new PlayListRes();
             TbMusicEntity tbMusicEntity = musicMaps.get(likeMusicId);
             BeanUtils.copyProperties(tbMusicEntity, e);
             
-            List<TbResourcePojo> tbResourcePojos = resourceListMap.get(likeMusicId);
-            if (CollUtil.isNotEmpty(tbResourcePojos)) {
-                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(tbResourcePojos);
+            if (CollUtil.isNotEmpty(tbMusicEntity.getTbResourcesById())) {
+                TbResourceEntity tbResourcePojo = resourceReturnStrategyUtil.handleResourceEntity(ListUtil.toList(tbMusicEntity.getTbResourcesById()));
                 e.setMd5(tbResourcePojo.getMd5());
                 e.setPath(tbResourcePojo.getPath());
                 e.setSize(tbResourcePojo.getSize());
-                e.setResourceList(tbResourcePojos);
                 res.add(e);
             }
         }

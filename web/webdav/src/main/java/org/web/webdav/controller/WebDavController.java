@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.github.benmanes.caffeine.cache.Cache;
 import io.milton.annotations.*;
 import io.milton.http.Auth;
 import io.milton.http.HttpManager;
@@ -19,16 +20,14 @@ import org.api.common.service.QukuAPI;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.service.WebdavApi;
+import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.jpa.entity.TbAlbumEntity;
-import org.core.jpa.entity.TbArtistEntity;
-import org.core.jpa.entity.TbMusicArtistEntity;
+import org.core.jpa.entity.TbResourceEntity;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.i18n.I18nUtil;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
@@ -48,13 +47,16 @@ public class WebDavController {
     private static final String REFRESH = "refresh";
     
     @Autowired
+    private Cache<String, String> resource;
+    
+    @Autowired
     private WebdavApi webdavApi;
     
     @Autowired
     private QukuAPI qukuApi;
     
     @Autowired
-    private MessageSource messageSource;
+    private WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil;
     
     @Nullable
     private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {
@@ -174,18 +176,13 @@ public class WebDavController {
             // 修复路径读取问题,使用/会造成路径读取问题
             // 使用字符 - 替换 /
             String replace = StringUtils.replace(playListRes.getMusicName(), "/", "-");
-            TbAlbumEntity albumConvert = playListRes.getTbAlbumByAlbumId();
-            Collection<TbMusicArtistEntity> musicArtistsById = playListRes.getTbMusicArtistsById();
-            List<TbArtistEntity> artistEntities = musicArtistsById.parallelStream().map(TbMusicArtistEntity::getTbArtistByArtistId).toList();
-            List<String> artistNameList = CollUtil.isEmpty(artistEntities) ? Collections.emptyList() : artistEntities.parallelStream()
-                                                                                                                     .map(TbArtistEntity::getArtistName)
-                                                                                                                     .toList();
-            String format = MessageFormat.format("{0}_alias:[{1}]_album:[{2}]_artist:[{3}]",
+            String format = MessageFormat.format("{0}{1}",
                     replace,
-                    StringUtils.defaultString(playListRes.getAliasName(), "no alias"),
-                    Objects.isNull(albumConvert) ? "no album" : StringUtils.defaultString(albumConvert.getAlbumName(), "no album"),
-                    CollUtil.isEmpty(artistEntities) ? "no artist" : StringUtils.join(artistNameList, ","));
+                    StringUtils.isBlank(playListRes.getAliasName()) ? "" : " (" + playListRes.getAliasName() + ")");
             String musicName = format + "." + FileUtil.getSuffix(playListRes.getPath());
+            
+            TbResourceEntity tbResourceEntity = webdavResourceReturnStrategyUtil.handleResourceEntity(ListUtil.toList(playListRes.getTbResourcesById()));
+            resource.put(musicName, qukuApi.getAddresses(tbResourceEntity.getPath(), false));
             resources.add(new WebDavResource(musicName,
                     playListRes.getMd5(),
                     playListRes.getPath(),

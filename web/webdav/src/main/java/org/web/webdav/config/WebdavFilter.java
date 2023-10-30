@@ -1,10 +1,9 @@
 package org.web.webdav.config;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.URLDecoder;
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.github.benmanes.caffeine.cache.Cache;
 import io.milton.common.Path;
 import io.milton.http.HttpManager;
 import io.milton.servlet.FilterConfigWrapper;
@@ -14,46 +13,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.common.service.QukuAPI;
-import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.config.WebConfig;
-import org.core.mybatis.iservice.TbMusicService;
-import org.core.mybatis.iservice.TbResourceService;
-import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 @Component
 @Slf4j
 public class WebdavFilter extends SpringMiltonFilter {
     
-    private final Pattern pattern = Pattern.compile("alias:\\[(.*?)\\]_album:\\[(.*?)\\]_artist:\\[(.*?)\\]");
-    
-    private final QukuAPI qukuApi;
-    
-    private final WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil;
-    
-    private final TbMusicService tbMusicService;
-    
-    private final TbResourceService tbResourceService;
-    
     private final MiltonConfig miltonConfig;
     
-    public WebdavFilter(QukuAPI qukuApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil, TbMusicService tbMusicService, TbResourceService tbResourceService, MiltonConfig miltonConfig) {
-        this.qukuApi = qukuApi;
-        this.webdavResourceReturnStrategyUtil = webdavResourceReturnStrategyUtil;
-        this.tbMusicService = tbMusicService;
-        this.tbResourceService = tbResourceService;
+    private final Cache<String, String> cache;
+    
+    public WebdavFilter(MiltonConfig miltonConfig, Cache<String, String> cache) {
         this.miltonConfig = miltonConfig;
+        this.cache = cache;
     }
     
     /**
@@ -88,20 +66,10 @@ public class WebdavFilter extends SpringMiltonFilter {
             // 获取url地址, 分割并获取文件名
             Path path = Path.path(httpServletRequest.getRequestURI());
             String name = path.getName();
-            String nameDecode = URLDecoder.decode(FileUtil.mainName(name), StandardCharsets.UTF_8);
+            String nameDecode = URLDecoder.decode(name, StandardCharsets.UTF_8);
             // 修复路径读取问题,使用/会造成路径读取问题
             // 使用字符 - 替换 /
-            String replaceMusicName = StringUtils.replace(nameDecode, "-", "/");
-            List<String> allGroups = ReUtil.getAllGroups(pattern, replaceMusicName);
-            // TODO: 根据音乐名获取音乐地址，只有一个时直接返回，如果有多个进行判断专辑和歌手
-            String alias = allGroups.get(1);
-            String albumName = allGroups.get(2);
-            String artistName = allGroups.get(3);
-            TbMusicPojo musicByName = tbMusicService.getMusicByName(StringUtils.split(replaceMusicName, '_')[0], alias);
-            Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(Collections.singleton(musicByName.getId()));
-            List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicByName.getId());
-            TbResourcePojo tbResourcePojo = webdavResourceReturnStrategyUtil.handleResource(tbResourcePojos);
-            String addresses = qukuApi.getAddresses(tbResourcePojo.getPath(), false);
+            String addresses = cache.asMap().get(nameDecode);
             if (StringUtils.isBlank(addresses)) {
                 super.doFilter(req, resp, fc);
                 return;

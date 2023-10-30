@@ -48,4 +48,19 @@ public class CacheConfig {
                        // 缓存的最大条数
                        .maximumSize(1000_0).build();
     }
+    
+    /**
+     * 设置Webdav Resource URL 缓存
+     */
+    @Bean
+    public Cache<String, String> userWebdavPlayListResourceCacheCaffeineCache() {
+        return Caffeine.newBuilder()
+                       // 设置最后一次写入或访问后经过固定时间过期
+                       .expireAfterWrite(1, TimeUnit.DAYS)
+                       // 初始的缓存空间大小
+                       .initialCapacity(1024 * 1024)
+                       // 缓存的最大条数
+                       .maximumSize(1000_0).build();
+    }
+    
 }

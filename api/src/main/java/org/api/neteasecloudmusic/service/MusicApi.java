@@ -15,7 +15,7 @@ import org.api.neteasecloudmusic.model.vo.songdetail.*;
 import org.api.neteasecloudmusic.model.vo.songurl.DataItem;
 import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.core.common.constant.HistoryConstant;
-import org.core.config.LyricConfig;
+import org.core.common.constant.LyricConstant;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -141,17 +141,17 @@ public class MusicApi {
         List<TbLyricPojo> tbLyricPojos = Optional.ofNullable(qukuService.getMusicLyric(id))
                                                  .orElse(new ArrayList<>());
         TbLyricPojo lyricPojo = tbLyricPojos.stream()
-                                            .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.LYRIC))
+                                            .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConstant.LYRIC))
                                             .findFirst()
                                             .orElse(new TbLyricPojo());
     
         TbLyricPojo kLyricPojo = tbLyricPojos.stream()
-                                             .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.K_LYRIC))
+                                             .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConstant.K_LYRIC))
                                              .findFirst()
                                              .orElse(new TbLyricPojo());
     
         TbLyricPojo tLyricPojo = tbLyricPojos.stream()
-                                             .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.K_LYRIC))
+                                             .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConstant.K_LYRIC))
                                              .findFirst()
                                              .orElse(new TbLyricPojo());
         Lrc lrc = new Lrc();

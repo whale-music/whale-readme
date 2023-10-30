@@ -18,10 +18,10 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.model.res.ExportExcelRes;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.LyricConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
-import org.core.config.LyricConfig;
 import org.core.jpa.entity.*;
 import org.core.jpa.repository.TbAlbumEntityRepository;
 import org.core.jpa.repository.TbArtistEntityRepository;
@@ -105,12 +105,12 @@ public class ExchangeApi {
                 List<TbLyricPojo> musicLyric = musicLyricMap.get(tbMusicEntity.getId());
                 if (CollUtil.isNotEmpty(musicLyric)) {
                     musicInfo.setCommonLyrics(musicLyric.stream()
-                                                        .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.LYRIC))
+                                                        .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConstant.LYRIC))
                                                         .findFirst()
                                                         .orElse(new TbLyricPojo())
                                                         .getLyric());
                     musicInfo.setCommonLyrics(musicLyric.stream()
-                                                        .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConfig.K_LYRIC))
+                                                        .filter(tbLyricPojo -> StringUtils.equals(tbLyricPojo.getType(), LyricConstant.K_LYRIC))
                                                         .findFirst()
                                                         .orElse(new TbLyricPojo())
                                                         .getLyric());

@@ -14,7 +14,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.upload.AudioInfoReq;
-import org.core.config.PluginType;
+import org.core.common.constant.PluginConstant;
 import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.MusicDetails;
 import org.core.mybatis.pojo.TbOriginPojo;
@@ -53,7 +53,7 @@ class SyncOneMusicPlugin implements CommonPlugin {
      */
     @Override
     public String getType() {
-        return PluginType.COMMON;
+        return PluginConstant.COMMON;
     }
     
     /**

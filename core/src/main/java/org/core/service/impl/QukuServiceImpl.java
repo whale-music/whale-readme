@@ -19,12 +19,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.DefaultedMap;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.LyricConstant;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.TargetTagConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.LyricConfig;
 import org.core.config.PlayListTypeConfig;
 import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
@@ -1386,17 +1386,17 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateLyric(Long musicId, String type, String lyric) {
-        if (!(StringUtils.equals(type, LyricConfig.LYRIC) ||
-                StringUtils.equals(type, LyricConfig.K_LYRIC) ||
-                StringUtils.equals(type, LyricConfig.T_LYRIC))) {
+        if (!(StringUtils.equals(type, LyricConstant.LYRIC) ||
+                StringUtils.equals(type, LyricConstant.K_LYRIC) ||
+                StringUtils.equals(type, LyricConstant.T_LYRIC))) {
             throw new BaseException(ResultCode.LYRIC_NO_EXIST_EXISTED);
         }
         TbLyricPojo one = lyricService.getOne(Wrappers.<TbLyricPojo>lambdaQuery()
                                                       .eq(TbLyricPojo::getMusicId, musicId)
-                                                      .eq(TbLyricPojo::getType, LyricConfig.LYRIC));
+                                                      .eq(TbLyricPojo::getType, LyricConstant.LYRIC));
         TbLyricPojo entity = Optional.ofNullable(one).orElse(new TbLyricPojo());
         entity.setMusicId(musicId);
-        entity.setType(LyricConfig.LYRIC);
+        entity.setType(LyricConstant.LYRIC);
         entity.setLyric(lyric);
         lyricService.saveOrUpdate(entity);
     }

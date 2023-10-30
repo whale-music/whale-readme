@@ -1,6 +1,6 @@
-package org.core.config;
+package org.core.common.constant;
 
-public class LyricConfig {
+public class LyricConstant {
     
     // 普通歌词
     public static final String LYRIC = "lyric";
@@ -9,6 +9,6 @@ public class LyricConfig {
     // 未知
     public static final String T_LYRIC = "tlyric";
     
-    private LyricConfig() {
+    private LyricConstant() {
     }
 }

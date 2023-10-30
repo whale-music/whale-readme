@@ -12,9 +12,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.service.MusicFlowApi;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.PluginConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.PluginType;
 import org.core.mybatis.iservice.TbPluginMsgService;
 import org.core.mybatis.iservice.TbPluginService;
 import org.core.mybatis.iservice.TbPluginTaskService;
@@ -153,11 +153,11 @@ public class PluginServiceImpl implements PluginService {
     @Override
     public PluginRes saveOrUpdatePlugin(PluginReq req) {
         if (org.apache.commons.lang3.StringUtils.isBlank(req.getCode())) {
-            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginType.COMMON)) {
+            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginConstant.COMMON)) {
                 String code = ResourceUtil.readStr("examples/CommonPluginTest.java", CharsetUtil.CHARSET_UTF_8);
                 req.setCode(code);
             }
-            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginType.INTERACTIVE)) {
+            if (org.apache.commons.lang3.StringUtils.equals(req.getType(), PluginConstant.INTERACTIVE)) {
                 String code = ResourceUtil.readStr("examples/InteractivePluginDemo.java", CharsetUtil.CHARSET_UTF_8);
                 req.setCode(code);
             }
@@ -188,10 +188,10 @@ public class PluginServiceImpl implements PluginService {
         }
         String allClassName = getClassName(script);
         switch (byId.getType()) {
-            case PluginType.COMMON:
+            case PluginConstant.COMMON:
                 CommonPlugin func = runCommonCode(script, allClassName);
                 return new PluginRunParamsRes(func.getType(), func.getParams());
-            case PluginType.INTERACTIVE:
+            case PluginConstant.INTERACTIVE:
                 ComboSearchPlugin comboSearchPlugin = runInteractiveCode(script, allClassName);
                 return new PluginRunParamsRes(comboSearchPlugin.getType(), comboSearchPlugin.getParams());
             default:

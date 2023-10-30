@@ -1,6 +1,6 @@
 package org.plugin.service.impl;
 
-import org.core.config.PluginType;
+import org.core.common.constant.PluginConstant;
 import org.plugin.common.ComboSearchPlugin;
 import org.plugin.converter.PluginLabelValue;
 
@@ -19,7 +19,7 @@ public class ComboSearchMusicPlugin implements ComboSearchPlugin {
      */
     @Override
     public String getType() {
-        return PluginType.INTERACTIVE;
+        return PluginConstant.INTERACTIVE;
     }
     
     /**

@@ -2,6 +2,7 @@ package org.plugin.common;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.PluginConstant;
 import org.plugin.converter.PluginLabelValue;
 import org.plugin.service.impl.PluginPackage;
 
@@ -18,7 +19,7 @@ public interface CommonPlugin extends PluginType {
      */
     @Override
     default String getType() {
-        return org.core.config.PluginType.COMMON;
+        return PluginConstant.COMMON;
     }
     
     /**

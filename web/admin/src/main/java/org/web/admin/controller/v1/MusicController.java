@@ -4,6 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.req.RemoveMusicReq;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
@@ -101,9 +102,9 @@ public class MusicController {
      * @param compel  是否强制删除
      * @return 成功信息
      */
-    @DeleteMapping("/{id}")
-    public R deleteMusic(@PathVariable("id") List<Long> musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
-        uploadMusic.deleteMusic(musicId, compel);
+    @DeleteMapping("/")
+    public R deleteMusic(@RequestBody RemoveMusicReq musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
+        uploadMusic.deleteMusic(musicId.getIds(), compel);
         return R.success();
     }
     

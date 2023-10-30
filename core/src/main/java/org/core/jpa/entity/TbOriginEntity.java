@@ -18,10 +18,10 @@ public class TbOriginEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "music_id", nullable = false)
+    @Column(name = "music_id", nullable = true)
     private Long musicId;
     @Basic
-    @Column(name = "resource_id", nullable = false)
+    @Column(name = "resource_id", nullable = true)
     private Long resourceId;
     @Basic
     @Column(name = "origin", nullable = false, length = 256)
@@ -30,10 +30,10 @@ public class TbOriginEntity implements Serializable {
     @Column(name = "origin_url", nullable = true, length = 256)
     private String originUrl;
     @ManyToOne
-    @JoinColumn(name = "music_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "music_id", referencedColumnName = "id", insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMusicId;
     @ManyToOne
-    @JoinColumn(name = "resource_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "resource_id", referencedColumnName = "id", insertable = false, updatable = false)
     private TbResourceEntity tbResourceByResourceId;
     
     public Long getId() {

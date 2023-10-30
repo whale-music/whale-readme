@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.AlbumPageReq;
+import org.api.admin.model.req.RemoveAlbumReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumPageRes;
@@ -46,9 +47,9 @@ public class AlbumController {
         return R.success(albums);
     }
     
-    @DeleteMapping("/{id}")
-    public R deleteAlbum(@PathVariable List<Long> id, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
-        albumApi.deleteAlbum(id, compel);
+    @DeleteMapping("/")
+    public R deleteAlbum(@RequestBody RemoveAlbumReq ids, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
+        albumApi.deleteAlbum(ids.getIds(), compel);
         return R.success();
     }
     

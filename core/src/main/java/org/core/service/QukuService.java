@@ -477,6 +477,33 @@ public interface QukuService {
     void removeLabelAll(Long id);
     
     /**
+     * 根据类型ID, 删除tag
+     *
+     * @param ids  tag id
+     * @param type tag type
+     */
+    default void removeLabel(List<Long> ids, byte type) {
+        removeLabel(ids, Collections.singleton(type));
+    }
+    
+    /**
+     * 根据类型ID, 删除tag列表
+     *
+     * @param ids   tag id
+     * @param types tag type
+     */
+    void removeLabel(List<Long> ids, Collection<Byte> types);
+    
+    /**
+     * 移除专辑tag
+     *
+     * @param ids tag id
+     */
+    default void removeLabelAlbum(List<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_ALBUM_GENRE);
+    }
+    
+    /**
      * 删除歌单或音乐中的tag, 根据ID
      *
      * @param target       指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单

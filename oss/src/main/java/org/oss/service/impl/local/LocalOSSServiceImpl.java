@@ -330,6 +330,7 @@ public class LocalOSSServiceImpl implements OSSService {
         // 音乐地址URL缓存
         Map<String, ArrayList<FileMetadata>> collect = name.parallelStream()
                                                            .map(MUSIC_PATH_CACHE::get)
+                                                           .filter(Objects::nonNull)
                                                            .collect(Collectors.toMap(FileMetadata::getUri, ListUtil::toList, (objects, objects2) -> {
                                                                objects2.addAll(objects);
                                                                return objects2;

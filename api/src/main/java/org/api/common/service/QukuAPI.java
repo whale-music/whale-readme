@@ -47,7 +47,7 @@ public class QukuAPI extends QukuServiceImpl {
     @Autowired
     private TbMiddlePicService tbMiddlePicService;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService) {
         super(musicService,
                 albumService,
                 artistService,
@@ -67,7 +67,10 @@ public class QukuAPI extends QukuServiceImpl {
                 middlePicService,
                 picCache,
                 picMiddleCache,
-                defaultInfo);
+                defaultInfo,
+                tbMvArtistService,
+                tbOriginService
+        );
         this.config = config;
         this.httpRequestConfig = httpRequestConfig;
     }

@@ -8,6 +8,7 @@ import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -19,6 +20,7 @@ import org.apache.commons.collections4.map.DefaultedMap;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.PicTypeConstant;
+import org.core.common.constant.TargetTagConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -35,6 +37,7 @@ import org.core.service.AccountService;
 import org.core.service.QukuService;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +61,7 @@ public class QukuServiceImpl implements QukuService {
     
     private final TbArtistService artistService;
     
-    private final TbResourceService musicUrlService;
+    private final TbResourceService resourceService;
     
     private final TbUserAlbumService userAlbumService;
     
@@ -91,6 +94,12 @@ public class QukuServiceImpl implements QukuService {
     private final Cache<MiddleTypeModel, Long> picMiddleCache;
     
     private final DefaultInfo defaultInfo;
+    
+    @Autowired
+    private TbMvArtistService tbMvArtistService;
+    
+    @Autowired
+    private TbOriginService tbOriginService;
     
     
     private static List<AlbumConvert> getAlbumConvertList(List<TbAlbumPojo> albumPojoList, Map<Long, String> picUrl) {
@@ -202,7 +211,7 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyMap();
         }
         LambdaQueryWrapper<TbResourcePojo> in = Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicId);
-        List<TbResourcePojo> list = musicUrlService.list(in);
+        List<TbResourcePojo> list = resourceService.list(in);
         return list.parallelStream()
                    .collect(Collectors.toConcurrentMap(TbResourcePojo::getMusicId, ListUtil::toList, (objects, objects2) -> {
                        objects2.addAll(objects);
@@ -284,7 +293,7 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<TbResourcePojo> getMusicPaths(Collection<Long> musicId) {
         LambdaQueryWrapper<TbResourcePojo> in = Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getMusicId, musicId);
-        return musicUrlService.list(in);
+        return resourceService.list(in);
     }
     
     /**
@@ -1074,8 +1083,10 @@ public class QukuServiceImpl implements QukuService {
      * 删除全部tag
      *
      * @param id 音乐，歌单， 专辑
+     * @deprecated 已被启用，请使用 {@link QukuService#removeLabel(List, byte)}
      */
     @Override
+    @Deprecated(since = "1.0")
     public void removeLabelAll(Long id) {
         synchronized (removeLabelLock) {
             LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
@@ -1087,7 +1098,28 @@ public class QukuServiceImpl implements QukuService {
             // 根据相同tag分组, 然后查询出对于的tag表, 然后根据每个要删除的数量进行计算, 等于或小于0时删除tag
             voteToRemoveTag(tbMiddleTagPojoList);
         }
-        
+    }
+    
+    /**
+     * 根据类型ID, 删除tag
+     *
+     * @param ids   tag id
+     * @param types tag type
+     */
+    @Override
+    public void removeLabel(List<Long> ids, Collection<Byte> types) {
+        synchronized (removeLabelLock) {
+            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                             .in(TbMiddleTagPojo::getMiddleId, ids)
+                                                             .in(TbMiddleTagPojo::getType, types);
+            // 查询出所有tag关联数据
+            List<TbMiddleTagPojo> tbMiddleTagPojoList = middleTagService.list(eq);
+            if (CollUtil.isEmpty(tbMiddleTagPojoList)) {
+                return;
+            }
+            // 根据相同tag分组, 然后查询出对于的tag表, 然后根据每个要删除的数量进行计算, 等于或小于0时删除tag
+            voteToRemoveTag(tbMiddleTagPojoList);
+        }
     }
     
     /**
@@ -1242,22 +1274,22 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 删除音乐
      *
-     * @param musicId 音乐ID
-     * @param compel  是否强制删除
+     * @param musicIds 音乐ID
+     * @param compel   是否强制删除
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteMusic(List<Long> musicId, Boolean compel) {
-        if (CollUtil.isEmpty(musicId)) {
+    public void deleteMusic(List<Long> musicIds, Boolean compel) {
+        if (CollUtil.isEmpty(musicIds)) {
             return;
         }
-        List<TbMusicPojo> musicList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicId));
+        List<TbMusicPojo> musicList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, musicIds));
         if (CollUtil.isEmpty(musicList)) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST);
         }
         // 删除歌单
         LambdaQueryWrapper<TbCollectMusicPojo> queryWrapper1 = Wrappers.lambdaQuery();
-        queryWrapper1.in(TbCollectMusicPojo::getMusicId, musicId);
+        queryWrapper1.in(TbCollectMusicPojo::getMusicId, musicIds);
         List<TbCollectMusicPojo> list = collectMusicService.list(queryWrapper1);
         // 是否强制删除歌单中的音乐
         if (CollUtil.isEmpty(list) || Boolean.TRUE.equals(compel)) {
@@ -1266,57 +1298,61 @@ public class QukuServiceImpl implements QukuService {
             throw new BaseException(ResultCode.COLLECT_MUSIC_ERROR);
         }
         // 删除歌手
-        musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicId));
-        // 删除音源
+        musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicIds));
+        // 删除流派
+        this.removeLabel(musicIds, TargetTagConstant.TARGET_MUSIC_GENRE);
+        // 删除tag
+        this.removeLabel(musicIds, TargetTagConstant.TARGET_MUSIC_TAG);
+        // 删除origin
+        tbOriginService.remove(Wrappers.<TbOriginPojo>lambdaQuery().in(TbOriginPojo::getMusicId, musicIds));
+        // 删除音源关联数据
         LambdaQueryWrapper<TbResourcePojo> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.in(TbResourcePojo::getMusicId, musicId);
-        musicUrlService.remove(queryWrapper);
-        // 删除Tag
-        musicId.forEach(this::removeLabelAll);
+        queryWrapper.in(TbResourcePojo::getMusicId, musicIds);
+        resourceService.remove(queryWrapper);
         // 删除封面
-        this.removePicIds(musicId, Collections.singletonList(PicTypeConstant.MUSIC));
+        this.removePicIds(musicIds, Collections.singletonList(PicTypeConstant.MUSIC));
+        // 删除歌词
+        lyricService.remove(Wrappers.<TbLyricPojo>lambdaQuery().in(TbLyricPojo::getMusicId, musicIds));
         // 删除歌曲
-        musicService.removeBatchByIds(musicId);
+        musicService.removeBatchByIds(musicIds);
     }
     
     
     /**
      * 删除专辑
-     * 强制删除会删除歌曲表
+     * 强制删除会删除歌曲关联数据
      *
-     * @param id     专辑ID 列表
+     * @param ids    专辑ID 列表
      * @param compel 是否强制删除
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteAlbum(List<Long> id, Boolean compel) {
-        if (CollUtil.isEmpty(id)) {
+    public void deleteAlbum(List<Long> ids, Boolean compel) {
+        if (CollUtil.isEmpty(ids)) {
             return;
         }
-        // 检测是否存在专辑
-        long count = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().in(TbAlbumPojo::getId, id));
-        if (count == 0) {
-            throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
-        }
         // 检测专辑是否包括音乐
-        List<MusicConvert> musicListByAlbumId = getMusicListByAlbumId(id);
+        List<MusicConvert> musicListByAlbumId = getMusicListByAlbumId(ids);
         if (CollUtil.isEmpty(musicListByAlbumId) || Boolean.TRUE.equals(compel)) {
             // 删除封面
-            List<TbAlbumPojo> albumPojoList = albumService.listByIds(id);
-            removePicIds(id, Collections.singletonList(PicTypeConstant.ALBUM));
-            albumArtistService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, id));
+            removePicIds(ids, Collections.singletonList(PicTypeConstant.ALBUM));
+            // 删除用户关注专辑
+            userAlbumService.remove(Wrappers.<TbUserAlbumPojo>lambdaQuery().in(TbUserAlbumPojo::getAlbumId, ids));
+            // 删除专辑歌手表
+            albumArtistService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, ids));
+            // 删除音乐关联数据
+            if (CollUtil.isNotEmpty(musicListByAlbumId)) {
+                LambdaUpdateWrapper<TbMusicPojo> musicUpdateLambda = new LambdaUpdateWrapper<>();
+                musicUpdateLambda.set(TbMusicPojo::getAlbumId, null);
+                musicUpdateLambda.in(TbMusicPojo::getAlbumId, ids);
+                musicService.update(musicUpdateLambda);
+            }
             // 删除tag
-            albumPojoList.stream().map(TbAlbumPojo::getId).filter(Objects::nonNull).forEach(this::removeLabelAll);
-            albumService.removeByIds(id);
+            this.removeLabelAlbum(ids);
+            albumService.removeByIds(ids);
         } else {
             throw new BaseException(ResultCode.ALBUM_MUSIC_EXIST_ERROR);
         }
-        // 强制删除音乐
-        if (CollUtil.isNotEmpty(musicListByAlbumId) && Boolean.TRUE.equals(compel)) {
-            List<Long> collect = musicListByAlbumId.parallelStream().map(TbMusicPojo::getId).toList();
-            deleteMusic(collect, true);
-        }
-        
     }
     
     /**
@@ -1330,14 +1366,12 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        Wrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, ids);
-        long count = artistService.count(wrapper);
-        if (count == 0) {
-            throw new BaseException(ResultCode.ARTIST_NO_EXIST_ERROR);
-        }
         LambdaQueryWrapper<TbAlbumArtistPojo> in = Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getArtistId, ids);
         albumArtistService.remove(in);
-        artistService.remove(wrapper);
+        userSingerService.remove(Wrappers.<TbUserArtistPojo>lambdaQuery().in(TbUserArtistPojo::getArtistId, ids));
+        musicArtistService.remove(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getArtistId, ids));
+        tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().eq(TbMvArtistPojo::getArtistId, ids));
+        artistService.removeBatchByIds(ids);
         // 删除封面
         removePicIds(ids, Collections.singletonList(PicTypeConstant.ARTIST));
     }

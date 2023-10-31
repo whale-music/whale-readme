@@ -14,6 +14,7 @@ import org.core.oss.service.impl.alist.model.list.ContentItem;
 import org.core.oss.service.impl.alist.util.RequestUtils;
 import org.core.utils.ExceptionUtil;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.io.BufferedInputStream;
@@ -22,9 +23,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service(AListOSSServiceImpl.SERVICE_NAME)
 public class AListOSSServiceImpl implements OSSService {
     
-    private static final String SERVICE_NAME = "AList";
+    public static final String SERVICE_NAME = "AList";
     
     private static final String LOGIN_KEY = "loginKey";
     

@@ -14,6 +14,7 @@ import org.core.common.result.ResultCode;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.local.model.FileMetadata;
 import org.core.utils.ServletUtils;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,13 +25,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service(LocalOSSServiceImpl.SERVICE_NAME)
 public class LocalOSSServiceImpl implements OSSService {
     
     // 音乐地址创建缓存
     public static final TimedCache<String, FileMetadata> MUSIC_PATH_CACHE = CacheUtil.newTimedCache(1000L * 60L * 60L);
     public static final String SIZE = "size";
     public static final String URL = "url";
-    private static final String SERVICE_NAME = "Local";
+    public static final String SERVICE_NAME = "Local";
     private SaveConfig config;
     private int initMusicAllCount;
     

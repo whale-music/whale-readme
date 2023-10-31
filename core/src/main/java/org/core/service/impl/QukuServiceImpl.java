@@ -1315,6 +1315,7 @@ public class QukuServiceImpl implements QukuService {
         lyricService.remove(Wrappers.<TbLyricPojo>lambdaQuery().in(TbLyricPojo::getMusicId, musicIds));
         // 删除歌曲
         musicService.removeBatchByIds(musicIds);
+        // TODO: 删除音乐文件
     }
     
     

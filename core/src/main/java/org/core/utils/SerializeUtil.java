@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
+import org.common.exception.BaseException;
+import org.common.result.ResultCode;
 
 public class SerializeUtil {
     private SerializeUtil(){}

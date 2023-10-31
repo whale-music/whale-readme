@@ -1,9 +1,9 @@
-package org.core.config;
+package org.common.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
+import org.common.exception.BaseException;
+import org.common.result.ResultCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

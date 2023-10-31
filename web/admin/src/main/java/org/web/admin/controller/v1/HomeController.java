@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
 import org.api.admin.service.HoneApi;
-import org.core.common.result.R;
+import org.common.result.R;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;

@@ -1,4 +1,4 @@
-package org.core.config;
+package org.common.properties;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

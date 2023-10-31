@@ -1,6 +1,6 @@
 package org.oss.factory;
 
-import org.core.config.SaveConfig;
+import org.common.properties.SaveConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.oss.service.OSSService;

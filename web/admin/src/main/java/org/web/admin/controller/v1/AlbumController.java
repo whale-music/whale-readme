@@ -9,7 +9,7 @@ import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.service.AlbumApi;
-import org.core.common.result.R;
+import org.common.result.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

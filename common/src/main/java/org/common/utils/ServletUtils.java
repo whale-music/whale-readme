@@ -1,4 +1,4 @@
-package org.core.utils;
+package org.common.utils;
 
 import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson2.JSON;
@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.exception.BaseErrorInfoInterface;
-import org.core.common.result.R;
+import org.common.exception.BaseErrorInfoInterface;
+import org.common.result.R;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;

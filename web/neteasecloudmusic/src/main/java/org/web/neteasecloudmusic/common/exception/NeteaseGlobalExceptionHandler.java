@@ -2,12 +2,12 @@ package org.web.neteasecloudmusic.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.exception.BaseErrorInfoInterface;
-import org.core.common.exception.BaseException;
+import org.common.exception.BaseErrorInfoInterface;
+import org.common.exception.BaseException;
+import org.common.properties.DebugConfig;
+import org.common.result.R;
+import org.common.result.ResultCode;
 import org.core.common.result.NeteaseResult;
-import org.core.common.result.R;
-import org.core.common.result.ResultCode;
-import org.core.config.DebugConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;

@@ -46,13 +46,11 @@
     </dependencies>
 
     <build>
+        <finalName>${project.parent.artifactId}-music-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <finalName>${project.parent.artifactId}-music-${project.version}</finalName>
-                </configuration>
             </plugin>
         </plugins>
     </build>

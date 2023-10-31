@@ -1,7 +1,7 @@
-package org.core.utils;
+package org.common.utils;
 
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
+import org.common.exception.BaseException;
+import org.common.result.ResultCode;
 
 public class ExceptionUtil {
     private ExceptionUtil() {}

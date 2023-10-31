@@ -2,8 +2,8 @@ package org.core.utils;
 
 import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
+import org.common.exception.BaseException;
+import org.common.result.ResultCode;
 
 import java.io.File;
 import java.util.List;

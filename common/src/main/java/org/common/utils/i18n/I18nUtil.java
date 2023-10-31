@@ -1,4 +1,4 @@
-package org.core.utils.i18n;
+package org.common.utils.i18n;
 
 import cn.hutool.extra.spring.SpringUtil;
 import jakarta.annotation.PostConstruct;

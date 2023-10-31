@@ -5,9 +5,9 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
-import org.core.config.SaveConfig;
+import org.common.exception.BaseException;
+import org.common.properties.SaveConfig;
+import org.common.result.ResultCode;
 import org.oss.service.OSSService;
 
 import java.util.Arrays;

@@ -10,7 +10,7 @@ import org.api.admin.model.req.PlayListReq;
 import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
-import org.core.common.result.R;
+import org.common.result.R;
 import org.core.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

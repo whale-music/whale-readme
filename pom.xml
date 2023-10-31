@@ -22,6 +22,7 @@
         <module>oss</module>
         <module>plugin</module>
         <module>starter</module>
+        <module>common</module>
     </modules>
 
     <properties>
@@ -302,6 +303,12 @@
             <dependency>
                 <groupId>org.whale</groupId>
                 <artifactId>plugin</artifactId>
+                <version>${whale.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.whale</groupId>
+                <artifactId>common</artifactId>
                 <version>${whale.version}</version>
             </dependency>
         </dependencies>

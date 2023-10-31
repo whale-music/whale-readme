@@ -8,10 +8,10 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
-import org.core.config.SaveConfig;
-import org.core.utils.ServletUtils;
+import org.common.exception.BaseException;
+import org.common.properties.SaveConfig;
+import org.common.result.ResultCode;
+import org.common.utils.ServletUtils;
 import org.oss.service.OSSService;
 import org.oss.service.impl.local.model.FileMetadata;
 

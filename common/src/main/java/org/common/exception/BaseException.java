@@ -1,4 +1,4 @@
-package org.core.common.exception;
+package org.common.exception;
 
 import java.io.Serial;
 

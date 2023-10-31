@@ -2,6 +2,7 @@ package org.core.config;
 
 import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.common.properties.SaveConfig;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

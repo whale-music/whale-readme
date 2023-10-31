@@ -1,6 +1,6 @@
 package org.plugin.controller;
 
-import org.common.result.R;
+import org.core.common.result.R;
 import org.core.mybatis.pojo.TbPluginMsgPojo;
 import org.core.mybatis.pojo.TbPluginTaskPojo;
 import org.core.mybatis.pojo.TbScheduleTaskPojo;

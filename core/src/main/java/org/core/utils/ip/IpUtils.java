@@ -2,7 +2,7 @@ package org.core.utils.ip;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.common.utils.ServletUtils;
+import org.core.utils.ServletUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

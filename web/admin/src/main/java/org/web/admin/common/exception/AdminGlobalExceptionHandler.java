@@ -1,10 +1,10 @@
 package org.web.admin.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.common.exception.BaseException;
-import org.common.properties.DebugConfig;
-import org.common.result.R;
-import org.common.result.ResultCode;
+import org.core.common.exception.BaseException;
+import org.core.common.properties.DebugConfig;
+import org.core.common.result.R;
+import org.core.common.result.ResultCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.common.exception.BaseErrorInfoInterface;
-import org.common.result.ResultCode;
+import org.core.common.exception.BaseErrorInfoInterface;
 
 import java.util.HashMap;
 

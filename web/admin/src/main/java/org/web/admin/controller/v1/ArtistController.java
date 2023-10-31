@@ -9,7 +9,7 @@ import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
-import org.common.result.R;
+import org.core.common.result.R;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

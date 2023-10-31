@@ -5,8 +5,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
-import org.common.exception.BaseException;
-import org.common.result.ResultCode;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
 import org.core.mybatis.pojo.SysUserPojo;
 

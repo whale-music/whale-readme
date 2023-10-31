@@ -48,12 +48,12 @@ public class AListOSSServiceImpl implements OSSService {
     }
     
     /**
-     * 只会返回true,登录错误直接抛出异常
+     * 登录错误直接抛出异常
      *
      * @param config 保存信息
      */
     @Override
-    public boolean isConnected(SaveConfig config) {
+    public void isConnected(SaveConfig config) {
         this.config = config;
         this.config.setAssignObjectSave(config.getAssignObjectSave() == null ? 0 : config.getAssignObjectSave());
         String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
@@ -62,7 +62,6 @@ public class AListOSSServiceImpl implements OSSService {
             loginTimeCache.put(LOGIN_KEY, login);
             ExceptionUtil.isNull(StringUtils.isBlank(loginTimeCache.get(LOGIN_KEY)), ResultCode.OSS_LOGIN_ERROR);
         }
-        return true;
     }
     
     @Override
@@ -206,10 +205,7 @@ public class AListOSSServiceImpl implements OSSService {
     private String getLoginJwtCache(SaveConfig config) {
         String loginCacheStr = loginTimeCache.get(LOGIN_KEY);
         if (StringUtils.isBlank(loginCacheStr)) {
-            boolean connected = isConnected(config);
-            if (!connected) {
-                throw new BaseException(ResultCode.OSS_LOGIN_ERROR);
-            }
+            isConnected(config);
             loginCacheStr = loginTimeCache.get(LOGIN_KEY);
         }
         return loginCacheStr;

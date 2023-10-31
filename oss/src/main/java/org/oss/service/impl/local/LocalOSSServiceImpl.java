@@ -48,10 +48,9 @@ public class LocalOSSServiceImpl implements OSSService {
      * 检查访问存储地址
      *
      * @param config 服务配置
-     * @return 是否可以连接
      */
     @Override
-    public boolean isConnected(SaveConfig config) {
+    public void isConnected(SaveConfig config) {
         this.config = config;
         String host = config.getHost();
         File mkdir = FileUtil.mkdir(host);
@@ -59,7 +58,6 @@ public class LocalOSSServiceImpl implements OSSService {
         if (Boolean.FALSE.equals(directory)) {
             throw new BaseException(ResultCode.STORAGE_PATH_DOES_NOT_EXIST);
         }
-        return true;
     }
     
     /**

@@ -29,9 +29,8 @@ public interface OSSService {
      * 检查访问存储地址
      *
      * @param config 服务配置
-     * @return 是否可以连接
      */
-    boolean isConnected(SaveConfig config);
+    void isConnected(SaveConfig config);
     
     /**
      * 存储文件是否存在

@@ -216,3 +216,6 @@ subsonic:
 webdav:
   resource:
     return-plan: first
+
+upload:
+  musicNameTemplate: '{music} - {album} - [artist]'

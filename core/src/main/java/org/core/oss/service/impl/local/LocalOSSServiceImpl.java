@@ -5,15 +5,20 @@ import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.util.URLUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
+import org.core.mybatis.iservice.TbResourceService;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.local.model.FileMetadata;
 import org.core.utils.ServletUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -35,6 +40,9 @@ public class LocalOSSServiceImpl implements OSSService {
     public static final String SERVICE_NAME = "Local";
     private SaveConfig config;
     private int initMusicAllCount;
+    
+    @Autowired
+    private TbResourceService tbResourceService;
     
     /**
      * 返回当前服务名
@@ -178,7 +186,7 @@ public class LocalOSSServiceImpl implements OSSService {
         String scheme = ServletUtils.getRequest().getScheme();
         // 127.0.0.1:6780/d/music/7694f4a66316e53c8cdd9d9954bd611d.mp3
         String resourcePrefix = "common/static";
-        return String.format("%s://%s:%d/%s/%s", scheme, remoteHost, serverPort, resourcePrefix, path);
+        return String.format("%s://%s:%d/%s/%s", scheme, remoteHost, serverPort, resourcePrefix, URLEncodeUtil.encodeQuery(path));
     }
     
     private void getPathMap(HashMap<String, Map<String, String>> map, FileMetadata contentItem) {
@@ -192,12 +200,12 @@ public class LocalOSSServiceImpl implements OSSService {
     /**
      * 获取音乐地址
      *
-     * @param md5     音乐文件文件MD5
+     * @param md5Set  音乐文件文件MD5
      * @param refresh 是否刷新缓存
      * @return 音乐地址 key md5, value url, size
      */
     @Override
-    public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
+    public Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh) {
         // 音乐地址URL缓存
         Iterator<FileMetadata> set = MUSIC_PATH_CACHE.iterator();
         // 没有地址便刷新缓存,获取所有文件保存到缓存中
@@ -209,14 +217,18 @@ public class LocalOSSServiceImpl implements OSSService {
             set = MUSIC_PATH_CACHE.iterator();
         }
         HashMap<String, Map<String, String>> map = new HashMap<>();
-        if (StringUtils.isBlank(md5)) {
+        if (CollUtil.isEmpty(md5Set)) {
             set.forEachRemaining(contentItem -> getPathMap(map, contentItem));
         } else {
-            set.forEachRemaining(contentItem -> {
-                if (StringUtils.startsWithIgnoreCase(StringUtils.split(contentItem.getName(), ".")[0], md5)) {
-                    getPathMap(map, contentItem);
-                }
-            });
+            for (String md5 : md5Set) {
+                set.forEachRemaining(contentItem -> {
+                    TbResourcePojo one = tbResourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery()
+                                                                          .eq(TbResourcePojo::getPath, contentItem.getName()));
+                    if (StringUtils.equals(one.getMd5(), md5)) {
+                        getPathMap(map, contentItem);
+                    }
+                });
+            }
         }
         return map;
     }
@@ -229,7 +241,7 @@ public class LocalOSSServiceImpl implements OSSService {
      * @return MD5值
      */
     @Override
-    public Collection<String> getAllMD5(String md5, boolean refresh) {
+    public Collection<String> getResourceMD5(String md5, boolean refresh) {
         // 音乐地址URL缓存
         // 没有地址便刷新缓存,获取所有文件保存到缓存中
         // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件

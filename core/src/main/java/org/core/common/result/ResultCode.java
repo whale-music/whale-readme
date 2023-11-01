@@ -160,6 +160,7 @@ public enum ResultCode implements BaseErrorInfoInterface {
     IMG_DOWNLOAD_ERROR("50016", "error.messages.img_download_error"),
     // 音源已存在，请不要添加相同歌曲
     RESOURCE_DATA_EXISTED("50017", "error.messages.resource_data_existed"),
+    SAVE_MUSIC_META_DATA_WRITE_ERROR("50018", "error.messages.save_music_meta_data_write_error"),
     
     
     /* 接口错误：60001-69999 */

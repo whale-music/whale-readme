@@ -60,11 +60,11 @@ public interface OSSService {
     /**
      * 获取音乐地址
      *
-     * @param md5     音乐文件文件MD5
+     * @param md5Set  音乐文件文件MD5
      * @param refresh 是否刷新缓存
      * @return 音乐地址 key md5, value url, size
      */
-    Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh);
+    Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh);
     
     /**
      * 获取音乐MD5值，为null获取所有md5
@@ -73,10 +73,10 @@ public interface OSSService {
      * @param refresh 是否刷新缓存
      * @return MD5值
      */
-    Collection<String> getAllMD5(String md5, boolean refresh);
+    Collection<String> getResourceMD5(String md5, boolean refresh);
     
-    default Collection<String> getAllMD5(boolean refresh) {
-        return this.getAllMD5(null, refresh);
+    default Collection<String> getResourceMD5(boolean refresh) {
+        return this.getResourceMD5(null, refresh);
     }
     
     /**

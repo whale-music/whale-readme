@@ -434,8 +434,8 @@ public class QukuServiceImpl implements QukuService {
      * 获取专辑歌手列表
      */
     @Override
-    public List<ArtistConvert> getAlbumArtistListByAlbumIds(Long albumIds) {
-        return getAlbumArtistListByAlbumIds(Collections.singletonList(albumIds));
+    public List<ArtistConvert> getAlbumArtistListByAlbumIds(Long albumId) {
+        return getAlbumArtistListByAlbumIds(Collections.singletonList(albumId));
     }
     
     @Override

@@ -8,6 +8,7 @@ import org.core.common.constant.ExceptionPathConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.DebugConfig;
 import org.core.common.result.ResultCode;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,8 @@ public class AnonymousAuthenticationEntryPoint implements AuthenticationEntryPoi
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         log.error("visit uri {}", request.getRequestURI());
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(authException.getMessage(), authException.fillInStackTrace()));
+        Optional.of(DebugConfig.getDebug() || authException.getCause() instanceof InsufficientAuthenticationException)
+                .ifPresent(aBoolean -> log.error(authException.getMessage(), authException.fillInStackTrace()));
         request.setAttribute(ExceptionPathConstant.ATTRIBUTE_EXCEPTION_IDENTIFIER, new BaseException(ResultCode.USER_NOT_LOGIN));
         request.getRequestDispatcher(ExceptionPathConstant.ERROR_PATH).forward(request, response);
     }

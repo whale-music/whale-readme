@@ -5,15 +5,20 @@ import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.net.URLEncodeUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
+import org.core.mybatis.iservice.TbResourceService;
+import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.alist.model.list.ContentItem;
 import org.core.oss.service.impl.alist.util.RequestUtils;
 import org.core.utils.ExceptionUtil;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -38,6 +43,9 @@ public class AListOSSServiceImpl implements OSSService {
     private Integer initMusicAllCount = 0;
     
     private SaveConfig config;
+    
+    @Autowired
+    private TbResourceService tbResourceService;
     
     static {
         musicUrltimedCache.schedulePrune(1000);
@@ -129,12 +137,12 @@ public class AListOSSServiceImpl implements OSSService {
     /**
      * 获取音乐地址
      *
-     * @param md5     音乐文件文件MD5
+     * @param md5Set  音乐文件文件MD5
      * @param refresh 是否刷新缓存
      * @return 音乐地址
      */
     @Override
-    public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
+    public Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh) {
         try {
             String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存
@@ -148,14 +156,18 @@ public class AListOSSServiceImpl implements OSSService {
                 set = musicUrltimedCache.iterator();
             }
             HashMap<String, Map<String, String>> map = new HashMap<>();
-            if (StringUtils.isBlank(md5)) {
+            if (CollUtil.isEmpty(md5Set)) {
                 set.forEachRemaining(contentItem -> getPathMap(map, contentItem));
             } else {
-                set.forEachRemaining(contentItem -> {
-                    if (StringUtils.startsWithIgnoreCase(StringUtils.split(contentItem.getName(), ".")[0], md5)) {
-                        getPathMap(map, contentItem);
-                    }
-                });
+                for (String md5 : md5Set) {
+                    set.forEachRemaining(contentItem -> {
+                        TbResourcePojo one = tbResourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery()
+                                                                              .eq(TbResourcePojo::getPath, contentItem.getName()));
+                        if (StringUtils.startsWithIgnoreCase(one.getMd5(), md5)) {
+                            getPathMap(map, contentItem);
+                        }
+                    });
+                }
             }
             return map;
         } catch (BaseException e) {
@@ -179,7 +191,7 @@ public class AListOSSServiceImpl implements OSSService {
         return String.format("%s/d/%s/%s?sign=%s",
                 config.getHost(),
                 path,
-                contentItem.getName(),
+                URLEncodeUtil.encodeQuery(contentItem.getName()),
                 contentItem.getSign());
     }
     
@@ -261,7 +273,7 @@ public class AListOSSServiceImpl implements OSSService {
      * @return 音乐下载地址
      */
     @Override
-    public Collection<String> getAllMD5(String md5, boolean refresh) {
+    public Collection<String> getResourceMD5(String md5, boolean refresh) {
         try {
             String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存

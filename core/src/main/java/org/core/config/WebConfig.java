@@ -76,6 +76,7 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(@NotNull CorsRegistry registry) {
+        // 允许音频文件跨域
         for (String s : getPublicList()) {
             registry.addMapping(s) // 映射到静态资源的路径
                     .allowedOriginPatterns("*") // 允许来自此来源的跨域请求

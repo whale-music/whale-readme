@@ -182,7 +182,7 @@ public class QukuAPI extends QukuServiceImpl {
         try (FileInputStream fis = new FileInputStream(fileFromUrl)) {
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
             rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
-            // 删除文件
+            // 上传封面
             upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -280,15 +280,19 @@ public class QukuAPI extends QukuServiceImpl {
     
     
     public Collection<String> getMD5(boolean refresh) {
-        return OSSFactory.ossFactory(config).getAllMD5(refresh);
+        return OSSFactory.ossFactory(config).getResourceMD5(refresh);
     }
     
     public Collection<String> getMD5(String md5, boolean refresh) {
-        return OSSFactory.ossFactory(config).getAllMD5(md5, refresh);
+        return OSSFactory.ossFactory(config).getResourceMD5(md5, refresh);
     }
     
     public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
-        return OSSFactory.ossFactory(config).getAddressByMd5(md5, refresh);
+        return OSSFactory.ossFactory(config).getAddressByMd5(Collections.singleton(md5), refresh);
+    }
+    
+    public Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh) {
+        return OSSFactory.ossFactory(config).getAddressByMd5(md5Set, refresh);
     }
     
     public String getAddresses(String md5, boolean refresh) {

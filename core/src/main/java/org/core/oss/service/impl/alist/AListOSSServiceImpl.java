@@ -327,4 +327,18 @@ public class AListOSSServiceImpl implements OSSService {
         RequestUtils.delete(config.getHost(), collect, loginCacheStr);
         return true;
     }
+    
+    /**
+     * 重命名
+     *
+     * @param oldName 旧文件名
+     * @param newName 新文件名
+     */
+    @Override
+    public void rename(String oldName, String newName) {
+        String loginJwtCache = getLoginJwtCache(config);
+        isExist(oldName);
+        ContentItem contentItem = musicUrltimedCache.get(oldName);
+        RequestUtils.rename(config.getHost(), loginJwtCache, contentItem, newName);
+    }
 }

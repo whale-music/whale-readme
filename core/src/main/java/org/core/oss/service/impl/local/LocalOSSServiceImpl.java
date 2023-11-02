@@ -7,6 +7,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,6 @@ import org.core.utils.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -288,9 +288,7 @@ public class LocalOSSServiceImpl implements OSSService {
             }
             String musicAddresses;
             if (StringUtils.isEmpty(md5)) {
-                BufferedInputStream inputStream = FileUtil.getInputStream(srcFile);
-                String tempMd5 = org.springframework.util.DigestUtils.md5DigestAsHex(inputStream);
-                inputStream.close();
+                String tempMd5 = DigestUtil.md5Hex(srcFile);
                 musicAddresses = this.getAddresses(tempMd5, false);
             } else {
                 musicAddresses = this.getAddresses(md5, false);
@@ -302,8 +300,6 @@ public class LocalOSSServiceImpl implements OSSService {
             if (!StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
                 throw new BaseException(e.getCode(), e.getResultMsg());
             }
-        } catch (IOException e) {
-            throw new BaseException(e.getMessage());
         }
         String pathname = paths.get(index);
         pathname = StringUtils.startsWith(pathname, "/") ? pathname : pathname + FileUtil.FILE_SEPARATOR;
@@ -311,7 +307,7 @@ public class LocalOSSServiceImpl implements OSSService {
         pathname = StringUtils.replace(pathname, "\\", FileUtil.FILE_SEPARATOR);
         
         File dest = new File(config.getHost() + FileUtil.FILE_SEPARATOR + pathname, srcFile.getName());
-        File file = FileUtil.writeFromStream(FileUtil.getInputStream(srcFile), dest);
+        File file = FileUtil.copy(srcFile, dest, true);
         // 校验是否上传成功
         try {
             getAddresses(file.getName(), true);
@@ -354,5 +350,18 @@ public class LocalOSSServiceImpl implements OSSService {
             }
         }
         return true;
+    }
+    
+    /**
+     * 重命名
+     *
+     * @param oldName 旧文件名
+     * @param newName 新文件名
+     */
+    @Override
+    public void rename(String oldName, String newName) {
+        isExist(oldName);
+        FileMetadata metadata = MUSIC_PATH_CACHE.get(oldName);
+        FileUtil.rename(new File(metadata.getFullPath()), newName, true);
     }
 }

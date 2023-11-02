@@ -101,4 +101,12 @@ public interface OSSService {
     default boolean delete(String name) {
         return delete(Collections.singletonList(name));
     }
+    
+    /**
+     * 重命名
+     *
+     * @param oldName 旧文件名
+     * @param newName 新文件名
+     */
+    void rename(String oldName, String newName);
 }

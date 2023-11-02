@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RequestUtils {
     
@@ -127,12 +126,24 @@ public class RequestUtils {
             
             Remove remove = new Remove();
             remove.setDir(entry.getKey());
-            remove.setNames(entry.getValue().parallelStream().map(ContentItem::getName).collect(Collectors.toList()));
+            remove.setNames(entry.getValue().parallelStream().map(ContentItem::getName).toList());
             String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
             Object code = JSONObject.parseObject(req).get("code");
             if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
                 throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
             }
+        }
+    }
+    
+    public static void rename(String host, String loginCacheStr, ContentItem contentItem, String newName) {
+        HashMap<String, String> headers = getHeaders(host, "", loginCacheStr);
+        HashMap<String, String> reqBodyMap = new HashMap<>();
+        reqBodyMap.put("path", contentItem.getPath());
+        reqBodyMap.put("name", newName);
+        String req = req(host + "/api/fs/rename", JSON.toJSONString(reqBodyMap), headers);
+        Object code = JSONObject.parseObject(req).get("code");
+        if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
+            throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
         }
     }
 }

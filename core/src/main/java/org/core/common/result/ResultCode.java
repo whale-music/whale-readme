@@ -55,6 +55,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLAY_LIST_LIKE("10017", "error.messages.play_list_like"),
     // 存储路径不存在
     STORAGE_PATH_DOES_NOT_EXIST("10018", "error.messages.storage_path_does_not_exist"),
+    // 存储文件不存在
+    STORAGE_FILE_DOES_NOT_EXIST_ERROR("10018", "error.messages.storage_file_does_not_exist"),
     
     
     /* 用户错误：20001-29999*/

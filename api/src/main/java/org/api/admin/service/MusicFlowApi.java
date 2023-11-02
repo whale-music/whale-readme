@@ -5,8 +5,10 @@ import cn.hutool.core.collection.IterUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.text.StrFormatter;
+import cn.hutool.core.text.StrPool;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,9 +16,11 @@ import com.github.houbb.opencc4j.util.ZhConverterUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
+import org.api.admin.model.req.SyncMusicMetaDataReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.model.res.AudioInfoRes;
@@ -32,11 +36,13 @@ import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
 import org.core.config.HttpRequestConfig;
+import org.core.config.UploadConfig;
 import org.core.jpa.repository.TbResourceEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
 import org.core.oss.factory.OSSFactory;
+import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
@@ -65,7 +71,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +128,8 @@ public class MusicFlowApi {
     private final TbResourceService resourceService;
     
     private final TbResourceEntityRepository resourceEntityRepository;
+    
+    private final UploadConfig uploadConfig;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -246,21 +253,6 @@ public class MusicFlowApi {
                              .body(new FileSystemResource(file));
     }
     
-    private static File getMusicFile(AudioInfoReq.AudioSource source, String path) throws IOException {
-        // 检测本地是否有已上传的数据
-        File file = new File(path);
-        if (!FileUtil.isFile(path)) {
-            HttpUtil.downloadFile(source.getPathTemp(), file, 600000);
-        }
-        BufferedInputStream inputStream = FileUtil.getInputStream(file);
-        String md5 = DigestUtils.md5DigestAsHex(inputStream);
-        inputStream.close();
-        if (StringUtils.equals(md5, source.getMd5())) {
-            return file;
-        }
-        throw new BaseException(ResultCode.DOWNLOAD_ERROR);
-    }
-    
     /**
      * 保存歌词数据
      *
@@ -330,14 +322,6 @@ public class MusicFlowApi {
         return null;
     }
     
-    private static String getMusicFileName(TbMusicPojo byId, TbAlbumPojo albumPojo, Stream<String> artistStream) {
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("music", byId.getMusicName() + " " + StringUtils.defaultString(byId.getAliasName()));
-        placeholders.put("album", albumPojo.getAlbumName());
-        placeholders.put("artist", StringUtils.join(artistStream.toList(), ' '));
-        return StrFormatter.format("{music} - {album} - [{artist}]", placeholders, false);
-    }
-    
     private void uploadLocalFile(AudioInfoReq.AudioSource source, TbMusicPojo musicPojo, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistList, TbResourcePojo urlPojo, List<TbLyricPojo> lyricPojoList) {
         File file = null;
         String md5 = "";
@@ -346,20 +330,15 @@ public class MusicFlowApi {
         try {
             if (StringUtils.startsWithIgnoreCase(source.getPathTemp(), "http")) {
                 // 没有md5，取文件的md5
-                File tempPathFile = new File(requestConfig.getTempPath());
-                HttpUtil.downloadFile(source.getPathTemp(), tempPathFile, requestConfig.getTimeout());
-                File[] files = Objects.requireNonNull(tempPathFile.listFiles());
-                File lastFile = StringUtils.isBlank(FileUtil.getSuffix(files[files.length - 1])) ? null : files[files.length - 1];
-                ExceptionUtil.isNull(lastFile == null, ResultCode.DOWNLOAD_ERROR);
-                BufferedInputStream inputStream = FileUtil.getInputStream(lastFile);
-                md5 = DigestUtils.md5DigestAsHex(inputStream);
-                inputStream.close();
+                file = new File(UUID.fastUUID().toString(true) + StrPool.DOT + FileUtil.getSuffix(source.getPathTemp()));
+                HttpUtil.downloadFile(source.getPathTemp(), file, requestConfig.getTimeout());
+                ExceptionUtil.isNull(FileUtil.isEmpty(file) || FileUtil.size(file) < 100, ResultCode.DOWNLOAD_ERROR);
             } else {
                 // 读取本地文件
                 file = new File(requestConfig.getTempPath(), source.getPathTemp());
             }
             // 设置音乐元数据, 然后上传
-            uploadPath = writeMusicMetaAndUploadMusicFile(file, musicPojo, albumPojo, musicArtistList, musicArtistList, lyricPojoList);
+            uploadPath = writeMusicMetaAndUploadMusicFile(file, source.getRate(), musicPojo, albumPojo, musicArtistList, musicArtistList, lyricPojoList);
             
             size = FileUtil.size(file);
             FileUtil.del(file);
@@ -858,7 +837,7 @@ public class MusicFlowApi {
                 List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
                 // 歌词
                 List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
-                String path = writeMusicMetaAndUploadMusicFile(file, byId,
+                String path = writeMusicMetaAndUploadMusicFile(file, resource.getRate(), byId,
                         albumPojo,
                         musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
                         albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),
@@ -871,10 +850,13 @@ public class MusicFlowApi {
         }
     }
     
-    private String writeMusicMetaAndUploadMusicFile(File file, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) throws IOException {
-        String formatName = getMusicFileName(byId,
-                albumPojo,
-                musicArtistByMusicId.parallelStream().map(TbArtistPojo::getArtistName));
+    private String writeMusicMetaAndUploadMusicFile(File file, Integer rate, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) throws IOException {
+        String formatName = uploadConfig.getMusicNameTemplate(byId.getMusicName(),
+                byId.getAliasName(),
+                albumPojo.getAlbumName(),
+                StringUtils.join(musicArtistByMusicId.parallelStream().map(TbArtistPojo::getArtistName).filter(StringUtils::isNotBlank).toList(), ' '),
+                String.valueOf(rate)
+        );
         file = FileUtil.rename(file, formatName, true, true);
         
         setMusicMetaData(file,
@@ -1093,14 +1075,14 @@ public class MusicFlowApi {
             List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
             // 上传
             List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
+            int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
             String upload = writeMusicMetaAndUploadMusicFile(dest,
-                    byId,
+                    rate, byId,
                     albumPojo,
                     musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
                     albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),
                     musicLyric);
             TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
-            int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
             rate = rate * 1000;
             if (one == null) {
                 entity.setRate(rate);
@@ -1196,5 +1178,112 @@ public class MusicFlowApi {
         }
         qukuService.saveOrUpdatePicFile(id, tempType, file);
         return qukuService.getPicPath(id, tempType);
+    }
+    
+    /**
+     * 同步音乐元数据
+     *
+     * @param req 音乐数据
+     */
+    public void syncMetaMusicFile(SyncMusicMetaDataReq req) {
+        TbResourcePojo byId = resourceService.getById(req.getResourceId());
+        String path = byId.getPath();
+        String addresses = qukuService.getAddresses(path, false);
+        String originPath = UUID.fastUUID().toString(true) + "." + byId.getEncodeType();
+        File destFile = new File(requestConfig.getTempPath(), originPath);
+        HttpUtil.downloadFile(addresses, destFile, requestConfig.getTimeout());
+        // 防止文件下载错误，返回数据是json而不是音频，所以判断必须大于100byte才算音频文件
+        if (FileUtil.isEmpty(destFile) || FileUtil.size(destFile) < 100) {
+            throw new BaseException(ResultCode.STORAGE_FILE_DOES_NOT_EXIST_ERROR);
+        }
+        
+        String extName = FileUtil.extName(destFile);
+        boolean isMatching = Stream.of("mp3", "flac").anyMatch(s -> StringUtils.equals(s, extName));
+        if (isMatching) {
+            // 读取音乐文件的元数据
+            try {
+                AudioFile audioFile = AudioFileIO.read(destFile);
+                Tag tag = audioFile.getTag();
+                
+                // 设置元数据（例如，设置标题和艺术家）
+                tag.setField(FieldKey.TITLE, req.getMusicName());
+                if (StringUtils.isNotBlank(req.getMusicAliasName())) {
+                    tag.setField(FieldKey.SUBTITLE, req.getMusicAliasName());
+                }
+                if (StringUtils.isNotBlank(req.getAlbumName())) {
+                    tag.setField(FieldKey.ALBUM, req.getAlbumName());
+                }
+                // 音乐歌手
+                if (StringUtils.isNotBlank(req.getMusicArtist())) {
+                    tag.setField(FieldKey.ARTIST, req.getMusicArtist());
+                }
+                // 专辑歌手
+                if (StringUtils.isNotBlank(req.getAlbumArtist())) {
+                    tag.setField(FieldKey.ALBUM_ARTIST, req.getAlbumArtist());
+                }
+                // 发布日期
+                if (StringUtils.isNotBlank(req.getYear())) {
+                    tag.setField(FieldKey.YEAR, req.getYear());
+                }
+                if (StringUtils.isNotBlank(req.getLyric())) {
+                    // 设置歌词
+                    String lyric = req.getLyric();
+                    String replaceLyric = StringUtils.replace(lyric, "\\n", "\n");
+                    try {
+                        tag.setField(FieldKey.LYRICS, replaceLyric);
+                    } catch (FieldDataInvalidException e) {
+                        log.error("music name: {},lyric write error: {}\n text: {}", req.getMusicName(), req.getResourceId().shortValue(), replaceLyric);
+                    }
+                }
+                // 设置封面
+                if (StringUtils.isNotBlank(req.getPicBase64())) {
+                    String picBase64 = RegExUtils.replaceFirst(req.getPicBase64(), "^data:image/jpeg;base64,", "");
+                    byte[] decode = Base64.getDecoder().decode(picBase64);
+                    Artwork artwork = new StandardArtwork();
+                    artwork.setBinaryData(decode);
+                    tag.deleteField(FieldKey.COVER_ART); // 删除现有的封面（可选）
+                    tag.addField(artwork);
+                } else if (StringUtils.isNotBlank(req.getPicUrl())) {
+                    Artwork artwork = new StandardArtwork();
+                    artwork.setBinaryData(HttpUtil.downloadBytes(req.getPicUrl()));
+                    tag.deleteField(FieldKey.COVER_ART); // 删除现有的封面（可选）
+                    tag.addField(artwork);
+                }
+                // 保存更改到音乐文件
+                AudioFileIO.write(audioFile);
+            } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException | CannotWriteException e) {
+                log.error(e.getMessage(), e);
+                throw new BaseException(ResultCode.DATA_WRONG);
+            }
+        }
+        String format = uploadConfig.getMusicNameTemplate(req.getMusicName(),
+                StringUtils.defaultString(req.getMusicAliasName()),
+                req.getAlbumName(),
+                req.getMusicArtist(),
+                String.valueOf(byId.getRate()));
+        // 删除与重命名文件相同的文件名
+        File newFile = FileUtil.rename(destFile, format, true, true);
+        
+        OSSService ossService = OSSFactory.ossFactory(config);
+        String newName = UUID.fastUUID() + "." + extName;
+        ossService.rename(path, newName);
+        try {
+            String md5 = DigestUtil.md5Hex(newFile);
+            byId.setMd5(md5);
+            String upload = ossService.upload(config.getObjectSave(), config.getAssignObjectSave(), newFile, md5);
+            byId.setPath(upload);
+            byId.setSize(FileUtil.size(newFile));
+            resourceService.updateById(byId);
+            log.debug("上传成功: {}", format);
+            ossService.delete(newName);
+            log.debug("清除oss文件缓存成功: {}", newName);
+        } catch (Exception e) {
+            ossService.rename(newName, path);
+            throw new BaseException(ResultCode.UPLOAD_ERROR, e);
+        } finally {
+            // 删除缓存
+            FileUtil.del(newFile);
+            log.debug("清除本地文件缓存成功: {}", newName);
+        }
     }
 }

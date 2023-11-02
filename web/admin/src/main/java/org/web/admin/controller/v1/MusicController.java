@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.RemoveMusicReq;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
+import org.api.admin.model.req.SyncMusicMetaDataReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
@@ -207,5 +208,11 @@ public class MusicController {
     public R uploadPic(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id, @RequestParam("type") String type) throws IOException {
         String picUrl = uploadMusic.uploadPic(uploadFile, id, type);
         return R.success(picUrl);
+    }
+    
+    @PostMapping("/sync/metadata")
+    public R syncMetaMusicFile(@RequestBody SyncMusicMetaDataReq req) {
+        uploadMusic.syncMetaMusicFile(req);
+        return R.success();
     }
 }

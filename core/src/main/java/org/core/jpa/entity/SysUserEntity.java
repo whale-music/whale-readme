@@ -50,6 +50,9 @@ public class SysUserEntity implements Serializable {
     @Column(name = "role_name", nullable = true)
     private String roleName;
     @Basic
+    @Column(name = "sub_account_password", nullable = true)
+    private String subAccountPassword;
+    @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
     @Basic
@@ -194,6 +197,14 @@ public class SysUserEntity implements Serializable {
         return Optional.ofNullable(getAccountType()).orElse(-1) == 0;
     }
     
+    public String getSubAccountPassword() {
+        return subAccountPassword;
+    }
+    
+    public void setSubAccountPassword(String subAccountPassword) {
+        this.subAccountPassword = subAccountPassword;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -236,6 +247,9 @@ public class SysUserEntity implements Serializable {
             return false;
         }
         if (getRoleName() != null ? !getRoleName().equals(that.getRoleName()) : that.getRoleName() != null) {
+            return false;
+        }
+        if (getSubAccountPassword() != null ? !getSubAccountPassword().equals(that.getSubAccountPassword()) : that.getSubAccountPassword() != null) {
             return false;
         }
         if (getCreateTime() != null ? !getCreateTime().equals(that.getCreateTime()) : that.getCreateTime() != null) {
@@ -302,6 +316,7 @@ public class SysUserEntity implements Serializable {
         result = 31 * result + (getLastLoginTime() != null ? getLastLoginTime().hashCode() : 0);
         result = 31 * result + (getLoginDevice() != null ? getLoginDevice().hashCode() : 0);
         result = 31 * result + (getRoleName() != null ? getRoleName().hashCode() : 0);
+        result = 31 * result + (getSubAccountPassword() != null ? getSubAccountPassword().hashCode() : 0);
         result = 31 * result + (getCreateTime() != null ? getCreateTime().hashCode() : 0);
         result = 31 * result + (getUpdateTime() != null ? getUpdateTime().hashCode() : 0);
         result = 31 * result + (getTbAlbumsById() != null ? getTbAlbumsById().hashCode() : 0);

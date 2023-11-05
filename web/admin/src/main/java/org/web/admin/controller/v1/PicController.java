@@ -46,4 +46,12 @@ public class PicController {
     public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
         return R.success(picApi.uploadPicFile(uploadFile, url));
     }
+    
+    
+    @AnonymousAccess
+    @PostMapping("/upload")
+    public R uploadPic(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id, @RequestParam("type") String type) throws IOException {
+        String picUrl = picApi.uploadPic(uploadFile, id, type);
+        return R.success(picUrl);
+    }
 }

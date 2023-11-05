@@ -15,7 +15,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.houbb.opencc4j.util.ZhConverterUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
@@ -28,7 +27,6 @@ import org.api.admin.model.res.MusicFileRes;
 import org.api.admin.model.res.MusicInfoRes;
 import org.api.common.service.QukuAPI;
 import org.core.common.constant.LyricConstant;
-import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.constant.defaultinfo.EnumNameType;
 import org.core.common.exception.BaseException;
@@ -1159,25 +1157,6 @@ public class MusicFlowApi {
                       })
                       .limit(20)
                       .toList();
-    }
-    
-    public String uploadPic(MultipartFile uploadFile, Long id, String type) throws IOException {
-        // 下载封面, 保存文件名为md5
-        String randomName = System.currentTimeMillis() + "" + RandomUtils.nextLong();
-        File mkdir = FileUtil.touch(new File(requestConfig.getTempPath(), randomName));
-        File file = FileUtil.writeBytes(uploadFile.getBytes(), mkdir);
-        byte tempType;
-        switch (type) {
-            case "music" -> tempType = PicTypeConstant.MUSIC;
-            case "playList" -> tempType = PicTypeConstant.PLAYLIST;
-            case "album" -> tempType = PicTypeConstant.ALBUM;
-            case "artist" -> tempType = PicTypeConstant.ARTIST;
-            case "userAvatar" -> tempType = PicTypeConstant.USER_AVATAR;
-            case "userBackground" -> tempType = PicTypeConstant.USER_BACKGROUND;
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        }
-        qukuService.saveOrUpdatePicFile(id, tempType, file);
-        return qukuService.getPicPath(id, tempType);
     }
     
     /**

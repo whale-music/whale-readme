@@ -8,7 +8,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
@@ -66,8 +65,7 @@ public class LoginController extends BaseController {
         }
         String email = req.get("email");
         String password = req.get("password");
-        String account = StringUtils.split(email, "@")[0];
-        UserConvert userPojo = user.login(account, password);
+        UserConvert userPojo = user.login(email, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, userPojo);

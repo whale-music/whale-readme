@@ -102,6 +102,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     ADMIN_CANNOT_DELETE("20021", "error.messages.admin_cannot_delete"),
     // 文件大小不能为零
     FILE_SIZE_CANNOT_BE_ZERO("20022", "error.messages.file_size_cannot_be_zero"),
+    // 子账户已存在
+    SUB_ACCOUNT_EXISTS("20023", "error.messages.sub_account_exists"),
     
     
     /* 业务错误：30001-39999 */

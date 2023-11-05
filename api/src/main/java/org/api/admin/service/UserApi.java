@@ -1,6 +1,8 @@
 package org.api.admin.service;
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -19,6 +21,7 @@ import org.core.common.constant.RoleConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
+import org.core.config.UserSubPasswordConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.*;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -63,6 +67,9 @@ public class UserApi {
     
     @Autowired
     private TbCollectMusicService collectMusicService;
+    
+    @Autowired
+    private UserSubPasswordConfig userSubPasswordConfig;
     
     public void createAccount(UserReq req) {
         accountService.createAccount(req);
@@ -166,12 +173,31 @@ public class UserApi {
         accountService.removeById(id);
     }
     
-    public void updateUserPassword(Long id, String username, String nickname, String password) {
-        ExceptionUtil.isNull(!Objects.equals(UserUtil.getUser().getId(), id), ResultCode.PERMISSION_NO_ACCESS);
+    public void updateUserInfo(SysUserPojo sysUserPojo) {
+        String subAccountPassword = sysUserPojo.getSubAccountPassword();
+        TypeReference<List<Map<String, String>>> typeReference = new TypeReference<>() {
+        };
+        List<Map<String, String>> updateSubAccount = JSON.parseObject(subAccountPassword, typeReference);
+        Long id = sysUserPojo.getId();
         SysUserPojo byId = accountService.getById(id);
-        byId.setUsername(username);
-        byId.setNickname(nickname);
-        byId.setPassword(password);
-        byId.updateById();
+        // 删除缓存，然后重新添加
+        List<Map<String, String>> dbSubAccount = JSON.parseObject(byId.getSubAccountPassword(), typeReference);
+        for (Map<String, String> stringStringMap : dbSubAccount) {
+            userSubPasswordConfig.delAccountCache(stringStringMap.get(UserSubPasswordConfig.ACCOUNT));
+        }
+        // 重新添加
+        for (Map<String, String> stringStringMap : updateSubAccount) {
+            // 检查是否重复
+            if (userSubPasswordConfig.accountExistence(stringStringMap.get(UserSubPasswordConfig.ACCOUNT))) {
+                throw new BaseException(ResultCode.SUB_ACCOUNT_EXISTS);
+            }
+            userSubPasswordConfig.addAccountCache(byId,
+                    stringStringMap.get(UserSubPasswordConfig.ACCOUNT),
+                    stringStringMap.get(UserSubPasswordConfig.PASSWORD));
+        }
+        
+        
+        ExceptionUtil.isNull(!Objects.equals(UserUtil.getUser().getId(), id), ResultCode.PERMISSION_NO_ACCESS);
+        accountService.updateById(sysUserPojo);
     }
 }

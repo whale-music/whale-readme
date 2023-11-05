@@ -70,7 +70,7 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     @TableField("login_device")
     private String loginDevice;
     
-    @Schema(title = "JSON数据类型，保存用户子密码", example = "[{'account': '','password': ''},{'account': '','password': ''}]")
+    @Schema(title = "JSON数据类型，保存用户子密码", example = "[{'name': '', account': '','password': ''},{'name': '', 'account': '','password': ''}]")
     @TableField("sub_account_password")
     private String subAccountPassword;
     

@@ -22,6 +22,7 @@ public class UserConvert extends SysUserPojo {
         setRoleName(user.getRoleName());
         setLastLoginIp(user.getLastLoginIp());
         setLastLoginTime(user.getLastLoginTime());
+        setSubAccountPassword(user.getSubAccountPassword());
         setCreateTime(user.getCreateTime());
         setUpdateTime(user.getUpdateTime());
     }

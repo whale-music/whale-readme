@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlist.Creator;
@@ -114,7 +115,18 @@ public class UserApi {
      * @return 返回用户信息
      */
     public UserConvert login(String phone, String password) {
-        SysUserPojo login = accountService.login(phone, password);
+        SysUserPojo login = null;
+        try {
+            login = accountService.login(phone, password);
+        } catch (BaseException e) {
+            // 登录错误则使用子账户
+            if (StringUtils.equals(e.getCode(), ResultCode.USER_ACCOUNT_FORBIDDEN.getCode())
+                    || StringUtils.equals(e.getCode(), ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD.getCode())) {
+                login = accountService.loginSub(phone, password);
+            } else {
+                throw new BaseException(e);
+            }
+        }
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(login, userConvert);
         userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(login.getId()));
@@ -162,13 +174,13 @@ public class UserApi {
             return new PlayListVo();
         }
         // 导出歌单id
-        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).collect(Collectors.toList());
+        List<Long> collectIds = collectPojoList.stream().map(TbCollectPojo::getId).toList();
         // 根据歌单和tag的中间表来获取tag id列表
         List<TbMiddleTagPojo> collectIdAndTagsIdList = collectApi.getCollectTagIdList(collectIds);
         // 根据tag id 列表获取tag Name列表
         List<Long> tagIdList = collectIdAndTagsIdList.stream()
                                                      .map(TbMiddleTagPojo::getTagId)
-                                                     .collect(Collectors.toList());
+                                                     .toList();
         List<TbTagPojo> collectTagList = collectApi.getTagPojoList(tagIdList);
         
         
@@ -204,7 +216,7 @@ public class UserApi {
                                                           .filter(tbCollectTagPojo -> tbCollectTagPojo.getId()
                                                                                                       .equals(tbCollectPojo.getId()))
                                                           .map(tbCollectTagPojo -> getTags(tbCollectTagPojo.getTagId(), collectTagList))
-                                                          .collect(Collectors.toList());
+                                                          .toList();
                 item.setTags(tags);
             }
             // 歌单名
@@ -287,7 +299,7 @@ public class UserApi {
             Page<TbMusicPojo> page = musicService.page(new Page<>(0, 100L));
             musicPojoList = page.getRecords();
         } else {
-            List<Long> musicIds = list.stream().map(TbHistoryPojo::getId).collect(Collectors.toList());
+            List<Long> musicIds = list.stream().map(TbHistoryPojo::getId).toList();
             musicPojoList = musicService.listByIds(musicIds);
         }
         

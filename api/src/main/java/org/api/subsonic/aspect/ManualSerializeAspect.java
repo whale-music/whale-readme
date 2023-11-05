@@ -90,7 +90,17 @@ public class ManualSerializeAspect {
             } else {
                 tempPassword = password;
             }
-            accountService.login(user, tempPassword);
+            try {
+                accountService.login(user, tempPassword);
+            } catch (BaseException e) {
+                // 登录错误则使用子账户
+                if (StringUtils.equals(e.getCode(), ResultCode.USER_ACCOUNT_FORBIDDEN.getCode())
+                        || StringUtils.equals(e.getCode(), ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD.getCode())) {
+                    accountService.loginSub(user, password);
+                } else {
+                    throw new BaseException(e);
+                }
+            }
         } else {
             // 从API版本1.13.0开始，推荐的身份验证方案是发送身份验证令牌，计算为密码的单向加盐哈希。
             // This involves two steps: 这涉及两个步骤：
@@ -106,7 +116,16 @@ public class ManualSerializeAspect {
             // 例如：如果口令是sesame，随机盐是c19 b2 d，则token = md5（“sesamec 19 b2 d”）= 26719 a1196 d2 a940705 a59634 eb 18 eab。相应的请求URL变为：
             //
             // http://your-server/rest/ping.view?u=joe&t=26719a1196d2a940705a59634eb18eab&s=c19b2d&v=1.12.0&c=myapp
-            SysUserPojo pojo = accountService.getUser(user);
+            SysUserPojo pojo;
+            try {
+                pojo = accountService.getUser(user);
+            } catch (BaseException e) {
+                if (StringUtils.equals(ResultCode.USER_NOT_EXIST.getCode(), e.getCode())) {
+                    pojo = accountService.getSubAccountMasterUserInfoBySubAccount(user);
+                } else {
+                    throw new BaseException(e);
+                }
+            }
             String originToken = SecureUtil.md5(pojo.getPassword() + salt);
             if (!StringUtils.equals(originToken, token)) {
                 throw new BaseException(ResultCode.PASSWORD_ERROR);

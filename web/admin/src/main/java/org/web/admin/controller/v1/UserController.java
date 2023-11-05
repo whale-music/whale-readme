@@ -7,6 +7,7 @@ import org.api.admin.model.req.SaveOrUpdateUserReq;
 import org.api.admin.service.UserApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +47,8 @@ public class UserController {
     }
     
     @PostMapping("/update/account")
-    public R updateUserPassword(Long id, String username, String nickname, String password) {
-        userApi.updateUserPassword(id, username, nickname, password);
+    public R updateUserPassword(@RequestBody SysUserPojo sysUserPojo) {
+        userApi.updateUserInfo(sysUserPojo);
         return R.success();
     }
 }

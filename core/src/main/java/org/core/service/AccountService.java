@@ -39,4 +39,21 @@ public interface AccountService extends SysUserService {
      * @return 用户信息
      */
     SysUserPojo getUserByName(String username);
+    
+    /**
+     * 登录子账户
+     *
+     * @param account  账户
+     * @param password 密码
+     * @return 用户信息
+     */
+    SysUserPojo loginSub(String account, String password);
+    
+    /**
+     * 获取master账户信息
+     *
+     * @param account 子账户名
+     * @return 用户信息
+     */
+    SysUserPojo getSubAccountMasterUserInfoBySubAccount(String account);
 }

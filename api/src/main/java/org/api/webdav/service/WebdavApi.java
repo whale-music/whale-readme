@@ -96,7 +96,11 @@ public class WebdavApi {
     
     @Cacheable(value = "webdav-user-pojo", key = "#userName")
     public SysUserPojo getUserByName(String userName) {
-        return accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserByName(userName);
+        if (Objects.isNull(userByName)) {
+            return accountService.getSubAccountMasterUserInfoBySubAccount(userName);
+        }
+        return userByName;
     }
     
     @CacheEvict(value = {WEBDAV_COLLECT_TYPE_LIST, WEBDAV_PLAY_LIST, WEBDAV_USER_POJO}, allEntries = true)

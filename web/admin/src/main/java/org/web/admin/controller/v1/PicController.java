@@ -42,7 +42,7 @@ public class PicController {
      * @return 返回音乐数据
      */
     @AnonymousAccess
-    @PostMapping("/upload")
+    @PostMapping("/temp/upload")
     public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
         return R.success(picApi.uploadPicFile(uploadFile, url));
     }

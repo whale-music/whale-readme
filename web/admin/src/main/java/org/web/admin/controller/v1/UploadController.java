@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @CrossOrigin
 @AllArgsConstructor
-public class PicController {
+public class UploadController {
     
     private final PicApi picApi;
     
@@ -36,7 +36,7 @@ public class PicController {
     }
     
     /**
-     * 上传图片临时文件
+     * 上传临时文件
      *
      * @param uploadFile 临时文件
      * @return 返回音乐数据

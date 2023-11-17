@@ -165,6 +165,23 @@ public interface QukuService {
      */
     List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
     
+    /**
+     * 获取Mv歌手
+     *
+     * @param mvIds 用户信息
+     */
+    Map<Long, List<ArtistConvert>> getMvArtistByMvIdToMap(List<Long> mvIds);
+    
+    /**
+     * 获取MV歌手
+     *
+     * @param mvId MV id
+     * @return 歌手信息
+     */
+    default Map<Long, List<ArtistConvert>> getMvArtistByMvIdToMap(Long mvId) {
+        return getMvArtistByMvIdToMap(Collections.singletonList(mvId));
+    }
+    
     
     /**
      * 获取用户收藏专辑
@@ -317,7 +334,15 @@ public interface QukuService {
      * @param ids    歌单，音乐，专辑
      * @return tag列表
      */
-    Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids);
+    Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids, List<String> tagName);
+    
+    default Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids, String tagName) {
+        return getLabel(target, ids, Collections.singletonList(tagName));
+    }
+    
+    default Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids) {
+        return getLabel(target, ids, Collections.emptyList());
+    }
     
     /**
      * 获取tag Map
@@ -429,6 +454,36 @@ public interface QukuService {
     }
     
     /**
+     * 获取tag mv
+     *
+     * @param ids mv ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(List<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, ids);
+    }
+    
+    /**
+     * 获取tag mv
+     *
+     * @param id mv ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(Long id) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, Collections.singletonList(id));
+    }
+    
+    /**
+     * 获取tag MV
+     *
+     * @param ids MV ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(List<Long> ids, List<String> tags) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, ids, tags);
+    }
+    
+    /**
      * 批量添加tag
      *
      * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
@@ -497,10 +552,29 @@ public interface QukuService {
     /**
      * 移除专辑tag
      *
-     * @param ids tag id
+     * @param ids album id
      */
     default void removeLabelAlbum(List<Long> ids) {
         removeLabel(ids, TargetTagConstant.TARGET_ALBUM_GENRE);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param ids mv ids
+     */
+    default void removeLabelMv(List<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_MV_TAG);
+    }
+    
+    
+    /**
+     * 移除MV tag
+     *
+     * @param id mv id
+     */
+    default void removeLabelMv(Long id) {
+        removeLabel(Collections.singletonList(id), TargetTagConstant.TARGET_MV_TAG);
     }
     
     /**
@@ -596,6 +670,10 @@ public interface QukuService {
     
     default void addMusicGenreLabel(Long id, List<String> labels) {
         this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labels);
+    }
+    
+    default void addMvGenreLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_MV_TAG, id, labels);
     }
     
     /**
@@ -816,6 +894,11 @@ public interface QukuService {
         this.saveOrUpdatePic(id, PicTypeConstant.USER_BACKGROUND, pojo);
     }
     
+    @Transactional(rollbackFor = Exception.class)
+    default void saveOrUpdateMvPic(Long id, TbPicPojo pojo) {
+        this.saveOrUpdatePic(id, PicTypeConstant.MV, pojo);
+    }
+    
     /**
      * 用户继承类实现, 从地址或base64保存数据到数据库
      *
@@ -963,6 +1046,26 @@ public interface QukuService {
      */
     default Map<Long, String> getArtistPicUrl(Collection<Long> ids) {
         return this.getPicUrl(ids, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 获取mv封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default String getMvPicUrl(Long ids) {
+        return this.getPicUrl(ids, PicTypeConstant.MV);
+    }
+    
+    /**
+     * 获取歌单封面地址
+     *
+     * @param ids 封面关联ID
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    default Map<Long, String> getMvPicUrl(Collection<Long> ids) {
+        return this.getPicUrl(ids, PicTypeConstant.MV);
     }
     
     

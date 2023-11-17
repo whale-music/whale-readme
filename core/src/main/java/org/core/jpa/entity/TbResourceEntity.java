@@ -49,8 +49,6 @@ public class TbResourceEntity implements Serializable {
     @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
-    @OneToMany(mappedBy = "tbResourceBySourceId")
-    private Collection<TbMvEntity> tbMvsById;
     @OneToMany(mappedBy = "tbResourceByResourceId")
     private Collection<TbOriginEntity> tbOriginsById;
     @ManyToOne
@@ -167,14 +165,6 @@ public class TbResourceEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, musicId, rate, path, md5, level, encodeType, size, userId, createTime, updateTime);
-    }
-    
-    public Collection<TbMvEntity> getTbMvsById() {
-        return tbMvsById;
-    }
-    
-    public void setTbMvsById(Collection<TbMvEntity> tbMvsById) {
-        this.tbMvsById = tbMvsById;
     }
     
     public Collection<TbOriginEntity> getTbOriginsById() {

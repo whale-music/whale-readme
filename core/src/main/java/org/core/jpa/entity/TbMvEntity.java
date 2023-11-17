@@ -7,7 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
 @Entity
 @Table(name = "tb_mv")
@@ -20,17 +19,20 @@ public class TbMvEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "source_id", nullable = false)
-    private Long sourceId;
-    @Basic
     @Column(name = "title", nullable = true, length = 255)
     private String title;
+    @Basic
+    @Column(name = "path", nullable = false)
+    private String path;
+    @Basic
+    @Column(name = "md5", nullable = false)
+    private String md5;
     @Basic
     @Column(name = "description", nullable = true, length = -1)
     private String description;
     @Basic
     @Column(name = "duration", nullable = true)
-    private Integer duration;
+    private Long duration;
     @Basic
     @Column(name = "user_id", nullable = true)
     private Long userId;
@@ -43,9 +45,6 @@ public class TbMvEntity implements Serializable {
     @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
-    @ManyToOne
-    @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    private TbResourceEntity tbResourceBySourceId;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
@@ -60,14 +59,6 @@ public class TbMvEntity implements Serializable {
     
     public void setId(Long id) {
         this.id = id;
-    }
-    
-    public Long getSourceId() {
-        return sourceId;
-    }
-    
-    public void setSourceId(Long sourceId) {
-        this.sourceId = sourceId;
     }
     
     public String getTitle() {
@@ -86,11 +77,11 @@ public class TbMvEntity implements Serializable {
         this.description = description;
     }
     
-    public Integer getDuration() {
+    public Long getDuration() {
         return duration;
     }
     
-    public void setDuration(Integer duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
     
@@ -126,32 +117,20 @@ public class TbMvEntity implements Serializable {
         this.updateTime = updateTime;
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TbMvEntity that = (TbMvEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(sourceId, that.sourceId) && Objects.equals(title,
-                that.title) && Objects.equals(description, that.description) && Objects.equals(duration,
-                that.duration) && Objects.equals(userId, that.userId) && Objects.equals(publishTime,
-                that.publishTime) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+    public String getPath() {
+        return path;
     }
     
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, sourceId, title, description, duration, userId, publishTime, createTime, updateTime);
+    public void setPath(String path) {
+        this.path = path;
     }
     
-    public TbResourceEntity getTbResourceBySourceId() {
-        return tbResourceBySourceId;
+    public String getMd5() {
+        return md5;
     }
     
-    public void setTbResourceBySourceId(TbResourceEntity tbResourceBySourceId) {
-        this.tbResourceBySourceId = tbResourceBySourceId;
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
     
     public SysUserEntity getSysUserByUserId() {

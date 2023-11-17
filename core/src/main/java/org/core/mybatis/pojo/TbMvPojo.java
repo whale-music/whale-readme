@@ -28,9 +28,13 @@ public class TbMvPojo extends Model<TbMvPojo> implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
-    @Schema(title = "视频资源ID")
-    @TableField("source_id")
-    private Long sourceId;
+    @Schema(title = "视频资源路径")
+    @TableField("path")
+    private String path;
+    
+    @Schema(title = "MD5")
+    @TableField("md5")
+    private String md5;
     
     @Schema(title = "标题")
     @TableField("title")
@@ -42,7 +46,7 @@ public class TbMvPojo extends Model<TbMvPojo> implements Serializable {
     
     @Schema(title = "视频时长")
     @TableField("duration")
-    private Integer duration;
+    private Long duration;
     
     @Schema(title = "上传用户")
     @TableField("user_id")

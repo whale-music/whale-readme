@@ -35,6 +35,12 @@ public class SaveConfig {
     // 上传图片,从0开始
     private Integer assignImgSave;
     
+    // MV存储地址
+    private List<String> mvSave = new ArrayList<>();
+    
+    // MV图片,从0开始
+    private Integer assignMvSave;
+    
     // 访问账户
     private String accessKey;
     
@@ -94,6 +100,22 @@ public class SaveConfig {
     
     public void setAssignImgSave(Integer assignImgSave) {
         this.assignImgSave = assignImgSave == null ? 0 : assignImgSave;
+    }
+    
+    public List<String> getMvSave() {
+        return mvSave;
+    }
+    
+    public void setMvSave(List<String> mvSave) {
+        this.mvSave = mvSave;
+    }
+    
+    public Integer getAssignMvSave() {
+        return assignMvSave;
+    }
+    
+    public void setAssignMvSave(Integer assignMvSave) {
+        this.assignMvSave = assignMvSave == null ? 0 : assignMvSave;
     }
     
     public String getAccessKey() {

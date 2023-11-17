@@ -32,6 +32,11 @@ public class PicTypeConstant {
      */
     public static final byte USER_BACKGROUND = 5;
     
+    /**
+     * MV
+     */
+    public static final byte MV = 6;
+    
     private PicTypeConstant() {
     }
 }

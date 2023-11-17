@@ -37,7 +37,6 @@ import org.core.service.AccountService;
 import org.core.service.QukuService;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,11 +94,9 @@ public class QukuServiceImpl implements QukuService {
     
     private final DefaultInfo defaultInfo;
     
-    @Autowired
-    private TbMvArtistService tbMvArtistService;
+    private final TbMvArtistService tbMvArtistService;
     
-    @Autowired
-    private TbOriginService tbOriginService;
+    private final TbOriginService tbOriginService;
     
     
     private static List<AlbumConvert> getAlbumConvertList(List<TbAlbumPojo> albumPojoList, Map<Long, String> picUrl) {
@@ -449,6 +446,43 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyList();
         }
         return getAlbumListByAlbumId(list.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toSet()));
+    }
+    
+    /**
+     * 获取Mv歌手
+     *
+     * @param mvIds 用户信息
+     */
+    @Override
+    public Map<Long, List<ArtistConvert>> getMvArtistByMvIdToMap(List<Long> mvIds) {
+        if (CollUtil.isEmpty(mvIds)) {
+            return Collections.emptyMap();
+        }
+        List<TbMvArtistPojo> list = tbMvArtistService.list(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, mvIds));
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        Map<Long, ArrayList<Long>> mvIdArtistIdMap = list.parallelStream()
+                                                         .collect(Collectors.toMap(TbMvArtistPojo::getMvId,
+                                                                 tbMvArtistPojo -> ListUtil.toList(tbMvArtistPojo.getArtistId()),
+                                                                 (objects, objects2) -> {
+                                                                     objects2.addAll(objects);
+                                                                     return objects2;
+                                                                 }));
+        List<Long> artistIds = list.parallelStream().map(TbMvArtistPojo::getArtistId).toList();
+        List<TbArtistPojo> artistList = artistService.listByIds(artistIds);
+        List<ArtistConvert> artistConvertList = getArtistConvertList(artistList, getCollectPicUrl(artistIds));
+        Map<Long, ArtistConvert> artistById = artistConvertList.parallelStream()
+                                                               .collect(Collectors.toMap(ArtistConvert::getId, artistConvert -> artistConvert));
+        HashMap<Long, List<ArtistConvert>> map = new HashMap<>();
+        for (Map.Entry<Long, ArrayList<Long>> longLongEntry : mvIdArtistIdMap.entrySet()) {
+            Long key = longLongEntry.getKey();
+            ArrayList<Long> value = longLongEntry.getValue();
+            ArrayList<ArtistConvert> artistListValue = new ArrayList<>(value.size());
+            value.forEach(aLong -> artistListValue.add(artistById.get(aLong)));
+            map.put(key, artistListValue);
+        }
+        return map;
     }
     
     /**
@@ -941,7 +975,7 @@ public class QukuServiceImpl implements QukuService {
      * @return tag列表
      */
     @Override
-    public Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids) {
+    public Map<Long, List<TbTagPojo>> getLabel(Byte target, Collection<Long> ids, List<String> tagName) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
@@ -954,7 +988,10 @@ public class QukuServiceImpl implements QukuService {
         }
         Map<Long, TbMiddleTagPojo> collect = middleTagList.parallelStream()
                                                           .collect(Collectors.toMap(TbMiddleTagPojo::getTagId, tbMiddleTagPojo -> tbMiddleTagPojo));
-        List<TbTagPojo> tbTagPojos = tagService.listByIds(middleTagList.parallelStream().map(TbMiddleTagPojo::getTagId).toList());
+        List<Long> tagIds = middleTagList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
+        List<TbTagPojo> tbTagPojos = tagService.list(Wrappers.<TbTagPojo>lambdaQuery()
+                                                             .in(TbTagPojo::getId, tagIds)
+                                                             .in(CollUtil.isNotEmpty(tagName), TbTagPojo::getTagName, tagName));
         Map<Long, List<TbTagPojo>> resultMap = tbTagPojos.parallelStream()
                                                          .collect(Collectors.toMap(tbTagPojo -> collect.get(tbTagPojo.getId()).getMiddleId(),
                                                                  tbTagPojo -> {
@@ -1559,10 +1596,14 @@ public class QukuServiceImpl implements QukuService {
                 entity.setMiddleId(id);
                 entity.setType(type);
                 entity.setPicId(one.getId());
+                // 更新关联图片数
                 one.setCount(one.getCount() + 1);
+                // 更新封面
                 picService.updateById(one);
             }
             middlePicService.saveOrUpdate(entity);
+            // 清除添加数据的缓存
+            picMiddleCache.invalidate(new MiddleTypeModel(entity.getMiddleId(), entity.getType()));
         }
     }
     

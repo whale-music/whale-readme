@@ -21,6 +21,11 @@ public class TargetTagConstant {
      */
     public static final Byte TARGET_COLLECT_TAG = 3;
     
+    /**
+     * MV tag
+     */
+    public static final Byte TARGET_MV_TAG = 3;
+    
     private TargetTagConstant() {
     }
 }

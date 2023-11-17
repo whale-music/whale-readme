@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service(AdminConfig.ADMIN + "PicApi")
 @Slf4j
@@ -57,7 +58,8 @@ public class PicApi {
         File file;
         if (StringUtils.isBlank(url)) {
             file = FileUtil.writeBytes(uploadFile.getBytes(),
-                    new File(requestConfig.getTempPath(), LocalDateTime.now().getNano() + "-" + uploadFile.getResource().getFilename()));
+                    new File(requestConfig.getTempPath(),
+                            Objects.requireNonNull(uploadFile.getResource().getFilename()) + "- " + LocalDateTime.now().getNano()));
         } else {
             byte[] bytes = HttpUtil.downloadBytes(url);
             File fileBytes = FileUtil.writeBytes(bytes,
@@ -81,9 +83,10 @@ public class PicApi {
             case "artist" -> tempType = PicTypeConstant.ARTIST;
             case "userAvatar" -> tempType = PicTypeConstant.USER_AVATAR;
             case "userBackground" -> tempType = PicTypeConstant.USER_BACKGROUND;
+            case "mv" -> tempType = PicTypeConstant.MV;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
         qukuAPI.saveOrUpdatePicFile(id, tempType, file);
-        return qukuAPI.getPicPath(id, tempType);
+        return qukuAPI.getAddresses(qukuAPI.getPicPath(id, tempType), false);
     }
 }

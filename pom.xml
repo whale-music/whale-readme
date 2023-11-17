@@ -226,6 +226,12 @@
             <version>4.4</version>
         </dependency>
 
+        <!-- 音频处理库(纯java实现) -->
+        <dependency>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec</artifactId>
+            <version>0.2.5</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

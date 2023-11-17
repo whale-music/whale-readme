@@ -19,7 +19,6 @@ import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.local.model.FileMetadata;
 import org.core.utils.ServletUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -41,8 +40,11 @@ public class LocalOSSServiceImpl implements OSSService {
     private SaveConfig config;
     private int initMusicAllCount;
     
-    @Autowired
-    private TbResourceService tbResourceService;
+    private final TbResourceService tbResourceService;
+    
+    public LocalOSSServiceImpl(TbResourceService tbResourceService) {
+        this.tbResourceService = tbResourceService;
+    }
     
     /**
      * 返回当前服务名
@@ -144,6 +146,7 @@ public class LocalOSSServiceImpl implements OSSService {
         ArrayList<String> list = new ArrayList<>();
         list.addAll(config.getObjectSave());
         list.addAll(config.getImgSave());
+        list.addAll(config.getMvSave());
         
         for (String parentFileName : list) {
             File file = new File(config.getHost(), parentFileName);

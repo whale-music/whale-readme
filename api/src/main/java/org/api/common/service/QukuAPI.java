@@ -18,6 +18,7 @@ import org.core.config.HttpRequestConfig;
 import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
+import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.factory.OSSFactory;
@@ -25,7 +26,6 @@ import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.ImageTypeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +44,11 @@ public class QukuAPI extends QukuServiceImpl {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    @Autowired
-    private TbMiddlePicService tbMiddlePicService;
+    private final TbMiddlePicService tbMiddlePicService;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService) {
+    private final TbMvService tbMvService;
+    
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, TbMvService tbMvService) {
         super(musicService,
                 albumService,
                 artistService,
@@ -73,6 +74,8 @@ public class QukuAPI extends QukuServiceImpl {
         );
         this.config = config;
         this.httpRequestConfig = httpRequestConfig;
+        this.tbMiddlePicService = tbMiddlePicService;
+        this.tbMvService = tbMvService;
     }
     
     
@@ -102,22 +105,24 @@ public class QukuAPI extends QukuServiceImpl {
      * @param type 添加ID类型 歌曲，专辑，歌单，歌手
      * @param file 封面数据
      */
-    @Transactional(rollbackFor = Exception.class)
+    // @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdatePicFile(Long id, Byte type, File file) {
         OSSService ossService = OSSFactory.ossFactory(config);
         String md5Hex;
         String upload;
-        File rename = null;
+        File dest = null;
         try (FileInputStream fis = new FileInputStream(file)) {
             md5Hex = DigestUtil.md5Hex(file);
-            rename = FileUtil.rename(file, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
-            // 删除文件
+            dest = new File(md5Hex + ImageTypeUtils.getPicType(fis));
+            File rename = FileUtil.copy(file, dest, true);
             upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
         } catch (Exception e) {
             throw new BaseException(e.getMessage());
+        } finally {
+            FileUtil.del(dest);
         }
         // TODO: 自动删除缓存文件
         TbPicPojo pojo = new TbPicPojo();
@@ -149,6 +154,11 @@ public class QukuAPI extends QukuServiceImpl {
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateBackgroundPicFile(Long id, File file) {
         this.saveOrUpdatePicFile(id, PicTypeConstant.USER_BACKGROUND, file);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrUpdateMvPicFile(Long id, File file) {
+        this.saveOrUpdatePicFile(id, PicTypeConstant.MV, file);
     }
     
     /**
@@ -331,5 +341,20 @@ public class QukuAPI extends QukuServiceImpl {
     
     public Map<Long, Long> getAlbumPicIds(List<Long> middleId) {
         return getPicIds(middleId, PicTypeConstant.ALBUM);
+    }
+    
+    public String uploadMvFile(File mvFile, String md5) {
+        return OSSFactory.ossFactory(config).upload(config.getMvSave(), config.getAssignMvSave(), mvFile, md5);
+    }
+    
+    public String uploadMvFile(File file) {
+        return this.uploadMvFile(file, null);
+    }
+    
+    public void removeMvStorageFiles(List<Long> ids) {
+        List<TbMvPojo> tbMvPojos = tbMvService.listByIds(ids);
+        OSSService ossService = OSSFactory.ossFactory(config);
+        List<String> list = tbMvPojos.parallelStream().map(TbMvPojo::getPath).toList();
+        ossService.delete(list);
     }
 }

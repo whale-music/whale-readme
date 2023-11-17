@@ -135,12 +135,15 @@ save-config:
     # - /test/img
     - /img
   assign-img-save: 0
+  mv-save:
+    - /mv
+  assign-mv-save: 0
   # 请求地址(必须)
   # 除非debug, 否则不要填写localhost and 127.0.0.1. 这样会造成只能本地访问
   host: ./data/storage
   # 账户(根据使用模式填写)
   access-key: admin
-  # 密码(根据使用模式填写)
+  # 密码(必须)
   secret-key: LLq9quPO
 
 jwt-config:
@@ -218,4 +221,4 @@ webdav:
     return-plan: first
 
 upload:
-  musicNameTemplate: '{music} - {album} - [artist]'
+  music-name-template: "{music}-{album}-[{artist}]-{rate}"

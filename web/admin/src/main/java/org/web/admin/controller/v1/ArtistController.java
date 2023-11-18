@@ -7,6 +7,7 @@ import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.RemoveArtistReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
+import org.api.admin.model.res.ArtistMvListRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
@@ -60,5 +61,11 @@ public class ArtistController {
     public R saveOrUpdateArtist(@RequestBody SaveOrUpdateArtistReq req) {
         artistApi.saveOrUpdateArtist(req);
         return R.success();
+    }
+    
+    @GetMapping("/mv")
+    public R getMvList(@RequestParam("id") Long id) {
+        List<ArtistMvListRes> mvList = artistApi.getMvList(id);
+        return R.success(mvList);
     }
 }

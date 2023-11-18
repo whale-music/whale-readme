@@ -1,15 +1,18 @@
 package org.api.admin.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.common.SimpleArtist;
 import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
+import org.api.admin.model.res.ArtistMvListRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
 import org.api.common.service.QukuAPI;
@@ -18,10 +21,15 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbArtistService;
+import org.core.mybatis.iservice.TbMvArtistService;
+import org.core.mybatis.iservice.TbMvService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.TbArtistPojo;
+import org.core.mybatis.pojo.TbMvArtistPojo;
+import org.core.mybatis.pojo.TbMvPojo;
+import org.core.mybatis.pojo.TbTagPojo;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +54,12 @@ public class ArtistApi {
     
     @Autowired
     private HttpRequestConfig httpRequestConfig;
+    
+    @Autowired
+    private TbMvArtistService tbMvArtistService;
+    
+    @Autowired
+    private TbMvService tbMvService;
     
     /**
      * 设置分页查询排序
@@ -148,5 +162,36 @@ public class ArtistApi {
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.DATA_NONE_FOUND);
             qukuService.saveOrUpdateArtistPicFile(req.getId(), file);
         }
+    }
+    
+    public List<ArtistMvListRes> getMvList(Long id) {
+        List<TbMvArtistPojo> list = tbMvArtistService.list(Wrappers.<TbMvArtistPojo>lambdaQuery().eq(TbMvArtistPojo::getArtistId, id));
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        List<TbMvPojo> tbMvPojos = tbMvService.listByIds(list.parallelStream().map(TbMvArtistPojo::getMvId).toList());
+        
+        List<Long> mvIds = tbMvPojos.parallelStream().map(TbMvPojo::getId).toList();
+        Map<Long, List<TbTagPojo>> labelMusicTag = qukuService.getLabelMvTag(mvIds);
+        Map<Long, String> mvPicUrl = qukuService.getMvPicUrl(mvIds);
+        Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuService.getMvArtistByMvIdToMap(mvIds);
+        
+        List<ArtistMvListRes> listRes = new ArrayList<>();
+        for (TbMvPojo mvPojo : tbMvPojos) {
+            ArtistMvListRes e = new ArtistMvListRes(mvPojo);
+            List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
+            if (CollUtil.isNotEmpty(tbTagPojos)) {
+                e.setTags(tbTagPojos.parallelStream().map(TbTagPojo::getTagName).toList());
+            }
+            e.setPicUrl(mvPicUrl.get(mvPojo.getId()));
+            List<ArtistConvert> artistConverts = mvArtistByMvIdsToMap.get(mvPojo.getId());
+            if (CollUtil.isNotEmpty(artistConverts)) {
+                e.setArtists(artistConverts.parallelStream()
+                                           .map(artistConvert -> new SimpleArtist(artistConvert.getId(), artistConvert.getArtistName()))
+                                           .toList());
+            }
+            listRes.add(e);
+        }
+        return listRes;
     }
 }

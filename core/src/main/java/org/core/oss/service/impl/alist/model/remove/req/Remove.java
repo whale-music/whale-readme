@@ -1,6 +1,6 @@
 package org.core.oss.service.impl.alist.model.remove.req;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package org.core.oss.service.impl.alist.model.remove.res;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 
 public class RemoveRes {
     

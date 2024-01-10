@@ -4,6 +4,8 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.URLEncodeUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -13,12 +15,12 @@ import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.alist.model.list.ContentItem;
 import org.core.oss.service.impl.alist.util.RequestUtils;
 import org.core.utils.ExceptionUtil;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 @Service(AListOSSServiceImpl.SERVICE_NAME)
 public class AListOSSServiceImpl implements OSSService {
     
-    public static final String SERVICE_NAME = "AList";
+    public static final String SERVICE_NAME = "aList";
     
     private static final String LOGIN_KEY = "loginKey";
     
@@ -44,11 +46,14 @@ public class AListOSSServiceImpl implements OSSService {
     
     private SaveConfig config;
     
-    @Autowired
-    private TbResourceService tbResourceService;
+    private final TbResourceService tbResourceService;
     
     static {
         musicUrltimedCache.schedulePrune(1000);
+    }
+    
+    public AListOSSServiceImpl(TbResourceService tbResourceService) {
+        this.tbResourceService = tbResourceService;
     }
     
     
@@ -82,12 +87,12 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public String getAddresses(String name, boolean refresh) {
         try {
-            String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存
             ContentItem item = musicUrltimedCache.get(name);
             // 没有地址便刷新缓存,获取所有文件保存到缓存中
             // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
             if ((item == null && refresh) || musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
+                String loginCacheStr = getLoginJwtCache(config);
                 refreshMusicCache(loginCacheStr);
                 // 更新初始化音乐数量
                 this.initMusicAllCount = musicUrltimedCache.size();
@@ -144,12 +149,12 @@ public class AListOSSServiceImpl implements OSSService {
     @Override
     public Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh) {
         try {
-            String loginCacheStr = getLoginJwtCache(config);
             // 音乐地址URL缓存
             Iterator<ContentItem> set = musicUrltimedCache.iterator();
             // 没有地址便刷新缓存,获取所有文件保存到缓存中
             // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
             if (musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
+                String loginCacheStr = getLoginJwtCache(config);
                 refreshMusicCache(loginCacheStr);
                 // 更新初始化音乐数量
                 this.initMusicAllCount = musicUrltimedCache.size();
@@ -302,6 +307,62 @@ public class AListOSSServiceImpl implements OSSService {
         } catch (BaseException e) {
             throw new BaseException(ResultCode.SONG_NOT_EXIST.getCode(), e.getResultMsg());
         }
+    }
+    
+    /**
+     * 列出所有文件
+     */
+    @Override
+    public Set<Resource> list(boolean refresh) {
+        if (Boolean.TRUE.equals(refresh)) {
+            String loginCacheStr = getLoginJwtCache(config);
+            refreshMusicCache(loginCacheStr);
+        }
+        Iterator<ContentItem> iterator = musicUrltimedCache.iterator();
+        
+        HashSet<Resource> resources = new HashSet<>();
+        iterator.forEachRemaining(contentItem -> resources.add(fullResource(contentItem)));
+        return resources;
+    }
+    
+    
+    /**
+     * 获取文件信息
+     *
+     * @param name    文件路径
+     * @param refresh 是否刷新
+     * @return 文件信息
+     */
+    @Override
+    public Resource getResourceInfo(String name, boolean refresh) {
+        String loginCacheStr = getLoginJwtCache(config);
+        // 音乐地址URL缓存
+        ContentItem contentItem = musicUrltimedCache.get(name);
+        // 没有地址便刷新缓存,获取所有文件保存到缓存中
+        // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+        if ((refresh && Objects.isNull(contentItem)) || musicUrltimedCache.isEmpty() || musicUrltimedCache.size() != initMusicAllCount) {
+            refreshMusicCache(loginCacheStr);
+            // 更新初始化音乐数量
+            this.initMusicAllCount = musicUrltimedCache.size();
+            contentItem = musicUrltimedCache.get(name);
+        }
+        if (Objects.isNull(contentItem)) {
+            return new Resource();
+        }
+        
+        return fullResource(contentItem);
+    }
+    
+    private Resource fullResource(ContentItem contentItem) {
+        Resource resource = new Resource();
+        resource.setName(contentItem.getName());
+        resource.setSize(Long.valueOf(contentItem.getSize()));
+        resource.setUrl(this.getPath(contentItem));
+        resource.setModificationTime(DateUtil.parse(contentItem.getModified(), DatePattern.UTC_SIMPLE_FORMAT));
+        resource.setCreationTime(DateUtil.parse(contentItem.getCreated(), DatePattern.UTC_SIMPLE_FORMAT));
+        resource.setPath(contentItem.getPath());
+        resource.setFileExtension(FileUtil.getSuffix(contentItem.getName()));
+        return resource;
     }
     
     @Override

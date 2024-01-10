@@ -9,6 +9,7 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.crypto.digest.MD5;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -1044,24 +1045,24 @@ public class MusicFlowApi {
         return musicDetails;
     }
     
-    public void uploadAutoMusicFile(Long userId, MultipartFile uploadFile, Long musicId) {
+    public void uploadAutoMusicFile(Long userId, File uploadFile, Long musicId) {
         TbResourcePojo entity = new TbResourcePojo();
         entity.setMusicId(musicId);
         userId = userId == null ? UserUtil.getUser().getId() : userId;
         try {
-            String tempMd5 = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
+            String tempMd5 = MD5.create().digestHex(uploadFile);
             TbResourcePojo tempOne = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
             // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
             if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
                 throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
                         ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲ID: " + tempOne.getMusicId());
             }
-            String[] nameArr = StringUtils.split(uploadFile.getOriginalFilename(), ".");
+            String[] nameArr = StringUtils.split(uploadFile.getName(), ".");
             if (nameArr == null || nameArr.length < 1) {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
             File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
-            FileUtil.writeBytes(uploadFile.getBytes(), dest);
+            FileUtil.move(uploadFile, dest, true);
             AudioFile audioInfo = getAudioInfo(dest);
             // 写入音乐元数据到音频文件中
             // 音乐名

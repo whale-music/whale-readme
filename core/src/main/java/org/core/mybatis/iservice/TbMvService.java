@@ -12,5 +12,12 @@ import org.core.mybatis.pojo.TbMvPojo;
  * @since 2023-06-28
  */
 public interface TbMvService extends IService<TbMvPojo> {
-
+    
+    /**
+     * 获取MV pojo
+     *
+     * @param path 路径
+     * @return pojo
+     */
+    TbMvPojo getMvByPath(String path);
 }

@@ -119,6 +119,10 @@ public enum ResultCode implements BaseErrorInfoInterface {
     PLUGIN_CANNOT_DELETE_RUNNING("30005", "error.messages.plugin_cannot_delete_running"),
     // 数据库运行错误
     SQL_RUN_ERROR("30006", "error.messages.sql_run_error"),
+    // 关联图片错误
+    LINK_PIC_ERROR("30007", "error.messages.link_pic_error"),
+    // 关联音频文件错误
+    LINK_AUDIO_ERROR("30007", "error.messages.link_audio_error"),
     
     
     /* 系统错误：40001-49999 */

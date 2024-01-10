@@ -25,4 +25,11 @@ public interface TbResourceService extends IService<TbResourcePojo> {
      */
     Map<Long, List<TbResourcePojo>> getResourceMap(Collection<Long> musicIds);
     
+    /**
+     * 根据文件名获取音乐数据
+     *
+     * @param name 文件名
+     * @return 音乐数据
+     */
+    TbResourcePojo getResourceByName(String name);
 }

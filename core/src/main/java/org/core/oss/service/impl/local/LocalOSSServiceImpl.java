@@ -16,6 +16,7 @@ import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.impl.local.model.FileMetadata;
 import org.core.utils.ServletUtils;
@@ -36,7 +37,7 @@ public class LocalOSSServiceImpl implements OSSService {
     public static final TimedCache<String, FileMetadata> MUSIC_PATH_CACHE = CacheUtil.newTimedCache(1000L * 60L * 60L);
     public static final String SIZE = "size";
     public static final String URL = "url";
-    public static final String SERVICE_NAME = "Local";
+    public static final String SERVICE_NAME = "local";
     private SaveConfig config;
     private int initMusicAllCount;
     
@@ -168,11 +169,13 @@ public class LocalOSSServiceImpl implements OSSService {
                 meta.setLastAccessTime(FileUtil.lastModifiedTime(item));
                 try {
                     BasicFileAttributes basicFileAttributes = Files.readAttributes(item.toPath(), BasicFileAttributes.class);
+                    meta.setModificationTime(new Date(basicFileAttributes.lastModifiedTime().toMillis()));
                     meta.setCreationTime(new Date(basicFileAttributes.creationTime().toMillis()));
                     meta.setLastAccessTime(new Date(basicFileAttributes.lastAccessTime().toMillis()));
                 } catch (IOException e) {
                     meta.setCreationTime(new Date());
                     meta.setLastAccessTime(new Date());
+                    meta.setModificationTime(new Date());
                     log.warn("read file no create data: {}", e.getMessage());
                 }
                 MUSIC_PATH_CACHE.put(item.getName(), meta);
@@ -268,6 +271,59 @@ public class LocalOSSServiceImpl implements OSSService {
         MUSIC_PATH_CACHE.forEach(contentItem -> res.add(Optional.ofNullable(StringUtils.split(contentItem.getName(), "."))
                                                                 .orElse(new String[]{""})[0]));
         return res;
+    }
+    
+    /**
+     * 列出所有文件
+     */
+    @Override
+    public Set<Resource> list(boolean refresh) {
+        if (Boolean.TRUE.equals(refresh)) {
+            refreshMusicCache();
+        }
+        Iterator<FileMetadata> iterator = MUSIC_PATH_CACHE.iterator();
+        
+        HashSet<Resource> resources = new HashSet<>();
+        iterator.forEachRemaining(contentItem -> resources.add(fullResource(contentItem)));
+        return resources;
+    }
+    
+    private Resource fullResource(FileMetadata contentItem) {
+        Resource r = new Resource();
+        r.setName(contentItem.getName());
+        r.setSize(contentItem.getSize());
+        r.setUrl(this.getPath(contentItem));
+        r.setModificationTime(contentItem.getModificationTime());
+        r.setCreationTime(contentItem.getCreationTime());
+        r.setPath(contentItem.getUri());
+        r.setFileExtension(FileUtil.getSuffix(contentItem.getName()));
+        return r;
+    }
+    
+    /**
+     * 获取文件信息
+     *
+     * @param name    文件路径
+     * @param refresh 是否刷新
+     * @return 文件信息
+     */
+    @Override
+    public Resource getResourceInfo(String name, boolean refresh) {
+        // 音乐地址URL缓存
+        FileMetadata metadata = MUSIC_PATH_CACHE.get(name);
+        // 没有地址便刷新缓存,获取所有文件保存到缓存中
+        // 第一次执行，必须刷新缓存。所以添加添加缓存是否存在条件
+        if ((refresh && Objects.isNull(metadata)) || MUSIC_PATH_CACHE.isEmpty() || MUSIC_PATH_CACHE.size() != initMusicAllCount) {
+            refreshMusicCache();
+            // 更新初始化音乐数量
+            this.initMusicAllCount = MUSIC_PATH_CACHE.size();
+            metadata = MUSIC_PATH_CACHE.get(name);
+        }
+        if (Objects.isNull(metadata)) {
+            return new Resource();
+        }
+        
+        return fullResource(metadata);
     }
     
     /**

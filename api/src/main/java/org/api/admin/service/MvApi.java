@@ -12,10 +12,9 @@ import org.api.admin.model.common.SimpleArtist;
 import org.api.admin.model.req.SaveMvReq;
 import org.api.admin.model.res.MvInfoRes;
 import org.api.admin.model.res.MvPageRes;
+import org.api.admin.utils.VideoUtil;
 import org.api.common.service.QukuAPI;
 import org.core.common.constant.PicTypeConstant;
-import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbMvArtistService;
 import org.core.mybatis.iservice.TbMvService;
@@ -23,10 +22,6 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.TbMvArtistPojo;
 import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
-import org.jcodec.common.DemuxerTrack;
-import org.jcodec.common.io.FileChannelWrapper;
-import org.jcodec.common.io.NIOUtils;
-import org.jcodec.containers.mp4.demuxer.MP4Demuxer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,18 +52,6 @@ public class MvApi {
         this.tbMvArtistService = tbMvArtistService;
     }
     
-    public static long getVideoDuration(File videoFile) throws IOException {
-        if (videoFile.exists()) {
-            FileChannelWrapper ch = NIOUtils.readableChannel(videoFile);
-            MP4Demuxer demuxer = MP4Demuxer.createMP4Demuxer(ch);
-            DemuxerTrack videoTrack = demuxer.getVideoTrack();
-            double totalDuration = videoTrack.getMeta().getTotalDuration();
-            log.info("video_duration: " + totalDuration);
-            return (long) Math.ceil(totalDuration);
-        }
-        throw new BaseException(ResultCode.FILENAME_NO_EXIST);
-    }
-    
     @Transactional(rollbackFor = Exception.class)
     public void saveMvInfo(SaveMvReq request) throws IOException {
         TbMvPojo one = tbMvService.getOne(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getTitle, request.getTitle()));
@@ -89,13 +72,14 @@ public class MvApi {
         // upload pic
         qukuApi.saveOrUpdateMvPicFile(request.getId(), new File(httpRequestConfig.getTempPath(), request.getPicTempPath()));
         // 上传文件
-        File file = new File(httpRequestConfig.getTempPath(), request.getMvTempPath());
-        long videoDuration = getVideoDuration(file);
-        request.setDuration(videoDuration);
-        String path = qukuApi.uploadMvFile(file);
-        
-        // path
-        request.setPath(path);
+        if (StringUtils.isNotBlank(request.getMvTempPath())) {
+            File file = new File(httpRequestConfig.getTempPath(), request.getMvTempPath());
+            long videoDuration = VideoUtil.getVideoDuration(file);
+            request.setDuration(videoDuration);
+            String path = qukuApi.uploadMvFile(file);
+            // path
+            request.setPath(path);
+        }
         tbMvService.updateById(request);
         // tag
         Long id = request.getId();
@@ -194,7 +178,10 @@ public class MvApi {
                                        .map(artistConvert -> new SimpleArtist(artistConvert.getId(), artistConvert.getArtistName()))
                                        .toList());
         }
-        e.setMvUrl(qukuApi.getAddresses(e.getPath(), false));
+        String path = e.getPath();
+        if (StringUtils.isNotBlank(path)) {
+            e.setMvUrl(qukuApi.getAddresses(path, false));
+        }
         return e;
     }
     
@@ -220,7 +207,7 @@ public class MvApi {
         File dest = new File(httpRequestConfig.getTempPath(),
                 LocalDateTime.now().getNano() + "-" + Objects.requireNonNull(uploadFile.getOriginalFilename()));
         FileUtil.writeBytes(uploadFile.getBytes(), dest);
-        long videoDuration = getVideoDuration(dest);
+        long videoDuration = VideoUtil.getVideoDuration(dest);
         String md5Str = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
         String path = qukuApi.uploadMvFile(dest, md5Str);
         mvPojo.setPath(path);

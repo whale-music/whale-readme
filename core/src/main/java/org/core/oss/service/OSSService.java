@@ -2,6 +2,7 @@ package org.core.oss.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.properties.SaveConfig;
+import org.core.oss.model.Resource;
 
 import java.io.File;
 import java.util.*;
@@ -67,6 +68,13 @@ public interface OSSService {
     Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh);
     
     /**
+     * 列出所有文件
+     *
+     * @param refresh 是否刷新
+     */
+    Set<Resource> list(boolean refresh);
+    
+    /**
      * 获取音乐MD5值，为null获取所有md5
      *
      * @param md5     音乐的md5值
@@ -109,4 +117,13 @@ public interface OSSService {
      * @param newName 新文件名
      */
     void rename(String oldName, String newName);
+    
+    /**
+     * 获取文件信息
+     *
+     * @param name    文件路径
+     * @param refresh 是否刷新
+     * @return 文件信息
+     */
+    Resource getResourceInfo(String name, boolean refresh);
 }

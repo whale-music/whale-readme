@@ -14,6 +14,7 @@ public class ContentItem {
     private String name;
     private String sign;
     private String modified;
+    private String created;
     private Integer type;
     private String path;
 }

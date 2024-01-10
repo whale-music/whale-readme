@@ -1,5 +1,7 @@
 package org.core.common.constant;
 
+import java.util.Map;
+
 public class PicTypeConstant {
     
     /**
@@ -36,6 +38,32 @@ public class PicTypeConstant {
      * MV
      */
     public static final byte MV = 6;
+    
+    public static final Map<Byte, String> PIC_TYPE_KEY = Map.of(PicTypeConstant.MUSIC,
+            "music",
+            PicTypeConstant.PLAYLIST,
+            "playlist",
+            PicTypeConstant.ALBUM,
+            "album",
+            PicTypeConstant.ARTIST,
+            "artist",
+            PicTypeConstant.USER_AVATAR,
+            "userAvatar",
+            PicTypeConstant.USER_BACKGROUND,
+            "userBackground");
+    
+    public static final Map<String, Byte> PIC_TYPE_VALUE = Map.of("music",
+            PicTypeConstant.MUSIC,
+            "playlist",
+            PicTypeConstant.PLAYLIST,
+            "album",
+            PicTypeConstant.ALBUM,
+            "artist",
+            PicTypeConstant.ARTIST,
+            "userAvatar",
+            PicTypeConstant.USER_AVATAR,
+            "userBackground",
+            PicTypeConstant.USER_BACKGROUND);
     
     private PicTypeConstant() {
     }

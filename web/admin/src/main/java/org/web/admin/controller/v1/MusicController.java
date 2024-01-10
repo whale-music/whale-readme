@@ -1,7 +1,8 @@
 package org.web.admin.controller.v1;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.RemoveMusicReq;
@@ -12,6 +13,7 @@ import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
+import org.core.config.HttpRequestConfig;
 import org.core.mybatis.pojo.MusicDetails;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -23,19 +25,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController(AdminConfig.ADMIN + "MusicController")
 @RequestMapping("/admin/music")
 @Slf4j
 @CrossOrigin
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MusicController {
     private final MusicFlowApi uploadMusic;
+    
+    private final HttpRequestConfig httpRequestConfig;
     
     /**
      * 上传音乐临时文件
@@ -156,8 +158,10 @@ public class MusicController {
      */
     @PostMapping("/auto/upload")
     @AnonymousAccess
-    public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) {
-        uploadMusic.uploadAutoMusicFile(userId, uploadFile, musicId);
+    public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) throws IOException {
+        File uploadFile1 = FileUtil.writeBytes(uploadFile.getBytes(), new File(httpRequestConfig.getTempPath(),
+                Objects.requireNonNull(uploadFile.getOriginalFilename())));
+        uploadMusic.uploadAutoMusicFile(userId, uploadFile1, musicId);
         return R.success();
     }
     

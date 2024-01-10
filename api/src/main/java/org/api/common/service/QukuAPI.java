@@ -22,6 +22,7 @@ import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.factory.OSSFactory;
+import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.impl.QukuServiceImpl;
@@ -36,7 +37,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@Service("QukuAPI")
+@Service("qukuAPI")
 @Slf4j
 public class QukuAPI extends QukuServiceImpl {
     
@@ -343,6 +344,11 @@ public class QukuAPI extends QukuServiceImpl {
         return getPicIds(middleId, PicTypeConstant.ALBUM);
     }
     
+    public String uploadAudioFile(File file, String md5Hex) {
+        return OSSFactory.ossFactory(config).upload(config.getObjectSave(), config.getAssignObjectSave(), file, md5Hex);
+    }
+    
+    
     public String uploadMvFile(File mvFile, String md5) {
         return OSSFactory.ossFactory(config).upload(config.getMvSave(), config.getAssignMvSave(), mvFile, md5);
     }
@@ -356,5 +362,13 @@ public class QukuAPI extends QukuServiceImpl {
         OSSService ossService = OSSFactory.ossFactory(config);
         List<String> list = tbMvPojos.parallelStream().map(TbMvPojo::getPath).toList();
         ossService.delete(list);
+    }
+    
+    public Set<Resource> listResource(boolean refresh) {
+        return OSSFactory.ossFactory(config).list(refresh);
+    }
+    
+    public Resource getResource(String path, boolean refresh) {
+        return OSSFactory.ossFactory(config).getResourceInfo(path, refresh);
     }
 }

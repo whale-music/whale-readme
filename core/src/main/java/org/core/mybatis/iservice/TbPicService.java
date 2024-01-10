@@ -12,5 +12,12 @@ import org.core.mybatis.pojo.TbPicPojo;
  * @since 2023-06-28
  */
 public interface TbPicService extends IService<TbPicPojo> {
-
+    
+    /**
+     * 获取封面信息
+     *
+     * @param path 封面路径
+     * @return 封面信息
+     */
+    TbPicPojo getPicResourceByName(String path);
 }

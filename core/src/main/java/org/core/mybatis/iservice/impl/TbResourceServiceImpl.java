@@ -39,4 +39,15 @@ public class TbResourceServiceImpl extends ServiceImpl<TbResourceMapper, TbResou
             return o2;
         }));
     }
+    
+    /**
+     * 根据文件名获取音乐数据
+     *
+     * @param name 文件名
+     * @return 音乐数据
+     */
+    @Override
+    public TbResourcePojo getResourceByName(String name) {
+        return this.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getPath, name));
+    }
 }

@@ -130,6 +130,8 @@ public class MusicFlowApi {
     
     private final UploadConfig uploadConfig;
     
+    private final OSSFactory ossFactory;
+    
     /**
      * 上传文件或音乐URL下载到临时目录
      *
@@ -208,7 +210,6 @@ public class MusicFlowApi {
         audioInfoRes.setMusicFileTemp(path.getName());
         return audioInfoRes;
     }
-    
     
     
     private static void getLevel(TbResourcePojo entity, int rate) {
@@ -862,7 +863,7 @@ public class MusicFlowApi {
                 byId,
                 albumPojo, musicArtistByMusicId, albumArtistList, lyricPojoList);
         
-        return OSSFactory.ossFactory(config)
+        return ossFactory.ossFactory()
                          .upload(config.getObjectSave(),
                                  config.getAssignObjectSave(),
                                  file,
@@ -1244,7 +1245,7 @@ public class MusicFlowApi {
         // 删除与重命名文件相同的文件名
         File newFile = FileUtil.rename(destFile, format, true, true);
         
-        OSSService ossService = OSSFactory.ossFactory(config);
+        OSSService ossService = ossFactory.ossFactory();
         String newName = UUID.fastUUID() + "." + extName;
         ossService.rename(path, newName);
         try {

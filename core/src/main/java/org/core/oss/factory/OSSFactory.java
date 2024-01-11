@@ -6,7 +6,6 @@ import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.oss.service.OSSService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -18,30 +17,24 @@ public class OSSFactory {
     /**
      * 存储OSS，Map key是忽略大小写的
      */
-    private static Map<String, OSSService> _map;
+    private final Map<String, OSSService> ossMap;
     
-    private static SaveConfig saveConfig;
+    private final SaveConfig saveConfig;
     
-    private OSSFactory() {
+    public OSSFactory(Map<String, OSSService> ossMap, SaveConfig saveConfig) {
+        this.ossMap = new CaseInsensitiveMap<>(ossMap);
+        this.saveConfig = saveConfig;
     }
     
     /**
      * 获取音乐处理工厂
-     *
-     * @param config 保存信息
      */
-    public static OSSService ossFactory(SaveConfig config) {
-        OSSService oss = _map.get(config.getSaveMode());
+    public OSSService ossFactory() {
+        OSSService oss = ossMap.get(saveConfig.getSaveMode());
         if (oss == null) {
             throw new BaseException(ResultCode.SAVE_NAME_INVALID);
         }
         oss.isConnected(saveConfig);
         return oss;
-    }
-    
-    @Autowired
-    public void setMapAndSaveConfig(Map<String, OSSService> map, SaveConfig saveConfig) {
-        OSSFactory._map = new CaseInsensitiveMap<>(map);
-        OSSFactory.saveConfig = saveConfig;
     }
 }

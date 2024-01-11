@@ -1,5 +1,6 @@
 package org.core.oss.factory;
 
+import cn.hutool.core.map.CaseInsensitiveMap;
 import lombok.extern.slf4j.Slf4j;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
@@ -14,6 +15,9 @@ import java.util.Map;
 @Slf4j
 public class OSSFactory {
     
+    /**
+     * 存储OSS，Map key是忽略大小写的
+     */
     private static Map<String, OSSService> _map;
     
     private static SaveConfig saveConfig;
@@ -37,7 +41,7 @@ public class OSSFactory {
     
     @Autowired
     public void setMapAndSaveConfig(Map<String, OSSService> map, SaveConfig saveConfig) {
-        OSSFactory._map = map;
+        OSSFactory._map = new CaseInsensitiveMap<>(map);
         OSSFactory.saveConfig = saveConfig;
     }
 }

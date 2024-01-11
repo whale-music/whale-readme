@@ -1,9 +1,10 @@
 <h1 align="center">Whale</h1>
 <div align="center">
- <a href="https://alist.nn.ci">
-<img height="100px" alt="logo" src="./docs/img/logo.svg"/>
-</a>
+    <a href="https://alist.nn.ci">
+        <img height="100px" alt="logo" src="./docs/img/logo.svg" />
+    </a>
 </div>
+
 
 > 个人音乐管理服务
 

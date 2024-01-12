@@ -10,7 +10,6 @@ import org.core.mybatis.iservice.TbPluginTaskService;
 import org.core.mybatis.pojo.MusicDetails;
 import org.core.mybatis.pojo.TbPluginMsgPojo;
 import org.core.mybatis.pojo.TbPluginTaskPojo;
-import org.plugin.common.CommonPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +32,14 @@ public class PluginPackage {
     private final List<TbPluginMsgPojo> msgPackages = new ArrayList<>();
     private final Long taskId;
     private final Long userId;
-    private final CommonPlugin func;
     
-    public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, QukuAPI qukuService, Long taskId, Long userId, CommonPlugin func) {
+    public PluginPackage(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, QukuAPI qukuService, Long taskId, Long userId) {
         this.musicFlowApi = musicFlowApi;
         this.pluginMsgService = pluginMsgService;
         this.pluginTaskService = pluginTaskService;
         this.qukuService = qukuService;
         this.taskId = taskId;
         this.userId = userId;
-        this.func = func;
     }
     
     public QukuAPI getQukuService() {

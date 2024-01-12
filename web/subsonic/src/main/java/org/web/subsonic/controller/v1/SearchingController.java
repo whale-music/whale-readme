@@ -14,7 +14,6 @@ import org.api.subsonic.model.res.search2.Search2Res;
 import org.api.subsonic.model.res.search3.Search3Res;
 import org.api.subsonic.service.SearchingApi;
 import org.core.model.HttpStatusStr;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +26,11 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class SearchingController {
     
-    @Autowired
-    private SearchingApi searchingApi;
+    private final SearchingApi searchingApi;
+    
+    public SearchingController(SearchingApi searchingApi) {
+        this.searchingApi = searchingApi;
+    }
     
     @Operation(summary = "返回明星歌曲，专辑和艺术家", description = "该功能未实现", deprecated = true)
     @ApiResponse(responseCode = HttpStatusStr.OK,

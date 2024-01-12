@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbAlbumArtistEntityUpdateVO;
 import org.core.jpa.model.vo.TbAlbumArtistEntityVO;
 import org.core.jpa.repository.TbAlbumArtistEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbAlbumArtistEntityService {
     
-    @Autowired
-    private TbAlbumArtistEntityRepository tbAlbumArtistEntityRepository;
+    private final TbAlbumArtistEntityRepository tbAlbumArtistEntityRepository;
+    
+    public TbAlbumArtistEntityService(TbAlbumArtistEntityRepository tbAlbumArtistEntityRepository) {
+        this.tbAlbumArtistEntityRepository = tbAlbumArtistEntityRepository;
+    }
     
     public Long save(TbAlbumArtistEntityVO vO) {
         TbAlbumArtistEntity bean = new TbAlbumArtistEntity();

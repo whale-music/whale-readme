@@ -26,7 +26,6 @@ import org.core.mybatis.pojo.TbAlbumArtistPojo;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.utils.AliasUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -37,17 +36,20 @@ import java.util.Optional;
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "ArtistApi")
 public class ArtistApi {
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private TbAlbumArtistService albumSingerService;
+    private final TbAlbumArtistService albumSingerService;
     
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
-    @Autowired
-    private TbArtistService singerService;
+    private final TbArtistService singerService;
+    
+    public ArtistApi(QukuAPI qukuService, TbAlbumArtistService albumSingerService, TbAlbumService albumService, TbArtistService singerService) {
+        this.qukuService = qukuService;
+        this.albumSingerService = albumSingerService;
+        this.albumService = albumService;
+        this.singerService = singerService;
+    }
     
     public ArtistSubListRes artistSublist(SysUserPojo user) {
         user = Optional.ofNullable(user).orElse(new SysUserPojo());

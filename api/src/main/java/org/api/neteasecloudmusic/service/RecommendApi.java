@@ -27,7 +27,6 @@ import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,14 +39,17 @@ public class RecommendApi {
     /**
      * 曲库数据库操作层
      */
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private PlayListService playListService;
+    private final PlayListService playListService;
     
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
+    
+    public RecommendApi(QukuAPI qukuService, PlayListService playListService, AccountService accountService) {
+        this.qukuService = qukuService;
+        this.playListService = playListService;
+        this.accountService = accountService;
+    }
     
     public PersonalFMRes personalFM() {
         PersonalFMRes res = new PersonalFMRes();

@@ -33,7 +33,6 @@ import org.core.service.AccountService;
 import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -52,34 +51,37 @@ import java.util.stream.Stream;
 @Service(NeteaseCloudConfig.NETEASECLOUD + "UserApi")
 public class UserApi {
     // 用户服务
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
     // 歌单表
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
-    @Autowired
-    private TbUserCollectEntityRepository userCollectEntityRepository;
+    private final TbUserCollectEntityRepository userCollectEntityRepository;
     
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
     // 用户关注歌手表
-    @Autowired
-    private TbUserArtistService userSingerService;
+    private final TbUserArtistService userSingerService;
     
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private CollectApi collectApi;
+    private final CollectApi collectApi;
     
-    @Autowired
-    private TbHistoryService historyService;
+    private final TbHistoryService historyService;
+    
+    public UserApi(AccountService accountService, TbCollectService collectService, TbUserCollectEntityRepository userCollectEntityRepository, TbCollectMusicService collectMusicService, TbUserArtistService userSingerService, TbMusicService musicService, QukuAPI qukuService, CollectApi collectApi, TbHistoryService historyService) {
+        this.accountService = accountService;
+        this.collectService = collectService;
+        this.userCollectEntityRepository = userCollectEntityRepository;
+        this.collectMusicService = collectMusicService;
+        this.userSingerService = userSingerService;
+        this.musicService = musicService;
+        this.qukuService = qukuService;
+        this.collectApi = collectApi;
+        this.historyService = historyService;
+    }
     
     /**
      * 创建用户

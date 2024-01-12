@@ -15,7 +15,6 @@ import org.api.subsonic.model.res.playlist.PlaylistRes;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
 import org.api.subsonic.service.PlaylistApi;
 import org.core.model.HttpStatusStr;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +28,11 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class PlaylistController {
     
-    @Autowired
-    private PlaylistApi playlistApi;
+    private final PlaylistApi playlistApi;
+    
+    public PlaylistController(PlaylistApi playlistApi) {
+        this.playlistApi = playlistApi;
+    }
     
     @Operation(summary = "返回允许用户播放的所有播放列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,

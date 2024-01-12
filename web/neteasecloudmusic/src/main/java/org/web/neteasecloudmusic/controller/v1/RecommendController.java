@@ -12,7 +12,6 @@ import org.api.neteasecloudmusic.model.vo.recommend.songs.RecommendSongerRes;
 import org.api.neteasecloudmusic.service.RecommendApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,8 +30,11 @@ import java.util.List;
 @Slf4j
 public class RecommendController {
     
-    @Autowired
-    private RecommendApi recommendApi;
+    private final RecommendApi recommendApi;
+    
+    public RecommendController(RecommendApi recommendApi) {
+        this.recommendApi = recommendApi;
+    }
     
     /**
      * 推荐FM

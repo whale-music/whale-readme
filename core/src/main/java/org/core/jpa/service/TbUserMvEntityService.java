@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbUserMvEntityUpdateVO;
 import org.core.jpa.model.vo.TbUserMvEntityVO;
 import org.core.jpa.repository.TbUserMvEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbUserMvEntityService {
     
-    @Autowired
-    private TbUserMvEntityRepository tbUserMvEntityRepository;
+    private final TbUserMvEntityRepository tbUserMvEntityRepository;
+    
+    public TbUserMvEntityService(TbUserMvEntityRepository tbUserMvEntityRepository) {
+        this.tbUserMvEntityRepository = tbUserMvEntityRepository;
+    }
     
     public Long save(TbUserMvEntityVO vO) {
         TbUserMvEntity bean = new TbUserMvEntity();

@@ -9,7 +9,6 @@ import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
 import org.api.neteasecloudmusic.service.TopListApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,8 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 @Slf4j
 public class TopListController {
-    @Autowired
-    private TopListApi topListApi;
+    private final TopListApi topListApi;
+    
+    public TopListController(TopListApi topListApi) {
+        this.topListApi = topListApi;
+    }
     
     @GetMapping("/toplist")
     public NeteaseResult toplist() {

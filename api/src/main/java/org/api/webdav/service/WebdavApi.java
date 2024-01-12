@@ -2,7 +2,6 @@ package org.api.webdav.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import org.api.common.service.QukuAPI;
 import org.api.webdav.config.WebdavConfig;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
@@ -13,13 +12,11 @@ import org.core.jpa.entity.TbResourceEntity;
 import org.core.jpa.repository.TbMusicEntityRepository;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
-import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.service.AccountService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,30 +26,27 @@ import java.util.stream.Collectors;
 
 @Service(WebdavConfig.WEBDAV + "WebdavApi")
 public class WebdavApi {
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private QukuAPI qukuApi;
+    private final TbMusicEntityRepository tbMusicEntityRepository;
     
-    @Autowired
-    private TbMusicEntityRepository tbMusicEntityRepository;
+    private final TbCollectService tbCollectService;
     
-    @Autowired
-    private TbCollectService tbCollectService;
+    private final WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
-    @Autowired
-    private TbResourceService tbResourceService;
-    
-    @Autowired
-    private WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
-    
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
     public static final String WEBDAV_COLLECT_TYPE_LIST = "webdav-collect-type-list";
     public static final String WEBDAV_PLAY_LIST = "webdav-play-list";
     public static final String WEBDAV_USER_POJO = "webdav-user-pojo";
+    
+    public WebdavApi(TbCollectMusicService collectMusicService, TbMusicEntityRepository tbMusicEntityRepository, TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, AccountService accountService) {
+        this.collectMusicService = collectMusicService;
+        this.tbMusicEntityRepository = tbMusicEntityRepository;
+        this.tbCollectService = tbCollectService;
+        this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
+        this.accountService = accountService;
+    }
     
     @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
     public CollectTypeList getUserPlayList(Long id) {

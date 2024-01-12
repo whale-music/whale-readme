@@ -2,7 +2,6 @@ package org.api.subsonic.utils.spring;
 
 import org.api.subsonic.config.SubsonicResourceReturnStrategyConfig;
 import org.core.mybatis.pojo.TbResourcePojo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -12,8 +11,11 @@ import java.util.Optional;
 @Component
 public class SubsonicResourceReturnStrategyUtil {
     
-    @Autowired
-    private SubsonicResourceReturnStrategyConfig resourceReturnStrategyConfig;
+    private final SubsonicResourceReturnStrategyConfig resourceReturnStrategyConfig;
+    
+    public SubsonicResourceReturnStrategyUtil(SubsonicResourceReturnStrategyConfig resourceReturnStrategyConfig) {
+        this.resourceReturnStrategyConfig = resourceReturnStrategyConfig;
+    }
     
     /**
      * 根据配置选择返回资源文件

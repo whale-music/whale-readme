@@ -5,7 +5,6 @@ import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
 import org.api.neteasecloudmusic.service.SimiApi;
 import org.core.common.result.NeteaseResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +16,11 @@ import java.util.List;
 @RequestMapping("/")
 @Slf4j
 public class SimiController {
-    @Autowired
-    private SimiApi simiApi;
+    private final SimiApi simiApi;
+    
+    public SimiController(SimiApi simiApi) {
+        this.simiApi = simiApi;
+    }
     
     /**
      * 获取相似歌手(随即抽取歌手)

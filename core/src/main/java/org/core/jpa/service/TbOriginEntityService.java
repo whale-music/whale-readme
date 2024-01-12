@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbOriginEntityUpdateVO;
 import org.core.jpa.model.vo.TbOriginEntityVO;
 import org.core.jpa.repository.TbOriginEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbOriginEntityService {
     
-    @Autowired
-    private TbOriginEntityRepository tbOriginEntityRepository;
+    private final TbOriginEntityRepository tbOriginEntityRepository;
+    
+    public TbOriginEntityService(TbOriginEntityRepository tbOriginEntityRepository) {
+        this.tbOriginEntityRepository = tbOriginEntityRepository;
+    }
     
     public Long save(TbOriginEntityVO vO) {
         TbOriginEntity bean = new TbOriginEntity();

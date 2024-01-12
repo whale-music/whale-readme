@@ -28,7 +28,6 @@ import org.api.subsonic.model.res.videoinfo.VideoInfoRes;
 import org.api.subsonic.model.res.videos.VideosRes;
 import org.api.subsonic.service.BrowsingApi;
 import org.core.model.HttpStatusStr;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +39,11 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class BrowsingController {
     
-    @Autowired
-    private BrowsingApi browsingApi;
+    private final BrowsingApi browsingApi;
+    
+    public BrowsingController(BrowsingApi browsingApi) {
+        this.browsingApi = browsingApi;
+    }
     
     @Operation(summary = "返回所有已配置的顶级音乐文件夹。不带额外的参数")
     @ApiResponse(responseCode = HttpStatusStr.OK,

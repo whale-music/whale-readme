@@ -26,7 +26,6 @@ import org.core.service.AccountService;
 import org.core.utils.AliasUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -35,17 +34,20 @@ import java.util.*;
 @Service(NeteaseCloudConfig.NETEASECLOUD + "TopListApi")
 public class TopListApi {
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private TbArtistService singerService;
+    private final TbArtistService singerService;
     
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
+    
+    public TopListApi(QukuAPI qukuService, TbArtistService singerService, AccountService accountService, TbCollectService collectService) {
+        this.qukuService = qukuService;
+        this.singerService = singerService;
+        this.accountService = accountService;
+        this.collectService = collectService;
+    }
     
     public TopListArtistRes artist(String type) {
         log.debug("歌手类型: {}", type);

@@ -18,7 +18,6 @@ import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -37,8 +36,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PlayListController {
     
-    @Autowired
-    private CollectApi collect;
+    private final CollectApi collect;
+    
+    public PlayListController(CollectApi collect) {
+        this.collect = collect;
+    }
     
     
     /**

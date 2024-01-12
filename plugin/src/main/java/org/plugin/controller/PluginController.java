@@ -10,7 +10,6 @@ import org.plugin.converter.*;
 import org.plugin.model.PluginRunParamsRes;
 import org.plugin.model.PluginTaskLogRes;
 import org.plugin.service.PluginService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +19,11 @@ import java.util.Optional;
 @RequestMapping("/admin")
 public class PluginController {
     
-    @Autowired
-    private PluginService pluginService;
+    private final PluginService pluginService;
+    
+    public PluginController(PluginService pluginService) {
+        this.pluginService = pluginService;
+    }
     
     @PostMapping("/saveOrUpdatePlugin")
     public R saveOrUpdatePlugin(@RequestBody PluginReq req) {

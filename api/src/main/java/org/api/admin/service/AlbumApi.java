@@ -27,7 +27,6 @@ import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,26 +40,29 @@ public class AlbumApi {
     /**
      * 专辑表
      */
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
     /**
      * 专辑歌手中间表
      */
-    @Autowired
-    private TbAlbumArtistService albumSingerService;
+    private final TbAlbumArtistService albumSingerService;
     
     /**
      * 歌手表
      */
-    @Autowired
-    private TbArtistService singerService;
+    private final TbArtistService singerService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private HttpRequestConfig httpRequestConfig;
+    private final HttpRequestConfig httpRequestConfig;
+    
+    public AlbumApi(TbAlbumService albumService, TbAlbumArtistService albumSingerService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig) {
+        this.albumService = albumService;
+        this.albumSingerService = albumSingerService;
+        this.singerService = singerService;
+        this.qukuService = qukuService;
+        this.httpRequestConfig = httpRequestConfig;
+    }
     
     
     public Page<AlbumPageRes> getAllAlbumList(AlbumPageReq req) {

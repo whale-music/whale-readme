@@ -14,7 +14,6 @@ import org.core.common.result.NeteaseResult;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.web.neteasecloudmusic.controller.BaseController;
 
@@ -35,8 +34,11 @@ import java.util.Optional;
 @Slf4j
 public class UserController extends BaseController {
     
-    @Autowired
-    private UserApi user;
+    private final UserApi user;
+    
+    public UserController(UserApi user) {
+        this.user = user;
+    }
     
     
     /**

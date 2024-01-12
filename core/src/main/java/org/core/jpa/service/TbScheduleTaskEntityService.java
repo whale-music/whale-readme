@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbScheduleTaskEntityUpdateVO;
 import org.core.jpa.model.vo.TbScheduleTaskEntityVO;
 import org.core.jpa.repository.TbScheduleTaskEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbScheduleTaskEntityService {
     
-    @Autowired
-    private TbScheduleTaskEntityRepository tbScheduleTaskEntityRepository;
+    private final TbScheduleTaskEntityRepository tbScheduleTaskEntityRepository;
+    
+    public TbScheduleTaskEntityService(TbScheduleTaskEntityRepository tbScheduleTaskEntityRepository) {
+        this.tbScheduleTaskEntityRepository = tbScheduleTaskEntityRepository;
+    }
     
     public Long save(TbScheduleTaskEntityVO vO) {
         TbScheduleTaskEntity bean = new TbScheduleTaskEntity();

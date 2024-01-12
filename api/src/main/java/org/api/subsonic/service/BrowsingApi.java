@@ -39,7 +39,6 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -49,32 +48,16 @@ import java.util.stream.Collectors;
 @Service(SubsonicConfig.SUBSONIC + "BrowsingApi")
 public class BrowsingApi {
     
-    @Autowired
-    private QukuAPI qukuService;
-    
-    @Autowired
-    private TbAlbumService albumService;
-    
-    @Autowired
-    private TbMusicService musicService;
-    
-    @Autowired
-    private TbArtistService tbArtistService;
-    
-    @Autowired
-    private TbMiddleTagService tbMiddleTagService;
-    
-    @Autowired
-    private TbTagService tbTagService;
-    
-    @Autowired
-    private TbResourceService tbResourceService;
-    
-    @Autowired
-    private SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
-    
-    @Autowired
-    private TbMusicArtistService tbMusicArtistService;
+    private static final String URL = "http://www.last.fm";
+    private final QukuAPI qukuService;
+    private final TbAlbumService albumService;
+    private final TbMusicService musicService;
+    private final TbArtistService tbArtistService;
+    private final TbMiddleTagService tbMiddleTagService;
+    private final TbTagService tbTagService;
+    private final TbResourceService tbResourceService;
+    private final SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
+    private final TbMusicArtistService tbMusicArtistService;
     
     @NotNull
     private static Character getCharacterFirstLetter(String name) {
@@ -134,74 +117,16 @@ public class BrowsingApi {
         }
     }
     
-    public AlbumRes getAlbum(Long id) {
-        TbAlbumPojo albumPojo = albumService.getById(id);
-        Album album = new Album();
-        album.setId(String.valueOf(albumPojo.getId()));
-        album.setName(albumPojo.getAlbumName());
-        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
-        ArtistConvert artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new ArtistConvert() : artistListByAlbumIds.get(0);
-        album.setArtist(artistPojo.getArtistName());
-        album.setArtistId(String.valueOf(artistPojo.getId()));
-        album.setCoverArt(String.valueOf(albumPojo.getId()));
-        album.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
-        album.setPlayCount(0);
-        album.setPlayed(albumPojo.getUpdateTime().toString());
-        album.setCreated(albumPojo.getCreateTime().toString());
-        album.setYear(albumPojo.getPublishTime().getYear());
-        album.setStarred(albumPojo.getUpdateTime().toString());
-        
-        ArrayList<SongItem> song = new ArrayList<>();
-        List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
-        List<ArtistConvert> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
-        ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new ArtistConvert() : artistListByAlbumIds1.get(0);
-        Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
-                                                                                                    .map(TbMusicPojo::getId)
-                                                                                                    .collect(Collectors.toSet()));
-        int duration = 0;
-        for (TbMusicPojo musicPojo : musicListByAlbumId) {
-            SongItem e = new SongItem();
-            e.setId(String.valueOf(musicPojo.getId()));
-            e.setParent(String.valueOf(albumPojo.getId()));
-            e.setIsDir(false);
-            e.setTitle(musicPojo.getMusicName());
-            e.setAlbum(albumPojo.getAlbumName());
-            e.setAlbumId(String.valueOf(albumPojo.getId()));
-            e.setArtist(tbArtistPojo.getArtistName());
-            e.setArtistId(String.valueOf(tbArtistPojo.getId()));
-            e.setTrack(1);
-            e.setYear(albumPojo.getPublishTime().getYear());
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
-            List<TbResourcePojo> musicPath = musicMapUrl.get(musicPojo.getId());
-            TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(musicPath);
-            if (Objects.nonNull(tbResourcePojo)) {
-                e.setSize(Math.toIntExact(tbResourcePojo.getSize() == null ? 0 : tbResourcePojo.getSize()));
-                e.setSuffix(tbResourcePojo.getEncodeType());
-                e.setBitRate(tbResourcePojo.getRate());
-                e.setPath(tbResourcePojo.getPath());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    e.setContentType("audio/mpeg");
-                } else {
-                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
-            }
-            e.setStarred(musicPojo.getUpdateTime().toString());
-            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
-            e.setPlayCount(0);
-            e.setPlayed(musicPojo.getCreateTime().toString());
-            e.setType("music");
-            e.setIsVideo(false);
-            e.setCreated(albumPojo.getPublishTime().toString());
-            song.add(e);
-            duration += musicPojo.getTimeLength();
-        }
-        album.setDuration(duration / 1000);
-        album.setSong(song);
-        
-        
-        AlbumRes albumRes = new AlbumRes();
-        albumRes.setAlbum(album);
-        return albumRes;
+    public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService) {
+        this.qukuService = qukuService;
+        this.albumService = albumService;
+        this.musicService = musicService;
+        this.tbArtistService = tbArtistService;
+        this.tbMiddleTagService = tbMiddleTagService;
+        this.tbTagService = tbTagService;
+        this.tbResourceService = tbResourceService;
+        this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
+        this.tbMusicArtistService = tbMusicArtistService;
     }
     
     public SongRes getSong(Long id) {
@@ -530,6 +455,77 @@ public class BrowsingApi {
         return artistInfoRes;
     }
     
+    public AlbumRes getAlbum(Long id) {
+        TbAlbumPojo albumPojo = albumService.getById(id);
+        Album album = new Album();
+        album.setId(String.valueOf(albumPojo.getId()));
+        album.setName(albumPojo.getAlbumName());
+        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+        ArtistConvert artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new ArtistConvert() : artistListByAlbumIds.get(0);
+        album.setArtist(artistPojo.getArtistName());
+        album.setArtistId(String.valueOf(artistPojo.getId()));
+        album.setCoverArt(String.valueOf(albumPojo.getId()));
+        album.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
+        album.setPlayCount(0);
+        album.setPlayed(albumPojo.getUpdateTime().toString());
+        album.setCreated(albumPojo.getCreateTime().toString());
+        album.setYear(albumPojo.getPublishTime().getYear());
+        album.setStarred(albumPojo.getUpdateTime().toString());
+        
+        ArrayList<SongItem> song = new ArrayList<>();
+        List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
+        List<ArtistConvert> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
+        ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new ArtistConvert() : artistListByAlbumIds1.get(0);
+        Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
+                                                                                                    .map(TbMusicPojo::getId)
+                                                                                                    .collect(Collectors.toSet()));
+        int duration = 0;
+        for (TbMusicPojo musicPojo : musicListByAlbumId) {
+            SongItem e = new SongItem();
+            e.setId(String.valueOf(musicPojo.getId()));
+            e.setParent(String.valueOf(albumPojo.getId()));
+            e.setIsDir(false);
+            e.setTitle(musicPojo.getMusicName());
+            e.setAlbum(albumPojo.getAlbumName());
+            e.setAlbumId(String.valueOf(albumPojo.getId()));
+            e.setArtist(tbArtistPojo.getArtistName());
+            e.setArtistId(String.valueOf(tbArtistPojo.getId()));
+            e.setTrack(1);
+            e.setYear(albumPojo.getPublishTime().getYear());
+            e.setCoverArt(String.valueOf(musicPojo.getId()));
+            List<TbResourcePojo> musicPath = musicMapUrl.get(musicPojo.getId());
+            TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(musicPath);
+            if (Objects.nonNull(tbResourcePojo)) {
+                e.setSize(Math.toIntExact(tbResourcePojo.getSize() == null ? 0 : tbResourcePojo.getSize()));
+                e.setSuffix(tbResourcePojo.getEncodeType());
+                e.setBitRate(tbResourcePojo.getRate());
+                e.setPath(tbResourcePojo.getPath());
+                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
+                    // TODO 需要修改为Mime，不要使用魔法值
+                    e.setContentType("audio/mpeg");
+                } else {
+                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
+                }
+            }
+            e.setStarred(musicPojo.getUpdateTime().toString());
+            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
+            e.setPlayCount(0);
+            e.setPlayed(musicPojo.getCreateTime().toString());
+            e.setType("music");
+            e.setIsVideo(false);
+            e.setCreated(albumPojo.getPublishTime().toString());
+            song.add(e);
+            duration += musicPojo.getTimeLength();
+        }
+        album.setDuration(duration / 1000);
+        album.setSong(song);
+        
+        
+        AlbumRes albumRes = new AlbumRes();
+        albumRes.setAlbum(album);
+        return albumRes;
+    }
+    
     /**
      * 专辑信息
      *
@@ -543,7 +539,7 @@ public class BrowsingApi {
         TbAlbumPojo albumPojo = albumService.getById(id);
         if (Objects.nonNull(albumPojo)) {
             albumInfo.setNotes(albumPojo.getDescription());
-            albumInfo.setLastFmUrl("http://www.last.fm");
+            albumInfo.setLastFmUrl(URL);
             String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
             albumInfo.setLargeImageUrl(albumPicUrl);
             albumInfo.setSmallImageUrl(albumPicUrl);
@@ -557,7 +553,7 @@ public class BrowsingApi {
             if (Objects.nonNull(albumId)) {
                 TbAlbumPojo albumPojo1 = albumService.getById(albumId);
                 albumInfo.setNotes(albumPojo1.getDescription());
-                albumInfo.setLastFmUrl("http://www.last.fm");
+                albumInfo.setLastFmUrl(URL);
                 String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo1.getId());
                 albumInfo.setLargeImageUrl(albumPicUrl);
                 albumInfo.setSmallImageUrl(albumPicUrl);

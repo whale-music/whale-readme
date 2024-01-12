@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbMusicEntityUpdateVO;
 import org.core.jpa.model.vo.TbMusicEntityVO;
 import org.core.jpa.repository.TbMusicEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbMusicEntityService {
     
-    @Autowired
-    private TbMusicEntityRepository tbMusicEntityRepository;
+    private final TbMusicEntityRepository tbMusicEntityRepository;
+    
+    public TbMusicEntityService(TbMusicEntityRepository tbMusicEntityRepository) {
+        this.tbMusicEntityRepository = tbMusicEntityRepository;
+    }
     
     public Long save(TbMusicEntityVO vO) {
         TbMusicEntity bean = new TbMusicEntity();

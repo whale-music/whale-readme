@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbUserCollectEntityUpdateVO;
 import org.core.jpa.model.vo.TbUserCollectEntityVO;
 import org.core.jpa.repository.TbUserCollectEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbUserCollectEntityService {
     
-    @Autowired
-    private TbUserCollectEntityRepository tbUserCollectEntityRepository;
+    private final TbUserCollectEntityRepository tbUserCollectEntityRepository;
+    
+    public TbUserCollectEntityService(TbUserCollectEntityRepository tbUserCollectEntityRepository) {
+        this.tbUserCollectEntityRepository = tbUserCollectEntityRepository;
+    }
     
     public Long save(TbUserCollectEntityVO vO) {
         TbUserCollectEntity bean = new TbUserCollectEntity();

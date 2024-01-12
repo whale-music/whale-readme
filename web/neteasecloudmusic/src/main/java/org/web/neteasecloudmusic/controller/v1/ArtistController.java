@@ -12,7 +12,6 @@ import org.api.neteasecloudmusic.service.ArtistApi;
 import org.core.common.result.NeteaseResult;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,8 +27,11 @@ public class ArtistController {
     /**
      * 歌手API
      */
-    @Autowired
-    private ArtistApi artistApi;
+    private final ArtistApi artistApi;
+    
+    public ArtistController(ArtistApi artistApi) {
+        this.artistApi = artistApi;
+    }
     
     /**
      * 获取歌手(信息)单曲
@@ -65,6 +67,7 @@ public class ArtistController {
     
     @GetMapping("/artist/mv")
     public NeteaseResult artistMv() {
+        // TODO MV 填充
         ArtistMvRes res = new ArtistMvRes();
         res.setName("超级面对面 第119期 周杰伦：想让歌迷听一辈子");
         Artist artist = new Artist();

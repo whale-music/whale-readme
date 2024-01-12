@@ -20,7 +20,6 @@ import java.util.Map;
 
 @Configuration
 public class UserSubPasswordConfig {
-    public static final String ACCOUNT_NAME = "name";
     public static final String ACCOUNT = "account";
     public static final String PASSWORD = "password";
     protected static final Map<String, String> allSubAccount = new LinkedHashMap<>();
@@ -29,7 +28,7 @@ public class UserSubPasswordConfig {
     };
     @Autowired
     @Qualifier("sysUserServiceImpl")
-    SysUserService accountService;
+    private SysUserService accountService;
     
     /**
      * 初始化用户子账户信息

@@ -27,7 +27,6 @@ import org.core.jpa.entity.TbResourceEntity;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.i18n.I18nUtil;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web.webdav.model.WebDavFolder;
 import org.web.webdav.model.WebDavResource;
@@ -46,17 +45,20 @@ public class WebDavController {
     private static final String COMMON = "common";
     private static final String REFRESH = "refresh";
     
-    @Autowired
-    private Cache<String, String> resource;
+    private final Cache<String, String> resource;
     
-    @Autowired
-    private WebdavApi webdavApi;
+    private final WebdavApi webdavApi;
     
-    @Autowired
-    private QukuAPI qukuApi;
+    private final QukuAPI qukuApi;
     
-    @Autowired
-    private WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil;
+    private final WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil;
+    
+    public WebDavController(Cache<String, String> resource, WebdavApi webdavApi, QukuAPI qukuApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil) {
+        this.resource = resource;
+        this.webdavApi = webdavApi;
+        this.qukuApi = qukuApi;
+        this.webdavResourceReturnStrategyUtil = webdavResourceReturnStrategyUtil;
+    }
     
     @Nullable
     private static List<? extends Resource> getWebDavFolders(WebDavFolder webDavFolder, String type) {

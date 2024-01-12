@@ -9,7 +9,6 @@ import org.api.neteasecloudmusic.model.vo.songurl.SongUrlRes;
 import org.api.neteasecloudmusic.service.MusicApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +26,11 @@ import java.util.List;
 @Slf4j
 public class SongController {
     
-    @Autowired
-    private MusicApi musicApi;
+    private final MusicApi musicApi;
+    
+    public SongController(MusicApi musicApi) {
+        this.musicApi = musicApi;
+    }
     
     /**
      * 获取歌曲详情

@@ -12,7 +12,6 @@ import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -25,8 +24,11 @@ import java.util.Optional;
 @Slf4j
 public class PlayListController {
     
-    @Autowired
-    private PlayListApi playList;
+    private final PlayListApi playList;
+    
+    public PlayListController(PlayListApi playList) {
+        this.playList = playList;
+    }
     
     /**
      * 获取全部音乐

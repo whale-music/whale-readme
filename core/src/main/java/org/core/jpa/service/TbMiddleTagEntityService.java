@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbMiddleTagEntityUpdateVO;
 import org.core.jpa.model.vo.TbMiddleTagEntityVO;
 import org.core.jpa.repository.TbMiddleTagEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbMiddleTagEntityService {
     
-    @Autowired
-    private TbMiddleTagEntityRepository tbMiddleTagEntityRepository;
+    private final TbMiddleTagEntityRepository tbMiddleTagEntityRepository;
+    
+    public TbMiddleTagEntityService(TbMiddleTagEntityRepository tbMiddleTagEntityRepository) {
+        this.tbMiddleTagEntityRepository = tbMiddleTagEntityRepository;
+    }
     
     public Long save(TbMiddleTagEntityVO vO) {
         TbMiddleTagEntity bean = new TbMiddleTagEntity();

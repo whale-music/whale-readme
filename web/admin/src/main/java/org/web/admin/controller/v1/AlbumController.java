@@ -10,7 +10,6 @@ import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,8 +20,11 @@ import java.util.Map;
 @Slf4j
 public class AlbumController {
     
-    @Autowired
-    private AlbumApi albumApi;
+    private final AlbumApi albumApi;
+    
+    public AlbumController(AlbumApi albumApi) {
+        this.albumApi = albumApi;
+    }
     
     @PostMapping("/page")
     public R getAllAlbumList(@RequestBody AlbumPageReq req) {

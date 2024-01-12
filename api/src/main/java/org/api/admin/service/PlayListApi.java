@@ -32,7 +32,6 @@ import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,35 +44,38 @@ public class PlayListApi {
     /**
      * 音乐表
      */
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
     /**
      * 专辑表
      */
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
     /**
      * 歌单与音乐中间表
      */
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private PlayListService playListService;
+    private final PlayListService playListService;
     
-    @Autowired
-    private TbResourceService musicUrlService;
+    private final TbResourceService musicUrlService;
     
-    @Autowired
-    private DefaultInfo defaultInfo;
+    private final DefaultInfo defaultInfo;
+    
+    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo) {
+        this.musicService = musicService;
+        this.qukuService = qukuService;
+        this.albumService = albumService;
+        this.collectService = collectService;
+        this.collectMusicService = collectMusicService;
+        this.playListService = playListService;
+        this.musicUrlService = musicUrlService;
+        this.defaultInfo = defaultInfo;
+    }
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
         // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序

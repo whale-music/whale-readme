@@ -6,7 +6,6 @@ import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.utils.AliasUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,8 +15,11 @@ import java.util.List;
 @Service(NeteaseCloudConfig.NETEASECLOUD + "SimiApi")
 public class SimiApi {
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
+    
+    public SimiApi(QukuAPI qukuService) {
+        this.qukuService = qukuService;
+    }
     
     /**
      * 获取相似歌手

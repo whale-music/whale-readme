@@ -10,7 +10,6 @@ import org.api.neteasecloudmusic.service.AlbumApi;
 import org.core.common.result.NeteaseResult;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AlbumController {
     
-    @Autowired
-    private AlbumApi albumApi;
+    private final AlbumApi albumApi;
+    
+    public AlbumController(AlbumApi albumApi) {
+        this.albumApi = albumApi;
+    }
     
     @GetMapping("/album")
     public NeteaseResult album(@RequestParam("id") Long id) {

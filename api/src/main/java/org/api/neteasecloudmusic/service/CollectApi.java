@@ -26,7 +26,6 @@ import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,39 +37,38 @@ import java.util.*;
 @Service(NeteaseCloudConfig.NETEASECLOUD + "CollectApi")
 public class CollectApi {
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
-    @Autowired
-    private TbUserCollectService userCollectService;
+    private final TbUserCollectService userCollectService;
     
-    @Autowired
-    private TbTagService tagService;
+    private final TbTagService tagService;
     
-    @Autowired
-    private TbMiddleTagService collectMusicTagService;
+    private final TbMiddleTagService collectMusicTagService;
     
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
-    @Autowired
-    private TbResourceService musicUrlService;
+    private final TbResourceService musicUrlService;
     
+    private final PlayListService playListService;
     
-    @Autowired
-    private PlayListService playListService;
+    private final AccountService accountService;
     
-    @Autowired
-    private AccountService accountService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private QukuAPI qukuService;
-    
-    @Autowired
-    private DefaultInfo defaultInfo;
+    public CollectApi(TbMiddleTagService collectMusicTagService, TbCollectService collectService, TbUserCollectService userCollectService, TbTagService tagService, TbCollectMusicService collectMusicService, TbMusicService musicService, TbResourceService musicUrlService, PlayListService playListService, AccountService accountService, QukuAPI qukuService, DefaultInfo defaultInfo) {
+        this.collectMusicTagService = collectMusicTagService;
+        this.collectService = collectService;
+        this.userCollectService = userCollectService;
+        this.tagService = tagService;
+        this.collectMusicService = collectMusicService;
+        this.musicService = musicService;
+        this.musicUrlService = musicUrlService;
+        this.playListService = playListService;
+        this.accountService = accountService;
+        this.qukuService = qukuService;
+    }
     
     /**
      * 是否包含tag

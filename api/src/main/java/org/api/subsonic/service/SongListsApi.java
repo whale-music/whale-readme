@@ -34,7 +34,6 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -44,47 +43,50 @@ import java.util.stream.Collectors;
 @Service(SubsonicConfig.SUBSONIC + "SongListsApi")
 public class SongListsApi {
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private TbCollectMusicService tbCollectMusicService;
+    private final TbCollectMusicService tbCollectMusicService;
     
-    @Autowired
-    private TbMusicService tbMusicService;
+    private final TbMusicService tbMusicService;
     
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
-    @Autowired
-    private TbArtistService tbArtistService;
+    private final TbArtistService tbArtistService;
     
-    @Autowired
-    private TbCollectService tbCollectService;
+    private final TbCollectService tbCollectService;
     
-    @Autowired
-    private TbMvService tbMvService;
+    private final TbMvService tbMvService;
     
-    @Autowired
-    private TbHistoryService tbHistoryService;
+    private final TbHistoryService tbHistoryService;
     
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
-    @Autowired
-    private SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    private final SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
     
-    @Autowired
-    private TbMiddleTagService tbMiddleTagService;
+    private final TbMiddleTagService tbMiddleTagService;
     
-    @Autowired
-    private TbTagService tbTagService;
+    private final TbTagService tbTagService;
     
-    @Autowired
-    private TbUserAlbumService tbUserAlbumService;
+    private final TbUserAlbumService tbUserAlbumService;
     
-    @Autowired
-    private TbUserArtistService tbUserArtistService;
+    private final TbUserArtistService tbUserArtistService;
+    
+    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbCollectService tbCollectService, TbMvService tbMvService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService) {
+        this.tbCollectMusicService = tbCollectMusicService;
+        this.qukuService = qukuService;
+        this.tbMusicService = tbMusicService;
+        this.tbUserAlbumService = tbUserAlbumService;
+        this.tbUserArtistService = tbUserArtistService;
+        this.albumService = albumService;
+        this.tbTagService = tbTagService;
+        this.tbArtistService = tbArtistService;
+        this.tbCollectService = tbCollectService;
+        this.tbMvService = tbMvService;
+        this.tbHistoryService = tbHistoryService;
+        this.accountService = accountService;
+        this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
+        this.tbMiddleTagService = tbMiddleTagService;
+    }
     
     
     /**
@@ -265,6 +267,7 @@ public class SongListsApi {
                 id,
                 HistoryConstant.MV,
                 timeStamp)) {
+            // TODO MV 后续处理
             return;
         }
     }

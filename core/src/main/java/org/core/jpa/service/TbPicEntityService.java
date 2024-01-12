@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbPicEntityUpdateVO;
 import org.core.jpa.model.vo.TbPicEntityVO;
 import org.core.jpa.repository.TbPicEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbPicEntityService {
     
-    @Autowired
-    private TbPicEntityRepository tbPicEntityRepository;
+    private final TbPicEntityRepository tbPicEntityRepository;
+    
+    public TbPicEntityService(TbPicEntityRepository tbPicEntityRepository) {
+        this.tbPicEntityRepository = tbPicEntityRepository;
+    }
     
     public Long save(TbPicEntityVO vO) {
         TbPicEntity bean = new TbPicEntity();

@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.SysUserEntityUpdateVO;
 import org.core.jpa.model.vo.SysUserEntityVO;
 import org.core.jpa.repository.SysUserEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class SysUserEntityService {
     
-    @Autowired
-    private SysUserEntityRepository sysUserEntityRepository;
+    private final SysUserEntityRepository sysUserEntityRepository;
+    
+    public SysUserEntityService(SysUserEntityRepository sysUserEntityRepository) {
+        this.sysUserEntityRepository = sysUserEntityRepository;
+    }
     
     public Long save(SysUserEntityVO vO) {
         SysUserEntity bean = new SysUserEntity();

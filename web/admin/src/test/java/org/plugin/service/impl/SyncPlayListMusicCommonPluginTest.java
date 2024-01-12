@@ -39,10 +39,10 @@ class SyncPlayListMusicCommonPluginTest {
     void testApply() {
         SyncPlayListMusicPlugin plugin = new SyncPlayListMusicPlugin();
         List<PluginLabelValue> params = plugin.getParams();
-        String cookieStr = "MUSIC_U=d33658da9213990dece8c775a34a34c50a72fdf0cc97532e1e2f6d7efc8affd3519e07624a9f00535f3dd833cb266a5025ff223deb3065a43726809422c6334bdebf8de6ed45b634d4dbf082a8813684";
-        String hostStr = "http://43.139.22.243:3000";
-        String playListIdStr = "7234346265";
-        String localUserIdStr = "403648304906373";
+        String cookieStr = "";
+        String hostStr = "";
+        String playListIdStr = "";
+        String localUserIdStr = "";
         
         params.parallelStream()
               .filter(pluginLabelValue -> StringUtils.equals(SyncPlayListMusicPlugin.COOKIE_KEY, pluginLabelValue.getKey()))
@@ -70,7 +70,7 @@ class SyncPlayListMusicCommonPluginTest {
         
         TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(405408338284677L, params, 403648304906373L);
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService,
-                qukuService, taskPojo.getId(), taskPojo.getUserId(), plugin);
+                qukuService, taskPojo.getId(), taskPojo.getUserId());
         plugin.apply(params, pluginPackage);
     }
 }

@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbLyricEntityUpdateVO;
 import org.core.jpa.model.vo.TbLyricEntityVO;
 import org.core.jpa.repository.TbLyricEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbLyricEntityService {
     
-    @Autowired
-    private TbLyricEntityRepository tbLyricEntityRepository;
+    private final TbLyricEntityRepository tbLyricEntityRepository;
+    
+    public TbLyricEntityService(TbLyricEntityRepository tbLyricEntityRepository) {
+        this.tbLyricEntityRepository = tbLyricEntityRepository;
+    }
     
     public Long save(TbLyricEntityVO vO) {
         TbLyricEntity bean = new TbLyricEntity();

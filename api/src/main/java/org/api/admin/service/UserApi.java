@@ -30,7 +30,6 @@ import org.core.utils.ExceptionUtil;
 import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -44,32 +43,35 @@ import java.util.Set;
 public class UserApi {
     
     // 用户服务
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
-    @Autowired
-    private QukuAPI qukuAPI;
+    private final QukuAPI qukuAPI;
     
-    @Autowired
-    private HttpRequestConfig requestConfig;
+    private final HttpRequestConfig requestConfig;
     
-    @Autowired
-    private TbUserCollectService userCollectService;
+    private final TbUserCollectService userCollectService;
     
-    @Autowired
-    private TbUserAlbumService userAlbumService;
+    private final TbUserAlbumService userAlbumService;
     
-    @Autowired
-    private TbUserArtistService userArtistService;
+    private final TbUserArtistService userArtistService;
     
-    @Autowired
-    private TbUserMvService userMvService;
+    private final TbUserMvService userMvService;
     
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private UserSubPasswordConfig userSubPasswordConfig;
+    private final UserSubPasswordConfig userSubPasswordConfig;
+    
+    public UserApi(AccountService accountService, QukuAPI qukuAPI, HttpRequestConfig requestConfig, TbUserCollectService userCollectService, TbUserAlbumService userAlbumService, TbUserArtistService userArtistService, TbUserMvService userMvService, TbCollectMusicService collectMusicService, UserSubPasswordConfig userSubPasswordConfig) {
+        this.accountService = accountService;
+        this.qukuAPI = qukuAPI;
+        this.requestConfig = requestConfig;
+        this.userCollectService = userCollectService;
+        this.userAlbumService = userAlbumService;
+        this.userArtistService = userArtistService;
+        this.userMvService = userMvService;
+        this.collectMusicService = collectMusicService;
+        this.userSubPasswordConfig = userSubPasswordConfig;
+    }
     
     public void createAccount(UserReq req) {
         accountService.createAccount(req);

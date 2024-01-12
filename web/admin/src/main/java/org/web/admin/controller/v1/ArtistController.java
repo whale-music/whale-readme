@@ -12,7 +12,6 @@ import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
 import org.core.mybatis.model.convert.ArtistConvert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +23,11 @@ import java.util.Map;
 public class ArtistController {
     
     
-    @Autowired
-    private ArtistApi artistApi;
+    private final ArtistApi artistApi;
+    
+    public ArtistController(ArtistApi artistApi) {
+        this.artistApi = artistApi;
+    }
     
     @PostMapping("/allSinger")
     public R getAllSingerList(@RequestBody AlbumPageReq req) {

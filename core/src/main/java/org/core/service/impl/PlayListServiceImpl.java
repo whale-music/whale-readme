@@ -14,23 +14,24 @@ import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.service.PlayListService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-@Service("PlayListServiceImpl")
+@Service("playListServiceImpl")
 public class PlayListServiceImpl implements PlayListService {
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
-    @Autowired
-    private TbCollectMusicService collectMusicService;
+    private final TbCollectMusicService collectMusicService;
     
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
+    
+    public PlayListServiceImpl(TbCollectService collectService, TbCollectMusicService collectMusicService, TbMusicService musicService) {
+        this.collectService = collectService;
+        this.collectMusicService = collectMusicService;
+        this.musicService = musicService;
+    }
     
     public Page<TbCollectPojo> getPlayList(TbCollectPojo collectPojo, Long current, Long size, Byte type) {
         collectPojo = Optional.ofNullable(collectPojo).orElse(new TbCollectPojo());
@@ -70,7 +71,7 @@ public class PlayListServiceImpl implements PlayListService {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
-        List<Long> musicIds = list.stream().map(TbCollectMusicPojo::getMusicId).collect(Collectors.toList());
+        List<Long> musicIds = list.stream().map(TbCollectMusicPojo::getMusicId).toList();
         return musicService.listByIds(musicIds);
     }
     

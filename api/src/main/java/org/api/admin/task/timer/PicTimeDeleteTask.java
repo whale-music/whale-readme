@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class PicTimeDeleteTask {
@@ -36,7 +35,7 @@ public class PicTimeDeleteTask {
         // List<TbCollectPojo> collectList = collectService.list();
         //
         // List<TbPicPojo> list = picService.list();
-        // List<Long> picIds = list.parallelStream().map(TbPicPojo::getId).collect(Collectors.toList());
+        // List<Long> picIds = list.parallelStream().map(TbPicPojo::getId).toList();
         // Set<Long> musicPicIds = musicList.parallelStream().map(TbMusicPojo::getId).collect(Collectors.toSet());
         // Set<Long> albumPicIds = albumList.parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
         // Set<Long> artistPicIds = artistList.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet());
@@ -61,8 +60,8 @@ public class PicTimeDeleteTask {
     public void autoDeleteTag() {
         List<TbTagPojo> tagList = tagService.list();
         List<TbMiddleTagPojo> middleTagList = middleTagService.list();
-        List<Long> tagIds = tagList.parallelStream().map(TbTagPojo::getId).collect(Collectors.toList());
-        List<Long> middleTagIds = middleTagList.parallelStream().map(TbMiddleTagPojo::getMiddleId).collect(Collectors.toList());
+        List<Long> tagIds = tagList.parallelStream().map(TbTagPojo::getId).toList();
+        List<Long> middleTagIds = middleTagList.parallelStream().map(TbMiddleTagPojo::getMiddleId).toList();
         List<Long> subtract = CollUtil.subtractToList(tagIds, middleTagIds);
         if (CollUtil.isNotEmpty(subtract)) {
             subtract.parallelStream().forEach(qukuAPI::removeLabelAll);

@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbUserArtistEntityUpdateVO;
 import org.core.jpa.model.vo.TbUserArtistEntityVO;
 import org.core.jpa.repository.TbUserArtistEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbUserArtistEntityService {
     
-    @Autowired
-    private TbUserArtistEntityRepository tbUserArtistEntityRepository;
+    private final TbUserArtistEntityRepository tbUserArtistEntityRepository;
+    
+    public TbUserArtistEntityService(TbUserArtistEntityRepository tbUserArtistEntityRepository) {
+        this.tbUserArtistEntityRepository = tbUserArtistEntityRepository;
+    }
     
     public Long save(TbUserArtistEntityVO vO) {
         TbUserArtistEntity bean = new TbUserArtistEntity();

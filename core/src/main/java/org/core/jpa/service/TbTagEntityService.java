@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbTagEntityUpdateVO;
 import org.core.jpa.model.vo.TbTagEntityVO;
 import org.core.jpa.repository.TbTagEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbTagEntityService {
     
-    @Autowired
-    private TbTagEntityRepository tbTagEntityRepository;
+    private final TbTagEntityRepository tbTagEntityRepository;
+    
+    public TbTagEntityService(TbTagEntityRepository tbTagEntityRepository) {
+        this.tbTagEntityRepository = tbTagEntityRepository;
+    }
     
     public Long save(TbTagEntityVO vO) {
         TbTagEntity bean = new TbTagEntity();

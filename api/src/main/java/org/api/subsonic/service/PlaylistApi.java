@@ -18,7 +18,6 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbCollectService;
-import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.CollectConvert;
@@ -26,7 +25,6 @@ import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,20 +34,20 @@ import java.util.*;
 @Service(SubsonicConfig.SUBSONIC + "PlaylistApi")
 public class PlaylistApi {
     
-    @Autowired
-    private QukuAPI qukuApi;
+    private final QukuAPI qukuApi;
     
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
     
-    @Autowired
-    private PlayListService playListService;
+    private final PlayListService playListService;
     
-    @Autowired
-    private TbCollectService collectService;
+    private final TbCollectService collectService;
     
-    @Autowired
-    private TbResourceService tbResourceService;
+    public PlaylistApi(QukuAPI qukuApi, AccountService accountService, PlayListService playListService, TbCollectService collectService) {
+        this.qukuApi = qukuApi;
+        this.accountService = accountService;
+        this.playListService = playListService;
+        this.collectService = collectService;
+    }
     
     public PlaylistsRes getPlaylists(SubsonicCommonReq req, String username) {
         username = StringUtils.isBlank(username) ? req.getU() : username;

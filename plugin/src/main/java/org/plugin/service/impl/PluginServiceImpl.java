@@ -34,7 +34,6 @@ import org.plugin.model.PluginTaskLogRes;
 import org.plugin.scheduling.DynamicTaskService;
 import org.plugin.service.PluginService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
@@ -47,26 +46,29 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class PluginServiceImpl implements PluginService {
-    @Autowired
-    private MusicFlowApi musicFlowApi;
+    private final MusicFlowApi musicFlowApi;
     
-    @Autowired
-    private TbPluginMsgService pluginMsgService;
+    private final TbPluginMsgService pluginMsgService;
     
-    @Autowired
-    private TbPluginTaskService pluginTaskService;
+    private final TbPluginTaskService pluginTaskService;
     
-    @Autowired
-    private TbPluginService pluginService;
+    private final TbPluginService pluginService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private TbScheduleTaskService scheduleTaskService;
+    private final TbScheduleTaskService scheduleTaskService;
     
-    @Autowired
-    private DynamicTaskService dynamicTaskService;
+    private final DynamicTaskService dynamicTaskService;
+    
+    public PluginServiceImpl(MusicFlowApi musicFlowApi, TbPluginMsgService pluginMsgService, TbPluginTaskService pluginTaskService, TbPluginService pluginService, QukuAPI qukuService, TbScheduleTaskService scheduleTaskService, DynamicTaskService dynamicTaskService) {
+        this.musicFlowApi = musicFlowApi;
+        this.pluginMsgService = pluginMsgService;
+        this.pluginTaskService = pluginTaskService;
+        this.pluginService = pluginService;
+        this.qukuService = qukuService;
+        this.scheduleTaskService = scheduleTaskService;
+        this.dynamicTaskService = dynamicTaskService;
+    }
     
     private static CommonPlugin runCommonCode(String script, String allClassName) {
         try {
@@ -228,8 +230,8 @@ public class PluginServiceImpl implements PluginService {
                     pluginTaskService,
                     qukuService,
                     task.getId(),
-                    task.getUserId(),
-                    null);
+                    task.getUserId()
+            );
             pluginPackage.log((byte) 3, "error错误: {}: {}", e.getClass().getName(), e.getMessage());
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.PLUGIN_CODE.getCode(), e.getMessage());
@@ -268,8 +270,8 @@ public class PluginServiceImpl implements PluginService {
                 pluginTaskService,
                 qukuService,
                 task.getId(),
-                task.getUserId(),
-                null);
+                task.getUserId()
+        );
         func.apply(req, pluginPackage);
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
         entity.setId(task.getId());
@@ -395,8 +397,8 @@ public class PluginServiceImpl implements PluginService {
                     pluginTaskService,
                     qukuService,
                     pojo.getId(),
-                    pojo.getUserId(),
-                    null);
+                    pojo.getUserId()
+            );
             String sync = comboSearchPlugin.sync(pluginLabelValue, type, id, pluginPackage);
             List<TbPluginMsgPojo> logs = pluginPackage.getLogs();
             PluginTaskLogRes pluginTaskLogRes = new PluginTaskLogRes();

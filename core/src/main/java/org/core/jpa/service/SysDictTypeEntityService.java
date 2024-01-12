@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.SysDictTypeEntityUpdateVO;
 import org.core.jpa.model.vo.SysDictTypeEntityVO;
 import org.core.jpa.repository.SysDictTypeEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class SysDictTypeEntityService {
     
-    @Autowired
-    private SysDictTypeEntityRepository sysDictTypeEntityRepository;
+    private final SysDictTypeEntityRepository sysDictTypeEntityRepository;
+    
+    public SysDictTypeEntityService(SysDictTypeEntityRepository sysDictTypeEntityRepository) {
+        this.sysDictTypeEntityRepository = sysDictTypeEntityRepository;
+    }
     
     public Long save(SysDictTypeEntityVO vO) {
         SysDictTypeEntity bean = new SysDictTypeEntity();

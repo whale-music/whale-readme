@@ -22,7 +22,6 @@ import org.api.subsonic.model.res.starred.StarredRes;
 import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.api.subsonic.service.SongListsApi;
 import org.core.model.HttpStatusStr;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +32,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @CrossOrigin(origins = "*")
 public class AlbumAndSongListsController {
-    @Autowired
-    private SongListsApi songListsApi;
+    private final SongListsApi songListsApi;
+    
+    public AlbumAndSongListsController(SongListsApi songListsApi) {
+        this.songListsApi = songListsApi;
+    }
     
     @Operation(summary = "返回一个随机的，最新的，最高评级等列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,

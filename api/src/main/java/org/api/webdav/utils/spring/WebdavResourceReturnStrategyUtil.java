@@ -3,7 +3,6 @@ package org.api.webdav.utils.spring;
 import org.api.webdav.config.WebdavResourceReturnStrategyConfig;
 import org.core.jpa.entity.TbResourceEntity;
 import org.core.mybatis.pojo.TbResourcePojo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Component
 public class WebdavResourceReturnStrategyUtil {
     
-    @Autowired
-    private WebdavResourceReturnStrategyConfig resourceReturnStrategyConfig;
+    private final WebdavResourceReturnStrategyConfig resourceReturnStrategyConfig;
+    
+    public WebdavResourceReturnStrategyUtil(WebdavResourceReturnStrategyConfig resourceReturnStrategyConfig) {
+        this.resourceReturnStrategyConfig = resourceReturnStrategyConfig;
+    }
     
     /**
      * 根据配置选择返回资源文件

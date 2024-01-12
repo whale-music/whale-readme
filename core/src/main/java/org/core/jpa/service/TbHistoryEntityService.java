@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbHistoryEntityUpdateVO;
 import org.core.jpa.model.vo.TbHistoryEntityVO;
 import org.core.jpa.repository.TbHistoryEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbHistoryEntityService {
     
-    @Autowired
-    private TbHistoryEntityRepository tbHistoryEntityRepository;
+    private final TbHistoryEntityRepository tbHistoryEntityRepository;
+    
+    public TbHistoryEntityService(TbHistoryEntityRepository tbHistoryEntityRepository) {
+        this.tbHistoryEntityRepository = tbHistoryEntityRepository;
+    }
     
     public Long save(TbHistoryEntityVO vO) {
         TbHistoryEntity bean = new TbHistoryEntity();

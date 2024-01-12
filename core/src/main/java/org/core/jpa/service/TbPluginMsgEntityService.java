@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbPluginMsgEntityUpdateVO;
 import org.core.jpa.model.vo.TbPluginMsgEntityVO;
 import org.core.jpa.repository.TbPluginMsgEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbPluginMsgEntityService {
     
-    @Autowired
-    private TbPluginMsgEntityRepository tbPluginMsgEntityRepository;
+    private final TbPluginMsgEntityRepository tbPluginMsgEntityRepository;
+    
+    public TbPluginMsgEntityService(TbPluginMsgEntityRepository tbPluginMsgEntityRepository) {
+        this.tbPluginMsgEntityRepository = tbPluginMsgEntityRepository;
+    }
     
     public Long save(TbPluginMsgEntityVO vO) {
         TbPluginMsgEntity bean = new TbPluginMsgEntity();

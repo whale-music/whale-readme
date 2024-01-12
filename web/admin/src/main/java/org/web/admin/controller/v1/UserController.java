@@ -8,7 +8,6 @@ import org.api.admin.service.UserApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController(AdminConfig.ADMIN + "UserController")
@@ -16,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
     
-    @Autowired
-    private UserApi userApi;
+    private final UserApi userApi;
+    
+    public UserController(UserApi userApi) {
+        this.userApi = userApi;
+    }
     
     @GetMapping("/{id}")
     public R getUserInfo(@PathVariable("id") Long id) {

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.core.mybatis.model.convert.ArtistConvert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,8 +14,11 @@ public class SongApi {
     /**
      * 曲库服务
      */
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
+    
+    public SongApi(QukuAPI qukuService) {
+        this.qukuService = qukuService;
+    }
     
     /**
      * 获取歌曲下艺术家信息

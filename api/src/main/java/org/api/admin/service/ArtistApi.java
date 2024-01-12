@@ -33,7 +33,6 @@ import org.core.mybatis.pojo.TbTagPojo;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -43,23 +42,26 @@ import java.util.*;
 public class ArtistApi {
     
     
-    @Autowired
-    private TbArtistService artistService;
+    private final TbArtistService artistService;
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private DefaultInfo defaultInfo;
+    private final DefaultInfo defaultInfo;
     
-    @Autowired
-    private HttpRequestConfig httpRequestConfig;
+    private final HttpRequestConfig httpRequestConfig;
     
-    @Autowired
-    private TbMvArtistService tbMvArtistService;
+    private final TbMvArtistService tbMvArtistService;
     
-    @Autowired
-    private TbMvService tbMvService;
+    private final TbMvService tbMvService;
+    
+    public ArtistApi(TbArtistService artistService, QukuAPI qukuService, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbMvService tbMvService) {
+        this.artistService = artistService;
+        this.qukuService = qukuService;
+        this.defaultInfo = defaultInfo;
+        this.httpRequestConfig = httpRequestConfig;
+        this.tbMvArtistService = tbMvArtistService;
+        this.tbMvService = tbMvService;
+    }
     
     /**
      * 设置分页查询排序

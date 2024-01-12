@@ -21,7 +21,6 @@ import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -30,23 +29,26 @@ import java.util.*;
 @Service(SubsonicConfig.SUBSONIC + "SearchingApi")
 public class SearchingApi {
     
-    @Autowired
-    private TbMusicService tbMusicService;
+    private final TbMusicService tbMusicService;
     
-    @Autowired
-    private TbArtistService tbArtistService;
+    private final TbArtistService tbArtistService;
     
-    @Autowired
-    private TbAlbumService tbAlbumService;
+    private final TbAlbumService tbAlbumService;
     
-    @Autowired
-    private QukuAPI qukuApi;
+    private final QukuAPI qukuApi;
     
-    @Autowired
-    private TbResourceService tbResourceService;
+    private final TbResourceService tbResourceService;
     
-    @Autowired
-    private SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    private final SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    
+    public SearchingApi(TbMusicService tbMusicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, QukuAPI qukuApi, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil) {
+        this.tbMusicService = tbMusicService;
+        this.tbArtistService = tbArtistService;
+        this.tbAlbumService = tbAlbumService;
+        this.qukuApi = qukuApi;
+        this.tbResourceService = tbResourceService;
+        this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
+    }
     
     
     /**

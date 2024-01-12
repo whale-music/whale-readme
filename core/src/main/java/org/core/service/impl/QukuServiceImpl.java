@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
-@Service("QukuService")
+@Service("qukuService")
 @Slf4j
 public class QukuServiceImpl implements QukuService {
     private static final Object lock = new Object();

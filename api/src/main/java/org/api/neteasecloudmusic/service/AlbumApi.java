@@ -17,7 +17,6 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.AliasUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +28,11 @@ import java.util.Optional;
 @Service(NeteaseCloudConfig.NETEASECLOUD + "AlbumApi")
 public class AlbumApi {
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
+    
+    public AlbumApi(QukuAPI qukuService) {
+        this.qukuService = qukuService;
+    }
     
     /**
      * 返回专辑数据和歌手数据(没有歌手数据)

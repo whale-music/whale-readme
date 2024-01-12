@@ -65,7 +65,7 @@ class InteractivePluginTestTest {
         
         TbPluginTaskPojo taskPojo = pluginService.getTbPluginTaskPojo(441213820829829L, params, 424608186796165L);
         PluginPackage pluginPackage = new PluginPackage(musicFlowApi, pluginMsgService, pluginTaskService,
-                qukuService, taskPojo.getId(), taskPojo.getUserId(), null);
+                qukuService, taskPojo.getId(), taskPojo.getUserId());
         List<PluginLabelValue> search = plugin.search(params, input);
         log.info(search.toString());
     }

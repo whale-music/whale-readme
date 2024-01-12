@@ -10,16 +10,18 @@ import org.core.mybatis.iservice.impl.SysUserServiceImpl;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.ip.IpUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Service("Account")
+@Service("account")
 public class AccountServiceImpl extends SysUserServiceImpl implements AccountService {
     
-    @Autowired
-    private UserSubPasswordConfig userSubPasswordConfig;
+    private final UserSubPasswordConfig userSubPasswordConfig;
+    
+    public AccountServiceImpl(UserSubPasswordConfig userSubPasswordConfig) {
+        this.userSubPasswordConfig = userSubPasswordConfig;
+    }
     
     /**
      * 创建用户

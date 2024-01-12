@@ -7,7 +7,6 @@ import org.core.jpa.model.vo.TbPluginEntityUpdateVO;
 import org.core.jpa.model.vo.TbPluginEntityVO;
 import org.core.jpa.repository.TbPluginEntityRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,11 @@ import java.util.NoSuchElementException;
 @Service
 public class TbPluginEntityService {
     
-    @Autowired
-    private TbPluginEntityRepository tbPluginEntityRepository;
+    private final TbPluginEntityRepository tbPluginEntityRepository;
+    
+    public TbPluginEntityService(TbPluginEntityRepository tbPluginEntityRepository) {
+        this.tbPluginEntityRepository = tbPluginEntityRepository;
+    }
     
     public Long save(TbPluginEntityVO vO) {
         TbPluginEntity bean = new TbPluginEntity();

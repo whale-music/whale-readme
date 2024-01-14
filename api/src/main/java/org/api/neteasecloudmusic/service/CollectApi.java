@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
-import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
@@ -57,7 +56,7 @@ public class CollectApi {
     
     private final QukuAPI qukuService;
     
-    public CollectApi(TbMiddleTagService collectMusicTagService, TbCollectService collectService, TbUserCollectService userCollectService, TbTagService tagService, TbCollectMusicService collectMusicService, TbMusicService musicService, TbResourceService musicUrlService, PlayListService playListService, AccountService accountService, QukuAPI qukuService, DefaultInfo defaultInfo) {
+    public CollectApi(TbMiddleTagService collectMusicTagService, TbCollectService collectService, TbUserCollectService userCollectService, TbTagService tagService, TbCollectMusicService collectMusicService, TbMusicService musicService, TbResourceService musicUrlService, PlayListService playListService, AccountService accountService, QukuAPI qukuService) {
         this.collectMusicTagService = collectMusicTagService;
         this.collectService = collectService;
         this.userCollectService = userCollectService;
@@ -303,15 +302,7 @@ public class CollectApi {
     public NeteaseResult addSongToCollect(Long userID, Long collectId, List<Long> songIds, boolean flag) {
         TbCollectPojo tbCollectPojo = collectService.getById(collectId);
         QukuServiceImpl.checkUserAuth(userID, tbCollectPojo);
-        try {
-            qukuService.addOrRemoveMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
-        } catch (BaseException e) {
-            if (StringUtils.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
-                NeteaseResult r = new NeteaseResult();
-                return r.error("502", "歌单内歌曲重复");
-            }
-            throw new BaseException();
-        }
+        qukuService.addOrRemoveMusicToCollect(userID, tbCollectPojo.getId(), songIds, flag);
         long count = collectMusicService.count(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, collectId));
         NeteaseResult map = new NeteaseResult();
         map.put("trackIds", songIds.toArray());

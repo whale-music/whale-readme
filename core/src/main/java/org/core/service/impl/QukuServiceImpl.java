@@ -782,7 +782,7 @@ public class QukuServiceImpl implements QukuService {
             return;
         }
         if (flag) {
-            // 查询歌单内歌曲是否存在
+            // 查询歌单内歌曲是否存在, 存在则删除
             List<TbCollectMusicPojo> collectMusicPojoList = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                                                              .eq(TbCollectMusicPojo::getCollectId, collectId)
                                                                                              .in(TbCollectMusicPojo::getMusicId, songIds));
@@ -1281,6 +1281,12 @@ public class QukuServiceImpl implements QukuService {
         
     }
     
+    /**
+     * 歌单page排序，倒序查询，查询出最后一条数据，并i+=1
+     *
+     * @param id 歌单ID
+     * @return 歌曲排序ID
+     */
     private Long getCollectCount(Long id) {
         LambdaQueryWrapper<TbCollectMusicPojo> eq = Wrappers.<TbCollectMusicPojo>lambdaQuery().
                                                             eq(TbCollectMusicPojo::getCollectId, id)

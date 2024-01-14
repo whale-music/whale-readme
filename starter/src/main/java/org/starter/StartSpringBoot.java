@@ -1,8 +1,11 @@
 package org.starter;
 
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.api.config.ApplicationStartup;
+import org.core.common.properties.DebugConfig;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -21,8 +24,10 @@ import org.springframework.util.ClassUtils;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 // 启用Hutool Spring
 @EnableSpringUtil
@@ -31,12 +36,20 @@ import java.util.Set;
 // @SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss"}, excludeName = "org.web", exclude = SecurityAutoConfiguration.class)
 @SpringBootApplication(scanBasePackages = "org.core")
 @EnableScheduling // 开启定时任务
+@Slf4j
 public class StartSpringBoot {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {
+        StopWatch sw = new StopWatch("priming step");
+        sw.start("StartSpringBoot start");
         SpringApplicationBuilder build = new SpringApplicationBuilder(StartSpringBoot.class);
         ConfigurableApplicationContext context = build.web(WebApplicationType.NONE).run(args);
+        sw.stop();
+        
+        sw.start("Scan class SpringBootApplication annotation");
         Set<Class<?>> org = searchClassesWithAnnotation("org.web", SpringBootApplication.class);
+        sw.stop();
         for (Class<?> aClass : org) {
+            sw.start(aClass.getSimpleName());
             Object o = aClass.getDeclaredConstructor().newInstance();
             String simpleName = CharSequenceUtil.toSymbolCase(aClass.getSimpleName(), '-');
             String property = context.getEnvironment().getProperty("application.enable." + simpleName);
@@ -47,12 +60,16 @@ public class StartSpringBoot {
                     throw new NoSuchMethodException();
                 }
             }
+            sw.stop();
+        }
+        if (Boolean.TRUE.equals(DebugConfig.getDebug())) {
+            log.info("\n" + sw.prettyPrint(TimeUnit.MILLISECONDS));
         }
     }
     
     
     public static Set<Class<?>> searchClassesWithAnnotation(String basePackage, Class<? extends Annotation> annotation) throws IOException, ClassNotFoundException {
-        Set<Class<?>> classes = new HashSet<>();
+        Set<Class<?>> classes = new TreeSet<>(Comparator.comparing(Class::getSimpleName));
         // spring工具类，可以获取指定路径下的全部类
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(basePackage) + "/**/*.class";

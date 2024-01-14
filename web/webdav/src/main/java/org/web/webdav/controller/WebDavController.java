@@ -16,7 +16,6 @@ import io.milton.http.http11.auth.DigestResponse;
 import io.milton.resource.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.api.common.service.QukuAPI;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.service.WebdavApi;
@@ -25,6 +24,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.jpa.entity.TbResourceEntity;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.service.RemoteStorageService;
 import org.core.utils.i18n.I18nUtil;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
@@ -49,15 +49,15 @@ public class WebDavController {
     
     private final WebdavApi webdavApi;
     
-    private final QukuAPI qukuApi;
+    private final RemoteStorageService remoteStorageService;
     
     private final WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil;
     
-    public WebDavController(Cache<String, String> resource, WebdavApi webdavApi, QukuAPI qukuApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil) {
+    public WebDavController(Cache<String, String> resource, WebdavApi webdavApi, WebdavResourceReturnStrategyUtil webdavResourceReturnStrategyUtil, RemoteStorageService remoteStorageService) {
         this.resource = resource;
         this.webdavApi = webdavApi;
-        this.qukuApi = qukuApi;
         this.webdavResourceReturnStrategyUtil = webdavResourceReturnStrategyUtil;
+        this.remoteStorageService = remoteStorageService;
     }
     
     @Nullable
@@ -184,7 +184,7 @@ public class WebDavController {
             String musicName = format + "." + FileUtil.getSuffix(playListRes.getPath());
             
             TbResourceEntity tbResourceEntity = webdavResourceReturnStrategyUtil.handleResourceEntity(ListUtil.toList(playListRes.getTbResourcesById()));
-            resource.put(musicName, qukuApi.getAddresses(tbResourceEntity.getPath(), false));
+            resource.put(musicName, remoteStorageService.getAddresses(tbResourceEntity.getPath(), false));
             resources.add(new WebDavResource(musicName,
                     playListRes.getMd5(),
                     playListRes.getPath(),
@@ -198,7 +198,7 @@ public class WebDavController {
     public InputStream getChild(WebDavResource webDavFolder) {
         String name = webDavFolder.getName();
         log.info("output file: {}", name);
-        Map<String, Map<String, String>> address = qukuApi.getAddressByMd5(webDavFolder.getMd5(), false);
+        Map<String, Map<String, String>> address = remoteStorageService.getAddressByMd5(webDavFolder.getMd5(), false);
         String url = address.get(webDavFolder.getPath()).get("url");
         log.info("url download: {}", url);
         try (HttpResponse execute = HttpRequest.get(url).execute()) {

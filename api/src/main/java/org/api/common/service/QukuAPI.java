@@ -12,19 +12,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
-import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
 import org.core.model.MiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
-import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
-import org.core.oss.factory.OSSFactory;
-import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorageService;
 import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.ImageTypeUtils;
 import org.springframework.stereotype.Service;
@@ -41,17 +38,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class QukuAPI extends QukuServiceImpl {
     
-    private final SaveConfig config;
-    
     private final HttpRequestConfig httpRequestConfig;
     
     private final TbMiddlePicService tbMiddlePicService;
     
-    private final TbMvService tbMvService;
+    private final OSSService ossService;
     
-    private final OSSFactory ossFactory;
+    private final RemoteStorageService remoteStorageService;
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, SaveConfig config, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, TbMvService tbMvService, OSSFactory ossFactory) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, TbPicService picService, TbMiddlePicService middlePicService, Cache<Long, TbPicPojo> picCache, Cache<MiddleTypeModel, Long> picMiddleCache, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, OSSService ossService, RemoteStorageService remoteStorageService) {
         super(musicService,
                 albumService,
                 artistService,
@@ -75,11 +70,10 @@ public class QukuAPI extends QukuServiceImpl {
                 tbMvArtistService,
                 tbOriginService
         );
-        this.config = config;
         this.httpRequestConfig = httpRequestConfig;
         this.tbMiddlePicService = tbMiddlePicService;
-        this.tbMvService = tbMvService;
-        this.ossFactory = ossFactory;
+        this.ossService = ossService;
+        this.remoteStorageService = remoteStorageService;
     }
     
     /**
@@ -105,7 +99,6 @@ public class QukuAPI extends QukuServiceImpl {
      */
     // @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdatePicFile(Long id, Byte type, File file) {
-        OSSService ossService = ossFactory.ossFactory();
         String md5Hex;
         String upload;
         File dest = null;
@@ -113,7 +106,7 @@ public class QukuAPI extends QukuServiceImpl {
             md5Hex = DigestUtil.md5Hex(file);
             dest = new File(md5Hex + ImageTypeUtils.getPicType(fis));
             File rename = FileUtil.copy(file, dest, true);
-            upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+            upload = remoteStorageService.uploadPicFile(rename, md5Hex);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
@@ -172,7 +165,6 @@ public class QukuAPI extends QukuServiceImpl {
         if (StringUtils.isBlank(url)) {
             return;
         }
-        OSSService ossService = ossFactory.ossFactory();
         // 下载封面, 保存文件名为md5
         String randomName = System.currentTimeMillis() + String.valueOf(RandomUtils.nextLong());
         String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName;
@@ -191,7 +183,7 @@ public class QukuAPI extends QukuServiceImpl {
             md5Hex = DigestUtil.md5Hex(fileFromUrl);
             rename = FileUtil.rename(fileFromUrl, md5Hex + ImageTypeUtils.getPicType(fis), false, true);
             // 上传封面
-            upload = ossService.upload(config.getImgSave(), config.getAssignImgSave(), rename, md5Hex);
+            upload = remoteStorageService.uploadPicFile(rename, md5Hex);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.IMG_DOWNLOAD_ERROR);
@@ -218,7 +210,6 @@ public class QukuAPI extends QukuServiceImpl {
     @Override
     protected void removePicFile(Collection<Long> ids, Collection<Byte> types, Consumer<List<String>> consumer) {
         // 删除歌曲文件
-        OSSService ossService = ossFactory.ossFactory();
         super.removePicFile(ids, types, ossService::delete);
     }
     
@@ -243,34 +234,10 @@ public class QukuAPI extends QukuServiceImpl {
     
     public List<TbResourcePojo> getMusicUrlByMusicUrlList(List<TbResourcePojo> list, boolean refresh) {
         for (TbResourcePojo tbMusicUrlPojo : list) {
-            String s = getAddresses(refresh, tbMusicUrlPojo.getPath());
+            String s = remoteStorageService.getAddresses(tbMusicUrlPojo.getPath(), refresh);
             tbMusicUrlPojo.setPath(s);
         }
         return list;
-    }
-    
-    private String getAddresses(boolean refresh, String path) {
-        try {
-            return getAddresses(path, refresh);
-        } catch (BaseException e) {
-            if (Objects.equals(e.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
-                log.warn("获取下载地址出错: {}", e.getMessage());
-                return "";
-            }
-            log.error(e.getMessage(), e);
-            throw new BaseException(e.getCode(), e.getResultMsg());
-        }
-    }
-    
-    public String getOSSPicPath(String path, boolean refresh) {
-        return StringUtils.startsWithIgnoreCase("http", path) ? path : getAddresses(refresh, path);
-    }
-    
-    public List<TbPicPojo> getOSSPicList(List<TbPicPojo> picPojoList, boolean refresh) {
-        for (TbPicPojo tbPicPojo : picPojoList) {
-            tbPicPojo.setPath(getAddresses(refresh, tbPicPojo.getPath()));
-        }
-        return picPojoList;
     }
     
     public Map<Long, String> getPicUrlList(Map<Long, String> paths, boolean refresh) {
@@ -279,40 +246,11 @@ public class QukuAPI extends QukuServiceImpl {
             if (StringUtils.startsWithIgnoreCase(longStringEntry.getValue(), "http")) {
                 s = longStringEntry.getValue();
             } else {
-                s = getAddresses(refresh, longStringEntry.getValue());
+                s = remoteStorageService.getAddresses(longStringEntry.getValue(), refresh);
             }
             paths.put(longStringEntry.getKey(), s);
         }
         return paths;
-    }
-    
-    
-    public Collection<String> getMD5(boolean refresh) {
-        return ossFactory.ossFactory().getResourceMD5(refresh);
-    }
-    
-    public Collection<String> getMD5(String md5, boolean refresh) {
-        return ossFactory.ossFactory().getResourceMD5(md5, refresh);
-    }
-    
-    public Map<String, Map<String, String>> getAddressByMd5(String md5, boolean refresh) {
-        return ossFactory.ossFactory().getAddressByMd5(Collections.singleton(md5), refresh);
-    }
-    
-    public Map<String, Map<String, String>> getAddressByMd5(Set<String> md5Set, boolean refresh) {
-        return ossFactory.ossFactory().getAddressByMd5(md5Set, refresh);
-    }
-    
-    public String getAddresses(String path, boolean refresh) {
-        return ossFactory.ossFactory().getAddresses(path, refresh);
-    }
-    
-    public Set<String> getAddresses(Collection<String> md5, boolean refresh) {
-        return ossFactory.ossFactory().getAddresses(md5, refresh);
-    }
-    
-    public Map<String, Map<String, String>> getAddressByMd5(boolean refresh) {
-        return ossFactory.ossFactory().getAddressByMd5(null, refresh);
     }
     
     /**
@@ -341,31 +279,4 @@ public class QukuAPI extends QukuServiceImpl {
         return getPicIds(middleId, PicTypeConstant.ALBUM);
     }
     
-    public String uploadAudioFile(File file, String md5Hex) {
-        return ossFactory.ossFactory().upload(config.getObjectSave(), config.getAssignObjectSave(), file, md5Hex);
-    }
-    
-    
-    public String uploadMvFile(File mvFile, String md5) {
-        return ossFactory.ossFactory().upload(config.getMvSave(), config.getAssignMvSave(), mvFile, md5);
-    }
-    
-    public String uploadMvFile(File file) {
-        return this.uploadMvFile(file, null);
-    }
-    
-    public void removeMvStorageFiles(List<Long> ids) {
-        List<TbMvPojo> tbMvPojos = tbMvService.listByIds(ids);
-        OSSService ossService = ossFactory.ossFactory();
-        List<String> list = tbMvPojos.parallelStream().map(TbMvPojo::getPath).toList();
-        ossService.delete(list);
-    }
-    
-    public Set<Resource> listResource(boolean refresh) {
-        return ossFactory.ossFactory().list(refresh);
-    }
-    
-    public Resource getResource(String path, boolean refresh) {
-        return ossFactory.ossFactory().getResourceInfo(path, refresh);
-    }
 }

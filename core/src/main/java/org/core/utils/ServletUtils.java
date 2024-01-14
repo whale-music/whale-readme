@@ -1,6 +1,8 @@
 package org.core.utils;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -167,5 +169,14 @@ public class ServletUtils {
      */
     public static String urlDecode(String str) {
         return URLDecoder.decode(str, StandardCharsets.UTF_8);
+    }
+    
+    public static String paresPath(String path) {
+        // 不能使用ServletUtils.getRequest().getRemoteHost(), 因为有时访问localhost,却返回ipv6. 所以直接返回访问域名
+        String remoteHost = URLUtil.url(ServletUtils.getRequest().getRequestURL().toString()).getHost();
+        int serverPort = ServletUtils.getRequest().getServerPort();
+        String scheme = ServletUtils.getRequest().getScheme();
+        String s = CharSequenceUtil.removePrefix(path, "/");
+        return String.format("%s://%s:%d/%s", scheme, remoteHost, serverPort, s);
     }
 }

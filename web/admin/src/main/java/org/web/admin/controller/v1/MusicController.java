@@ -143,7 +143,7 @@ public class MusicController {
      * @return 成功信息
      */
     @PostMapping("/")
-    public R updateMusic(@RequestBody SaveOrUpdateMusicReq req) throws IOException {
+    public R updateMusic(@RequestBody SaveOrUpdateMusicReq req) {
         uploadMusic.saveOrUpdateMusic(req);
         return R.success();
     }

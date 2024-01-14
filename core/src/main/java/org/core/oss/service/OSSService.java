@@ -93,7 +93,7 @@ public interface OSSService {
      * @param paths   路径
      * @param index   选中上传路径
      * @param srcFile 上传文件
-     * @param md5     上传文件md5 非必传
+     * @param md5     上传文件md5 非必传, 没有则会读入问的md5
      * @return 文件路径相对
      */
     String upload(List<String> paths, Integer index, File srcFile, String md5);

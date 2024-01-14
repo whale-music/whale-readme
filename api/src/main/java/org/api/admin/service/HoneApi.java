@@ -17,8 +17,8 @@ import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
+import org.core.service.RemoteStorageService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,26 +29,32 @@ import java.util.stream.Collectors;
 @Service(AdminConfig.ADMIN + "HoneApi")
 public class HoneApi {
     
-    @Autowired
-    private TbMusicService musicService;
+    private final TbMusicService musicService;
     
-    @Autowired
-    private TbAlbumService albumService;
+    private final TbAlbumService albumService;
     
-    @Autowired
-    private TbArtistService artistService;
+    private final TbArtistService artistService;
     
-    @Autowired
-    private TbResourceService musicUrlService;
+    private final TbResourceService musicUrlService;
     
-    @Autowired
-    private TbPluginTaskService pluginTaskService;
+    private final TbPluginTaskService pluginTaskService;
     
-    @Autowired
-    private TbPluginService pluginService;
+    private final TbPluginService pluginService;
     
-    @Autowired
-    private QukuAPI qukuAPI;
+    private final QukuAPI qukuAPI;
+    
+    private final RemoteStorageService remoteStorageService;
+    
+    public HoneApi(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbPluginTaskService pluginTaskService, TbPluginService pluginService, QukuAPI qukuAPI, RemoteStorageService remoteStorageService) {
+        this.musicService = musicService;
+        this.albumService = albumService;
+        this.artistService = artistService;
+        this.musicUrlService = musicUrlService;
+        this.pluginTaskService = pluginTaskService;
+        this.pluginService = pluginService;
+        this.qukuAPI = qukuAPI;
+        this.remoteStorageService = remoteStorageService;
+    }
     
     /**
      * **计算月增长率**
@@ -173,7 +179,7 @@ public class HoneApi {
         List<TbResourcePojo> musicUrlList = musicUrlService.list();
         List<TbMusicPojo> musicList = musicService.list();
         List<TbResourcePojo> musicUrlByMusicUrlList = qukuAPI.getMusicUrlByMusicUrlList(musicUrlList, false);
-        Collection<String> musicMD5 = qukuAPI.getMD5(false);
+        Collection<String> musicMD5 = remoteStorageService.getAllMD5(false);
         // 有效音乐
         // 音乐数据对比存储地址，查找对应的音乐地址是否存在
         long musicEffectiveCount = musicList.parallelStream().filter(tbMusicPojo ->

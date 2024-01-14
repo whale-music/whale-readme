@@ -385,6 +385,7 @@ public class PlayListApi {
         meta.setRank(3);
         // 标题路由
         RouterVo routerVo = new RouterVo();
+        routerVo.setName("PlayListVew");
         routerVo.setPath("/playlist");
         routerVo.setMeta(meta);
     

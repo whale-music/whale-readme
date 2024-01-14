@@ -869,8 +869,6 @@ public class QukuServiceImpl implements QukuService {
         entity.setUserId(userId);
         userCollectService.save(entity);
         
-        TbPicPojo pic = new TbPicPojo();
-        pic.setPath(defaultInfo.getPic().getPlayListPic());
         this.saveOrUpdateCollectPicUrl(collectPojo.getId(), defaultInfo.getPic().getPlayListPic());
         
         // 封面查询

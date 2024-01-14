@@ -16,7 +16,6 @@ import org.api.admin.model.req.LinkVideoResourceReq;
 import org.api.admin.model.req.ResourcePageReq;
 import org.api.admin.model.res.*;
 import org.api.admin.utils.FileTypeUtil;
-import org.api.common.service.QukuAPI;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -25,6 +24,7 @@ import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.*;
 import org.core.oss.model.Resource;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorageService;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
@@ -38,8 +38,6 @@ import java.util.stream.Stream;
 
 @Service(AdminConfig.ADMIN + "ResourceApi")
 public class ResourceApi {
-    
-    private final QukuAPI qukuApi;
     
     private final TbResourceService tbResourceService;
     
@@ -63,8 +61,9 @@ public class ResourceApi {
     
     private final MusicFlowApi musicFlowApi;
     
-    public ResourceApi(QukuAPI qukuApi, TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi) {
-        this.qukuApi = qukuApi;
+    private final RemoteStorageService remoteStorageService;
+    
+    public ResourceApi(TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi, RemoteStorageService remoteStorageService) {
         this.tbResourceService = tbResourceService;
         this.tbMiddlePicService = tbMiddlePicService;
         this.tbMusicService = tbMusicService;
@@ -76,10 +75,11 @@ public class ResourceApi {
         this.tbCollectService = tbCollectService;
         this.httpRequestConfig = httpRequestConfig;
         this.musicFlowApi = musicFlowApi;
+        this.remoteStorageService = remoteStorageService;
     }
     
     public List<ResourcePageRes> getResourcePage(ResourcePageReq req) {
-        Set<Resource> resources = qukuApi.listResource(true);
+        Set<Resource> resources = remoteStorageService.listResource(true);
         LinkedList<ResourcePageRes> res = new LinkedList<>();
         
         List<String> filter = req.getFilter();
@@ -161,7 +161,7 @@ public class ResourceApi {
     
     public Collection<FilterTermsRes> getFilterType(String type) {
         boolean b = StringUtils.equalsIgnoreCase(type, "type");
-        Set<Resource> resources = qukuApi.listResource(true);
+        Set<Resource> resources = remoteStorageService.listResource(true);
         Stream<String> stream = resources.parallelStream().map(Resource::getFileExtension);
         if (Boolean.TRUE.equals(b)) {
             Map<String, Long> collect = stream.map(FileTypeUtil::getTypeCategorization).collect(Collectors.groupingBy(
@@ -196,7 +196,7 @@ public class ResourceApi {
     }
     
     public ResourceAudioInfoRes getAudioResourceInfo(String path) {
-        Resource resource = qukuApi.getResource(path, false);
+        Resource resource = remoteStorageService.getResource(path, false);
         ResourceAudioInfoRes res = new ResourceAudioInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbResourcePojo dbResource = tbResourceService.getResourceByName(resource.getName());
@@ -213,7 +213,7 @@ public class ResourceApi {
     }
     
     public ResourcePicInfoRes getPicResourceInfo(String path) {
-        Resource resource = qukuApi.getResource(path, false);
+        Resource resource = remoteStorageService.getResource(path, false);
         ResourcePicInfoRes res = new ResourcePicInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbPicPojo picResourceByName = tbPicService.getPicResourceByName(path);
@@ -276,7 +276,7 @@ public class ResourceApi {
      * @return Video信息
      */
     public ResourceVideoInfoRes getVideoResourceInfo(String path) {
-        Resource resource = qukuApi.getResource(path, false);
+        Resource resource = remoteStorageService.getResource(path, false);
         ResourceVideoInfoRes res = new ResourceVideoInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbMvPojo mv = tbMvService.getMvByPath(path);
@@ -487,7 +487,7 @@ public class ResourceApi {
             tbResourceService.update(set);
         } else {
             // 保存音乐数据
-            Resource resource = qukuApi.getResource(audioResourceReq.getPath(), false);
+            Resource resource = remoteStorageService.getResource(audioResourceReq.getPath(), false);
             File file = HttpUtil.downloadFileFromUrl(resource.getUrl(),
                     new File(httpRequestConfig.getTempPath(), audioResourceReq.getPath()),
                     httpRequestConfig.getTimeout());

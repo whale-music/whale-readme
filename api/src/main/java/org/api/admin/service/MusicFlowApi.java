@@ -31,7 +31,6 @@ import org.core.common.constant.LyricConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.constant.defaultinfo.EnumNameType;
 import org.core.common.exception.BaseException;
-import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
 import org.core.config.FileTypeConfig;
 import org.core.config.HttpRequestConfig;
@@ -40,9 +39,9 @@ import org.core.jpa.repository.TbResourceEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
-import org.core.oss.factory.OSSFactory;
 import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorageService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -103,10 +102,6 @@ public class MusicFlowApi {
      * 专辑表
      */
     private final TbAlbumService albumService;
-    /**
-     * 上传配置
-     */
-    private final SaveConfig config;
     
     private final TbAlbumArtistService albumSingerService;
     
@@ -130,7 +125,9 @@ public class MusicFlowApi {
     
     private final UploadConfig uploadConfig;
     
-    private final OSSFactory ossFactory;
+    private final OSSService ossService;
+    
+    private final RemoteStorageService remoteStorageService;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -791,7 +788,7 @@ public class MusicFlowApi {
      * @param req 信息
      */
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateMusic(SaveOrUpdateMusicReq req) throws IOException {
+    public void saveOrUpdateMusic(SaveOrUpdateMusicReq req) {
         if (StringUtils.isBlank(req.getMusicName())) {
             throw new BaseException(ResultCode.PARAM_IS_BLANK);
         }
@@ -850,7 +847,7 @@ public class MusicFlowApi {
         }
     }
     
-    private String writeMusicMetaAndUploadMusicFile(File file, Integer rate, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) throws IOException {
+    private String writeMusicMetaAndUploadMusicFile(File file, Integer rate, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) {
         String formatName = uploadConfig.getMusicNameTemplate(byId.getMusicName(),
                 byId.getAliasName(),
                 albumPojo.getAlbumName(),
@@ -863,11 +860,7 @@ public class MusicFlowApi {
                 byId,
                 albumPojo, musicArtistByMusicId, albumArtistList, lyricPojoList);
         
-        return ossFactory.ossFactory()
-                         .upload(config.getObjectSave(),
-                                 config.getAssignObjectSave(),
-                                 file,
-                                 DigestUtils.md5DigestAsHex(FileUtil.getInputStream(file)));
+        return remoteStorageService.uploadAudioFile(file);
     }
     
     private void saveMusicTagAndGenre(AudioInfoReq dto, TbMusicPojo musicPojo) {
@@ -1050,63 +1043,59 @@ public class MusicFlowApi {
         TbResourcePojo entity = new TbResourcePojo();
         entity.setMusicId(musicId);
         userId = userId == null ? UserUtil.getUser().getId() : userId;
-        try {
-            String tempMd5 = MD5.create().digestHex(uploadFile);
-            TbResourcePojo tempOne = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
-            // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
-            if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
-                throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
-                        ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲ID: " + tempOne.getMusicId());
-            }
-            String[] nameArr = StringUtils.split(uploadFile.getName(), ".");
-            if (nameArr == null || nameArr.length < 1) {
-                throw new BaseException(ResultCode.FILENAME_INVALID);
-            }
-            File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
-            FileUtil.move(uploadFile, dest, true);
-            AudioFile audioInfo = getAudioInfo(dest);
-            // 写入音乐元数据到音频文件中
-            // 音乐名
-            TbMusicPojo byId = musicService.getById(musicId);
-            // 专辑名
-            TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
-            // 音乐歌手
-            List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(musicId);
-            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
-            // 上传
-            List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
-            int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
-            String upload = writeMusicMetaAndUploadMusicFile(dest,
-                    rate, byId,
-                    albumPojo,
-                    musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
-                    albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),
-                    musicLyric);
-            TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
-            rate = rate * 1000;
-            if (one == null) {
-                entity.setRate(rate);
-                getLevel(entity, rate);
-                entity.setPath(upload);
-                entity.setUserId(userId);
-                entity.setEncodeType(nameArr[1]);
-                entity.setSize(FileUtil.size(dest));
-                entity.setMd5(tempMd5);
-                resourceService.save(entity);
-                log.info("文件保存到数据库{}", entity);
-            } else {
-                one.setRate(rate);
-                getLevel(one, rate);
-                one.setPath(upload);
-                one.setSize(FileUtil.size(dest));
-                one.setEncodeType(nameArr[1]);
-                resourceService.updateById(one);
-                log.info("更新成功{}", entity);
-            }
-            FileUtil.del(dest);
-        } catch (IOException e) {
-            throw new BaseException(ResultCode.UPLOAD_ERROR);
+        String tempMd5 = MD5.create().digestHex(uploadFile);
+        TbResourcePojo tempOne = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
+        // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
+        if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
+            throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
+                    ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲ID: " + tempOne.getMusicId());
         }
+        String[] nameArr = StringUtils.split(uploadFile.getName(), ".");
+        if (nameArr == null || nameArr.length < 1) {
+            throw new BaseException(ResultCode.FILENAME_INVALID);
+        }
+        File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
+        FileUtil.move(uploadFile, dest, true);
+        AudioFile audioInfo = getAudioInfo(dest);
+        // 写入音乐元数据到音频文件中
+        // 音乐名
+        TbMusicPojo byId = musicService.getById(musicId);
+        // 专辑名
+        TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
+        // 音乐歌手
+        List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(musicId);
+        List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+        // 上传
+        List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
+        int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
+        String upload = writeMusicMetaAndUploadMusicFile(dest,
+                rate, byId,
+                albumPojo,
+                musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
+                albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),
+                musicLyric);
+        TbResourcePojo one = resourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, tempMd5));
+        rate = rate * 1000;
+        if (one == null) {
+            entity.setRate(rate);
+            getLevel(entity, rate);
+            entity.setPath(upload);
+            entity.setUserId(userId);
+            entity.setEncodeType(nameArr[1]);
+            entity.setSize(FileUtil.size(dest));
+            entity.setMd5(tempMd5);
+            resourceService.save(entity);
+            log.info("文件保存到数据库{}", entity);
+        } else {
+            one.setRate(rate);
+            getLevel(one, rate);
+            one.setPath(upload);
+            one.setSize(FileUtil.size(dest));
+            one.setEncodeType(nameArr[1]);
+            resourceService.updateById(one);
+            log.info("更新成功{}", entity);
+        }
+        FileUtil.del(dest);
     }
     
     public void uploadManualMusic(UploadMusicReq musicSource) {
@@ -1141,7 +1130,7 @@ public class MusicFlowApi {
     }
     
     public List<HashMap<String, String>> selectResources(String md5) {
-        Map<String, Map<String, String>> address = qukuService.getAddressByMd5(md5, false);
+        Map<String, Map<String, String>> address = remoteStorageService.getAddressByMd5(md5, false);
         return address.entrySet()
                       .parallelStream()
                       .filter(stringMapEntry -> {
@@ -1169,7 +1158,7 @@ public class MusicFlowApi {
     public void syncMetaMusicFile(SyncMusicMetaDataReq req) {
         TbResourcePojo byId = resourceService.getById(req.getResourceId());
         String path = byId.getPath();
-        String addresses = qukuService.getAddresses(path, false);
+        String addresses = ossService.getAddresses(path, false);
         String originPath = UUID.fastUUID().toString(true) + "." + byId.getEncodeType();
         File destFile = new File(requestConfig.getTempPath(), originPath);
         HttpUtil.downloadFile(addresses, destFile, requestConfig.getTimeout());
@@ -1245,13 +1234,12 @@ public class MusicFlowApi {
         // 删除与重命名文件相同的文件名
         File newFile = FileUtil.rename(destFile, format, true, true);
         
-        OSSService ossService = ossFactory.ossFactory();
         String newName = UUID.fastUUID() + "." + extName;
         ossService.rename(path, newName);
         try {
             String md5 = DigestUtil.md5Hex(newFile);
             byId.setMd5(md5);
-            String upload = ossService.upload(config.getObjectSave(), config.getAssignObjectSave(), newFile, md5);
+            String upload = remoteStorageService.uploadAudioFile(newFile, md5);
             byId.setPath(upload);
             byId.setSize(FileUtil.size(newFile));
             resourceService.updateById(byId);

@@ -3,7 +3,7 @@ package org.api.admin.service;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +11,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.common.service.QukuAPI;
 import org.core.common.constant.PicTypeConstant;
 import org.core.config.HttpRequestConfig;
+import org.core.service.RemoteStorageService;
 import org.core.utils.ImageTypeUtils;
 import org.core.utils.LocalFileUtil;
 import org.springframework.core.io.FileSystemResource;
@@ -28,12 +29,14 @@ import java.util.Objects;
 
 @Service(AdminConfig.ADMIN + "PicApi")
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PicApi {
     
     private final HttpRequestConfig requestConfig;
     
     private final QukuAPI qukuAPI;
+    
+    private final RemoteStorageService remoteStorageService;
     
     /**
      * 获取临时文件字节
@@ -87,6 +90,6 @@ public class PicApi {
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
         qukuAPI.saveOrUpdatePicFile(id, tempType, file);
-        return qukuAPI.getAddresses(qukuAPI.getPicPath(id, tempType), false);
+        return remoteStorageService.getAddresses(qukuAPI.getPicPath(id, tempType), false);
     }
 }

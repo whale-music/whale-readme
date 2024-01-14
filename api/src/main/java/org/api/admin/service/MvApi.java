@@ -22,6 +22,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.TbMvArtistPojo;
 import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
+import org.core.service.RemoteStorageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,11 +46,14 @@ public class MvApi {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService) {
+    private final RemoteStorageService remoteStorageService;
+    
+    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService) {
         this.tbMvService = tbMvService;
         this.qukuApi = qukuApi;
         this.httpRequestConfig = httpRequestConfig;
         this.tbMvArtistService = tbMvArtistService;
+        this.remoteStorageService = remoteStorageService;
     }
     
     @Transactional(rollbackFor = Exception.class)
@@ -76,7 +80,7 @@ public class MvApi {
             File file = new File(httpRequestConfig.getTempPath(), request.getMvTempPath());
             long videoDuration = VideoUtil.getVideoDuration(file);
             request.setDuration(videoDuration);
-            String path = qukuApi.uploadMvFile(file);
+            String path = remoteStorageService.uploadMvFile(file);
             // path
             request.setPath(path);
         }
@@ -153,7 +157,7 @@ public class MvApi {
         qukuApi.removeLabelMv(ids);
         
         // remove file
-        qukuApi.removeMvStorageFiles(ids);
+        remoteStorageService.removeMvStorageFiles(ids);
         
         // remove mv
         tbMvService.removeBatchByIds(ids);
@@ -180,7 +184,7 @@ public class MvApi {
         }
         String path = e.getPath();
         if (StringUtils.isNotBlank(path)) {
-            e.setMvUrl(qukuApi.getAddresses(path, false));
+            e.setMvUrl(remoteStorageService.getAddressesNoRefresh(path));
         }
         return e;
     }
@@ -209,7 +213,7 @@ public class MvApi {
         FileUtil.writeBytes(uploadFile.getBytes(), dest);
         long videoDuration = VideoUtil.getVideoDuration(dest);
         String md5Str = DigestUtils.md5DigestAsHex(uploadFile.getBytes());
-        String path = qukuApi.uploadMvFile(dest, md5Str);
+        String path = remoteStorageService.uploadMvFile(dest, md5Str);
         mvPojo.setPath(path);
         mvPojo.setMd5(md5Str);
         mvPojo.setDuration(videoDuration);

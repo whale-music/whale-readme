@@ -19,7 +19,7 @@ public interface RemoteStorageService {
     
     String getAddresses(String path, boolean refresh);
     
-    public String getAddressesNoRefresh(String path);
+    String getAddressesNoRefresh(String path);
     
     Map<String, Map<String, String>> getAddresses(Collection<String> md5, boolean refresh);
     

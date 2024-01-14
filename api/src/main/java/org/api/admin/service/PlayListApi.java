@@ -437,10 +437,7 @@ public class PlayListApi {
     }
     
     public TbCollectPojo createPlayList(String name) {
-        CollectConvert playList = qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
-        qukuService.saveOrUpdateCollectPicUrl(playList.getId(), defaultInfo.getPic().getPlayListPic());
-        playList.setPicUrl(this.qukuService.getCollectPicUrl(playList.getId()));
-        return playList;
+        return qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
     }
     
     public void deletePlayList(Long userId, List<Long> id) {

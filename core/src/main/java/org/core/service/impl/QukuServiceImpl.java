@@ -806,16 +806,6 @@ public class QukuServiceImpl implements QukuService {
                 collectMusicService.saveBatch(collect);
             }
             log.info("add collect music: {}, music list{}", collectId, CollUtil.join(songIds, ","));
-            // 更新封面
-            Long songId = songIds.get(songIds.size() - 1);
-            TbMusicPojo musicPojo = musicService.getById(songId);
-            TbCollectPojo entity = new TbCollectPojo();
-            entity.setId(collectId);
-            if (musicPojo != null) {
-                String picUrl = getMusicPicUrl(songId);
-                this.saveOrUpdateCollectPicUrl(entity.getId(), picUrl);
-            }
-            collectService.updateById(entity);
         } else {
             // 删除歌曲
             collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery()
@@ -1247,7 +1237,6 @@ public class QukuServiceImpl implements QukuService {
             entity.setUserId(userId);
             entity.setType(PlayListTypeConfig.LIKE);
             collectService.save(entity);
-            this.saveOrUpdateCollectPicUrl(entity.getId(), this.getUserAvatarPicUrl(userId));
             collectServiceById = entity;
         }
         TbMusicPojo byId = musicService.getById(id);
@@ -1280,7 +1269,6 @@ public class QukuServiceImpl implements QukuService {
             
             TbCollectPojo entity = new TbCollectPojo();
             entity.setId(collectServiceById.getId());
-            this.saveOrUpdateCollectPicUrl(entity.getId(), this.getMusicPicUrl(byId.getId()));
             collectService.updateById(entity);
         } else {
             // 歌曲不存在
@@ -1350,7 +1338,6 @@ public class QukuServiceImpl implements QukuService {
         lyricService.remove(Wrappers.<TbLyricPojo>lambdaQuery().in(TbLyricPojo::getMusicId, musicIds));
         // 删除歌曲
         musicService.removeBatchByIds(musicIds);
-        // TODO: 删除音乐文件
     }
     
     

@@ -221,7 +221,7 @@ public class AlbumApi {
             qukuService.addAlbumGenreLabel(req.getId(), StringUtils.trim(req.getAlbumGenre()));
         }
         if (StringUtils.isNotBlank(req.getTempFile())) {
-            File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
+            File file = httpRequestConfig.getTempPathFile(req.getTempFile());
             remoteStorePicService.saveOrUpdateAlbumPicFile(req.getId(), file);
         }
         // 如果是更新专辑关联歌手数据则删除原来的，重新添加

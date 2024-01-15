@@ -489,7 +489,7 @@ public class ResourceApi {
             // 保存音乐数据
             Resource resource = remoteStorageService.getResource(audioResourceReq.getPath(), false);
             File file = HttpUtil.downloadFileFromUrl(resource.getUrl(),
-                    new File(httpRequestConfig.getTempPath(), audioResourceReq.getPath()),
+                    httpRequestConfig.getTempPathFile(audioResourceReq.getPath()),
                     httpRequestConfig.getTimeout());
             musicFlowApi.uploadAutoMusicFile(UserUtil.getUser().getId(), file, audioResourceReq.getMusicId());
         }

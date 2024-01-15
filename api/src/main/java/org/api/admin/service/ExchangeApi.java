@@ -242,7 +242,7 @@ public class ExchangeApi {
         if (file == null) {
             throw new BaseException(ResultCode.FILENAME_NO_EXIST);
         }
-        File dest = new File(requestConfig.getTempPath(), Objects.requireNonNull(file.getOriginalFilename()));
+        File dest = requestConfig.getTempPathFile(Objects.requireNonNull(file.getOriginalFilename()));
         dest = FileUtil.writeBytes(file.getBytes(), dest);
         
         ExcelReaderBuilder read = EasyExcelFactory.read(dest).excelType(ExcelTypeEnum.XLSX);

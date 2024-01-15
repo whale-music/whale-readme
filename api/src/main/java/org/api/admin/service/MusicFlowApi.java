@@ -152,11 +152,11 @@ public class MusicFlowApi {
                 throw new BaseException(ResultCode.FILENAME_INVALID);
             }
             fileSuffix = LocalFileUtil.getFileSuffix(filename, fileType.getSuffix());
-            path = checkFileMd5(md5, new File(requestConfig.getTempPath(), md5 + "." + fileSuffix));
+            path = checkFileMd5(md5, requestConfig.getTempPathFile(md5 + "." + fileSuffix));
             // 本地没有则保存
             if (path == null) {
                 String musicFileName = md5 + "." + fileSuffix;
-                path = new File(requestConfig.getTempPath(), musicFileName);
+                path = requestConfig.getTempPathFile(musicFileName);
                 BufferedOutputStream outputStream = FileUtil.getOutputStream(path);
                 outputStream.write(uploadFile.getBytes());
                 outputStream.close();
@@ -168,7 +168,7 @@ public class MusicFlowApi {
             fileSuffix = LocalFileUtil.getFileSuffix(url, fileType.getSuffix());
             byte[] bytes = HttpUtil.downloadBytes(url);
             md5 = DigestUtils.md5DigestAsHex(bytes);
-            File dest = new File(requestConfig.getTempPath(), md5 + "." + fileSuffix);
+            File dest = requestConfig.getTempPathFile(md5 + "." + fileSuffix);
             path = checkFileMd5(md5, dest);
             // 本地没有则保存
             if (path == null) {
@@ -335,7 +335,7 @@ public class MusicFlowApi {
                 ExceptionUtil.isNull(FileUtil.isEmpty(file) || FileUtil.size(file) < 100, ResultCode.DOWNLOAD_ERROR);
             } else {
                 // 读取本地文件
-                file = new File(requestConfig.getTempPath(), source.getPathTemp());
+                file = requestConfig.getTempPathFile(source.getPathTemp());
             }
             // 设置音乐元数据, 然后上传
             uploadPath = writeMusicMetaAndUploadMusicFile(file, source.getRate(), musicPojo, albumPojo, musicArtistList, musicArtistList, lyricPojoList);
@@ -807,7 +807,7 @@ public class MusicFlowApi {
         }
         // 更新封面
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
-            File file = new File(requestConfig.getTempPath(), req.getTempPicFile());
+            File file = requestConfig.getTempPathFile(req.getTempPicFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
             remoteStorePicService.saveOrUpdateMusicPicFile(req.getId(), file);
         }
@@ -824,7 +824,7 @@ public class MusicFlowApi {
         if (Objects.nonNull(resource) && Objects.nonNull(resource.getMd5())) {
             long count = resourceEntityRepository.countByMd5EqualsIgnoreCase(req.getResource().getMd5());
             ExceptionUtil.isNull(count >= 1, ResultCode.RESOURCE_DATA_EXISTED);
-            File file = new File(requestConfig.getTempPath(), req.getTempMusicFile());
+            File file = requestConfig.getTempPathFile(req.getTempMusicFile());
             
             if (FileUtil.isEmpty(file)) {
                 resourceService.save(resource);
@@ -1163,7 +1163,7 @@ public class MusicFlowApi {
         String path = byId.getPath();
         String addresses = ossService.getAddresses(path, false);
         String originPath = UUID.fastUUID().toString(true) + "." + byId.getEncodeType();
-        File destFile = new File(requestConfig.getTempPath(), originPath);
+        File destFile = requestConfig.getTempPathFile(originPath);
         HttpUtil.downloadFile(addresses, destFile, requestConfig.getTimeout());
         // 防止文件下载错误，返回数据是json而不是音频，所以判断必须大于100byte才算音频文件
         if (FileUtil.isEmpty(destFile) || FileUtil.size(destFile) < 100) {

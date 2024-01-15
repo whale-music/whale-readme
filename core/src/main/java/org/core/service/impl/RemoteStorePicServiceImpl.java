@@ -1,7 +1,9 @@
 package org.core.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -341,7 +343,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         File dest = null;
         try (FileInputStream fis = new FileInputStream(file)) {
             md5Hex = DigestUtil.md5Hex(file);
-            dest = new File(md5Hex + ImageTypeUtils.getPicType(fis));
+            dest = new File(md5Hex + StrPool.DOT + FileTypeUtil.getType(fis));
             File rename = FileUtil.copy(file, dest, true);
             upload = remoteStorageService.uploadPicFile(rename, md5Hex);
         } catch (IOException e) {
@@ -352,7 +354,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         } finally {
             FileUtil.del(dest);
         }
-        // TODO: 自动删除缓存文件
+        // TODO: 自动删除缓存文件 file
         TbPicPojo pojo = new TbPicPojo();
         pojo.setMd5(md5Hex);
         pojo.setPath(upload);

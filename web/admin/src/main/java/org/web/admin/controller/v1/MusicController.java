@@ -159,8 +159,8 @@ public class MusicController {
     @PostMapping("/auto/upload")
     @AnonymousAccess
     public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) throws IOException {
-        File uploadFile1 = FileUtil.writeBytes(uploadFile.getBytes(), new File(httpRequestConfig.getTempPath(),
-                Objects.requireNonNull(uploadFile.getOriginalFilename())));
+        File uploadFile1 = FileUtil.writeBytes(uploadFile.getBytes(),
+                httpRequestConfig.getTempPathFile(Objects.requireNonNull(uploadFile.getOriginalFilename())));
         uploadMusic.uploadAutoMusicFile(userId, uploadFile1, musicId);
         return R.success();
     }

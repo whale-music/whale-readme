@@ -79,10 +79,10 @@ public class MvApi {
         }
         
         // upload pic
-        remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), new File(httpRequestConfig.getTempPath(), request.getPicTempPath()));
+        remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), httpRequestConfig.getTempPathFile(request.getPicTempPath()));
         // 上传文件
         if (StringUtils.isNotBlank(request.getMvTempPath())) {
-            File file = new File(httpRequestConfig.getTempPath(), request.getMvTempPath());
+            File file = httpRequestConfig.getTempPathFile(request.getMvTempPath());
             long videoDuration = VideoUtil.getVideoDuration(file);
             request.setDuration(videoDuration);
             String path = remoteStorageService.uploadMvFile(file);
@@ -213,8 +213,7 @@ public class MvApi {
     public String updateMvFile(MultipartFile uploadFile, Long id) throws IOException {
         TbMvPojo mvPojo = tbMvService.getById(id);
         // 上传文件
-        File dest = new File(httpRequestConfig.getTempPath(),
-                LocalDateTime.now().getNano() + "-" + Objects.requireNonNull(uploadFile.getOriginalFilename()));
+        File dest = httpRequestConfig.getTempPathFile(LocalDateTime.now().getNano() + "-" + Objects.requireNonNull(uploadFile.getOriginalFilename()));
         FileUtil.writeBytes(uploadFile.getBytes(), dest);
         long videoDuration = VideoUtil.getVideoDuration(dest);
         String md5Str = DigestUtils.md5DigestAsHex(uploadFile.getBytes());

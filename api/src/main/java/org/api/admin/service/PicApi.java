@@ -1,6 +1,9 @@
 package org.api.admin.service;
 
+import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +15,6 @@ import org.core.common.constant.PicTypeConstant;
 import org.core.config.HttpRequestConfig;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
-import org.core.utils.ImageTypeUtils;
 import org.core.utils.LocalFileUtil;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -22,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -61,14 +63,19 @@ public class PicApi {
         File file;
         if (StringUtils.isBlank(url)) {
             file = FileUtil.writeBytes(uploadFile.getBytes(),
-                    new File(requestConfig.getTempPath(),
-                            Objects.requireNonNull(uploadFile.getResource().getFilename()) + "- " + LocalDateTime.now().getNano()));
+                    requestConfig.getTempPathFile(Objects.requireNonNull(uploadFile.getResource().getFilename()) + "- " + LocalDateTime.now().getNano()));
         } else {
             byte[] bytes = HttpUtil.downloadBytes(url);
-            File fileBytes = FileUtil.writeBytes(bytes,
-                    new File(requestConfig.getTempPath(), String.valueOf(LocalDateTime.now().getNano() + RandomUtil.randomInt())));
-            file = FileUtil.touch(new File(requestConfig.getTempPath(),
-                    LocalDateTime.now().getNano() + "." + ImageTypeUtils.getPicType(new FileInputStream(fileBytes))));
+            String name = PathUtil.getName(Paths.get(url));
+            String suffix = FileUtil.getSuffix(name);
+            if (StringUtils.isBlank(suffix)) {
+                File fileBytes = FileUtil.writeBytes(bytes,
+                        requestConfig.getTempPathFile(String.valueOf(LocalDateTime.now().getNano() + RandomUtil.randomInt())));
+                file = FileUtil.touch(requestConfig.getTempPathFile(LocalDateTime.now().getNano() + StrPool.DOT + FileTypeUtil.getType(fileBytes)));
+            } else {
+                file = FileUtil.writeBytes(bytes,
+                        requestConfig.getTempPathFile(LocalDateTime.now().getNano() + StrPool.DOT + suffix));
+            }
         }
         return file.getName();
     }
@@ -76,7 +83,7 @@ public class PicApi {
     public String uploadPic(MultipartFile uploadFile, Long id, String type) throws IOException {
         // 下载封面, 保存文件名为md5
         String randomName = System.currentTimeMillis() + String.valueOf(RandomUtils.nextLong());
-        File mkdir = FileUtil.touch(new File(requestConfig.getTempPath(), randomName));
+        File mkdir = FileUtil.touch(requestConfig.getTempPathFile(randomName));
         File file = FileUtil.writeBytes(uploadFile.getBytes(), mkdir);
         byte tempType;
         switch (type) {

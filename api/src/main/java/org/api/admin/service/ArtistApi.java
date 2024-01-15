@@ -164,7 +164,7 @@ public class ArtistApi {
         }
         artistService.saveOrUpdate(req);
         if (StringUtils.isNotBlank(req.getTempFile())) {
-            File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
+            File file = httpRequestConfig.getTempPathFile(req.getTempFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.DATA_NONE_FOUND);
             remoteStorePicService.saveOrUpdateArtistPicFile(req.getId(), file);
         }

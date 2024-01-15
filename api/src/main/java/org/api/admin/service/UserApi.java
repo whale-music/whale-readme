@@ -132,13 +132,13 @@ public class UserApi {
             }
             // 更新用户头像
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getAvatarTempFile())) {
-                File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getAvatarTempFile());
+                File file = requestConfig.getTempPathFile(saveOrUpdateUserReq.getAvatarTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
                 remoteStorePicService.saveOrUpdateAvatarPicFile(saveOrUpdateUserReq.getId(), file);
             }
             // 更新用户背景
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getBackgroundTempFile())) {
-                File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getBackgroundTempFile());
+                File file = requestConfig.getTempPathFile(saveOrUpdateUserReq.getBackgroundTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
                 remoteStorePicService.saveOrUpdateBackgroundPicFile(saveOrUpdateUserReq.getId(), file);
             }

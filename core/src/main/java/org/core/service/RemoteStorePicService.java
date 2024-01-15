@@ -364,25 +364,39 @@ public interface RemoteStorePicService {
     }
     
     /**
+     * 删除图片
+     *
+     * @param ids 封面Id
+     */
+    void removePicById(List<Long> ids);
+    
+    default void removePicById(Long ids) {
+        removePicById(Collections.singletonList(ids));
+    }
+    
+    /**
      * 删除封面数据, 包括文件和数据库
      */
-    default void removePic(Long id, byte type) {
-        removePicIds(Collections.singletonList(id), Collections.singletonList(type));
+    default void removePicMiddle(Long id, byte type) {
+        removePicMiddleIds(Collections.singletonList(id), Collections.singletonList(type));
     }
     
     /**
      * 批量根据ID删除封面数据
+     *
+     * @param middleIds 封面
+     * @param types     封面类型
      */
-    void removePicIds(List<Long> picIds, Collection<Byte> types);
+    void removePicMiddleIds(List<Long> middleIds, Collection<Byte> types);
     
     /**
      * 批量删除封面文件
      *
-     * @param ids      封面
-     * @param types
-     * @param consumer 删除文件
+     * @param middleIds 封面
+     * @param types     封面类型
+     * @param consumer  删除文件
      */
-    void removePicFile(Collection<Long> ids, Collection<Byte> types, Consumer<List<String>> consumer);
+    void removePicMiddleFile(Collection<Long> middleIds, Collection<Byte> types, Consumer<List<String>> consumer);
     
     /**
      * 保存或更新封面

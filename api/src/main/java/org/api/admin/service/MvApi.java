@@ -156,7 +156,7 @@ public class MvApi {
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, ids));
         
         // remove mv pic
-        remoteStorePicService.removePicIds(ids, Collections.singleton(PicTypeConstant.MV));
+        remoteStorePicService.removePicMiddleIds(ids, Collections.singleton(PicTypeConstant.MV));
         
         // remove mv tag
         qukuApi.removeLabelMv(ids);

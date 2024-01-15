@@ -52,7 +52,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     
     private final Cache<Long, TbPicPojo> picCache;
     
-    private final TbPicService picService;
+    private final TbPicService tbPicService;
     
     private final DefaultInfo defaultInfo;
     
@@ -132,7 +132,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
                                                                        .in(TbMiddlePicPojo::getMiddleId, middleIds)
                                                                        .in(TbMiddlePicPojo::getPicId, picId)
                                                                        .eq(TbMiddlePicPojo::getType, finalQueryType));
-            List<TbPicPojo> tbPicPojoList = picService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toSet()));
+            List<TbPicPojo> tbPicPojoList = tbPicService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toSet()));
             return tbPicPojoList.parallelStream().map(tbPicPojo -> {
                 tbPicPojo = tbPicPojo == null ? new TbPicPojo() : tbPicPojo;
                 if (StringUtils.isEmpty(tbPicPojo.getPath())) {
@@ -174,7 +174,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         // 查询封面是否存在, 不存在则创建。存在则创建中间表关联
         Wrapper<TbPicPojo> eq = Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, pojo.getMd5());
         synchronized (lock) {
-            TbPicPojo one = picService.getOne(eq);
+            TbPicPojo one = tbPicService.getOne(eq);
             TbMiddlePicPojo entity = new TbMiddlePicPojo();
             
             // 保存前先删除中间表
@@ -183,20 +183,20 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
                                                                       .eq(TbMiddlePicPojo::getType, type);
             TbMiddlePicPojo middlePic = middlePicService.getOne(middlePicEq);
             if (Objects.nonNull(middlePic)) {
-                TbPicPojo picPojo = picService.getById(middlePic.getPicId());
+                TbPicPojo picPojo = tbPicService.getById(middlePic.getPicId());
                 picPojo.setCount(picPojo.getCount() - 1);
                 // 如果原来的封面没有关联的数据则删除
                 if (picPojo.getCount() <= 0) {
-                    removePic(picPojo.getId(), type);
+                    this.removePicById(picPojo.getId());
                 } else {
-                    picService.updateById(picPojo);
+                    tbPicService.updateById(picPojo);
                 }
                 middlePicService.removeById(middlePic);
             }
             if (one == null) {
                 // 没有图片数据则新建
                 pojo.setCount(1);
-                picService.save(pojo);
+                tbPicService.save(pojo);
                 entity.setMiddleId(id);
                 entity.setType(type);
                 entity.setPicId(pojo.getId());
@@ -214,7 +214,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
                 // 更新关联图片数
                 one.setCount(one.getCount() + 1);
                 // 更新封面
-                picService.updateById(one);
+                tbPicService.updateById(one);
             }
             middlePicService.saveOrUpdate(entity);
             // 清除添加数据的缓存
@@ -273,36 +273,57 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     }
     
     /**
-     * @param picIds 封面数据
-     * @param types
+     * 删除图片
+     *
+     * @param ids 封面Id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removePicById(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getPicId, ids));
+        if (CollUtil.isEmpty(list)) {
+            return;
+        }
+        List<Long> middleIds = list.parallelStream().map(TbMiddlePicPojo::getMiddleId).toList();
+        Set<Byte> types = list.parallelStream().map(TbMiddlePicPojo::getType).collect(Collectors.toSet());
+        this.removePicMiddleIds(middleIds, types);
+        tbPicService.removeBatchByIds(ids);
+    }
+    
+    /**
+     * @param middleIds 封面数据
+     * @param types     封面类型
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     // TODO 需要修改pic type
-    public void removePicIds(List<Long> picIds, Collection<Byte> types) {
-        this.removePicFile(picIds, types, ossService::delete);
+    public void removePicMiddleIds(List<Long> middleIds, Collection<Byte> types) {
+        this.removePicMiddleFile(middleIds, types, ossService::delete);
     }
     
     /**
      * 批量删除封面文件
      *
-     * @param ids      封面
-     * @param types
-     * @param consumer 删除文件
+     * @param middleIds 封面的关联ID
+     * @param types     封面类型
+     * @param consumer  删除文件
      */
     @Transactional(rollbackFor = Exception.class)
-    public void removePicFile(Collection<Long> ids, Collection<Byte> types, Consumer<List<String>> consumer) {
-        if (CollUtil.isEmpty(ids)) {
+    public void removePicMiddleFile(Collection<Long> middleIds, Collection<Byte> types, Consumer<List<String>> consumer) {
+        if (CollUtil.isEmpty(middleIds)) {
             return;
         }
         synchronized (lock) {
             Wrapper<TbMiddlePicPojo> middlePicWrapper = Wrappers.<TbMiddlePicPojo>lambdaQuery()
-                                                                .in(TbMiddlePicPojo::getMiddleId, ids)
+                                                                .in(TbMiddlePicPojo::getMiddleId, middleIds)
                                                                 .in(TbMiddlePicPojo::getType, types);
             List<TbMiddlePicPojo> middlePicList = middlePicService.list(middlePicWrapper);
             if (CollUtil.isNotEmpty(middlePicList)) {
                 List<Long> picIds = middlePicList.parallelStream().map(TbMiddlePicPojo::getPicId).toList();
-                List<TbPicPojo> picPojoList = picService.listByIds(picIds);
+                List<TbPicPojo> picPojoList = tbPicService.listByIds(picIds);
                 List<TbPicPojo> removePicIds = new ArrayList<>();
                 List<TbPicPojo> updatePicPojoList = new ArrayList<>();
                 for (TbPicPojo tbPicPojo : picPojoList) {
@@ -317,11 +338,11 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
                 }
                 middlePicService.removeBatchByIds(middlePicList);
                 if (CollUtil.isNotEmpty(updatePicPojoList)) {
-                    picService.updateBatchById(updatePicPojoList);
+                    tbPicService.updateBatchById(updatePicPojoList);
                 }
                 // 删除所有没有引用封面
                 if (CollectionUtils.isNotEmpty(removePicIds)) {
-                    picService.removeByIds(removePicIds);
+                    tbPicService.removeByIds(removePicIds);
                     consumer.accept(removePicIds.parallelStream().map(TbPicPojo::getPath).toList());
                 }
             }

@@ -890,7 +890,7 @@ public class QukuServiceImpl implements QukuService {
         // 删除歌单关联tag
         collectIds.forEach(this::removeLabelAll);
         // 删除封面
-        remoteStorePicService.removePicIds(new ArrayList<>(collectIds), Collections.singletonList(PicTypeConstant.PLAYLIST));
+        remoteStorePicService.removePicMiddleIds(new ArrayList<>(collectIds), Collections.singletonList(PicTypeConstant.PLAYLIST));
         // 删除歌单关联ID
         collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, collectIds));
         userCollectService.remove(Wrappers.<TbUserCollectPojo>lambdaQuery().in(TbUserCollectPojo::getCollectId, collectIds));
@@ -1342,7 +1342,7 @@ public class QukuServiceImpl implements QukuService {
         queryWrapper.in(TbResourcePojo::getMusicId, musicIds);
         resourceService.remove(queryWrapper);
         // 删除封面
-        remoteStorePicService.removePicIds(musicIds, Collections.singletonList(PicTypeConstant.MUSIC));
+        remoteStorePicService.removePicMiddleIds(musicIds, Collections.singletonList(PicTypeConstant.MUSIC));
         // 删除歌词
         lyricService.remove(Wrappers.<TbLyricPojo>lambdaQuery().in(TbLyricPojo::getMusicId, musicIds));
         // 删除歌曲
@@ -1367,7 +1367,7 @@ public class QukuServiceImpl implements QukuService {
         List<MusicConvert> musicListByAlbumId = getMusicListByAlbumId(ids);
         if (CollUtil.isEmpty(musicListByAlbumId) || Boolean.TRUE.equals(compel)) {
             // 删除封面
-            remoteStorePicService.removePicIds(ids, Collections.singletonList(PicTypeConstant.ALBUM));
+            remoteStorePicService.removePicMiddleIds(ids, Collections.singletonList(PicTypeConstant.ALBUM));
             // 删除用户关注专辑
             userAlbumService.remove(Wrappers.<TbUserAlbumPojo>lambdaQuery().in(TbUserAlbumPojo::getAlbumId, ids));
             // 删除专辑歌手表
@@ -1405,7 +1405,7 @@ public class QukuServiceImpl implements QukuService {
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().eq(TbMvArtistPojo::getArtistId, ids));
         artistService.removeBatchByIds(ids);
         // 删除封面
-        remoteStorePicService.removePicIds(ids, Collections.singletonList(PicTypeConstant.ARTIST));
+        remoteStorePicService.removePicMiddleIds(ids, Collections.singletonList(PicTypeConstant.ARTIST));
     }
     
     /**

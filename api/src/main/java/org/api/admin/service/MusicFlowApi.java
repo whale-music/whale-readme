@@ -42,6 +42,7 @@ import org.core.mybatis.pojo.*;
 import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -128,6 +129,8 @@ public class MusicFlowApi {
     private final OSSService ossService;
     
     private final RemoteStorageService remoteStorageService;
+    
+    private final RemoteStorePicService remoteStorePicService;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -455,10 +458,10 @@ public class MusicFlowApi {
         boolean save = musicService.saveOrUpdate(tbMusicPojo);
         boolean pathFlag = StringUtils.isNotBlank(dto.getMusic().getPic().getPath());
         if (pathFlag && StringUtils.isNotBlank(dto.getMusic().getPic().getMd5())) {
-            qukuService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getMusic().getPic());
+            remoteStorePicService.saveOrUpdateMusicPic(tbMusicPojo.getId(), dto.getMusic().getPic());
         } else {
             if (pathFlag) {
-                qukuService.saveOrUpdateMusicPicUrl(tbMusicPojo.getId(), dto.getMusic().getPic().getPath());
+                remoteStorePicService.saveOrUpdateMusicPicUrl(tbMusicPojo.getId(), dto.getMusic().getPic().getPath());
             }
         }
         // 保存错误，抛出异常
@@ -487,9 +490,9 @@ public class MusicFlowApi {
         Long albumId = album.getId();
         if (albumId != null) {
             if (StringUtils.isNotBlank(album.getPic().getPath()) && (StringUtils.isNotBlank(album.getPic().getMd5()))) {
-                qukuService.saveOrUpdateAlbumPic(albumId, album.getPic());
+                remoteStorePicService.saveOrUpdateAlbumPic(albumId, album.getPic());
             } else {
-                qukuService.saveOrUpdateAlbumPicUrl(albumId, album.getPic().getPath());
+                remoteStorePicService.saveOrUpdateAlbumPicUrl(albumId, album.getPic().getPath());
             }
             albumService.updateById(album);
             return album;
@@ -588,9 +591,9 @@ public class MusicFlowApi {
             artistService.saveOrUpdate(pojo);
             // 更新封面
             if (StringUtils.isNotBlank(singerReq.getPic().getPath()) && (StringUtils.isNotBlank(singerReq.getPic().getMd5()))) {
-                qukuService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPic());
+                remoteStorePicService.saveOrUpdateArtistPic(pojo.getId(), singerReq.getPic());
             } else {
-                qukuService.saveOrUpdateArtistPicUrl(pojo.getId(), singerReq.getPic().getPath());
+                remoteStorePicService.saveOrUpdateArtistPicUrl(pojo.getId(), singerReq.getPic().getPath());
             }
             saveBatch.add(pojo);
         }
@@ -642,7 +645,7 @@ public class MusicFlowApi {
                     }
                 }
                 // 设置封面
-                String musicPicUrl = qukuService.getMusicPicUrl(musicPojo.getId());
+                String musicPicUrl = remoteStorePicService.getMusicPicUrl(musicPojo.getId());
                 if (StringUtils.isNotBlank(musicPicUrl)) {
                     Artwork artwork = new StandardArtwork();
                     artwork.setBinaryData(HttpUtil.downloadBytes(musicPicUrl));
@@ -806,7 +809,7 @@ public class MusicFlowApi {
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
             File file = new File(requestConfig.getTempPath(), req.getTempPicFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
-            qukuService.saveOrUpdateMusicPicFile(req.getId(), file);
+            remoteStorePicService.saveOrUpdateMusicPicFile(req.getId(), file);
         }
         // 如果是更新则删除原有数据
         TbMusicPojo byId = musicService.getById(req.getId());
@@ -896,9 +899,9 @@ public class MusicFlowApi {
     private void saveAlbumPic(AudioInfoReq dto, TbAlbumPojo albumPojo) {
         // 更新封面
         if (StringUtils.isNotBlank(dto.getAlbum().getPic().getPath()) && (StringUtils.isNotBlank(dto.getAlbum().getPic().getMd5()))) {
-            qukuService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
+            remoteStorePicService.saveOrUpdateAlbumPic(albumPojo.getId(), dto.getAlbum().getPic());
         } else {
-            qukuService.saveOrUpdateAlbumPicUrl(albumPojo.getId(), dto.getAlbum().getPic().getPath());
+            remoteStorePicService.saveOrUpdateAlbumPicUrl(albumPojo.getId(), dto.getAlbum().getPic().getPath());
         }
     }
     
@@ -979,7 +982,7 @@ public class MusicFlowApi {
         musicInfoRes.setAlbumName(albumPojo.getAlbumName());
         musicInfoRes.setAlbumId(albumPojo.getId());
         BeanUtils.copyProperties(byId, musicInfoRes);
-        musicInfoRes.setPicUrl(qukuService.getMusicPicUrl(byId.getId()));
+        musicInfoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
         musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         return musicInfoRes;
     }

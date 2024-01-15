@@ -23,6 +23,7 @@ import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
@@ -42,11 +43,14 @@ public class TopListApi {
     
     private final TbCollectService collectService;
     
-    public TopListApi(QukuAPI qukuService, TbArtistService singerService, AccountService accountService, TbCollectService collectService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public TopListApi(QukuAPI qukuService, TbArtistService singerService, AccountService accountService, TbCollectService collectService, RemoteStorePicService remoteStorePicService) {
         this.qukuService = qukuService;
         this.singerService = singerService;
         this.accountService = accountService;
         this.collectService = collectService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public TopListArtistRes artist(String type) {
@@ -60,7 +64,7 @@ public class TopListApi {
             e.setId(singerPojo.getId());
             e.setName(singerPojo.getArtistName());
             e.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
-            e.setPicUrl(qukuService.getArtistPicUrl(singerPojo.getId()));
+            e.setPicUrl(remoteStorePicService.getArtistPicUrl(singerPojo.getId()));
             e.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(singerPojo.getId()));
             e.setBriefDesc("");
             artists.add(e);
@@ -126,12 +130,12 @@ public class TopListApi {
             // 播放次数
             e.setPlayCount(0);
             e.setDescription(tbCollectPojo.getDescription());
-            e.setCoverImgUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
+            e.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(tbCollectPojo.getId()));
             
             SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
             Creator creator = new Creator();
-            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
-            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
+            creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
+            creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(userPojo.getId()));
             creator.setNickname(userPojo.getNickname());
             creator.setSignature(userPojo.getSignature());
             e.setCreator(creator);

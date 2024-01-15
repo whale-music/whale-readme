@@ -30,6 +30,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
@@ -71,7 +72,10 @@ public class UserApi {
     
     private final TbHistoryService historyService;
     
-    public UserApi(AccountService accountService, TbCollectService collectService, TbUserCollectEntityRepository userCollectEntityRepository, TbCollectMusicService collectMusicService, TbUserArtistService userSingerService, TbMusicService musicService, QukuAPI qukuService, CollectApi collectApi, TbHistoryService historyService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    
+    public UserApi(AccountService accountService, TbCollectService collectService, TbUserCollectEntityRepository userCollectEntityRepository, TbCollectMusicService collectMusicService, TbUserArtistService userSingerService, TbMusicService musicService, QukuAPI qukuService, CollectApi collectApi, TbHistoryService historyService, RemoteStorePicService remoteStorePicService) {
         this.accountService = accountService;
         this.collectService = collectService;
         this.userCollectEntityRepository = userCollectEntityRepository;
@@ -81,6 +85,7 @@ public class UserApi {
         this.qukuService = qukuService;
         this.collectApi = collectApi;
         this.historyService = historyService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     /**
@@ -105,7 +110,7 @@ public class UserApi {
         }
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(userPojo, userConvert);
-        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
+        userConvert.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
         return userConvert;
     }
     
@@ -131,8 +136,8 @@ public class UserApi {
         }
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(login, userConvert);
-        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(login.getId()));
-        userConvert.setBackgroundPicUrl(qukuService.getUserBackgroundPicUrl(login.getId()));
+        userConvert.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(login.getId()));
+        userConvert.setBackgroundPicUrl(remoteStorePicService.getUserBackgroundPicUrl(login.getId()));
         return userConvert;
     }
     
@@ -198,13 +203,13 @@ public class UserApi {
             SysUserPojo account = Optional.ofNullable(accountService.getById(uid)).orElse(new SysUserPojo());
             creator.setNickname(account.getNickname());
             creator.setUserId(account.getId());
-            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(account.getId()));
-            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(account.getId()));
+            creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(account.getId()));
+            creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(account.getId()));
             item.setCreator(creator);
             // 用户ID
             item.setUserId(tbCollectPojo.getUserId());
             // 封面图像ID
-            item.setCoverImgUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
+            item.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(tbCollectPojo.getId()));
             // 创建时间
             item.setCreateTime(tbCollectPojo.getCreateTime().getNano());
             // 描述
@@ -349,8 +354,8 @@ public class UserApi {
         SysUserPojo one = accountService.getOne(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, phone));
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(one, userConvert);
-        userConvert.setAvatarUrl(qukuService.getUserAvatarPicUrl(one.getId()));
-        userConvert.setBackgroundPicUrl(qukuService.getUserBackgroundPicUrl(one.getId()));
+        userConvert.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(one.getId()));
+        userConvert.setBackgroundPicUrl(remoteStorePicService.getUserBackgroundPicUrl(one.getId()));
         return userConvert;
     }
     
@@ -370,23 +375,23 @@ public class UserApi {
         userPoint.setUpdateTime(accUserPojo.getUpdateTime().getNano());
         userPoint.setStatus(1);
         res.setUserPoint(userPoint);
-    
-    
+        
+        
         Profile profile = new Profile();
         profile.setUserId(accUserPojo.getId());
-        profile.setAvatarUrl(qukuService.getUserAvatarPicUrl(accUserPojo.getId()));
-        profile.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(accUserPojo.getId()));
+        profile.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(accUserPojo.getId()));
+        profile.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(accUserPojo.getId()));
         profile.setEventCount(233);
         profile.setFollows(2333);
         profile.setFolloweds(23333);
         res.setProfile(profile);
-    
+        
         ProfileVillageInfo profileVillageInfo = new ProfileVillageInfo();
         profileVillageInfo.setTitle("crown");
-        profileVillageInfo.setImageUrl(qukuService.getUserAvatarPicUrl(accUserPojo.getId()));
-        profileVillageInfo.setTargetUrl(qukuService.getUserBackgroundPicUrl(accUserPojo.getId()));
+        profileVillageInfo.setImageUrl(remoteStorePicService.getUserAvatarPicUrl(accUserPojo.getId()));
+        profileVillageInfo.setTargetUrl(remoteStorePicService.getUserBackgroundPicUrl(accUserPojo.getId()));
         res.setProfileVillageInfo(profileVillageInfo);
-    
+        
         return res;
     }
 }

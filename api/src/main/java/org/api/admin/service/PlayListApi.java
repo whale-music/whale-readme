@@ -28,6 +28,7 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.PlayListService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.Nullable;
@@ -66,7 +67,10 @@ public class PlayListApi {
     
     private final DefaultInfo defaultInfo;
     
-    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    
+    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo, RemoteStorePicService remoteStorePicService) {
         this.musicService = musicService;
         this.qukuService = qukuService;
         this.albumService = albumService;
@@ -75,6 +79,7 @@ public class PlayListApi {
         this.playListService = playListService;
         this.musicUrlService = musicUrlService;
         this.defaultInfo = defaultInfo;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
@@ -309,7 +314,7 @@ public class PlayListApi {
         List<MusicConvert> converts = page.getRecords().stream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));
+            convert.setPicUrl(remoteStorePicService.getMusicPicUrl(tbMusicPojo.getId()));
             return convert;
         }).toList();
         Page<MusicConvert> convertPage = new Page<>();
@@ -431,7 +436,7 @@ public class PlayListApi {
         CollectInfoRes collectInfoRes = new CollectInfoRes();
         BeanUtils.copyProperties(byId, collectInfoRes);
         collectInfoRes.setCollectTag(CollUtil.join(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList(), ","));
-        String picUrl = qukuService.getCollectPicUrl(byId.getId());
+        String picUrl = remoteStorePicService.getCollectPicUrl(byId.getId());
         collectInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         return collectInfoRes;
     }
@@ -488,7 +493,7 @@ public class PlayListApi {
         List<CollectConvert> converts = playList.getRecords().stream().map(collectPojo -> {
             CollectConvert convert = new CollectConvert();
             BeanUtils.copyProperties(collectPojo, convert);
-            convert.setPicUrl(qukuService.getCollectPicUrl(collectPojo.getId()));
+            convert.setPicUrl(remoteStorePicService.getCollectPicUrl(collectPojo.getId()));
             return convert;
         }).toList();
     

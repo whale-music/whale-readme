@@ -25,6 +25,7 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbAlbumArtistPojo;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.springframework.stereotype.Service;
 
@@ -44,11 +45,15 @@ public class ArtistApi {
     
     private final TbArtistService singerService;
     
-    public ArtistApi(QukuAPI qukuService, TbAlbumArtistService albumSingerService, TbAlbumService albumService, TbArtistService singerService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    
+    public ArtistApi(QukuAPI qukuService, TbAlbumArtistService albumSingerService, TbAlbumService albumService, TbArtistService singerService, RemoteStorePicService remoteStorePicService) {
         this.qukuService = qukuService;
         this.albumSingerService = albumSingerService;
         this.albumService = albumService;
         this.singerService = singerService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public ArtistSubListRes artistSublist(SysUserPojo user) {
@@ -79,7 +84,7 @@ public class ArtistApi {
     
         Artist artist = new Artist();
         TbArtistPojo singerPojo = singerService.getById(id);
-        String picUrl = qukuService.getArtistPicUrl(singerPojo.getId());
+        String picUrl = remoteStorePicService.getArtistPicUrl(singerPojo.getId());
         artist.setImg1v1Url(picUrl);
         artist.setId(singerPojo.getId());
         artist.setName(singerPojo.getArtistName());
@@ -105,7 +110,7 @@ public class ArtistApi {
             e.setId(tbAlbumPojo.getId());
             e.setName(tbAlbumPojo.getAlbumName());
             e.setCompany(tbAlbumPojo.getCompany());
-            String url = qukuService.getAlbumPicUrl(tbAlbumPojo.getId());
+            String url = remoteStorePicService.getAlbumPicUrl(tbAlbumPojo.getId());
             e.setPicUrl(url);
             e.setBlurPicUrl(url);
             e.setArtist(artist);
@@ -131,7 +136,7 @@ public class ArtistApi {
         org.api.neteasecloudmusic.model.vo.artist.artist.Artist artist = new org.api.neteasecloudmusic.model.vo.artist.artist.Artist();
         artist.setName(singerPojo.getArtistName());
         artist.setId(singerPojo.getId());
-        String picUrl = qukuService.getArtistPicUrl(singerPojo.getId());
+        String picUrl = remoteStorePicService.getArtistPicUrl(singerPojo.getId());
         artist.setPicUrl(picUrl);
         artist.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
         artist.setImg1v1IdStr(picUrl);

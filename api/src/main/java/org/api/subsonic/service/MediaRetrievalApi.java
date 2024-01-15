@@ -9,7 +9,7 @@ import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.mybatis.pojo.TbResourcePojo;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.core.service.RemoteStorePicService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,18 +19,24 @@ import java.util.Optional;
 @Slf4j
 public class MediaRetrievalApi {
     
-    @Autowired
-    private QukuAPI qukuService;
+    private final QukuAPI qukuService;
     
-    @Autowired
-    private DefaultInfo defaultInfo;
+    private final DefaultInfo defaultInfo;
     
-    @Autowired
-    private SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    private final SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
+    
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public MediaRetrievalApi(QukuAPI qukuService, DefaultInfo defaultInfo, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService) {
+        this.qukuService = qukuService;
+        this.defaultInfo = defaultInfo;
+        this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
+        this.remoteStorePicService = remoteStorePicService;
+    }
     
     public String getCoverArt(SubsonicCommonReq req, Long id, Long size) {
         log.debug(req.toString());
-        String picUrl = qukuService.getPicUrl(id, null);
+        String picUrl = remoteStorePicService.getPicUrl(id, null);
         if (StringUtils.isNotBlank(picUrl)) {
             return picUrl;
         }

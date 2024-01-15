@@ -1,24 +1,26 @@
 package org.api.neteasecloudmusic.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.Account;
 import org.api.neteasecloudmusic.model.vo.login.status.DataJson;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.login.status.Profile;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.core.service.RemoteStorePicService;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "LoginApi")
 public class LoginApi {
-    @Autowired
-    private UserApi user;
+    private final UserApi user;
     
-    @Autowired
-    private QukuAPI qukuAPI;
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public LoginApi(UserApi user, RemoteStorePicService remoteStorePicService) {
+        this.user = user;
+        this.remoteStorePicService = remoteStorePicService;
+    }
     
     public LoginStatusRes status(Long uid) {
         LoginStatusRes res = new LoginStatusRes();
@@ -29,10 +31,10 @@ public class LoginApi {
         profile.setUserId(account.getId());
         profile.setUserName(account.getUsername());
         profile.setNickname(account.getNickname());
-        profile.setBackgroundUrl(qukuAPI.getUserBackgroundPicUrl(account.getId()));
-        profile.setAvatarUrl(qukuAPI.getUserAvatarPicUrl(account.getId()));
+        profile.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(account.getId()));
+        profile.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(account.getId()));
         profile.setCreateTime(account.getCreateTime().getNano());
-    
+        
         dataJson.setProfile(profile);
         Account account1 = new Account();
         account1.setId(account.getId());

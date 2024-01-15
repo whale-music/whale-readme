@@ -25,6 +25,7 @@ import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -45,10 +46,13 @@ public class RecommendApi {
     
     private final AccountService accountService;
     
-    public RecommendApi(QukuAPI qukuService, PlayListService playListService, AccountService accountService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public RecommendApi(QukuAPI qukuService, PlayListService playListService, AccountService accountService, RemoteStorePicService remoteStorePicService) {
         this.qukuService = qukuService;
         this.playListService = playListService;
         this.accountService = accountService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public PersonalFMRes personalFM() {
@@ -110,7 +114,7 @@ public class RecommendApi {
             ResultItem e = new ResultItem();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
+            e.setPicUrl(remoteStorePicService.getCollectPicUrl(tbCollectPojo.getId()));
             e.setCanDislike(true);
             e.setTrackNumberUpdateTime(tbCollectPojo.getUpdateTime().getNano());
             result.add(e);
@@ -126,16 +130,16 @@ public class RecommendApi {
             DailyRecommendResourceRes e = new DailyRecommendResourceRes();
             e.setId(tbCollectPojo.getId());
             e.setName(tbCollectPojo.getPlayListName());
-            e.setPicUrl(qukuService.getCollectPicUrl(tbCollectPojo.getId()));
+            e.setPicUrl(remoteStorePicService.getCollectPicUrl(tbCollectPojo.getId()));
             e.setPlaycount(3000L);
             e.setCreateTime((long) tbCollectPojo.getCreateTime().getNano());
             e.setUserId(tbCollectPojo.getUserId());
-    
+            
             // 创建者信息
             SysUserPojo userPojo = accountService.getById(tbCollectPojo.getUserId());
             Creator creator = new Creator();
-            creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
-            creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
+            creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
+            creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(userPojo.getId()));
             creator.setNickname(userPojo.getNickname());
             creator.setDescription(userPojo.getSignature());
             creator.setSignature(userPojo.getSignature());

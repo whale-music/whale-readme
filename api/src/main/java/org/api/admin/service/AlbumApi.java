@@ -26,6 +26,7 @@ import org.core.mybatis.pojo.TbAlbumArtistPojo;
 import org.core.mybatis.pojo.TbAlbumPojo;
 import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbTagPojo;
+import org.core.service.RemoteStorePicService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,12 +57,15 @@ public class AlbumApi {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    public AlbumApi(TbAlbumService albumService, TbAlbumArtistService albumSingerService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public AlbumApi(TbAlbumService albumService, TbAlbumArtistService albumSingerService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig, RemoteStorePicService remoteStorePicService) {
         this.albumService = albumService;
         this.albumSingerService = albumSingerService;
         this.singerService = singerService;
         this.qukuService = qukuService;
         this.httpRequestConfig = httpRequestConfig;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     
@@ -197,7 +201,7 @@ public class AlbumApi {
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
-        albumRes.setPicUrl(qukuService.getAlbumPicUrl(byId.getId()));
+        albumRes.setPicUrl(remoteStorePicService.getAlbumPicUrl(byId.getId()));
         albumRes.setAlbumSize(Long.valueOf(albumCount));
         return albumRes;
     }
@@ -218,7 +222,7 @@ public class AlbumApi {
         }
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
-            qukuService.saveOrUpdateAlbumPicFile(req.getId(), file);
+            remoteStorePicService.saveOrUpdateAlbumPicFile(req.getId(), file);
         }
         // 如果是更新专辑关联歌手数据则删除原来的，重新添加
         albumSingerService.remove(Wrappers.<TbAlbumArtistPojo>lambdaQuery().in(TbAlbumArtistPojo::getAlbumId, req.getId()));

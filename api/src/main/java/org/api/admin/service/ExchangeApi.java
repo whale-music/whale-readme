@@ -33,8 +33,8 @@ import org.core.mybatis.pojo.TbLyricPojo;
 import org.core.mybatis.pojo.TbOriginPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbTagPojo;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -54,29 +54,35 @@ public class ExchangeApi {
     private static final String SHEET_SOURCE = "source";
     private static final String SHEET_PIC = "pic";
     
-    @Autowired
-    private TbMusicEntityRepository tbMusicEntityRepository;
+    private final TbMusicEntityRepository tbMusicEntityRepository;
     
-    @Autowired
-    private TbAlbumEntityRepository tbAlbumEntityRepository;
+    private final TbAlbumEntityRepository tbAlbumEntityRepository;
     
-    @Autowired
-    private TbArtistEntityRepository artistEntityRepository;
+    private final TbArtistEntityRepository artistEntityRepository;
     
-    @Autowired
-    private TbResourceEntityRepository resourceEntityRepository;
+    private final TbResourceEntityRepository resourceEntityRepository;
     
-    @Autowired
-    private TbPicService picService;
+    private final TbPicService picService;
     
-    @Autowired
-    private MusicFlowApi musicFlowApi;
+    private final MusicFlowApi musicFlowApi;
     
-    @Autowired
-    private HttpRequestConfig requestConfig;
+    private final HttpRequestConfig requestConfig;
     
-    @Autowired
-    private QukuAPI qukuApi;
+    private final QukuAPI qukuApi;
+    
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public ExchangeApi(TbMusicEntityRepository tbMusicEntityRepository, TbAlbumEntityRepository tbAlbumEntityRepository, TbArtistEntityRepository artistEntityRepository, TbResourceEntityRepository resourceEntityRepository, TbPicService picService, MusicFlowApi musicFlowApi, HttpRequestConfig requestConfig, QukuAPI qukuApi, RemoteStorePicService remoteStorePicService) {
+        this.tbMusicEntityRepository = tbMusicEntityRepository;
+        this.tbAlbumEntityRepository = tbAlbumEntityRepository;
+        this.artistEntityRepository = artistEntityRepository;
+        this.resourceEntityRepository = resourceEntityRepository;
+        this.picService = picService;
+        this.musicFlowApi = musicFlowApi;
+        this.requestConfig = requestConfig;
+        this.qukuApi = qukuApi;
+        this.remoteStorePicService = remoteStorePicService;
+    }
     
     public StreamingResponseBody exportExcel() {
         List<TbMusicEntity> all = tbMusicEntityRepository.findAll();
@@ -85,7 +91,7 @@ public class ExchangeApi {
         Set<Long> musicIds = all.parallelStream().map(TbMusicEntity::getId).collect(Collectors.toSet());
         
         Map<Long, List<TbTagPojo>> labelMusicGenreMap = qukuApi.getLabelMusicGenre(musicIds);
-        Map<Long, String> musicPicUrl = qukuApi.getMusicPicPath(musicIds);
+        Map<Long, String> musicPicUrl = remoteStorePicService.getMusicPicPath(musicIds);
         Map<Long, List<TbLyricPojo>> musicLyricMap = qukuApi.getMusicLyric(musicIds);
         Map<Long, List<TbTagPojo>> labelMusicTagMap = qukuApi.getLabelMusicTag(musicIds);
         
@@ -138,7 +144,7 @@ public class ExchangeApi {
         
         List<TbAlbumEntity> albumList = tbAlbumEntityRepository.findAll();
         List<Long> albumIds = albumList.parallelStream().map(TbAlbumEntity::getId).toList();
-        Map<Long, String> albumPicUrl = qukuApi.getAlbumPicPath(albumIds);
+        Map<Long, String> albumPicUrl = remoteStorePicService.getAlbumPicPath(albumIds);
         Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
         Collection<ExportExcelRes.AlbumInfo> albumInfos = new ConcurrentLinkedDeque<>();
         
@@ -160,7 +166,7 @@ public class ExchangeApi {
         
         List<TbArtistEntity> artistList = artistEntityRepository.findAll();
         List<Long> artistIds = artistList.parallelStream().map(TbArtistEntity::getId).toList();
-        Map<Long, String> artistPicUrlMap = qukuApi.getArtistPicPath(artistIds);
+        Map<Long, String> artistPicUrlMap = remoteStorePicService.getArtistPicPath(artistIds);
         List<ExportExcelRes.ArtistInfo> artistInfos = new LinkedList<>();
         for (TbArtistEntity artistEntity : artistList) {
             ExportExcelRes.ArtistInfo artistInfo = new ExportExcelRes.ArtistInfo();

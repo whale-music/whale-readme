@@ -24,6 +24,7 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.RemoteStorePicService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +43,15 @@ public class PlaylistApi {
     
     private final TbCollectService collectService;
     
-    public PlaylistApi(QukuAPI qukuApi, AccountService accountService, PlayListService playListService, TbCollectService collectService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    
+    public PlaylistApi(QukuAPI qukuApi, AccountService accountService, PlayListService playListService, TbCollectService collectService, RemoteStorePicService remoteStorePicService) {
         this.qukuApi = qukuApi;
         this.accountService = accountService;
         this.playListService = playListService;
         this.collectService = collectService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public PlaylistsRes getPlaylists(SubsonicCommonReq req, String username) {
@@ -163,7 +168,7 @@ public class PlaylistApi {
             // 更新
             TbCollectPojo byId = collectService.getById(playlistId);
             BeanUtils.copyProperties(byId, playList);
-            playList.setPicUrl(qukuApi.getCollectPicUrl(byId.getId()));
+            playList.setPicUrl(remoteStorePicService.getCollectPicUrl(byId.getId()));
             byId.setPlayListName(name);
             collectService.updateById(byId);
             

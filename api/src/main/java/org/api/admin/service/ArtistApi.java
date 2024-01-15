@@ -30,6 +30,7 @@ import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbMvArtistPojo;
 import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
@@ -54,13 +55,16 @@ public class ArtistApi {
     
     private final TbMvService tbMvService;
     
-    public ArtistApi(TbArtistService artistService, QukuAPI qukuService, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbMvService tbMvService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public ArtistApi(TbArtistService artistService, QukuAPI qukuService, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbMvService tbMvService, RemoteStorePicService remoteStorePicService) {
         this.artistService = artistService;
         this.qukuService = qukuService;
         this.defaultInfo = defaultInfo;
         this.httpRequestConfig = httpRequestConfig;
         this.tbMvArtistService = tbMvArtistService;
         this.tbMvService = tbMvService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     /**
@@ -105,7 +109,7 @@ public class ArtistApi {
             BeanUtils.copyProperties(singerPojo, artistRes);
             artistRes.setAlbumSize(String.valueOf(albumSize));
             artistRes.setMusicSize(String.valueOf(musicSize));
-            artistRes.setPicUrl(qukuService.getArtistPicUrl(singerPojo.getId()));
+            artistRes.setPicUrl(remoteStorePicService.getArtistPicUrl(singerPojo.getId()));
             singerResPage.getRecords().add(artistRes);
         }
     
@@ -141,7 +145,7 @@ public class ArtistApi {
         TbArtistPojo pojo = artistService.getById(id);
         BeanUtils.copyProperties(pojo, artistInfoRes);
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
-        String picUrl = qukuService.getArtistPicUrl(pojo.getId());
+        String picUrl = remoteStorePicService.getArtistPicUrl(pojo.getId());
         artistInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
         List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
         List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);
@@ -162,7 +166,7 @@ public class ArtistApi {
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = new File(httpRequestConfig.getTempPath(), req.getTempFile());
             ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.DATA_NONE_FOUND);
-            qukuService.saveOrUpdateArtistPicFile(req.getId(), file);
+            remoteStorePicService.saveOrUpdateArtistPicFile(req.getId(), file);
         }
     }
     
@@ -175,7 +179,7 @@ public class ArtistApi {
         
         List<Long> mvIds = tbMvPojos.parallelStream().map(TbMvPojo::getId).toList();
         Map<Long, List<TbTagPojo>> labelMusicTag = qukuService.getLabelMvTag(mvIds);
-        Map<Long, String> mvPicUrl = qukuService.getMvPicUrl(mvIds);
+        Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuService.getMvArtistByMvIdToMap(mvIds);
         
         List<ArtistMvListRes> listRes = new ArrayList<>();

@@ -21,6 +21,7 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.RemoteStorePicService;
 import org.core.service.impl.QukuServiceImpl;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
@@ -56,7 +57,9 @@ public class CollectApi {
     
     private final QukuAPI qukuService;
     
-    public CollectApi(TbMiddleTagService collectMusicTagService, TbCollectService collectService, TbUserCollectService userCollectService, TbTagService tagService, TbCollectMusicService collectMusicService, TbMusicService musicService, TbResourceService musicUrlService, PlayListService playListService, AccountService accountService, QukuAPI qukuService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public CollectApi(TbMiddleTagService collectMusicTagService, TbCollectService collectService, TbUserCollectService userCollectService, TbTagService tagService, TbCollectMusicService collectMusicService, TbMusicService musicService, TbResourceService musicUrlService, PlayListService playListService, AccountService accountService, QukuAPI qukuService, RemoteStorePicService remoteStorePicService) {
         this.collectMusicTagService = collectMusicTagService;
         this.collectService = collectService;
         this.userCollectService = userCollectService;
@@ -67,6 +70,7 @@ public class CollectApi {
         this.playListService = playListService;
         this.accountService = accountService;
         this.qukuService = qukuService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     /**
@@ -268,7 +272,7 @@ public class CollectApi {
         List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
-            convert.setPicUrl(qukuService.getMusicPicUrl(tbMusicPojo.getId()));
+            convert.setPicUrl(remoteStorePicService.getMusicPicUrl(tbMusicPojo.getId()));
             return convert;
         }).toList();
         
@@ -352,21 +356,21 @@ public class CollectApi {
         Playlist playlist = new Playlist();
         playlist.setId(byId.getId());
         playlist.setName(byId.getPlayListName());
-        playlist.setCoverImgUrl(qukuService.getCollectPicUrl(byId.getId()));
+        playlist.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(byId.getId()));
         playlist.setUpdateTime((long) byId.getUpdateTime().getNano());
         playlist.setDescription(byId.getDescription());
-    
+        
         // 歌单创建者
         Creator creator = new Creator();
         SysUserPojo userPojo = accountService.getById(byId.getUserId());
         userPojo = Optional.ofNullable(userPojo).orElse(new SysUserPojo());
         creator.setNickname(userPojo.getNickname());
-        creator.setBackgroundUrl(qukuService.getUserBackgroundPicUrl(userPojo.getId()));
-        creator.setAvatarUrl(qukuService.getUserAvatarPicUrl(userPojo.getId()));
+        creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(userPojo.getId()));
+        creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
         creator.setUserId(userPojo.getId());
         playlist.setCreator(creator);
         playlist.setUserId(userPojo.getId());
-    
+        
         ArrayList<TracksItem> tracks = new ArrayList<>();
         ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
         for (TbMusicPojo tbMusicPojo : playListAllMusic) {

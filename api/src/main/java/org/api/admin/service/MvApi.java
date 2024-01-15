@@ -23,6 +23,7 @@ import org.core.mybatis.pojo.TbMvArtistPojo;
 import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.RemoteStorageService;
+import org.core.service.RemoteStorePicService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,12 +49,16 @@ public class MvApi {
     
     private final RemoteStorageService remoteStorageService;
     
-    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    
+    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService, RemoteStorePicService remoteStorePicService) {
         this.tbMvService = tbMvService;
         this.qukuApi = qukuApi;
         this.httpRequestConfig = httpRequestConfig;
         this.tbMvArtistService = tbMvArtistService;
         this.remoteStorageService = remoteStorageService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     @Transactional(rollbackFor = Exception.class)
@@ -74,7 +79,7 @@ public class MvApi {
         }
         
         // upload pic
-        qukuApi.saveOrUpdateMvPicFile(request.getId(), new File(httpRequestConfig.getTempPath(), request.getPicTempPath()));
+        remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), new File(httpRequestConfig.getTempPath(), request.getPicTempPath()));
         // 上传文件
         if (StringUtils.isNotBlank(request.getMvTempPath())) {
             File file = new File(httpRequestConfig.getTempPath(), request.getMvTempPath());
@@ -124,7 +129,7 @@ public class MvApi {
         LinkedList<MvPageRes> records = new LinkedList<>();
         BeanUtils.copyProperties(page, mvPageResPage);
         Map<Long, List<TbTagPojo>> labelMusicTag = qukuApi.getLabelMvTag(mvIds);
-        Map<Long, String> mvPicUrl = qukuApi.getMvPicUrl(mvIds);
+        Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuApi.getMvArtistByMvIdToMap(mvIds);
         for (TbMvPojo mvPojo : page.getRecords()) {
             MvPageRes e = new MvPageRes();
@@ -151,7 +156,7 @@ public class MvApi {
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, ids));
         
         // remove mv pic
-        qukuApi.removePicIds(ids, Collections.singleton(PicTypeConstant.MV));
+        remoteStorePicService.removePicIds(ids, Collections.singleton(PicTypeConstant.MV));
         
         // remove mv tag
         qukuApi.removeLabelMv(ids);
@@ -168,7 +173,7 @@ public class MvApi {
         
         MvInfoRes e = new MvInfoRes();
         BeanUtils.copyProperties(mvPojo, e);
-        String mvPicUrl = qukuApi.getMvPicUrl(mvPojo.getId());
+        String mvPicUrl = remoteStorePicService.getMvPicUrl(mvPojo.getId());
         Map<Long, List<TbTagPojo>> labelMusicTag = qukuApi.getLabelMvTag(e.getId());
         List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
         if (CollUtil.isNotEmpty(tbTagPojos)) {

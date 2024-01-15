@@ -16,7 +16,6 @@ import org.api.admin.model.res.PageUserRes;
 import org.api.admin.model.res.SaveOrUpdateUserRes;
 import org.api.admin.model.res.UserRes;
 import org.api.admin.utils.MyPageUtil;
-import org.api.common.service.QukuAPI;
 import org.core.common.constant.RoleConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -26,6 +25,7 @@ import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
@@ -45,8 +45,6 @@ public class UserApi {
     // 用户服务
     private final AccountService accountService;
     
-    private final QukuAPI qukuAPI;
-    
     private final HttpRequestConfig requestConfig;
     
     private final TbUserCollectService userCollectService;
@@ -61,9 +59,10 @@ public class UserApi {
     
     private final UserSubPasswordConfig userSubPasswordConfig;
     
-    public UserApi(AccountService accountService, QukuAPI qukuAPI, HttpRequestConfig requestConfig, TbUserCollectService userCollectService, TbUserAlbumService userAlbumService, TbUserArtistService userArtistService, TbUserMvService userMvService, TbCollectMusicService collectMusicService, UserSubPasswordConfig userSubPasswordConfig) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public UserApi(AccountService accountService, HttpRequestConfig requestConfig, TbUserCollectService userCollectService, TbUserAlbumService userAlbumService, TbUserArtistService userArtistService, TbUserMvService userMvService, TbCollectMusicService collectMusicService, UserSubPasswordConfig userSubPasswordConfig, RemoteStorePicService remoteStorePicService) {
         this.accountService = accountService;
-        this.qukuAPI = qukuAPI;
         this.requestConfig = requestConfig;
         this.userCollectService = userCollectService;
         this.userAlbumService = userAlbumService;
@@ -71,6 +70,7 @@ public class UserApi {
         this.userMvService = userMvService;
         this.collectMusicService = collectMusicService;
         this.userSubPasswordConfig = userSubPasswordConfig;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public void createAccount(UserReq req) {
@@ -92,8 +92,8 @@ public class UserApi {
             return new UserConvert();
         }
         UserConvert res = new UserConvert(byId);
-        res.setBackgroundPicUrl(qukuAPI.getUserBackgroundPicUrl(byId.getId()));
-        res.setAvatarUrl(qukuAPI.getUserAvatarPicUrl(byId.getId()));
+        res.setBackgroundPicUrl(remoteStorePicService.getUserBackgroundPicUrl(byId.getId()));
+        res.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(byId.getId()));
         return res;
     }
     
@@ -134,13 +134,13 @@ public class UserApi {
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getAvatarTempFile())) {
                 File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getAvatarTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
-                qukuAPI.saveOrUpdateAvatarPicFile(saveOrUpdateUserReq.getId(), file);
+                remoteStorePicService.saveOrUpdateAvatarPicFile(saveOrUpdateUserReq.getId(), file);
             }
             // 更新用户背景
             if (StringUtils.isNotBlank(saveOrUpdateUserReq.getBackgroundTempFile())) {
                 File file = new File(requestConfig.getTempPath(), saveOrUpdateUserReq.getBackgroundTempFile());
                 ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
-                qukuAPI.saveOrUpdateBackgroundPicFile(saveOrUpdateUserReq.getId(), file);
+                remoteStorePicService.saveOrUpdateBackgroundPicFile(saveOrUpdateUserReq.getId(), file);
             }
             SaveOrUpdateUserRes res = new SaveOrUpdateUserRes();
             BeanUtils.copyProperties(saveOrUpdateUserReq, res);

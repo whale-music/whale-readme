@@ -1179,7 +1179,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeLabelByName(Byte target, Long id, Collection<Long> labelBatchName) {
+    public void removeLabelByName(Byte target, Long id, Collection<String> labelBatchName) {
         LambdaQueryWrapper<TbTagPojo> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.in(TbTagPojo::getTagName, labelBatchName);
         List<TbTagPojo> list = tagService.list(queryWrapper);

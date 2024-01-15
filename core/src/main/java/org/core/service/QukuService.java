@@ -601,7 +601,7 @@ public interface QukuService {
      * @param id             歌单或歌曲前ID
      * @param labelBatchName 需要删除的label ID
      */
-    void removeLabelByName(Byte target, Long id, Collection<Long> labelBatchName);
+    void removeLabelByName(Byte target, Long id, Collection<String> labelBatchName);
     
     /**
      * 删除歌单或音乐中的tag
@@ -621,7 +621,7 @@ public interface QukuService {
      * @param id        歌单或歌曲前ID
      * @param labelName 需要删除的label ID
      */
-    default void removeLabelByName(Byte target, Long id, Long labelName) {
+    default void removeLabelByName(Byte target, Long id, String labelName) {
         removeLabelByName(target, id, Collections.singletonList(labelName));
     }
     
@@ -631,7 +631,7 @@ public interface QukuService {
      * @param id        歌单或歌曲前ID
      * @param labelName 需要删除的label ID
      */
-    default void removeCollectLabelByName(Long id, Long labelName) {
+    default void removeCollectLabelByName(Long id, String labelName) {
         removeLabelByName(TargetTagConstant.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
     }
     

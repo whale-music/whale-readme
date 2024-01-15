@@ -24,6 +24,7 @@ import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.PlayListTypeConfig;
+import org.core.model.TagMiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -878,7 +879,7 @@ public class QukuServiceImpl implements QukuService {
             checkUserAuth(userId, tbCollectPojo);
         }
         // 删除歌单关联tag
-        collectIds.forEach(this::removeLabelAll);
+        this.removeLabelPlaylist(collectIds);
         // 删除封面
         remoteStorePicService.removePlaylistPicMiddleIds(collectIds);
         // 删除歌单关联ID
@@ -1098,38 +1099,17 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 删除全部tag
-     *
-     * @param id 音乐，歌单， 专辑
-     * @deprecated 已被启用，请使用 {@link QukuService#removeLabel(List, byte)}
-     */
-    @Override
-    @Deprecated(since = "1.0")
-    public void removeLabelAll(Long id) {
-        synchronized (removeLabelLock) {
-            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
-            // 查询出所有tag关联数据
-            List<TbMiddleTagPojo> tbMiddleTagPojoList = middleTagService.list(eq);
-            if (CollUtil.isEmpty(tbMiddleTagPojoList)) {
-                return;
-            }
-            // 根据相同tag分组, 然后查询出对于的tag表, 然后根据每个要删除的数量进行计算, 等于或小于0时删除tag
-            voteToRemoveTag(tbMiddleTagPojoList);
-        }
-    }
-    
-    /**
      * 根据类型ID, 删除tag
      *
-     * @param ids   tag id
-     * @param types tag type
+     * @param list tag 数据
      */
     @Override
-    public void removeLabel(List<Long> ids, Collection<Byte> types) {
+    public void removeLabel(Collection<TagMiddleTypeModel> list) {
         synchronized (removeLabelLock) {
-            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
-                                                             .in(TbMiddleTagPojo::getMiddleId, ids)
-                                                             .in(TbMiddleTagPojo::getType, types);
+            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery();
+            for (TagMiddleTypeModel middleTypeModel : list) {
+                eq.in(TbMiddleTagPojo::getMiddleId, middleTypeModel.getMiddleId()).in(TbMiddleTagPojo::getType, middleTypeModel.getType());
+            }
             // 查询出所有tag关联数据
             List<TbMiddleTagPojo> tbMiddleTagPojoList = middleTagService.list(eq);
             if (CollUtil.isEmpty(tbMiddleTagPojoList)) {

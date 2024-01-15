@@ -3,6 +3,7 @@ package org.core.service;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.common.constant.TargetTagConstant;
+import org.core.model.TagMiddleTypeModel;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.CollectConvert;
@@ -522,29 +523,21 @@ public interface QukuService {
     }
     
     /**
-     * 删除全部tag
-     *
-     * @param id 音乐，歌单， 专辑
-     */
-    void removeLabelAll(Long id);
-    
-    /**
      * 根据类型ID, 删除tag
      *
      * @param ids  tag id
      * @param type tag type
      */
-    default void removeLabel(List<Long> ids, byte type) {
-        removeLabel(ids, Collections.singleton(type));
+    default void removeLabel(Collection<Long> ids, byte type) {
+        this.removeLabel(ids.parallelStream().map(aLong -> new TagMiddleTypeModel(aLong, type)).toList());
     }
     
     /**
      * 根据类型ID, 删除tag列表
      *
-     * @param ids   tag id
-     * @param types tag type
+     * @param list tag 数据
      */
-    void removeLabel(List<Long> ids, Collection<Byte> types);
+    void removeLabel(Collection<TagMiddleTypeModel> list);
     
     /**
      * 移除专辑tag
@@ -572,6 +565,24 @@ public interface QukuService {
      */
     default void removeLabelMv(Long id) {
         removeLabel(Collections.singletonList(id), TargetTagConstant.TARGET_MV_TAG);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param id 歌单 id
+     */
+    default void removeLabelPlaylist(Long id) {
+        removeLabel(Collections.singletonList(id), TargetTagConstant.TARGET_COLLECT_TAG);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param ids 歌单 id
+     */
+    default void removeLabelPlaylist(Collection<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_COLLECT_TAG);
     }
     
     /**

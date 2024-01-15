@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.PlayListTypeConfig;
-import org.core.model.PicMiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -82,14 +80,6 @@ public class QukuServiceImpl implements QukuService {
     private final TbTagService tagService;
     
     private final AccountService accountService;
-    
-    private final TbPicService picService;
-    
-    private final TbMiddlePicService middlePicService;
-    
-    private final Cache<Long, TbPicPojo> picCache;
-    
-    private final Cache<PicMiddleTypeModel, Long> picMiddleCache;
     
     private final DefaultInfo defaultInfo;
     

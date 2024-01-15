@@ -2,6 +2,7 @@ package org.core.service;
 
 import cn.hutool.core.map.MapUtil;
 import org.core.common.constant.PicTypeConstant;
+import org.core.model.PicMiddleTypeModel;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -378,25 +379,51 @@ public interface RemoteStorePicService {
      * 删除封面数据, 包括文件和数据库
      */
     default void removePicMiddle(Long id, byte type) {
-        removePicMiddleIds(Collections.singletonList(id), Collections.singletonList(type));
+        removePicMiddleIds(Collections.singletonList(id), type);
     }
     
     /**
      * 批量根据ID删除封面数据
      *
      * @param middleIds 封面
-     * @param types     封面类型
+     * @param type      封面类型
      */
-    void removePicMiddleIds(List<Long> middleIds, Collection<Byte> types);
+    void removePicMiddleIds(Collection<Long> middleIds, Byte type);
+    
+    default void removeMvPicMiddleIds(Collection<Long> middleIds) {
+        removePicMiddleIds(middleIds, PicTypeConstant.MV);
+    }
+    
+    default void removePlaylistPicMiddleIds(Collection<Long> middleIds) {
+        removePicMiddleIds(middleIds, PicTypeConstant.PLAYLIST);
+    }
+    
+    default void removeMusicPicMiddleIds(Collection<Long> middleIds) {
+        removePicMiddleIds(middleIds, PicTypeConstant.MUSIC);
+    }
+    
+    default void removeAlbumPicMiddleIds(Collection<Long> middleIds) {
+        removePicMiddleIds(middleIds, PicTypeConstant.ALBUM);
+    }
+    
+    default void removeArtistPicMiddleIds(Collection<Long> middleIds) {
+        removePicMiddleIds(middleIds, PicTypeConstant.ARTIST);
+    }
+    
+    /**
+     * 批量根据ID删除封面数据
+     *
+     * @param list 封面
+     */
+    void removePicMiddleIds(Collection<PicMiddleTypeModel> list);
     
     /**
      * 批量删除封面文件
      *
-     * @param middleIds 封面
-     * @param types     封面类型
-     * @param consumer  删除文件
+     * @param list     封面数据
+     * @param consumer 删除文件
      */
-    void removePicMiddleFile(Collection<Long> middleIds, Collection<Byte> types, Consumer<List<String>> consumer);
+    void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer);
     
     /**
      * 保存或更新封面

@@ -14,7 +14,6 @@ import org.api.admin.model.res.MvInfoRes;
 import org.api.admin.model.res.MvPageRes;
 import org.api.admin.utils.VideoUtil;
 import org.api.common.service.QukuAPI;
-import org.core.common.constant.PicTypeConstant;
 import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbMvArtistService;
 import org.core.mybatis.iservice.TbMvService;
@@ -33,7 +32,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service(AdminConfig.ADMIN + "MvApi")
@@ -156,7 +158,7 @@ public class MvApi {
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, ids));
         
         // remove mv pic
-        remoteStorePicService.removePicMiddleIds(ids, Collections.singleton(PicTypeConstant.MV));
+        remoteStorePicService.removeMvPicMiddleIds(ids);
         
         // remove mv tag
         qukuApi.removeLabelMv(ids);

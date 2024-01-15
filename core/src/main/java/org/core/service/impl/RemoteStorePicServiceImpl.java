@@ -20,7 +20,7 @@ import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.HttpRequestConfig;
-import org.core.model.MiddleTypeModel;
+import org.core.model.PicMiddleTypeModel;
 import org.core.mybatis.iservice.TbMiddlePicService;
 import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
@@ -48,7 +48,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     
     private final TbMiddlePicService middlePicService;
     
-    private final Cache<MiddleTypeModel, Long> picMiddleCache;
+    private final Cache<PicMiddleTypeModel, Long> picMiddleCache;
     
     private final Cache<Long, TbPicPojo> picCache;
     
@@ -104,22 +104,22 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         }
         final Byte finalQueryType;
         // 通过关联ID获取封面ID, 没有则全部查询
-        List<MiddleTypeModel> middleTypeModels = new ArrayList<>();
+        List<PicMiddleTypeModel> middleTypeModels = new ArrayList<>();
         if (Objects.isNull(type)) {
             List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getMiddleId, middleIds));
             if (CollUtil.isNotEmpty(list)) {
                 finalQueryType = Optional.ofNullable(list.get(0)).orElse(new TbMiddlePicPojo()).getType();
-                middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new MiddleTypeModel(aLong, finalQueryType)).toList());
+                middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, finalQueryType)).toList());
             } else {
                 finalQueryType = null;
             }
         } else {
-            middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new MiddleTypeModel(aLong, type)).toList());
+            middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList());
             finalQueryType = type;
         }
-        Map<MiddleTypeModel, Long> picMiddle = picMiddleCache.getAll(middleTypeModels, aLong -> {
+        Map<PicMiddleTypeModel, Long> picMiddle = picMiddleCache.getAll(middleTypeModels, aLong -> {
             List<TbMiddlePicPojo> list = middlePicService.list();
-            return list.stream().collect(Collectors.toMap(o -> new MiddleTypeModel(o.getMiddleId(), o.getType()), TbMiddlePicPojo::getPicId));
+            return list.stream().collect(Collectors.toMap(o -> new PicMiddleTypeModel(o.getMiddleId(), o.getType()), TbMiddlePicPojo::getPicId));
         });
         // 没有查询到，直接返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
@@ -143,7 +143,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         });
         // 遍历ID，如果没有查找到，则返回默认数据
         return middleIds.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
-            Long picId = picMiddle.get(new MiddleTypeModel(aLong, finalQueryType));
+            Long picId = picMiddle.get(new PicMiddleTypeModel(aLong, finalQueryType));
             return picId == null ? getDefaultPicUrl(finalQueryType) : map.get(picId).getPath();
         }, (s, s2) -> s2));
     }
@@ -218,7 +218,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
             }
             middlePicService.saveOrUpdate(entity);
             // 清除添加数据的缓存
-            picMiddleCache.invalidate(new MiddleTypeModel(entity.getMiddleId(), entity.getType()));
+            picMiddleCache.invalidate(new PicMiddleTypeModel(entity.getMiddleId(), entity.getType()));
         }
     }
     
@@ -287,39 +287,52 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         if (CollUtil.isEmpty(list)) {
             return;
         }
-        List<Long> middleIds = list.parallelStream().map(TbMiddlePicPojo::getMiddleId).toList();
-        Set<Byte> types = list.parallelStream().map(TbMiddlePicPojo::getType).collect(Collectors.toSet());
-        this.removePicMiddleIds(middleIds, types);
+        List<PicMiddleTypeModel> middleIds = list.parallelStream()
+                                                 .map(tbMiddlePicPojo -> new PicMiddleTypeModel(tbMiddlePicPojo.getMiddleId(), tbMiddlePicPojo.getType()))
+                                                 .toList();
+        this.removePicMiddleIds(middleIds);
         tbPicService.removeBatchByIds(ids);
     }
     
     /**
      * @param middleIds 封面数据
-     * @param types     封面类型
+     * @param type      封面类型
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    // TODO 需要修改pic type
-    public void removePicMiddleIds(List<Long> middleIds, Collection<Byte> types) {
-        this.removePicMiddleFile(middleIds, types, ossService::delete);
+    public void removePicMiddleIds(Collection<Long> middleIds, Byte type) {
+        List<PicMiddleTypeModel> list = middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList();
+        this.removePicMiddleFile(list, ossService::delete);
+    }
+    
+    /**
+     * 批量根据ID删除封面数据
+     *
+     * @param list 封面
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removePicMiddleIds(Collection<PicMiddleTypeModel> list) {
+        this.removePicMiddleFile(list, ossService::delete);
     }
     
     /**
      * 批量删除封面文件
      *
-     * @param middleIds 封面的关联ID
-     * @param types     封面类型
-     * @param consumer  删除文件
+     * @param list     封面数据
+     * @param consumer 删除文件
      */
     @Transactional(rollbackFor = Exception.class)
-    public void removePicMiddleFile(Collection<Long> middleIds, Collection<Byte> types, Consumer<List<String>> consumer) {
-        if (CollUtil.isEmpty(middleIds)) {
+    public void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer) {
+        if (CollUtil.isEmpty(list)) {
             return;
         }
         synchronized (lock) {
-            Wrapper<TbMiddlePicPojo> middlePicWrapper = Wrappers.<TbMiddlePicPojo>lambdaQuery()
-                                                                .in(TbMiddlePicPojo::getMiddleId, middleIds)
-                                                                .in(TbMiddlePicPojo::getType, types);
+            LambdaQueryWrapper<TbMiddlePicPojo> middlePicWrapper = Wrappers.lambdaQuery();
+            for (PicMiddleTypeModel picMiddleTypeModel : list) {
+                middlePicWrapper.in(TbMiddlePicPojo::getMiddleId, picMiddleTypeModel.getMiddleId())
+                                .in(TbMiddlePicPojo::getType, picMiddleTypeModel.getType());
+            }
             List<TbMiddlePicPojo> middlePicList = middlePicService.list(middlePicWrapper);
             if (CollUtil.isNotEmpty(middlePicList)) {
                 List<Long> picIds = middlePicList.parallelStream().map(TbMiddlePicPojo::getPicId).toList();

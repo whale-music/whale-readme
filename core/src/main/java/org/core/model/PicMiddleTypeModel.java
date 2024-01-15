@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MiddleTypeModel {
+public class PicMiddleTypeModel {
     private Long middleId;
     private Byte type;
     
@@ -21,7 +21,7 @@ public class MiddleTypeModel {
             return false;
         }
         
-        MiddleTypeModel that = (MiddleTypeModel) o;
+        PicMiddleTypeModel that = (PicMiddleTypeModel) o;
         
         if (getMiddleId() != null ? !getMiddleId().equals(that.getMiddleId()) : that.getMiddleId() != null) {
             return false;

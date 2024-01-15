@@ -719,6 +719,15 @@ public interface QukuService {
     void saveOrUpdateLyric(Long musicId, String type, String lyric);
     
     /**
+     * 获取封面地址
+     *
+     * @param ids  封面关联ID
+     * @param type 关联ID类型
+     * @return 封面地址map long -> 关联ID, String -> 封面地址
+     */
+    Map<Long, String> getPicPath(Collection<Long> ids, Byte type);
+    
+    /**
      * 查询封面地址
      *
      * @param id   封面ID
@@ -829,16 +838,6 @@ public interface QukuService {
     default Map<Long, String> getArtistPicPath(Collection<Long> ids) {
         return this.getPicPath(ids, PicTypeConstant.ARTIST);
     }
-    
-    /**
-     * 获取封面地址
-     *
-     * @param ids  封面关联ID
-     * @param type 关联ID类型
-     * @return 封面地址map long -> 关联ID, String -> 封面地址
-     */
-    Map<Long, String> getPicPath(Collection<Long> ids, Byte type);
-    
     
     /**
      * 获取用户头像封面地址

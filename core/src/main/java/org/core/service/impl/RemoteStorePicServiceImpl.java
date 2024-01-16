@@ -123,7 +123,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         });
         // 没有查询到，直接返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
-            return middleIds.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(finalQueryType), (s, s2) -> s2));
+            return middleIds.stream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(finalQueryType), (s, s2) -> s2));
         }
         // 获取缓存中地址
         Collection<Long> picIds = picMiddle.values();
@@ -148,6 +148,12 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         }, (s, s2) -> s2));
     }
     
+    /**
+     * 不能使用多线程调用这个方法
+     *
+     * @param type 图片类型
+     * @return 图片地址
+     */
     private String getDefaultPicUrl(Byte type) {
         return switch (Optional.ofNullable(type).orElse((byte) -1)) {
             case PicTypeConstant.MUSIC -> defaultInfo.getPic().getMusicPic();

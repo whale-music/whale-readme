@@ -15,6 +15,7 @@ import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistMvListRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.utils.MyPageUtil;
+import org.api.admin.utils.OrderByUtil;
 import org.api.common.service.QukuAPI;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
@@ -67,25 +68,6 @@ public class ArtistApi {
         this.remoteStorePicService = remoteStorePicService;
     }
     
-    /**
-     * 设置分页查询排序
-     */
-    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbArtistPojo> musicWrapper) {
-        // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
-        switch (Optional.ofNullable(orderBy).orElse("")) {
-            case "id":
-                musicWrapper.orderBy(true, order, TbArtistPojo::getId);
-                break;
-            case "updateTime":
-                musicWrapper.orderBy(true, order, TbArtistPojo::getUpdateTime);
-                break;
-            case "createTime":
-            default:
-                musicWrapper.orderBy(true, order, TbArtistPojo::getCreateTime);
-                break;
-        }
-    }
-    
     public Page<ArtistRes> getAllSingerList(AlbumPageReq req) {
         req.setArtistName(StringUtils.trim(req.getArtistName()));
         req.setAlbumName(StringUtils.trim(req.getAlbumName()));
@@ -95,7 +77,7 @@ public class ArtistApi {
         Page<TbArtistPojo> page = new Page<>(req.getPage().getPageIndex(), req.getPage().getPageNum());
         LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(req.getArtistName()), TbArtistPojo::getArtistName, req.getArtistName());
-        pageOrderBy(req.getOrder(), req.getOrderBy(), queryWrapper);
+        OrderByUtil.pageOrderByArtist(req.getOrder(), req.getOrderBy(), queryWrapper);
         artistService.page(page, queryWrapper);
     
         Page<ArtistRes> singerResPage = new Page<>();

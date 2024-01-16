@@ -12,6 +12,7 @@ import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.utils.MyPageUtil;
+import org.api.admin.utils.OrderByUtil;
 import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -97,7 +98,7 @@ public class AlbumApi {
         albumListId.addAll(singerAlbumIdList);
     
         LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        pageOrderBy(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
+        OrderByUtil.pageOrderByAlbum(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
         lambdaQueryWrapper.in(CollUtil.isNotEmpty(albumListId), TbAlbumPojo::getId, albumListId);
         
         // 查询全部专辑数据
@@ -135,26 +136,6 @@ public class AlbumApi {
     
         return page;
     }
-    
-    /**
-     * 设置分页查询排序
-     */
-    private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbAlbumPojo> musicWrapper) {
-        // sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序
-        switch (Optional.ofNullable(orderBy).orElse("")) {
-            case "id":
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getId);
-                break;
-            case "updateTime":
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getUpdateTime);
-                break;
-            case "createTime":
-            default:
-                musicWrapper.orderBy(true, order, TbAlbumPojo::getCreateTime);
-                break;
-        }
-    }
-    
     
     /**
      * 添加音乐时选择专辑接口

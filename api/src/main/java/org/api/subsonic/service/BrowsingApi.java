@@ -38,6 +38,7 @@ import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
+import org.core.service.RemoteStorePicService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,7 @@ public class BrowsingApi {
     private final TbResourceService tbResourceService;
     private final SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
     private final TbMusicArtistService tbMusicArtistService;
+    private final RemoteStorePicService remoteStorePicService;
     
     @NotNull
     private static Character getCharacterFirstLetter(String name) {
@@ -117,7 +119,7 @@ public class BrowsingApi {
         }
     }
     
-    public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService) {
+    public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService, RemoteStorePicService remoteStorePicService) {
         this.qukuService = qukuService;
         this.albumService = albumService;
         this.musicService = musicService;
@@ -127,6 +129,7 @@ public class BrowsingApi {
         this.tbResourceService = tbResourceService;
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
         this.tbMusicArtistService = tbMusicArtistService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     public SongRes getSong(Long id) {
@@ -214,7 +217,7 @@ public class BrowsingApi {
                 IndexesRes.Artist e1 = new IndexesRes.Artist();
                 e1.setId(String.valueOf(tbArtistPojo.getId()));
                 e1.setName(tbArtistPojo.getArtistName());
-                e1.setArtistImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+                e1.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
                 e1.setCoverArt(String.valueOf(tbArtistPojo.getId()));
                 e1.setUserRating(0);
                 e1.setAlbumCount(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(tbArtistPojo.getId()));
@@ -294,7 +297,7 @@ public class BrowsingApi {
                 ArtistsRes.Artist e1 = new ArtistsRes.Artist();
                 e1.setId(String.valueOf(tbArtistPojo.getId()));
                 e1.setName(tbArtistPojo.getArtistName());
-                e1.setArtistImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+                e1.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
                 e1.setCoverArt(String.valueOf(tbArtistPojo.getId()));
                 e1.setUserRating(String.valueOf(0));
                 e1.setAlbumCount(String.valueOf(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(tbArtistPojo.getId())));
@@ -374,9 +377,9 @@ public class BrowsingApi {
         if (Objects.nonNull(artistPojo)) {
             artistInfo.setLastFmUrl("https://www.last.fm");
             artistInfo.setBiography(artistPojo.getIntroduction());
-            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
             artistInfoRes.setArtistInfo(artistInfo);
             return artistInfoRes;
         }
@@ -387,9 +390,9 @@ public class BrowsingApi {
                 ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
                 artistInfo.setLastFmUrl("https://www.last.fm");
                 artistInfo.setBiography(artistConvert.getIntroduction());
-                artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
-                artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
-                artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
                 artistInfoRes.setArtistInfo(artistInfo);
                 return artistInfoRes;
             }
@@ -402,9 +405,9 @@ public class BrowsingApi {
             TbArtistPojo tbArtistPojo = tbArtistService.getById(tbMusicArtistPojo.getArtistId());
             artistInfo.setLastFmUrl("https://www.last.fm");
             artistInfo.setBiography(tbArtistPojo.getIntroduction());
-            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
-            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
-            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
             artistInfoRes.setArtistInfo(artistInfo);
             return artistInfoRes;
         }
@@ -418,9 +421,9 @@ public class BrowsingApi {
         if (Objects.nonNull(artistPojo)) {
             artistInfo.setLastFmUrl("https://www.last.fm");
             artistInfo.setBiography(artistPojo.getIntroduction());
-            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
-            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
+            artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
             artistInfoRes.setArtistInfo2(artistInfo);
             return artistInfoRes;
         }
@@ -431,9 +434,9 @@ public class BrowsingApi {
                 ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
                 artistInfo.setLastFmUrl("https://www.last.fm");
                 artistInfo.setBiography(artistConvert.getIntroduction());
-                artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
-                artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
-                artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
+                artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(artistConvert.getId()));
                 artistInfoRes.setArtistInfo2(artistInfo);
                 return artistInfoRes;
             }
@@ -446,9 +449,9 @@ public class BrowsingApi {
             TbArtistPojo tbArtistPojo = tbArtistService.getById(tbMusicArtistPojo.getArtistId());
             artistInfo.setLastFmUrl("https://www.last.fm");
             artistInfo.setBiography(tbArtistPojo.getIntroduction());
-            artistInfo.setSmallImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
-            artistInfo.setMediumImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
-            artistInfo.setLargeImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setSmallImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setMediumImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
+            artistInfo.setLargeImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
             artistInfoRes.setArtistInfo2(artistInfo);
             return artistInfoRes;
         }
@@ -540,7 +543,7 @@ public class BrowsingApi {
         if (Objects.nonNull(albumPojo)) {
             albumInfo.setNotes(albumPojo.getDescription());
             albumInfo.setLastFmUrl(URL);
-            String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
+            String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo.getId());
             albumInfo.setLargeImageUrl(albumPicUrl);
             albumInfo.setSmallImageUrl(albumPicUrl);
             albumInfo.setMediumImageUrl(albumPicUrl);
@@ -554,7 +557,7 @@ public class BrowsingApi {
                 TbAlbumPojo albumPojo1 = albumService.getById(albumId);
                 albumInfo.setNotes(albumPojo1.getDescription());
                 albumInfo.setLastFmUrl(URL);
-                String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo1.getId());
+                String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo1.getId());
                 albumInfo.setLargeImageUrl(albumPicUrl);
                 albumInfo.setSmallImageUrl(albumPicUrl);
                 albumInfo.setMediumImageUrl(albumPicUrl);
@@ -572,7 +575,7 @@ public class BrowsingApi {
         if (Objects.nonNull(albumPojo)) {
             albumInfo.setNotes(albumPojo.getDescription());
             albumInfo.setLastFmUrl("http://www.last.fm");
-            String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo.getId());
+            String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo.getId());
             albumInfo.setLargeImageUrl(albumPicUrl);
             albumInfo.setSmallImageUrl(albumPicUrl);
             albumInfo.setMediumImageUrl(albumPicUrl);
@@ -586,7 +589,7 @@ public class BrowsingApi {
                 TbAlbumPojo albumPojo1 = albumService.getById(albumId);
                 albumInfo.setNotes(albumPojo1.getDescription());
                 albumInfo.setLastFmUrl("http://www.last.fm");
-                String albumPicUrl = qukuService.getAlbumPicUrl(albumPojo1.getId());
+                String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo1.getId());
                 albumInfo.setLargeImageUrl(albumPicUrl);
                 albumInfo.setSmallImageUrl(albumPicUrl);
                 albumInfo.setMediumImageUrl(albumPicUrl);

@@ -21,6 +21,7 @@ import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
+import org.core.service.RemoteStorePicService;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -41,13 +42,16 @@ public class SearchingApi {
     
     private final SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil;
     
-    public SearchingApi(TbMusicService tbMusicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, QukuAPI qukuApi, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public SearchingApi(TbMusicService tbMusicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, QukuAPI qukuApi, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService) {
         this.tbMusicService = tbMusicService;
         this.tbArtistService = tbArtistService;
         this.tbAlbumService = tbAlbumService;
         this.qukuApi = qukuApi;
         this.tbResourceService = tbResourceService;
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     
@@ -103,7 +107,7 @@ public class SearchingApi {
                 e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
                 e.setCoverArt(String.valueOf(artistPojo.getId()));
-                e.setArtistImageUrl(qukuApi.getArtistPicUrl(artistPojo.getId()));
+                e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
                 e.setUserRating(0);
                 
                 artist.add(e);
@@ -251,7 +255,7 @@ public class SearchingApi {
                 e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
                 e.setCoverArt(String.valueOf(artistPojo.getId()));
-                e.setArtistImageUrl(qukuApi.getArtistPicUrl(artistPojo.getId()));
+                e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
                 e.setUserRating(0);
                 
                 artist.add(e);

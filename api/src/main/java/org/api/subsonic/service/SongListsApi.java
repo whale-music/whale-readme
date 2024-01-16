@@ -33,6 +33,7 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorePicService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +72,9 @@ public class SongListsApi {
     
     private final TbUserArtistService tbUserArtistService;
     
-    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbCollectService tbCollectService, TbMvService tbMvService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbCollectService tbCollectService, TbMvService tbMvService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService, RemoteStorePicService remoteStorePicService) {
         this.tbCollectMusicService = tbCollectMusicService;
         this.qukuService = qukuService;
         this.tbMusicService = tbMusicService;
@@ -86,6 +89,7 @@ public class SongListsApi {
         this.accountService = accountService;
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
         this.tbMiddleTagService = tbMiddleTagService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     
@@ -627,7 +631,7 @@ public class SongListsApi {
                 e.setAlbumCount(tbArtistPojo.getCreateTime().getYear());
                 e.setUserRating(0);
                 e.setCoverArt(String.valueOf(tbArtistPojo.getId()));
-                e.setArtistImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+                e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
                 artists.add(e);
             }
             starred.setArtists(artists);
@@ -768,7 +772,7 @@ public class SongListsApi {
                 e.setAlbumCount(tbArtistPojo.getCreateTime().getYear());
                 e.setUserRating(0);
                 e.setCoverArt(String.valueOf(tbArtistPojo.getId()));
-                e.setArtistImageUrl(qukuService.getArtistPicUrl(tbArtistPojo.getId()));
+                e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
                 artists.add(e);
             }
             starred2.setArtist(artists);

@@ -2,8 +2,10 @@ package org.starter;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.text.UnicodeUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.api.config.ApplicationStartup;
 import org.core.common.properties.DebugConfig;
 import org.springframework.boot.WebApplicationType;
@@ -20,10 +22,13 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -65,6 +70,8 @@ public class StartSpringBoot {
         if (Boolean.TRUE.equals(DebugConfig.getDebug())) {
             log.info("\n" + sw.prettyPrint(TimeUnit.MILLISECONDS));
         }
+        File file = ResourceUtils.getFile("classpath:start_banner");
+        log.info(UnicodeUtil.toString(FileUtils.readFileToString(file, StandardCharsets.UTF_8)));
     }
     
     

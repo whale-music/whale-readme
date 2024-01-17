@@ -1,7 +1,6 @@
 package org.core.oss.service.impl.alist.util;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.*;
@@ -103,7 +102,7 @@ public class RequestUtils {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
         log.debug("上传成功: {},地址: {}", srcFile.getName(), url);
-        return FileUtil.getName(srcFile.getName());
+        return url;
     }
     
     @NotNull

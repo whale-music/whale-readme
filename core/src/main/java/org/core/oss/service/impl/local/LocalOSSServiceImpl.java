@@ -365,15 +365,18 @@ public class LocalOSSServiceImpl implements OSSService {
         pathname = StringUtils.replace(pathname, "/", FileUtil.FILE_SEPARATOR);
         pathname = StringUtils.replace(pathname, "\\", FileUtil.FILE_SEPARATOR);
         
-        File dest = new File(config.getHost() + FileUtil.FILE_SEPARATOR + pathname, srcFile.getName());
+        String parent = config.getHost() + FileUtil.FILE_SEPARATOR + pathname;
+        File dest = new File(parent, srcFile.getName());
         File file = FileUtil.copy(srcFile, dest, true);
+        String name = parent + '/' + file.getName();
         // 校验是否上传成功
         try {
-            getAddresses(file.getName(), true);
+            // 返回绝对路径
+            getAddresses(name, true);
         } catch (Exception e) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
-        return file.getName();
+        return name;
     }
     
     /**

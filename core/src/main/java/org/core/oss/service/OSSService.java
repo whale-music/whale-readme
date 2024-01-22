@@ -110,6 +110,7 @@ public interface OSSService {
      *
      * @param path    音乐文件文件地址
      * @param refresh 是否刷新缓存
+     * @param type    查询数据类型
      * @return 音乐地址
      */
     default String getResourceUrl(String path, boolean refresh, ResourceEnum type) {
@@ -121,6 +122,7 @@ public interface OSSService {
      *
      * @param md5Set  音乐文件文件MD5
      * @param refresh 是否刷新缓存
+     * @param type    查询数据类型
      * @return 音乐地址 key md5, value url, size
      */
     Map<String, Resource> getResourceByMd5ToMap(Collection<String> md5Set, boolean refresh, ResourceEnum type);

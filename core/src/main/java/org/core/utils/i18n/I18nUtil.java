@@ -13,8 +13,7 @@ import java.util.Locale;
 public class I18nUtil {
     
     public static MessageSource MESSAGE_SOURCE;
-    // todo
-    private static String defaultLanguage;
+    private static String DEFAULT_LANGUAGE;
     
     public static String getMsg(String code, Object[] args, Locale locale) {
         return I18nUtil.getI18().getMessage(code, args, locale);
@@ -22,10 +21,10 @@ public class I18nUtil {
     
     public static String getMsg(String code, Object[] args) {
         MessageSource messageSource = I18nUtil.getI18();
-        if (StringUtils.equalsIgnoreCase(defaultLanguage, "local")) {
+        if (StringUtils.equalsIgnoreCase(DEFAULT_LANGUAGE, "local")) {
             return messageSource.getMessage(code, args, Locale.getDefault());
         } else {
-            return messageSource.getMessage(code, args, LocaleUtils.toLocale(defaultLanguage));
+            return messageSource.getMessage(code, args, LocaleUtils.toLocale(DEFAULT_LANGUAGE));
         }
     }
     
@@ -42,6 +41,6 @@ public class I18nUtil {
     
     @Value("${spring.messages.default-language:local}")
     public void setDefaultLanguage(String defaultLanguage) {
-        I18nUtil.defaultLanguage = defaultLanguage;
+        I18nUtil.DEFAULT_LANGUAGE = defaultLanguage;
     }
 }

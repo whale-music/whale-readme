@@ -1,7 +1,6 @@
 package org.core.oss.service.impl.alist;
 
 import cn.hutool.cache.CacheUtil;
-import cn.hutool.cache.impl.LFUCache;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -16,6 +15,7 @@ import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
+import org.core.oss.service.OSSServiceAbs;
 import org.core.oss.service.impl.alist.enums.ResourceEnum;
 import org.core.oss.service.impl.alist.model.list.FsList;
 import org.core.oss.service.impl.alist.util.AlistUtil;
@@ -34,27 +34,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service(AListOSSServiceImpl.SERVICE_NAME)
-public class AListOSSServiceImpl implements OSSService {
+public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     
     public static final String SERVICE_NAME = "aList";
     
     private static final String LOGIN_KEY = "loginKey";
-    
-    // 音乐地址创建缓存
-    public final TimedCache<String, Resource> musicUrlTimedCache;
-    public final TimedCache<String, Resource> picUrlTimedCache;
-    public final TimedCache<String, Resource> mvUrlTimedCache;
-    
-    public final TimedCache<String, String> musicMd5TimedCache;
-    public final TimedCache<String, String> picMd5TimedCache;
-    public final TimedCache<String, String> mvMd5TimedCache;
-    
-    
-    public final Map<ResourceEnum, TimedCache<String, Resource>> cache = new EnumMap<>(ResourceEnum.class);
-    public final Map<ResourceEnum, TimedCache<String, String>> cacheMd5 = new EnumMap<>(ResourceEnum.class);
-    
-    // db 数据 key: path
-    public final LFUCache<String, TbResourcePojo> dbCache = CacheUtil.newLFUCache(5000);
     
     // 创建登录缓存
     public final TimedCache<String, String> loginTimeCacheStr;

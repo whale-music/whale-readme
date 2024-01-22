@@ -41,7 +41,7 @@ public class OSSFactory {
         if (oss == null) {
             throw new BaseException(ResultCode.SAVE_NAME_INVALID);
         }
-        oss.isConnected(saveConfig);
+        oss.isConnected();
         return oss;
     }
 }

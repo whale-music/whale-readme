@@ -1,6 +1,7 @@
 package org.core.config;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.properties.SaveConfig;
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +53,8 @@ public class WebConfig implements WebMvcConfigurer {
             String host = StringUtils.replace(replace, "\\", FileUtil.FILE_SEPARATOR);
             saveConfig.setHost(host);
             // 映射本地文件夹路径时，结尾必须以"\ or \\"结尾, 否则访问404
-            if (!StringUtils.endsWith(saveConfig.getHost(), FileUtil.FILE_SEPARATOR)) {
-                saveConfig.setHost(saveConfig.getHost() + FileUtil.FILE_SEPARATOR);
-            }
             registry.addResourceHandler(PUBLIC_STATIC_URL)
-                    .addResourceLocations("file:" + saveConfig.getHost());
+                    .addResourceLocations("file:" + CharSequenceUtil.addSuffixIfNot(saveConfig.getHost(), FileUtil.FILE_SEPARATOR));
         }
     }
     
@@ -65,7 +63,7 @@ public class WebConfig implements WebMvcConfigurer {
      * 映射适用于注释控制器、功能端点和静态
      * 资源。
      * <p> 注解控制器可通过以下方式进一步声明更精细的配置
-     * {@link CrossOrigin @CrossOrigin}。
+     * {@link CrossOrigin @CrossOrigin}
      * 在这种情况下，此处声明的 "全局 "CORS 配置为
      * {@link CorsConfiguration#combine(CorsConfiguration) combined} * 与在控制器上定义的本地 CORS 配置相结合。
      * 与控制器方法上定义的本地 CORS 配置相结合。

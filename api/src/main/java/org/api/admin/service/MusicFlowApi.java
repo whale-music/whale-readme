@@ -6,7 +6,6 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.digest.MD5;
@@ -39,6 +38,7 @@ import org.core.jpa.repository.TbResourceEntityRepository;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
+import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
@@ -570,12 +570,12 @@ public class MusicFlowApi {
                 .stream()
                 .map(TbArtistPojo::getArtistName)
                 .toList();
-    
+        
         // 查询数据库中歌手
         List<TbArtistPojo> singList = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery()
                                                                  .in(TbArtistPojo::getArtistName, singerNameList));
-    
-    
+        
+        
         List<TbArtistPojo> saveBatch = new ArrayList<>();
         // 遍历前端传入的所有歌手信息, 与前端进行比较，歌手名相同的则更新数据库。没有歌手就添加到数据库。注意这个更新条件是根据歌手名来更新的
         for (AudioInfoReq.AudioArtist singerReq : artists) {
@@ -1132,8 +1132,8 @@ public class MusicFlowApi {
         resourceService.removeById(id);
     }
     
-    public List<HashMap<String, String>> selectResources(String md5) {
-        Map<String, Map<String, String>> address = remoteStorageService.getAddressByMd5(md5, false);
+    public List<Map<String, Object>> selectResources(String md5) {
+        Map<String, Resource> address = remoteStorageService.getMusicResourceByMd5(md5, false);
         return address.entrySet()
                       .parallelStream()
                       .filter(stringMapEntry -> {
@@ -1142,11 +1142,12 @@ public class MusicFlowApi {
                           return !CollUtil.contains(imgSuffix, suffix);
                       })
                       .map(stringStringEntry -> {
-                          HashMap<String, String> map = new HashMap<>();
-                          map.put("md5", StringUtils.split(stringStringEntry.getKey(), ".")[0]);
-                          map.put("fileName", stringStringEntry.getKey());
-                          map.put("audio", MapUtil.get(stringStringEntry.getValue(), "url", String.class));
-                          map.put("size", MapUtil.get(stringStringEntry.getValue(), "size", String.class));
+                          Resource value = stringStringEntry.getValue();
+                          Map<String, Object> map = new HashMap<>();
+                          map.put("md5", value.getMd5());
+                          map.put("fileName", value.getName());
+                          map.put("audio", value.getUrl());
+                          map.put("size", value.getSize());
                           return map;
                       })
                       .limit(20)
@@ -1161,7 +1162,7 @@ public class MusicFlowApi {
     public void syncMetaMusicFile(SyncMusicMetaDataReq req) {
         TbResourcePojo byId = resourceService.getById(req.getResourceId());
         String path = byId.getPath();
-        String addresses = ossService.getAddresses(path, false);
+        String addresses = remoteStorageService.getMusicResourceUrl(path, false);
         String originPath = UUID.fastUUID().toString(true) + "." + byId.getEncodeType();
         File destFile = requestConfig.getTempPathFile(originPath);
         HttpUtil.downloadFile(addresses, destFile, requestConfig.getTimeout());
@@ -1238,7 +1239,7 @@ public class MusicFlowApi {
         File newFile = FileUtil.rename(destFile, format, true, true);
         
         String newName = UUID.fastUUID() + "." + extName;
-        ossService.rename(path, newName);
+        remoteStorageService.renameMusic(path, newName);
         try {
             String md5 = DigestUtil.md5Hex(newFile);
             byId.setMd5(md5);
@@ -1247,10 +1248,10 @@ public class MusicFlowApi {
             byId.setSize(FileUtil.size(newFile));
             resourceService.updateById(byId);
             log.debug("上传成功: {}", format);
-            ossService.delete(newName);
+            remoteStorageService.deleteMusic(newName);
             log.debug("清除oss文件缓存成功: {}", newName);
         } catch (Exception e) {
-            ossService.rename(newName, path);
+            remoteStorageService.renameMusic(newName, path);
             throw new BaseException(ResultCode.UPLOAD_ERROR, e);
         } finally {
             // 删除缓存

@@ -1,5 +1,6 @@
 package org.core.config;
 
+// todo: 移动该包
 public class PlayListTypeConfig {
     
     /**

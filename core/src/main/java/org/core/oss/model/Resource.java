@@ -1,5 +1,6 @@
 package org.core.oss.model;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class Resource {
      * 文件地址
      */
     private String url;
+    private String href;
     /**
      * 文件大小（字节）
      */
@@ -50,4 +52,8 @@ public class Resource {
      * 文件md5
      */
     private String md5;
+    
+    public String getPath() {
+        return CharSequenceUtil.addPrefixIfNot(path, "/");
+    }
 }

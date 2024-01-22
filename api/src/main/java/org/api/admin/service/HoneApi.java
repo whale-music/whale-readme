@@ -179,7 +179,7 @@ public class HoneApi {
         List<TbResourcePojo> musicUrlList = musicUrlService.list();
         List<TbMusicPojo> musicList = musicService.list();
         List<TbResourcePojo> musicUrlByMusicUrlList = qukuAPI.getMusicUrlByMusicUrlList(musicUrlList, false);
-        Collection<String> musicMD5 = remoteStorageService.getAllMD5(false);
+        Collection<String> musicMD5 = remoteStorageService.getResourceAllMD5(false);
         // 有效音乐
         // 音乐数据对比存储地址，查找对应的音乐地址是否存在
         long musicEffectiveCount = musicList.parallelStream().filter(tbMusicPojo ->

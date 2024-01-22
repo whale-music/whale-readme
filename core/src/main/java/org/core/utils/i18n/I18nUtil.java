@@ -1,9 +1,8 @@
 package org.core.utils.i18n;
 
-import cn.hutool.extra.spring.SpringUtil;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.core.utils.spring.SpringUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
@@ -14,18 +13,19 @@ import java.util.Locale;
 public class I18nUtil {
     
     public static MessageSource MESSAGE_SOURCE;
-    
+    // todo
     private static String defaultLanguage;
     
     public static String getMsg(String code, Object[] args, Locale locale) {
-        return I18nUtil.MESSAGE_SOURCE.getMessage(code, args, locale);
+        return I18nUtil.getI18().getMessage(code, args, locale);
     }
     
     public static String getMsg(String code, Object[] args) {
+        MessageSource messageSource = I18nUtil.getI18();
         if (StringUtils.equalsIgnoreCase(defaultLanguage, "local")) {
-            return I18nUtil.MESSAGE_SOURCE.getMessage(code, args, Locale.getDefault());
+            return messageSource.getMessage(code, args, Locale.getDefault());
         } else {
-            return I18nUtil.MESSAGE_SOURCE.getMessage(code, args, LocaleUtils.toLocale(defaultLanguage));
+            return messageSource.getMessage(code, args, LocaleUtils.toLocale(defaultLanguage));
         }
     }
     
@@ -33,9 +33,11 @@ public class I18nUtil {
         return getMsg(code, null);
     }
     
-    @PostConstruct
-    public void initI18n() {
-        I18nUtil.MESSAGE_SOURCE = SpringUtil.getBean(MessageSource.class);
+    public static MessageSource getI18() {
+        if (I18nUtil.MESSAGE_SOURCE == null) {
+            I18nUtil.MESSAGE_SOURCE = SpringUtil.getBean(MessageSource.class);
+        }
+        return I18nUtil.MESSAGE_SOURCE;
     }
     
     @Value("${spring.messages.default-language:local}")

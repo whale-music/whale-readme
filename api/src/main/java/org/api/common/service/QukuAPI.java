@@ -72,7 +72,7 @@ public class QukuAPI extends QukuServiceImpl {
     
     public List<TbResourcePojo> getMusicUrlByMusicUrlList(List<TbResourcePojo> list, boolean refresh) {
         for (TbResourcePojo tbMusicUrlPojo : list) {
-            String s = remoteStorageService.getAddresses(tbMusicUrlPojo.getPath(), refresh);
+            String s = remoteStorageService.getMusicResourceUrl(tbMusicUrlPojo.getPath(), refresh);
             tbMusicUrlPojo.setPath(s);
         }
         return list;

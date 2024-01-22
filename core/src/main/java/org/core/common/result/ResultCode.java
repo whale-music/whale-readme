@@ -169,6 +169,11 @@ public enum ResultCode implements BaseErrorInfoInterface {
     // 音源已存在，请不要添加相同歌曲
     RESOURCE_DATA_EXISTED("50017", "error.messages.resource_data_existed"),
     SAVE_MUSIC_META_DATA_WRITE_ERROR("50018", "error.messages.save_music_meta_data_write_error"),
+    OSS_ACCESS_ERROR("50019", "error.messages.oss_access_error"),
+    // OSS 数据错误
+    OSS_DATA_ERROR("50019", "error.messages.oss_data_error"),
+    // OSS 数据不存在
+    OSS_DATA_DOES_NOT_EXIST("50020", "error.messages.oss_data_does_not_exist"),
     
     
     /* 接口错误：60001-69999 */

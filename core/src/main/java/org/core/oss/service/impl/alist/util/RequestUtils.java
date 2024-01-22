@@ -1,18 +1,15 @@
 package org.core.oss.service.impl.alist.util;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.*;
-import cn.hutool.log.Log;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.oss.service.impl.alist.model.list.ContentItem;
-import org.core.oss.service.impl.alist.model.list.MusicListReq;
-import org.core.oss.service.impl.alist.model.list.MusicListRes;
+import org.core.oss.model.Resource;
 import org.core.oss.service.impl.alist.model.login.req.LoginReq;
 import org.core.oss.service.impl.alist.model.login.res.DataRes;
 import org.core.oss.service.impl.alist.model.login.res.LoginRes;
@@ -20,11 +17,13 @@ import org.core.oss.service.impl.alist.model.remove.req.Remove;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+@Slf4j
 public class RequestUtils {
-    
-    private static final Log log = Log.get();
     
     private RequestUtils() {
     }
@@ -37,6 +36,7 @@ public class RequestUtils {
         try (HttpResponse execute = HttpUtil.createPost(host).body(body).headerMap(headers, true).execute()) {
             return execute.body();
         } catch (IORuntimeException e) {
+            log.error(e.getMessage(), e);
             throw new BaseException(ResultCode.OSS_CONNECT_ERROR);
         } catch (HttpException e) {
             throw new HttpException("http请求失败" + e);
@@ -59,25 +59,6 @@ public class RequestUtils {
             return execute.body();
         } catch (HttpException e) {
             throw new HttpException("http请求失败" + e);
-        }
-    }
-    
-    public static List<ContentItem> list(String host, String objectSave, String loginCacheStr) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", loginCacheStr);
-        
-        MusicListReq musicListReq = new MusicListReq();
-        musicListReq.setPath('/' + objectSave);
-        musicListReq.setPage(1);
-        musicListReq.setPerPage(0);
-        musicListReq.setRefresh(true);
-        try {
-            String resStr = req(host + "/api/fs/list", JSON.toJSONString(musicListReq), headers);
-            MusicListRes res = JSON.parseObject(resStr, MusicListRes.class);
-            return res.getData().getContent();
-        } catch (Exception e) {
-            log.error("获取音乐错误{}\n{}", e.getMessage(), e.getStackTrace());
-            return ListUtil.empty();
         }
     }
     
@@ -119,13 +100,13 @@ public class RequestUtils {
         return headers;
     }
     
-    public static void delete(String host, Map<String, ArrayList<ContentItem>> item, String loginCacheStr) {
-        for (Map.Entry<String, ArrayList<ContentItem>> entry : item.entrySet()) {
+    public static void delete(String host, Map<String, List<Resource>> item, String loginCacheStr) {
+        for (Map.Entry<String, List<Resource>> entry : item.entrySet()) {
             HashMap<String, String> headers = getHeaders(host, entry.getKey(), loginCacheStr);
             
             Remove remove = new Remove();
             remove.setDir(entry.getKey());
-            remove.setNames(entry.getValue().parallelStream().map(ContentItem::getName).toList());
+            remove.setNames(entry.getValue().parallelStream().map(Resource::getName).toList());
             String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
             Object code = JSONObject.parseObject(req).get("code");
             if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
@@ -134,10 +115,10 @@ public class RequestUtils {
         }
     }
     
-    public static void rename(String host, String loginCacheStr, ContentItem contentItem, String newName) {
+    public static void rename(String host, String loginCacheStr, String path, String newName) {
         HashMap<String, String> headers = getHeaders(host, "", loginCacheStr);
         HashMap<String, String> reqBodyMap = new HashMap<>();
-        reqBodyMap.put("path", contentItem.getPath());
+        reqBodyMap.put("path", path);
         reqBodyMap.put("name", newName);
         String req = req(host + "/api/fs/rename", JSON.toJSONString(reqBodyMap), headers);
         Object code = JSONObject.parseObject(req).get("code");

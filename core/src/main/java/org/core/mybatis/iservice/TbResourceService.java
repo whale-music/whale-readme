@@ -28,8 +28,9 @@ public interface TbResourceService extends IService<TbResourcePojo> {
     /**
      * 根据文件名获取音乐数据
      *
-     * @param name 文件名
+     * @param path 文件名
      * @return 音乐数据
      */
-    TbResourcePojo getResourceByName(String name);
+    // TODO ByName重命名
+    TbResourcePojo getResourceByName(String path);
 }

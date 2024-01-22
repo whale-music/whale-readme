@@ -27,7 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @RestController(AdminConfig.ADMIN + "MusicController")
 @RequestMapping("/admin/music")
@@ -203,7 +206,7 @@ public class MusicController {
     
     @GetMapping("/select")
     public R selectResources(@RequestParam(value = "md5", required = false) String md5) {
-        List<HashMap<String, String>> maps = uploadMusic.selectResources(md5);
+        List<Map<String, Object>> maps = uploadMusic.selectResources(md5);
         return R.success(maps);
     }
     

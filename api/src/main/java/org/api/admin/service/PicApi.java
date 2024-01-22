@@ -97,6 +97,6 @@ public class PicApi {
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
         remoteStorePicService.saveOrUpdatePicFile(id, tempType, file);
-        return remoteStorageService.getAddresses(remoteStorePicService.getPicPath(id, tempType), false);
+        return remoteStorageService.getPicResourceUrl(remoteStorePicService.getPicPath(id, tempType), false);
     }
 }

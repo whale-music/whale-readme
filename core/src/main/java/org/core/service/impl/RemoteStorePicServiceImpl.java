@@ -25,7 +25,6 @@ import org.core.mybatis.iservice.TbMiddlePicService;
 import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbPicPojo;
-import org.core.oss.service.OSSService;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.ImageTypeUtils;
@@ -60,8 +59,6 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    private final OSSService ossService;
-    
     
     /**
      * 封面
@@ -83,7 +80,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
             if (StringUtils.startsWithIgnoreCase(longStringEntry.getValue(), "http")) {
                 s = longStringEntry.getValue();
             } else {
-                s = remoteStorageService.getAddresses(longStringEntry.getValue(), refresh);
+                s = remoteStorageService.getPicResourceUrl(longStringEntry.getValue(), refresh);
             }
             paths.put(longStringEntry.getKey(), s);
         }
@@ -308,7 +305,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     @Transactional(rollbackFor = Exception.class)
     public void removePicMiddleIds(Collection<Long> middleIds, Byte type) {
         List<PicMiddleTypeModel> list = middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList();
-        this.removePicMiddleFile(list, ossService::delete);
+        this.removePicMiddleFile(list, remoteStorageService::deletePic);
     }
     
     /**
@@ -319,7 +316,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removePicMiddleIds(Collection<PicMiddleTypeModel> list) {
-        this.removePicMiddleFile(list, ossService::delete);
+        this.removePicMiddleFile(list, remoteStorageService::deletePic);
     }
     
     /**

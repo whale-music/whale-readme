@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 // @Configuration
+// TODO 删除无用
 public class JacksonConfig {
     
     @Bean

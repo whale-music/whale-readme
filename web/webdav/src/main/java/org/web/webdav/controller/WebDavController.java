@@ -184,7 +184,7 @@ public class WebDavController {
             String musicName = format + "." + FileUtil.getSuffix(playListRes.getPath());
             
             TbResourceEntity tbResourceEntity = webdavResourceReturnStrategyUtil.handleResourceEntity(ListUtil.toList(playListRes.getTbResourcesById()));
-            resource.put(musicName, remoteStorageService.getAddresses(tbResourceEntity.getPath(), false));
+            resource.put(musicName, remoteStorageService.getMusicResourceUrl(tbResourceEntity.getPath(), false));
             resources.add(new WebDavResource(musicName,
                     playListRes.getMd5(),
                     playListRes.getPath(),
@@ -198,8 +198,8 @@ public class WebDavController {
     public InputStream getChild(WebDavResource webDavFolder) {
         String name = webDavFolder.getName();
         log.info("output file: {}", name);
-        Map<String, Map<String, String>> address = remoteStorageService.getAddressByMd5(webDavFolder.getMd5(), false);
-        String url = address.get(webDavFolder.getPath()).get("url");
+        Map<String, org.core.oss.model.Resource> address = remoteStorageService.getMusicResourceByMd5(webDavFolder.getMd5(), false);
+        String url = address.get(webDavFolder.getPath()).getUrl();
         log.info("url download: {}", url);
         try (HttpResponse execute = HttpRequest.get(url).execute()) {
             return execute.bodyStream();

@@ -191,7 +191,7 @@ public class MvApi {
         }
         String path = e.getPath();
         if (StringUtils.isNotBlank(path)) {
-            e.setMvUrl(remoteStorageService.getAddressesNoRefresh(path));
+            e.setMvUrl(remoteStorageService.getMvAddressesNoRefresh(path));
         }
         return e;
     }

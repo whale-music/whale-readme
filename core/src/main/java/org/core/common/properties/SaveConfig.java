@@ -1,5 +1,6 @@
 package org.core.common.properties;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.core.common.exception.BaseException;
@@ -18,28 +19,35 @@ import java.util.List;
 )
 public class SaveConfig {
     // 默认保存模式
+    // TODO 设置为枚举
     private String saveMode;
     
     // 主机
     private String host;
     
+    // 扫描路径深度
+    private Integer deep = 5;
+    
+    // 文件缓存时间
+    private Long bufferTime = 7_200_000L;
+    
     // 对象地址
     private List<String> objectSave = new ArrayList<>();
     
     // 保存地址，必须是对象地址中的值，顺序从0开始
-    private Integer assignObjectSave;
+    private Integer assignObjectSave = 0;
     
     // 图片存储地址
     private List<String> imgSave = new ArrayList<>();
     
     // 上传图片,从0开始
-    private Integer assignImgSave;
+    private Integer assignImgSave = 0;
     
     // MV存储地址
     private List<String> mvSave = new ArrayList<>();
     
     // MV图片,从0开始
-    private Integer assignMvSave;
+    private Integer assignMvSave = 0;
     
     // 访问账户
     private String accessKey;
@@ -55,12 +63,17 @@ public class SaveConfig {
         this.saveMode = saveMode;
     }
     
+    /**
+     * 获取WebConfig的路径映射
+     *
+     * @return host
+     */
+    public String getHostMapping() {
+        return host;
+    }
+    
     public String getHost() {
-        if (host.charAt(host.length() - 1) == '/') {
-            return host.substring(0, host.length() - 1);
-        } else {
-            return host;
-        }
+        return CharSequenceUtil.removeSuffix(host, "/");
     }
     
     public void setHost(String host) {
@@ -74,6 +87,22 @@ public class SaveConfig {
         return objectSave;
     }
     
+    public Integer getDeep() {
+        return deep;
+    }
+    
+    public void setDeep(Integer deep) {
+        this.deep = deep;
+    }
+    
+    public Long getBufferTime() {
+        return bufferTime;
+    }
+    
+    public void setBufferTime(Long bufferTime) {
+        this.bufferTime = bufferTime;
+    }
+    
     public void setObjectSave(List<String> objectSave) {
         this.objectSave = objectSave;
     }
@@ -83,7 +112,7 @@ public class SaveConfig {
     }
     
     public void setAssignObjectSave(Integer assignObjectSave) {
-        this.assignObjectSave = assignObjectSave == null ? 0 : assignObjectSave;
+        this.assignObjectSave = assignObjectSave;
     }
     
     public List<String> getImgSave() {
@@ -99,7 +128,7 @@ public class SaveConfig {
     }
     
     public void setAssignImgSave(Integer assignImgSave) {
-        this.assignImgSave = assignImgSave == null ? 0 : assignImgSave;
+        this.assignImgSave = assignImgSave;
     }
     
     public List<String> getMvSave() {
@@ -115,7 +144,7 @@ public class SaveConfig {
     }
     
     public void setAssignMvSave(Integer assignMvSave) {
-        this.assignMvSave = assignMvSave == null ? 0 : assignMvSave;
+        this.assignMvSave = assignMvSave;
     }
     
     public String getAccessKey() {

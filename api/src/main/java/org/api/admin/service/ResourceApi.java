@@ -196,7 +196,7 @@ public class ResourceApi {
     }
     
     public ResourceAudioInfoRes getAudioResourceInfo(String path) {
-        Resource resource = remoteStorageService.getResource(path, false);
+        Resource resource = remoteStorageService.getMusicResource(path);
         ResourceAudioInfoRes res = new ResourceAudioInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbResourcePojo dbResource = tbResourceService.getResourceByName(resource.getName());
@@ -213,7 +213,7 @@ public class ResourceApi {
     }
     
     public ResourcePicInfoRes getPicResourceInfo(String path) {
-        Resource resource = remoteStorageService.getResource(path, false);
+        Resource resource = remoteStorageService.getPicResource(path);
         ResourcePicInfoRes res = new ResourcePicInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbPicPojo picResourceByName = tbPicService.getPicResourceByName(path);
@@ -276,7 +276,7 @@ public class ResourceApi {
      * @return Video信息
      */
     public ResourceVideoInfoRes getVideoResourceInfo(String path) {
-        Resource resource = remoteStorageService.getResource(path, false);
+        Resource resource = remoteStorageService.getMvResource(path);
         ResourceVideoInfoRes res = new ResourceVideoInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbMvPojo mv = tbMvService.getMvByPath(path);
@@ -487,7 +487,7 @@ public class ResourceApi {
             tbResourceService.update(set);
         } else {
             // 保存音乐数据
-            Resource resource = remoteStorageService.getResource(audioResourceReq.getPath(), false);
+            Resource resource = remoteStorageService.getMusicResource(audioResourceReq.getPath());
             File file = HttpUtil.downloadFileFromUrl(resource.getUrl(),
                     httpRequestConfig.getTempPathFile(audioResourceReq.getPath()),
                     httpRequestConfig.getTimeout());

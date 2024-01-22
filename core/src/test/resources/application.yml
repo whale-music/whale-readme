@@ -51,7 +51,7 @@ spring:
   datasource:
     #引用项目中的数据库文件
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:./data/db/db_data
+    url: jdbc:h2:file:../data/db/db_data
     username: root
     password: root
   jpa:
@@ -163,7 +163,7 @@ http-request:
   # 超时设置，最好设置大一些。否则上传文件很容易超时
   timeout: 60_000
   # 上传缓存目录
-  temp-path: ./data/cache
+  temp-path: ../data/cache
 
 # web前端路径映射
 web-mapping:

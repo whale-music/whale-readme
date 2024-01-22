@@ -37,7 +37,7 @@ public class OSSFactory {
     @Bean("ossService")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public OSSService ossFactory() {
-        OSSService oss = ossMap.get(saveConfig.getSaveMode());
+        OSSService oss = ossMap.get(String.valueOf(saveConfig.getSaveMode()));
         if (oss == null) {
             throw new BaseException(ResultCode.SAVE_NAME_INVALID);
         }

@@ -3,6 +3,7 @@ package org.core.common.properties;
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.core.common.enums.SaveModeEnum;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,8 +20,7 @@ import java.util.List;
 )
 public class SaveConfig {
     // 默认保存模式
-    // TODO 设置为枚举
-    private String saveMode;
+    private SaveModeEnum saveMode;
     
     // 主机
     private String host;
@@ -55,11 +55,11 @@ public class SaveConfig {
     // 访问密钥(密码)
     private String secretKey;
     
-    public String getSaveMode() {
+    public SaveModeEnum getSaveMode() {
         return saveMode;
     }
     
-    public void setSaveMode(String saveMode) {
+    public void setSaveMode(SaveModeEnum saveMode) {
         this.saveMode = saveMode;
     }
     

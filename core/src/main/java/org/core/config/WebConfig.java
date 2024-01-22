@@ -3,6 +3,7 @@ package org.core.config;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.enums.SaveModeEnum;
 import org.core.common.properties.SaveConfig;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -48,7 +50,7 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addResourceHandlers(@NotNull ResourceHandlerRegistry registry) {
-        if (StringUtils.equalsIgnoreCase(saveConfig.getSaveMode(), "Local") && !registry.hasMappingForPattern(PUBLIC_STATIC_URL)) {
+        if (Objects.equals(saveConfig.getSaveMode(), SaveModeEnum.LOCAL) && !registry.hasMappingForPattern(PUBLIC_STATIC_URL)) {
             String replace = StringUtils.replace(saveConfig.getHost(), "/", FileUtil.FILE_SEPARATOR);
             String host = StringUtils.replace(replace, "\\", FileUtil.FILE_SEPARATOR);
             saveConfig.setHost(host);

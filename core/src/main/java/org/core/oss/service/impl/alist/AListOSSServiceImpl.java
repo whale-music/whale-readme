@@ -6,6 +6,7 @@ import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -326,6 +327,8 @@ public class AListOSSServiceImpl implements OSSService {
         isExist(path, type);
         Resource resource = this.getResource(path, false, type);
         RequestUtils.rename(config.getHost(), loginJwtCache, resource.getPath(), newName);
-        return Path.of(path).getParent() + "/" + newName;
+        Path parent = Path.of(path).getParent();
+        String replace = StringUtils.replace(String.valueOf(parent), "\\", "/");
+        return CharSequenceUtil.addSuffixIfNot(replace, "/") + newName;
     }
 }

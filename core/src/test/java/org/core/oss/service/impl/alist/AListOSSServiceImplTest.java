@@ -70,7 +70,7 @@ class AListOSSServiceImplTest {
         String upload = upload();
         String newName = "test_music1.txt";
         String rename = ossService.rename(upload, newName, ResourceEnum.MUSIC);
-        Assertions.assertEquals(Path.of(upload).getParent() + "\\" + newName, rename);
+        Assertions.assertEquals(rename, StringUtils.replace(Path.of(upload).getParent().toString(), "\\", "/") + "/" + newName);
     }
     
     @Test

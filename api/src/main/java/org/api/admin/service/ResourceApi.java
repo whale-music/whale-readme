@@ -329,7 +329,6 @@ public class ResourceApi {
     
     public List<AutocompletePicRes> getPicAutocomplete(final String name, final String type) {
         // artist album music playlist user userBackground mv
-        LinkedList<AutocompletePicRes> res = new LinkedList<>();
         final String music = "music";
         final String album = "album";
         final String playlist = "playlist";
@@ -411,8 +410,8 @@ public class ResourceApi {
                     return autocompletePicRes;
                 }).toList();
             }
+            default -> throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
-        return res;
     }
     
     @Transactional(rollbackFor = Exception.class)

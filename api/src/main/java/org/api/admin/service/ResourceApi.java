@@ -199,7 +199,7 @@ public class ResourceApi {
         Resource resource = remoteStorageService.getMusicResource(path);
         ResourceAudioInfoRes res = new ResourceAudioInfoRes();
         BeanUtils.copyProperties(resource, res);
-        TbResourcePojo dbResource = tbResourceService.getResourceByName(resource.getName());
+        TbResourcePojo dbResource = tbResourceService.getResourceByPath(resource.getName());
         res.setDbResource(dbResource);
         
         ResourceAudioInfoRes.LinkData linkData = new ResourceAudioInfoRes.LinkData();

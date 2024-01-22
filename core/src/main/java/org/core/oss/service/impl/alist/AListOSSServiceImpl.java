@@ -232,7 +232,7 @@ public class AListOSSServiceImpl implements OSSService {
                     e.setHref(String.format("%s/%s", config.getHost(), e.getPath()));
                     e.setSize(fsList.getSize());
                     
-                    TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByName(e.getPath()));
+                    TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByPath(e.getPath()));
                     if (Objects.nonNull(tbResourcePojo)) {
                         md5MappingPath.put(tbResourcePojo.getMd5(), e.getPath());
                     }

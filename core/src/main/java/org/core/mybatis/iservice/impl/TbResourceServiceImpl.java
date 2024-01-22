@@ -47,7 +47,7 @@ public class TbResourceServiceImpl extends ServiceImpl<TbResourceMapper, TbResou
      * @return 音乐数据
      */
     @Override
-    public TbResourcePojo getResourceByName(String path) {
+    public TbResourcePojo getResourceByPath(String path) {
         return this.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getPath, path));
     }
 }

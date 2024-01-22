@@ -16,8 +16,8 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.upload.AudioInfoReq;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.PluginConstant;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.*;
 import org.jetbrains.annotations.NotNull;
@@ -135,7 +135,7 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
         // 保存音乐到本地数据库，并返回保存的音乐信息
         List<MusicDetails> musicPojoList = saveMusicInfoList(playDetail, cookie, localUserId);
         // 创建歌单
-        TbCollectPojo collectApiPlayList = pluginPackage.getQukuService().createPlayList(localUserId, playName, PlayListTypeConfig.ORDINARY);
+        TbCollectPojo collectApiPlayList = pluginPackage.getQukuService().createPlayList(localUserId, playName, PlayListTypeConstant.ORDINARY);
         pluginPackage.logInfo("创建歌单成功: {}", playName);
         List<Long> musicIds = musicPojoList.stream().map(MusicDetails::getMusic).map(TbMusicPojo::getId).collect(Collectors.toList());
         if (CollUtil.isNotEmpty(musicIds)) {

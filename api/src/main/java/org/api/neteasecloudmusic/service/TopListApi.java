@@ -13,8 +13,8 @@ import org.api.neteasecloudmusic.model.vo.toplist.playlist.PlaylistsItem;
 import org.api.neteasecloudmusic.model.vo.toplist.playlist.TopListPlayListRes;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.ListItem;
 import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.TargetTagConstant;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbArtistService;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.model.convert.CollectConvert;
@@ -76,7 +76,7 @@ public class TopListApi {
     
     public TopListRes toplist() {
         TopListRes res = new TopListRes();
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singleton(PlayListTypeConfig.RECOMMEND));
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singleton(PlayListTypeConstant.RECOMMEND));
         ArrayList<ListItem> list = new ArrayList<>();
         for (CollectConvert tbCollectPojo : userPlayList) {
             ListItem e = new ListItem();
@@ -103,7 +103,7 @@ public class TopListApi {
     public TopListPlayListRes topPlaylist(String order, String cat, Long offset, Long limit) {
         TopListPlayListRes res = new TopListPlayListRes();
         Page<TbCollectPojo> page = collectService.getUserCollect(UserUtil.getUser().getId(),
-                Collections.singleton(PlayListTypeConfig.RECOMMEND),
+                Collections.singleton(PlayListTypeConstant.RECOMMEND),
                 offset,
                 limit);
         ArrayList<PlaylistsItem> playlists = new ArrayList<>();

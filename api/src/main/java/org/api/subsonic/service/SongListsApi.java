@@ -24,8 +24,8 @@ import org.api.subsonic.model.res.starred.StarredRes;
 import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.HistoryConstant;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.TargetTagConstant;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -178,7 +178,7 @@ public class SongListsApi {
                 break;
             // 收藏
             case "starred":
-                List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConfig.LIKE));
+                List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConstant.LIKE));
                 List<TbCollectMusicPojo> tbCollectMusicPojos = tbCollectMusicService.getCollectIds(userPlayList.stream()
                                                                                                                .map(TbCollectPojo::getId)
                                                                                                                .toList());
@@ -638,7 +638,7 @@ public class SongListsApi {
         }
         
         // 音乐
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConfig.LIKE));
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConstant.LIKE));
         if (CollUtil.isNotEmpty(userPlayList)) {
             List<TbCollectMusicPojo> tbCollectMusicPojos = tbCollectMusicService.getCollectIds(userPlayList.stream().map(TbCollectPojo::getId).toList());
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
@@ -779,7 +779,7 @@ public class SongListsApi {
         }
         
         // 音乐
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConfig.LIKE));
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(userByName.getId(), Collections.singleton(PlayListTypeConstant.LIKE));
         if (CollUtil.isNotEmpty(userPlayList)) {
             List<TbCollectMusicPojo> tbCollectMusicPojos = tbCollectMusicService.getCollectIds(userPlayList.stream().map(TbCollectPojo::getId).toList());
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();

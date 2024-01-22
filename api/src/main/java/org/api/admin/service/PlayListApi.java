@@ -18,10 +18,10 @@ import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.utils.MyPageUtil;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.CollectConvert;
@@ -235,9 +235,9 @@ public class PlayListApi {
                 throw new BaseException(ResultCode.SONG_NOT_EXIST);
             }
         }
-    
+        
         List<Long> likeMusic = new ArrayList<>();
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singletonList(PlayListTypeConfig.LIKE));
+        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singletonList(PlayListTypeConstant.LIKE));
         if (CollUtil.isNotEmpty(userPlayList) && userPlayList.size() == 1) {
             List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                                              .eq(TbCollectMusicPojo::getCollectId, userPlayList.get(0).getId()));
@@ -442,7 +442,7 @@ public class PlayListApi {
     }
     
     public TbCollectPojo createPlayList(String name) {
-        return qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConfig.ORDINARY);
+        return qukuService.createPlayList(UserUtil.getUser().getId(), name, PlayListTypeConstant.ORDINARY);
     }
     
     public void deletePlayList(Long userId, List<Long> id) {
@@ -451,7 +451,7 @@ public class PlayListApi {
     
     public List<PlayListRes> getUserPlayList(Long userId) {
         List<CollectConvert> userPlayList = qukuService.getUserPlayList(userId,
-                Arrays.asList(PlayListTypeConfig.LIKE, PlayListTypeConfig.ORDINARY, PlayListTypeConfig.RECOMMEND));
+                Arrays.asList(PlayListTypeConstant.LIKE, PlayListTypeConstant.ORDINARY, PlayListTypeConstant.RECOMMEND));
         List<PlayListRes> playListRes = new ArrayList<>();
         collectFillUpCount(userPlayList, playListRes);
         return playListRes;

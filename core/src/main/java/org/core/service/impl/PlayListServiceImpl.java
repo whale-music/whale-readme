@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
-import org.core.config.PlayListTypeConfig;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbMusicService;
@@ -53,7 +53,7 @@ public class PlayListServiceImpl implements PlayListService {
         }
         for (int i = 0; i < limit; i++) {
             long randomNum = RandomUtil.randomLong(count);
-            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L, PlayListTypeConfig.ORDINARY);
+            Page<TbCollectPojo> playList = getPlayList(null, randomNum, 1L, PlayListTypeConstant.ORDINARY);
             tbCollectPojos.addAll(playList.getRecords());
         }
         Set<TbCollectPojo> playerSet = new TreeSet<>(Comparator.comparing(TbCollectPojo::getId));

@@ -9,10 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.playlistdetail.*;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -127,7 +127,7 @@ public class CollectApi {
      * @return 歌单信息
      */
     public CollectConvert createPlayList(Long userId, String name) {
-        return qukuService.createPlayList(userId, name, PlayListTypeConfig.ORDINARY);
+        return qukuService.createPlayList(userId, name, PlayListTypeConstant.ORDINARY);
     }
     
     /**
@@ -333,7 +333,7 @@ public class CollectApi {
      * @return 返回歌曲数组
      */
     public List<Long> likelist(Long uid) {
-        List<TbCollectPojo> userCollect = collectService.getUserCollect(uid, PlayListTypeConfig.LIKE);
+        List<TbCollectPojo> userCollect = collectService.getUserCollect(uid, PlayListTypeConstant.LIKE);
         List<Long> collectIds = userCollect.parallelStream().map(TbCollectPojo::getId).toList();
         List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
                                                                          .in(TbCollectMusicPojo::getCollectId, collectIds));

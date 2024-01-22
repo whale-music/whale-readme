@@ -19,11 +19,11 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.LyricConstant;
 import org.core.common.constant.PicTypeConstant;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.TargetTagConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.PlayListTypeConfig;
 import org.core.model.TagMiddleTypeModel;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
@@ -1199,7 +1199,7 @@ public class QukuServiceImpl implements QukuService {
     public void collectLike(Long userId, Long id, Boolean isAddAndDelLike) {
         LambdaQueryWrapper<TbCollectPojo> query = Wrappers.lambdaQuery();
         query.eq(TbCollectPojo::getUserId, userId);
-        query.eq(TbCollectPojo::getType, PlayListTypeConfig.LIKE);
+        query.eq(TbCollectPojo::getType, PlayListTypeConstant.LIKE);
         TbCollectPojo collectServiceById = collectService.getOne(query);
         if (collectServiceById == null) {
             // 添加用户喜爱歌单
@@ -1208,7 +1208,7 @@ public class QukuServiceImpl implements QukuService {
             entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
             entity.setSort(collectService.count());
             entity.setUserId(userId);
-            entity.setType(PlayListTypeConfig.LIKE);
+            entity.setType(PlayListTypeConstant.LIKE);
             collectService.save(entity);
             collectServiceById = entity;
         }

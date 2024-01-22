@@ -6,7 +6,7 @@ import org.api.webdav.config.WebdavConfig;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
-import org.core.config.PlayListTypeConfig;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.jpa.entity.TbMusicEntity;
 import org.core.jpa.entity.TbResourceEntity;
 import org.core.jpa.repository.TbMusicEntityRepository;
@@ -50,9 +50,9 @@ public class WebdavApi {
     
     @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
     public CollectTypeList getUserPlayList(Long id) {
-        List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.ORDINARY);
-        List<TbCollectPojo> likeCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.LIKE);
-        List<TbCollectPojo> recommendCollect = tbCollectService.getUserCollect(id, PlayListTypeConfig.RECOMMEND);
+        List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConstant.ORDINARY);
+        List<TbCollectPojo> likeCollect = tbCollectService.getUserCollect(id, PlayListTypeConstant.LIKE);
+        List<TbCollectPojo> recommendCollect = tbCollectService.getUserCollect(id, PlayListTypeConstant.RECOMMEND);
         CollectTypeList collectTypeList = new CollectTypeList();
         collectTypeList.setLikeCollect(likeCollect);
         collectTypeList.setRecommendCollect(recommendCollect);

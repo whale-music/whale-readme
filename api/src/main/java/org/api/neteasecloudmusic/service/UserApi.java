@@ -19,9 +19,9 @@ import org.api.neteasecloudmusic.model.vo.user.record.Al;
 import org.api.neteasecloudmusic.model.vo.user.record.ArItem;
 import org.api.neteasecloudmusic.model.vo.user.record.Song;
 import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.PlayListTypeConfig;
 import org.core.jpa.entity.TbUserCollectEntity;
 import org.core.jpa.repository.TbUserCollectEntityRepository;
 import org.core.mybatis.iservice.*;
@@ -260,7 +260,7 @@ public class UserApi {
      */
     public Long getCreatedPlaylistCount(Long userId) {
         LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
-                                                                       .eq(TbCollectPojo::getType, PlayListTypeConfig.ORDINARY)
+                                                                       .eq(TbCollectPojo::getType, PlayListTypeConstant.ORDINARY)
                                                                        .eq(TbCollectPojo::getUserId, userId);
         return collectService.count(lambdaQueryWrapper);
     }

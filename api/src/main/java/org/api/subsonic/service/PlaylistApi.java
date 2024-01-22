@@ -14,9 +14,9 @@ import org.api.subsonic.model.res.playlist.PlaylistRes;
 import org.api.subsonic.model.res.playlists.PlayLists;
 import org.api.subsonic.model.res.playlists.PlaylistItem;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
+import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
-import org.core.config.PlayListTypeConfig;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -58,7 +58,7 @@ public class PlaylistApi {
         username = StringUtils.isBlank(username) ? req.getU() : username;
         SysUserPojo user = accountService.getUser(username);
         List<CollectConvert> userPlayList = qukuApi.getUserPlayList(user.getId(),
-                Arrays.asList(PlayListTypeConfig.ORDINARY, PlayListTypeConfig.ORDINARY));
+                Arrays.asList(PlayListTypeConstant.ORDINARY, PlayListTypeConstant.ORDINARY));
         
         List<PlaylistItem> playlist = new ArrayList<>();
         for (TbCollectPojo collectPojo : userPlayList) {
@@ -163,7 +163,7 @@ public class PlaylistApi {
             }
             String userName = req.getU();
             SysUserPojo userByName = Optional.ofNullable(accountService.getUserByName(userName)).orElse(new SysUserPojo());
-            playList = qukuApi.createPlayList(userByName.getId(), name, PlayListTypeConfig.ORDINARY);
+            playList = qukuApi.createPlayList(userByName.getId(), name, PlayListTypeConstant.ORDINARY);
         } else {
             // 更新
             TbCollectPojo byId = collectService.getById(playlistId);

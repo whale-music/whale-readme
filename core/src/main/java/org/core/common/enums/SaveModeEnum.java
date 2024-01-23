@@ -1,10 +1,11 @@
 package org.core.common.enums;
 
 import org.core.oss.service.impl.alist.AListOSSServiceImpl;
+import org.core.oss.service.impl.local.LocalOSSServiceImpl;
 
 public enum SaveModeEnum {
     ALIST(AListOSSServiceImpl.SERVICE_NAME),
-    LOCAL("Local");
+    LOCAL(LocalOSSServiceImpl.SERVICE_NAME);
     
     private final String serviceName;
     

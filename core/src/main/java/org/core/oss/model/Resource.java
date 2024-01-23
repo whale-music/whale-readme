@@ -4,12 +4,14 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Resource {
     /**
      * 文件名
@@ -23,6 +25,9 @@ public class Resource {
      * 文件地址
      */
     private String url;
+    /**
+     * 引用
+     */
     private String href;
     /**
      * 文件大小（字节）

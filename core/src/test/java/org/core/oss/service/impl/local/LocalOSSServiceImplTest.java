@@ -1,4 +1,4 @@
-package org.core.oss.service.impl.alist;
+package org.core.oss.service.impl.local;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.CharsetUtil;
@@ -19,24 +19,15 @@ import org.springframework.util.DigestUtils;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-/**
- * 测试该类时，需要创建AList服务，账号admin, 密码Lq9quPO
- */
 @SpringBootTest(classes = TestApplication.class)
 @TestPropertySource(properties = {
-        "save-config.save-mode=Alist",
-        "save-config.host=http://localhost:5244",
-        "save-config.access-key=admin",
-        "save-config.secret-key=LLq9quPO",
-        "save-config.object-save[0]=/test/music",
-        "save-config.img-save[0]=/test/img",
-        "save-config.mv-save[0]=/test/mv"
+        "save-config.save-mode=local",
+        "save-config.host=D:/temp/test"
 })
 @Slf4j
-class AListOSSServiceImplTest {
+class LocalOSSServiceImplTest {
     
     @Autowired
     private OSSService ossService;
@@ -47,7 +38,7 @@ class AListOSSServiceImplTest {
     
     @Test
     void getMode() {
-        Assertions.assertEquals(AListOSSServiceImpl.SERVICE_NAME, ossService.getMode());
+        Assertions.assertEquals(LocalOSSServiceImpl.SERVICE_NAME, ossService.getMode());
     }
     
     @Test
@@ -65,7 +56,7 @@ class AListOSSServiceImplTest {
         File touch = FileUtil.touch("./data/cache/test_music.txt");
         FileUtil.writeString("1231313", touch, CharsetUtil.CHARSET_UTF_8);
         String s = DigestUtils.md5DigestAsHex(FileUtil.readBytes(touch));
-        return ossService.upload(List.of("/test/music"), config.getAssignObjectSave(), touch, s, ResourceEnum.MUSIC);
+        return ossService.upload(config.getObjectSave(), config.getAssignObjectSave(), touch, s, ResourceEnum.MUSIC);
     }
     
     @Test
@@ -80,6 +71,7 @@ class AListOSSServiceImplTest {
     void getResourceList() {
         String upload = upload();
         Resource resource = ossService.getResource(upload, true, ResourceEnum.MUSIC);
+        log.info(String.valueOf(resource));
         Assertions.assertNotNull(resource);
         Assertions.assertEquals(resource.getPath(), upload);
     }

@@ -42,7 +42,7 @@ public interface OSSService {
      */
     default void isExist(String path, ResourceEnum type) {
         Resource resource = this.getResource(path, true, type);
-        Objects.requireNonNull(resource.getUrl(), ResultCode.OSS_DATA_DOES_NOT_EXIST.getResultMsg());
+        Objects.requireNonNull(resource.getPath(), ResultCode.OSS_DATA_DOES_NOT_EXIST.getResultMsg());
     }
     
     /**

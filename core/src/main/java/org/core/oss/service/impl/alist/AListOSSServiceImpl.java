@@ -5,8 +5,6 @@ import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.text.CharSequenceUtil;
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
@@ -42,9 +40,6 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     
     // 创建登录缓存
     public final TimedCache<String, String> loginTimeCacheStr;
-    
-    // 第一次获取所有歌曲量, 对比缓存，如果不相同则自动刷新
-    private final SaveConfig config;
     
     private final TbResourceService tbResourceService;
     
@@ -120,19 +115,6 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
         return resourceMap;
     }
     
-    private void conditionGetItemByPath(Collection<String> paths, TimedCache<String, Resource> cacheResources, Map<String, Resource> resourceMap) {
-        if (CollUtil.isEmpty(paths)) {
-            Iterator<Resource> iterator = cacheResources.iterator();
-            resourceMap.putAll(IteratorUtils.toList(iterator)
-                                            .parallelStream()
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.toMap(Resource::getPath, resource -> resource)));
-        } else {
-            Set<Resource> set = paths.parallelStream().map(cacheResources::get).filter(Objects::nonNull).collect(Collectors.toSet());
-            resourceMap.putAll(set.parallelStream().filter(Objects::nonNull).collect(Collectors.toMap(Resource::getPath, resource -> resource)));
-        }
-    }
-    
     /**
      * 获取音乐地址
      *
@@ -156,24 +138,6 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
         return resourceMap;
     }
     
-    private void conditionGetItemByMd5(Collection<String> md5s, TimedCache<String, Resource> cacheResources, TimedCache<String, String> md5Mapping, Map<String, Resource> resourceMap) {
-        if (CollUtil.isEmpty(md5s)) {
-            Iterator<String> iterator = md5Mapping.iterator();
-            if (CollUtil.isNotEmpty(iterator)) {
-                Map<String, Resource> collect = IteratorUtils.toList(iterator).parallelStream()
-                                                             .map(cacheResources::get)
-                                                             .collect(Collectors.toMap(Resource::getPath, resource -> resource));
-                resourceMap.putAll(collect);
-            }
-        } else {
-            Set<String> paths = md5s.parallelStream().map(md5Mapping::get).filter(Objects::nonNull).collect(Collectors.toSet());
-            if (CollUtil.isNotEmpty(paths)) {
-                Set<Resource> set = paths.parallelStream().map(cacheResources::get).collect(Collectors.toSet());
-                resourceMap.putAll(set.parallelStream().collect(Collectors.toMap(Resource::getPath, resource -> resource)));
-            }
-        }
-    }
-    
     private void scanResource(boolean refresh, int deep, ResourceEnum type) {
         String loginJwtCache = getLoginJwtCache();
         
@@ -182,14 +146,6 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
         
         for (String s : col) {
             fillingData(refresh, deep, loginJwtCache, s, type);
-        }
-    }
-    
-    private void correspondingData(ResourceEnum type, Set<String> col) {
-        switch (type) {
-            case MV -> col.addAll(config.getMvSave());
-            case PIC -> col.addAll(config.getImgSave());
-            case MUSIC -> col.addAll(config.getObjectSave());
         }
     }
     
@@ -311,8 +267,6 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
         isExist(path, type);
         Resource resource = this.getResource(path, false, type);
         RequestUtils.rename(config.getHost(), loginJwtCache, resource.getPath(), newName);
-        Path parent = Path.of(path).getParent();
-        String replace = StringUtils.replace(String.valueOf(parent), "\\", "/");
-        return CharSequenceUtil.addSuffixIfNot(replace, "/") + newName;
+        return getReName(path, newName);
     }
 }

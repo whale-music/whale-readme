@@ -8,6 +8,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.properties.SaveConfig;
+import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.model.Resource;
 import org.core.oss.service.impl.alist.enums.ResourceEnum;
@@ -33,6 +34,33 @@ public abstract class OSSServiceAbs {
     protected TimedCache<String, String> mvMd5TimedCache;
     
     protected SaveConfig config;
+    protected TbResourceService tbResourceService;
+    
+    protected OSSServiceAbs(SaveConfig config, TbResourceService tbResourceService) {
+        this.config = config;
+        this.tbResourceService = tbResourceService;
+        
+        long timeout = this.config.getBufferTime();
+        musicUrlTimedCache = CacheUtil.newTimedCache(timeout);
+        picUrlTimedCache = CacheUtil.newTimedCache(timeout);
+        mvUrlTimedCache = CacheUtil.newTimedCache(timeout);
+        musicMd5TimedCache = CacheUtil.newTimedCache(timeout);
+        picMd5TimedCache = CacheUtil.newTimedCache(timeout);
+        mvMd5TimedCache = CacheUtil.newTimedCache(timeout);
+        
+        int delay = 60 * 1000;
+        musicUrlTimedCache.schedulePrune(delay);
+        picUrlTimedCache.schedulePrune(delay);
+        mvUrlTimedCache.schedulePrune(delay);
+        
+        cache.put(ResourceEnum.MUSIC, musicUrlTimedCache);
+        cache.put(ResourceEnum.PIC, picUrlTimedCache);
+        cache.put(ResourceEnum.MV, mvUrlTimedCache);
+        
+        cacheMd5.put(ResourceEnum.MUSIC, musicMd5TimedCache);
+        cacheMd5.put(ResourceEnum.PIC, picMd5TimedCache);
+        cacheMd5.put(ResourceEnum.MV, mvMd5TimedCache);
+    }
     
     @NotNull
     protected static String getReName(String path, String newName) {

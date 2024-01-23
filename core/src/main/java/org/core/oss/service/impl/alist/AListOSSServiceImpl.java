@@ -41,36 +41,14 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     // 创建登录缓存
     public final TimedCache<String, String> loginTimeCacheStr;
     
-    private final TbResourceService tbResourceService;
     
     public AListOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService) {
-        this.config = config;
+        super(config, tbResourceService);
         
         long timeout = this.config.getBufferTime();
         loginTimeCacheStr = CacheUtil.newTimedCache(timeout);
+        loginTimeCacheStr.schedulePrune(60 * 1000L);
         
-        musicUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        picUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        mvUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        musicMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        picMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        mvMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        
-        int delay = 60 * 1000;
-        loginTimeCacheStr.schedulePrune(delay);
-        musicUrlTimedCache.schedulePrune(delay);
-        picUrlTimedCache.schedulePrune(delay);
-        mvUrlTimedCache.schedulePrune(delay);
-        
-        cache.put(ResourceEnum.MUSIC, musicUrlTimedCache);
-        cache.put(ResourceEnum.PIC, picUrlTimedCache);
-        cache.put(ResourceEnum.MV, mvUrlTimedCache);
-        
-        cacheMd5.put(ResourceEnum.MUSIC, musicMd5TimedCache);
-        cacheMd5.put(ResourceEnum.PIC, picMd5TimedCache);
-        cacheMd5.put(ResourceEnum.MV, mvMd5TimedCache);
-        
-        this.tbResourceService = tbResourceService;
     }
     
     

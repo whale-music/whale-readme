@@ -1,6 +1,5 @@
 package org.core.oss.service.impl.local;
 
-import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -35,32 +34,9 @@ import java.util.stream.Collectors;
 public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
     
     public static final String SERVICE_NAME = "local";
-    private final TbResourceService tbResourceService;
     
     public LocalOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService) {
-        this.config = config;
-        this.tbResourceService = tbResourceService;
-        
-        long timeout = this.config.getBufferTime();
-        musicUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        picUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        mvUrlTimedCache = CacheUtil.newTimedCache(timeout);
-        musicMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        picMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        mvMd5TimedCache = CacheUtil.newTimedCache(timeout);
-        
-        int delay = 60 * 1000;
-        musicUrlTimedCache.schedulePrune(delay);
-        picUrlTimedCache.schedulePrune(delay);
-        mvUrlTimedCache.schedulePrune(delay);
-        
-        cache.put(ResourceEnum.MUSIC, musicUrlTimedCache);
-        cache.put(ResourceEnum.PIC, picUrlTimedCache);
-        cache.put(ResourceEnum.MV, mvUrlTimedCache);
-        
-        cacheMd5.put(ResourceEnum.MUSIC, musicMd5TimedCache);
-        cacheMd5.put(ResourceEnum.PIC, picMd5TimedCache);
-        cacheMd5.put(ResourceEnum.MV, mvMd5TimedCache);
+        super(config, tbResourceService);
     }
     
     /**

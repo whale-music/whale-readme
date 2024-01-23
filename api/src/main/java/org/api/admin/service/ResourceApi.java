@@ -164,7 +164,7 @@ public class ResourceApi {
         Set<Resource> resources = remoteStorageService.listResource(true);
         Stream<String> stream = resources.parallelStream().map(Resource::getFileExtension);
         if (Boolean.TRUE.equals(b)) {
-            Map<String, Long> collect = stream.map(FileTypeUtil::getTypeCategorization).collect(Collectors.groupingBy(
+            Map<String, Long> collect = stream.filter(Objects::nonNull).map(FileTypeUtil::getTypeCategorization).collect(Collectors.groupingBy(
                     // 分组的键是元素的映射值，即字符串的长度
                     s -> s,
                     // 计数每个分组的元素个数

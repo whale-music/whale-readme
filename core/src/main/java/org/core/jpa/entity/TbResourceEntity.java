@@ -20,7 +20,7 @@ public class TbResourceEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "music_id", nullable = false)
+    @Column(name = "music_id", nullable = true)
     private Long musicId;
     @Basic
     @Column(name = "rate", nullable = true)

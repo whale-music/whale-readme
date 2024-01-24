@@ -132,6 +132,8 @@ public class MusicFlowApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
+    private final HttpRequestConfig httpRequestConfig;
+    
     /**
      * 上传文件或音乐URL下载到临时目录
      *
@@ -1051,13 +1053,13 @@ public class MusicFlowApi {
         // 如果上传的歌曲MD5值在数据中，并且与存储的歌曲ID不符合则不上传
         if (tempOne != null && !Objects.equals(tempOne.getMusicId(), musicId)) {
             throw new BaseException(ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getCode(),
-                    ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲ID: " + tempOne.getMusicId());
+                    ResultCode.UPLOAD_MUSIC_ID_NOT_MATCH.getResultMsg() + ", 歌曲: " + tempOne.getMusicId() + "-" + tempOne.getPath());
         }
         String[] nameArr = StringUtils.split(uploadFile.getName(), ".");
         if (nameArr == null || nameArr.length < 1) {
             throw new BaseException(ResultCode.FILENAME_INVALID);
         }
-        File dest = new File(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + "temp" + FileUtil.FILE_SEPARATOR + tempMd5 + "." + nameArr[1]);
+        File dest = httpRequestConfig.getTempPathFile(tempMd5 + "." + nameArr[1]);
         FileUtil.move(uploadFile, dest, true);
         AudioFile audioInfo = getAudioInfo(dest);
         // 写入音乐元数据到音频文件中

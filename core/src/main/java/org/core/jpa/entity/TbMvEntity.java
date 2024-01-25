@@ -19,8 +19,8 @@ public class TbMvEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "title", nullable = true, length = 255)
-    private String title;
+    @Column(name = "mv_id")
+    private Long mvId;
     @Basic
     @Column(name = "path", nullable = false)
     private String path;
@@ -28,17 +28,11 @@ public class TbMvEntity implements Serializable {
     @Column(name = "md5", nullable = false)
     private String md5;
     @Basic
-    @Column(name = "description", nullable = true, length = -1)
-    private String description;
-    @Basic
     @Column(name = "duration", nullable = true)
     private Long duration;
     @Basic
     @Column(name = "user_id", nullable = true)
     private Long userId;
-    @Basic
-    @Column(name = "publish_time", nullable = true)
-    private Timestamp publishTime;
     @Basic
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
@@ -52,6 +46,9 @@ public class TbMvEntity implements Serializable {
     private Collection<TbMvArtistEntity> tbMvArtistsById;
     @OneToMany(mappedBy = "tbMvByMvId")
     private Collection<TbUserMvEntity> tbUserMvsById;
+    @ManyToOne
+    @JoinColumn(name = "mv_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private TbMvInfoEntity tbMvInfoEntity;
     
     public Long getId() {
         return id;
@@ -61,20 +58,12 @@ public class TbMvEntity implements Serializable {
         this.id = id;
     }
     
-    public String getTitle() {
-        return title;
+    public Long getMvId() {
+        return mvId;
     }
     
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMvId(Long mvId) {
+        this.mvId = mvId;
     }
     
     public Long getDuration() {
@@ -91,14 +80,6 @@ public class TbMvEntity implements Serializable {
     
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-    
-    public Timestamp getPublishTime() {
-        return publishTime;
-    }
-    
-    public void setPublishTime(Timestamp publishTime) {
-        this.publishTime = publishTime;
     }
     
     public Timestamp getCreateTime() {
@@ -155,5 +136,13 @@ public class TbMvEntity implements Serializable {
     
     public void setTbUserMvsById(Collection<TbUserMvEntity> tbUserMvsById) {
         this.tbUserMvsById = tbUserMvsById;
+    }
+    
+    public TbMvInfoEntity getTbMvInfoEntity() {
+        return tbMvInfoEntity;
+    }
+    
+    public void setTbMvInfoEntity(TbMvInfoEntity tbMvInfoEntity) {
+        this.tbMvInfoEntity = tbMvInfoEntity;
     }
 }

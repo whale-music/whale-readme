@@ -24,8 +24,11 @@ import org.core.utils.ServletUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,6 +106,18 @@ public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
                 e.setUrl(path);
                 e.setHref(file.getAbsolutePath());
                 e.setSize(file.length());
+                e.setFileExtension(FileUtil.getSuffix(file.getName()));
+                try {
+                    BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                    e.setModificationTime(new Date(basicFileAttributes.lastModifiedTime().toMillis()));
+                    e.setCreationTime(new Date(basicFileAttributes.creationTime().toMillis()));
+                    e.setLastAccessTime(new Date(basicFileAttributes.lastAccessTime().toMillis()));
+                } catch (IOException ex) {
+                    e.setCreationTime(new Date());
+                    e.setLastAccessTime(new Date());
+                    e.setModificationTime(new Date());
+                    log.warn("read file no create data: {}", ex.getMessage());
+                }
                 
                 TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByPath(e.getPath()));
                 if (Objects.nonNull(tbResourcePojo)) {

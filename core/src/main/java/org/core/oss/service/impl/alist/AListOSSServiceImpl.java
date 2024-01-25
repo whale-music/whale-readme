@@ -4,6 +4,7 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -149,6 +150,8 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
                     e.setUrl(String.format("%s/d/%s", config.getHost(), e.getPath()));
                     e.setHref(String.format("%s/%s", config.getHost(), e.getPath()));
                     e.setSize(fsList.getSize());
+                    e.setModificationTime(DateUtil.parse(fsList.getModified()));
+                    e.setFileExtension(FileUtil.getSuffix(fsList.getName()));
                     
                     TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByPath(e.getPath()));
                     if (Objects.nonNull(tbResourcePojo)) {

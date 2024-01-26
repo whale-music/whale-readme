@@ -53,6 +53,8 @@ public class ResourceApi {
     
     private final TbMvService tbMvService;
     
+    private final TbMvInfoService tbMvInfoService;
+    
     private final AccountService accountService;
     
     private final TbCollectService tbCollectService;
@@ -63,7 +65,7 @@ public class ResourceApi {
     
     private final RemoteStorageService remoteStorageService;
     
-    public ResourceApi(TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi, RemoteStorageService remoteStorageService) {
+    public ResourceApi(TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi, RemoteStorageService remoteStorageService, TbMvInfoService tbMvInfoService) {
         this.tbResourceService = tbResourceService;
         this.tbMiddlePicService = tbMiddlePicService;
         this.tbMusicService = tbMusicService;
@@ -76,6 +78,7 @@ public class ResourceApi {
         this.httpRequestConfig = httpRequestConfig;
         this.musicFlowApi = musicFlowApi;
         this.remoteStorageService = remoteStorageService;
+        this.tbMvInfoService = tbMvInfoService;
     }
     
     public List<ResourcePageRes> getResourcePage(ResourcePageReq req) {
@@ -257,7 +260,7 @@ public class ResourceApi {
                         e.setName(collect.getPlayListName());
                     }
                     case PicTypeConstant.MV -> {
-                        TbMvPojo mvPojo = Optional.ofNullable(tbMvService.getById(middleId)).orElse(new TbMvPojo());
+                        TbMvInfoPojo mvPojo = Optional.ofNullable(tbMvInfoService.getById(middleId)).orElse(new TbMvInfoPojo());
                         e.setName(mvPojo.getTitle());
                     }
                     default -> throw new BaseException(ResultCode.PARAM_IS_INVALID);
@@ -286,9 +289,13 @@ public class ResourceApi {
             BeanUtils.copyProperties(mv, mvResource);
             mvResource.setFileExtension(FileUtil.getSuffix(mvResource.getPath()));
             res.setMvResource(mvResource);
+            
             linkData = new ResourceVideoInfoRes.LinkData();
             linkData.setId(mv.getId());
-            linkData.setName(mv.getTitle());
+            if (Objects.nonNull(mv.getMvId())) {
+                TbMvInfoPojo byId = tbMvInfoService.getById(mv.getMvId());
+                linkData.setName(byId.getTitle());
+            }
             linkData.setValue("");
             linkData.setType("video");
         }
@@ -313,9 +320,9 @@ public class ResourceApi {
     }
     
     public List<AutocompleteMvRes> getMvAutocomplete(String name) {
-        LambdaQueryWrapper<TbMvPojo> like = Wrappers.<TbMvPojo>lambdaQuery()
-                                                    .like(StringUtils.isNotBlank(name), TbMvPojo::getTitle, name);
-        Page<TbMvPojo> page = tbMvService.page(new Page<>(0, 10), like);
+        LambdaQueryWrapper<TbMvInfoPojo> like = Wrappers.<TbMvInfoPojo>lambdaQuery()
+                                                        .like(StringUtils.isNotBlank(name), TbMvInfoPojo::getTitle, name);
+        Page<TbMvInfoPojo> page = tbMvInfoService.page(new Page<>(0, 10), like);
         if (CollUtil.isEmpty(page.getRecords())) {
             return Collections.emptyList();
         }

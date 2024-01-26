@@ -3,17 +3,31 @@ package org.api.admin.model.req;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.mybatis.pojo.TbMvPojo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class SaveMvReq extends TbMvPojo {
+public class SaveMvReq {
+    
+    @Schema(title = "id")
+    private Long id;
+    
+    @Schema(title = "标题")
+    private String title;
+    
+    @Schema(title = "视频时长")
+    private Long duration;
+    
+    @Schema(title = "视频介绍")
+    private String description;
+    
+    @Schema(title = "发布时间")
+    private LocalDateTime publishTime;
+    
     @Schema(title = "MV视频缓存地址")
     private String mvTempPath;
     

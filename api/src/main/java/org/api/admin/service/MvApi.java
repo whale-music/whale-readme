@@ -2,6 +2,7 @@ package org.api.admin.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,13 +17,16 @@ import org.api.admin.utils.VideoUtil;
 import org.api.common.service.QukuAPI;
 import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbMvArtistService;
+import org.core.mybatis.iservice.TbMvInfoService;
 import org.core.mybatis.iservice.TbMvService;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.TbMvArtistPojo;
+import org.core.mybatis.pojo.TbMvInfoPojo;
 import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service(AdminConfig.ADMIN + "MvApi")
@@ -53,25 +54,29 @@ public class MvApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
+    private final TbMvInfoService tbMvInfoService;
     
-    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService, RemoteStorePicService remoteStorePicService) {
+    
+    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService, RemoteStorePicService remoteStorePicService, TbMvInfoService tbMvInfoService) {
         this.tbMvService = tbMvService;
         this.qukuApi = qukuApi;
         this.httpRequestConfig = httpRequestConfig;
         this.tbMvArtistService = tbMvArtistService;
         this.remoteStorageService = remoteStorageService;
         this.remoteStorePicService = remoteStorePicService;
+        this.tbMvInfoService = tbMvInfoService;
     }
     
     @Transactional(rollbackFor = Exception.class)
     public void saveMvInfo(SaveMvReq request) throws IOException {
-        TbMvPojo one = tbMvService.getOne(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getTitle, request.getTitle()));
-        if (Objects.nonNull(one)) {
-            request.setId(one.getId());
-        }
-        request.setPath("undefined path");
-        request.setMd5("undefined md5");
-        tbMvService.save(request);
+        TbMvInfoPojo one = Optional.ofNullable(tbMvInfoService.getOne(Wrappers.<TbMvInfoPojo>lambdaQuery().eq(TbMvInfoPojo::getTitle, request.getTitle())))
+                                   .orElse(new TbMvInfoPojo(request.getId(),
+                                           request.getTitle(),
+                                           request.getDescription(),
+                                           request.getPublishTime(),
+                                           null,
+                                           null));
+        tbMvInfoService.save(one);
         
         // artist
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, request.getId()));
@@ -79,19 +84,21 @@ public class MvApi {
             List<TbMvArtistPojo> list = request.getArtistIds().parallelStream().map(aLong -> new TbMvArtistPojo(request.getId(), aLong)).toList();
             tbMvArtistService.saveBatch(list);
         }
-        
         // upload pic
         remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), httpRequestConfig.getTempPathFile(request.getPicTempPath()));
-        // 上传文件
+        // 视频信息 上传文件
+        TbMvPojo entity = new TbMvPojo();
         if (StringUtils.isNotBlank(request.getMvTempPath())) {
             File file = httpRequestConfig.getTempPathFile(request.getMvTempPath());
-            long videoDuration = VideoUtil.getVideoDuration(file);
-            request.setDuration(videoDuration);
+            Long duration = Optional.ofNullable(request.getDuration()).orElse(VideoUtil.getVideoDuration(file));
             String path = remoteStorageService.uploadMvFile(file);
-            // path
-            request.setPath(path);
+            entity.setMd5(DigestUtil.md5Hex(file));
+            entity.setPath(path);
+            entity.setMvId(one.getId());
+            entity.setDuration(duration);
+            entity.setUserId(UserUtil.getUser().getId());
+            tbMvService.updateById(entity);
         }
-        tbMvService.updateById(request);
         // tag
         Long id = request.getId();
         // 移除重新添加
@@ -101,8 +108,9 @@ public class MvApi {
     
     public Page<MvPageRes> getMvPage(String title, List<String> artist, List<String> tags, String order, String orderBy, Long index, Long size) {
         // title
-        List<TbMvPojo> tbMvPojoList = tbMvService.list(Wrappers.<TbMvPojo>lambdaQuery().like(StringUtils.isNotBlank(title), TbMvPojo::getTitle, title));
-        List<Long> mvIds = new LinkedList<>(tbMvPojoList.parallelStream().map(TbMvPojo::getId).toList());
+        List<TbMvInfoPojo> tbMvPojoList = tbMvInfoService.list(Wrappers.<TbMvInfoPojo>lambdaQuery()
+                                                                       .like(StringUtils.isNotBlank(title), TbMvInfoPojo::getTitle, title));
+        List<Long> mvIds = new LinkedList<>(tbMvPojoList.parallelStream().map(TbMvInfoPojo::getId).toList());
         if (CollUtil.isEmpty(mvIds)) {
             return new Page<>();
         }
@@ -116,24 +124,24 @@ public class MvApi {
             Map<Long, List<TbTagPojo>> labelMvTag = qukuApi.getLabelMvTag(mvIds, tags);
             mvIds.addAll(labelMvTag.keySet());
         }
-        Page<TbMvPojo> page = new Page<>(index, size);
-        LambdaQueryWrapper<TbMvPojo> tbMvPojoLambdaQueryWrapper = Wrappers.lambdaQuery();
+        Page<TbMvInfoPojo> page = new Page<>(index, size);
+        LambdaQueryWrapper<TbMvInfoPojo> tbMvPojoLambdaQueryWrapper = Wrappers.lambdaQuery();
         if (StringUtils.isNotBlank(order) && StringUtils.isNotBlank(orderBy)) {
             boolean isAsc = StringUtils.equalsIgnoreCase(order, "asc");
             switch (orderBy) {
-                case "publishTime" -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvPojo::getPublishTime);
-                case "updateTime" -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvPojo::getUpdateTime);
-                default -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvPojo::getCreateTime);
+                case "publishTime" -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvInfoPojo::getPublishTime);
+                case "updateTime" -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvInfoPojo::getUpdateTime);
+                default -> tbMvPojoLambdaQueryWrapper.orderBy(true, isAsc, TbMvInfoPojo::getCreateTime);
             }
         }
-        tbMvService.page(page, tbMvPojoLambdaQueryWrapper.in(TbMvPojo::getId, mvIds));
+        tbMvInfoService.page(page, tbMvPojoLambdaQueryWrapper.in(TbMvInfoPojo::getId, mvIds));
         Page<MvPageRes> mvPageResPage = new Page<>();
         LinkedList<MvPageRes> records = new LinkedList<>();
         BeanUtils.copyProperties(page, mvPageResPage);
         Map<Long, List<TbTagPojo>> labelMusicTag = qukuApi.getLabelMvTag(mvIds);
         Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuApi.getMvArtistByMvIdToMap(mvIds);
-        for (TbMvPojo mvPojo : page.getRecords()) {
+        for (TbMvInfoPojo mvPojo : page.getRecords()) {
             MvPageRes e = new MvPageRes();
             BeanUtils.copyProperties(mvPojo, e);
             List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
@@ -167,7 +175,9 @@ public class MvApi {
         remoteStorageService.removeMvStorageFiles(ids);
         
         // remove mv
-        tbMvService.removeBatchByIds(ids);
+        tbMvInfoService.removeBatchByIds(ids);
+        
+        // 不移除mv资源表tb_mv
     }
     
     public MvInfoRes getMvInfo(Long id) {
@@ -209,7 +219,7 @@ public class MvApi {
             tbMvArtistService.saveBatch(list);
         }
         
-        tbMvService.updateById(request);
+        tbMvInfoService.updateById(new TbMvInfoPojo(request.getId(), request.getTitle(), request.getDescription(), request.getPublishTime(), null, null));
     }
     
     public String updateMvFile(MultipartFile uploadFile, Long id) throws IOException {

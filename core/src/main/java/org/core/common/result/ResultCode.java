@@ -174,6 +174,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_DATA_ERROR("50019", "error.messages.oss_data_error"),
     // OSS 数据不存在
     OSS_DATA_DOES_NOT_EXIST("50020", "error.messages.oss_data_does_not_exist"),
+    // 请先同步数据
+    PLEASE_SYNCHRONIZE_THE_DATA_FIRST("50021", "error.messages.please_synchronize_the_data_first"),
     
     
     /* 接口错误：60001-69999 */

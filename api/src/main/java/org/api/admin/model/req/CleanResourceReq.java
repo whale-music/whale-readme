@@ -1,6 +1,5 @@
 package org.api.admin.model.req;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LinkAudioResourceReq {
+public class CleanResourceReq {
+    private String type;
+    private String picType;
     private Long id;
-    @NotNull
-    private Long musicId;
+    private Long middleId;
+    private Boolean isForceDelete = false;
 }

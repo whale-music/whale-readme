@@ -278,22 +278,24 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     /**
      * 删除图片
      *
-     * @param ids 封面Id
+     * @param ids      封面Id
+     * @param isRemove 是否删除没有引用的图片文件
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removePicById(List<Long> ids) {
+    public void removePicById(List<Long> ids, boolean isRemove) {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getPicId, ids));
-        if (CollUtil.isEmpty(list)) {
-            return;
+        // 删除关联表
+        middlePicService.remove(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getPicId, ids));
+        // 是否删除文件
+        if (Boolean.TRUE.equals(isRemove)) {
+            List<TbPicPojo> picPojoList = tbPicService.listByIds(ids);
+            if (CollUtil.isNotEmpty(picPojoList)) {
+                remoteStorageService.deletePic(picPojoList.parallelStream().map(TbPicPojo::getPath).toList());
+            }
         }
-        List<PicMiddleTypeModel> middleIds = list.parallelStream()
-                                                 .map(tbMiddlePicPojo -> new PicMiddleTypeModel(tbMiddlePicPojo.getMiddleId(), tbMiddlePicPojo.getType()))
-                                                 .toList();
-        this.removePicMiddleIds(middleIds);
         tbPicService.removeBatchByIds(ids);
     }
     
@@ -303,9 +305,9 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removePicMiddleIds(Collection<Long> middleIds, Byte type) {
+    public void removePicMiddleIds(Collection<Long> middleIds, Byte type, boolean isRemove) {
         List<PicMiddleTypeModel> list = middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList();
-        this.removePicMiddleFile(list, remoteStorageService::deletePic);
+        this.removePicMiddleFile(list, remoteStorageService::deletePic, isRemove);
     }
     
     /**
@@ -316,7 +318,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removePicMiddleIds(Collection<PicMiddleTypeModel> list) {
-        this.removePicMiddleFile(list, remoteStorageService::deletePic);
+        this.removePicMiddleFile(list, remoteStorageService::deletePic, true);
     }
     
     /**
@@ -324,9 +326,10 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
      *
      * @param list     封面数据
      * @param consumer 删除文件
+     * @param isRemove 是否删除没有引用的图片文件
      */
     @Transactional(rollbackFor = Exception.class)
-    public void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer) {
+    public void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer, boolean isRemove) {
         if (CollUtil.isEmpty(list)) {
             return;
         }
@@ -357,7 +360,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
                     tbPicService.updateBatchById(updatePicPojoList);
                 }
                 // 删除所有没有引用封面
-                if (CollectionUtils.isNotEmpty(removePicIds)) {
+                if (CollectionUtils.isNotEmpty(removePicIds) && isRemove) {
                     tbPicService.removeByIds(removePicIds);
                     consumer.accept(removePicIds.parallelStream().map(TbPicPojo::getPath).toList());
                 }

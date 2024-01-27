@@ -367,12 +367,17 @@ public interface RemoteStorePicService {
     /**
      * 删除图片
      *
-     * @param ids 封面Id
+     * @param ids      封面Id
+     * @param isRemove 是否删除关联封面
      */
-    void removePicById(List<Long> ids);
+    void removePicById(List<Long> ids, boolean isRemove);
     
     default void removePicById(Long ids) {
-        removePicById(Collections.singletonList(ids));
+        removePicById(Collections.singletonList(ids), true);
+    }
+    
+    default void removePicById(Long ids, boolean isRemove) {
+        removePicById(Collections.singletonList(ids), isRemove);
     }
     
     /**
@@ -382,13 +387,28 @@ public interface RemoteStorePicService {
         removePicMiddleIds(Collections.singletonList(id), type);
     }
     
+    default void removePicMiddle(Long id, byte type, boolean isRemove) {
+        removePicMiddleIds(Collections.singletonList(id), type, isRemove);
+    }
+    
     /**
      * 批量根据ID删除封面数据
      *
      * @param middleIds 封面
      * @param type      封面类型
      */
-    void removePicMiddleIds(Collection<Long> middleIds, Byte type);
+    default void removePicMiddleIds(Collection<Long> middleIds, Byte type) {
+        removePicMiddleIds(middleIds, type, true);
+    }
+    
+    /**
+     * 批量根据ID删除封面数据
+     *
+     * @param middleIds 封面
+     * @param type      封面类型
+     * @param isRemove  是否删除关联封面
+     */
+    void removePicMiddleIds(Collection<Long> middleIds, Byte type, boolean isRemove);
     
     default void removeMvPicMiddleIds(Collection<Long> middleIds) {
         removePicMiddleIds(middleIds, PicTypeConstant.MV);
@@ -422,8 +442,9 @@ public interface RemoteStorePicService {
      *
      * @param list     封面数据
      * @param consumer 删除文件
+     * @param isRemove 是否删除没有引用的图片文件
      */
-    void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer);
+    void removePicMiddleFile(Collection<PicMiddleTypeModel> list, Consumer<List<String>> consumer, boolean isRemove);
     
     /**
      * 保存或更新封面

@@ -1,6 +1,6 @@
 package org.api.admin.model.req;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LinkAudioResourceReq {
-    private Long id;
-    @NotNull
-    private Long musicId;
+public class SyncResourceReq {
+    @NotBlank
+    private String type;
+    
+    @NotBlank
+    private String path;
 }

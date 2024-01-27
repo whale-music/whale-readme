@@ -85,7 +85,9 @@ public class MvApi {
             tbMvArtistService.saveBatch(list);
         }
         // upload pic
-        remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), httpRequestConfig.getTempPathFile(request.getPicTempPath()));
+        if (StringUtils.isNotBlank(request.getPicTempPath())) {
+            remoteStorePicService.saveOrUpdateMvPicFile(request.getId(), httpRequestConfig.getTempPathFile(request.getPicTempPath()));
+        }
         // 视频信息 上传文件
         TbMvPojo entity = new TbMvPojo();
         if (StringUtils.isNotBlank(request.getMvTempPath())) {
@@ -181,7 +183,7 @@ public class MvApi {
     }
     
     public MvInfoRes getMvInfo(Long id) {
-        TbMvPojo mvPojo = tbMvService.getById(id);
+        TbMvInfoPojo mvPojo = tbMvInfoService.getById(id);
         
         MvInfoRes e = new MvInfoRes();
         BeanUtils.copyProperties(mvPojo, e);
@@ -199,9 +201,12 @@ public class MvApi {
                                        .map(artistConvert -> new SimpleArtist(artistConvert.getId(), artistConvert.getArtistName()))
                                        .toList());
         }
-        String path = e.getPath();
-        if (StringUtils.isNotBlank(path)) {
-            e.setMvUrl(remoteStorageService.getMvAddressesNoRefresh(path));
+        TbMvPojo one = tbMvService.getOne(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getMvId, mvPojo.getId()));
+        if (Objects.nonNull(one)) {
+            String path = one.getPath();
+            if (StringUtils.isNotBlank(path)) {
+                e.setMvUrl(remoteStorageService.getMvAddressesNoRefresh(path));
+            }
         }
         return e;
     }

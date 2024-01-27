@@ -43,6 +43,7 @@ import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.AudioUtil;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
 import org.core.utils.UserUtil;
@@ -340,7 +341,7 @@ public class MusicFlowApi {
                 file = requestConfig.getTempPathFile(source.getPathTemp());
             }
             // 设置音乐元数据, 然后上传
-            uploadPath = writeMusicMetaAndUploadMusicFile(file, source.getRate(), musicPojo, albumPojo, musicArtistList, musicArtistList, lyricPojoList);
+            uploadPath = writeMusicMetaAndUploadMusicFile(file, musicPojo, albumPojo, musicArtistList, musicArtistList, lyricPojoList);
             
             size = FileUtil.size(file);
             FileUtil.del(file);
@@ -839,7 +840,7 @@ public class MusicFlowApi {
                 List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
                 // 歌词
                 List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
-                String path = writeMusicMetaAndUploadMusicFile(file, resource.getRate(), byId,
+                String path = writeMusicMetaAndUploadMusicFile(file, byId,
                         albumPojo,
                         musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
                         albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),
@@ -852,19 +853,11 @@ public class MusicFlowApi {
         }
     }
     
-    private String writeMusicMetaAndUploadMusicFile(File file, Integer rate, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) {
-        String formatName = uploadConfig.getMusicNameTemplate(byId.getMusicName(),
-                byId.getAliasName(),
-                albumPojo.getAlbumName(),
-                StringUtils.join(musicArtistByMusicId.parallelStream().map(TbArtistPojo::getArtistName).filter(StringUtils::isNotBlank).toList(), ' '),
-                String.valueOf(rate)
-        );
-        file = FileUtil.rename(file, formatName, true, true);
-        
+    private String writeMusicMetaAndUploadMusicFile(File file, TbMusicPojo byId, TbAlbumPojo albumPojo, List<TbArtistPojo> musicArtistByMusicId, List<TbArtistPojo> albumArtistList, List<TbLyricPojo> lyricPojoList) {
+        // 写入音乐元数据
         setMusicMetaData(file,
                 byId,
                 albumPojo, musicArtistByMusicId, albumArtistList, lyricPojoList);
-        
         return remoteStorageService.uploadAudioFile(file);
     }
     
@@ -1061,20 +1054,25 @@ public class MusicFlowApi {
         }
         File dest = httpRequestConfig.getTempPathFile(tempMd5 + "." + nameArr[1]);
         FileUtil.move(uploadFile, dest, true);
-        AudioFile audioInfo = getAudioInfo(dest);
+        AudioFile audioInfo = AudioUtil.getAudioInfo(dest);
         // 写入音乐元数据到音频文件中
         // 音乐名
         TbMusicPojo byId = musicService.getById(musicId);
         // 专辑名
-        TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
+        TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new TbAlbumPojo());
         // 音乐歌手
-        List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(musicId);
-        List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+        List<ArtistConvert> musicArtistByMusicId = Optional.ofNullable(qukuService.getMusicArtistByMusicId(musicId)).orElse(Collections.emptyList());
+        
+        List<ArtistConvert> albumArtistListByAlbumIds = new ArrayList<>();
+        if (Objects.nonNull(albumPojo.getId())) {
+            albumArtistListByAlbumIds = Optional.ofNullable(qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId())).orElse(Collections.emptyList());
+        }
         // 上传
-        List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
+        List<TbLyricPojo> musicLyric = Optional.ofNullable(qukuService.getMusicLyric(byId.getId())).orElse(Collections.emptyList());
         int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber());
+        // 处理文件
         String upload = writeMusicMetaAndUploadMusicFile(dest,
-                rate, byId,
+                byId,
                 albumPojo,
                 musicArtistByMusicId.parallelStream().map(TbArtistPojo.class::cast).toList(),
                 albumArtistListByAlbumIds.parallelStream().map(TbArtistPojo.class::cast).toList(),

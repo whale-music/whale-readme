@@ -2,16 +2,14 @@ package org.web.admin.controller.v1;
 
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.LinkAudioResourceReq;
-import org.api.admin.model.req.LinkPicResourceReq;
-import org.api.admin.model.req.LinkVideoResourceReq;
-import org.api.admin.model.req.ResourcePageReq;
+import org.api.admin.model.req.*;
 import org.api.admin.model.res.*;
 import org.api.admin.service.ResourceApi;
 import org.core.common.result.R;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -87,14 +85,38 @@ public class ResourceController {
     }
     
     @PostMapping("/link/video")
-    public R linkVideo(@RequestBody LinkVideoResourceReq videoResourceReq) {
+    public R linkVideo(@RequestBody @Validated LinkVideoResourceReq videoResourceReq) {
         resourceApi.linkVideo(videoResourceReq);
         return R.success();
     }
     
     @PostMapping("/link/audio")
-    public R linkAudio(@RequestBody LinkAudioResourceReq audioResourceReq) {
+    public R linkAudio(@RequestBody @Validated LinkAudioResourceReq audioResourceReq) {
         resourceApi.linkAudio(audioResourceReq);
+        return R.success();
+    }
+    
+    /**
+     * 同步资源数据
+     *
+     * @param resource 需要关联数据
+     * @return 返回数据
+     */
+    @PostMapping("/sync/resource")
+    public R syncResource(@RequestBody @Validated SyncResourceReq resource) throws IOException {
+        resourceApi.syncResource(resource);
+        return R.success();
+    }
+    
+    /**
+     * 清楚资源数据
+     *
+     * @param cleanResource 关联数据
+     * @return 返回数据
+     */
+    @PostMapping("/clean/resource")
+    public R cleanResource(@RequestBody @Validated CleanResourceReq cleanResource) {
+        resourceApi.cleanResource(cleanResource);
         return R.success();
     }
     

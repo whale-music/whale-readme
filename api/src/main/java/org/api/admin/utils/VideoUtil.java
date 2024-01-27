@@ -18,12 +18,13 @@ public class VideoUtil {
     
     public static long getVideoDuration(File videoFile) throws IOException {
         if (videoFile.exists()) {
-            FileChannelWrapper ch = NIOUtils.readableChannel(videoFile);
-            MP4Demuxer demurer = MP4Demuxer.createMP4Demuxer(ch);
-            DemuxerTrack videoTrack = demurer.getVideoTrack();
-            double totalDuration = videoTrack.getMeta().getTotalDuration();
-            log.info("video_duration: " + totalDuration);
-            return (long) Math.ceil(totalDuration);
+            try (FileChannelWrapper ch = NIOUtils.readableChannel(videoFile);) {
+                MP4Demuxer demurer = MP4Demuxer.createMP4Demuxer(ch);
+                DemuxerTrack videoTrack = demurer.getVideoTrack();
+                double totalDuration = videoTrack.getMeta().getTotalDuration();
+                log.info("video_duration: " + totalDuration);
+                return (long) Math.ceil(totalDuration);
+            }
         }
         throw new BaseException(ResultCode.FILENAME_NO_EXIST);
     }

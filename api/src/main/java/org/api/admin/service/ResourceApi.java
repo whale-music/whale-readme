@@ -2,20 +2,19 @@ package org.api.admin.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.http.HttpUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.LinkResourceCommon;
-import org.api.admin.model.req.LinkAudioResourceReq;
-import org.api.admin.model.req.LinkPicResourceReq;
-import org.api.admin.model.req.LinkVideoResourceReq;
-import org.api.admin.model.req.ResourcePageReq;
+import org.api.admin.model.req.*;
 import org.api.admin.model.res.*;
 import org.api.admin.utils.FileTypeUtil;
+import org.api.admin.utils.VideoUtil;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -25,19 +24,27 @@ import org.core.mybatis.pojo.*;
 import org.core.oss.model.Resource;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
+import org.core.service.RemoteStorePicService;
+import org.core.utils.AudioUtil;
+import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
+import org.jaudiotagger.audio.AudioFile;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service(AdminConfig.ADMIN + "ResourceApi")
+@Slf4j
 public class ResourceApi {
+    public static final Object lock = new Object();
     
     private final TbResourceService tbResourceService;
     
@@ -65,7 +72,9 @@ public class ResourceApi {
     
     private final RemoteStorageService remoteStorageService;
     
-    public ResourceApi(TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi, RemoteStorageService remoteStorageService, TbMvInfoService tbMvInfoService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public ResourceApi(TbResourceService tbResourceService, TbMiddlePicService tbMiddlePicService, TbMusicService tbMusicService, TbPicService tbPicService, TbArtistService tbArtistService, TbAlbumService tbAlbumService, TbMvService tbMvService, AccountService accountService, TbCollectService tbCollectService, HttpRequestConfig httpRequestConfig, MusicFlowApi musicFlowApi, RemoteStorageService remoteStorageService, TbMvInfoService tbMvInfoService, RemoteStorePicService remoteStorePicService) {
         this.tbResourceService = tbResourceService;
         this.tbMiddlePicService = tbMiddlePicService;
         this.tbMusicService = tbMusicService;
@@ -79,87 +88,18 @@ public class ResourceApi {
         this.musicFlowApi = musicFlowApi;
         this.remoteStorageService = remoteStorageService;
         this.tbMvInfoService = tbMvInfoService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
-    public List<ResourcePageRes> getResourcePage(ResourcePageReq req) {
-        Set<Resource> resources = remoteStorageService.listResource(true);
-        LinkedList<ResourcePageRes> res = new LinkedList<>();
-        
-        List<String> filter = req.getFilter();
-        
-        List<TbResourcePojo> resourceList = tbResourceService.list();
-        Map<String, TbResourcePojo> resourceMap = resourceList.parallelStream()
-                                                              .collect(Collectors.toMap(TbResourcePojo::getPath, tbResourcePojo -> tbResourcePojo));
-        List<TbPicPojo> picList = tbPicService.list();
-        Map<String, TbPicPojo> picMap = picList.parallelStream().collect(Collectors.toMap(TbPicPojo::getPath, tbPicPojo -> tbPicPojo));
-        List<TbMvPojo> mvList = tbMvService.list();
-        Map<String, TbMvPojo> mvMap = mvList.parallelStream().collect(Collectors.toMap(TbMvPojo::getPath, s -> s));
-        for (Resource resource : resources) {
-            String typeCategorization = FileTypeUtil.getTypeCategorization(resource.getFileExtension());
-            // 过滤
-            boolean b1 = CollUtil.isNotEmpty(filter)
-                    && !CollUtil.contains(filter,
-                    s -> StringUtils.equals(s,
-                            Boolean.TRUE.equals(req.getFilterType()) ? typeCategorization : resource.getFileExtension()));
-            if (b1
-                    // 查询
-                    || StringUtils.isNotBlank(req.getSelect()) && !StringUtils.equalsAnyIgnoreCase(resource.getName(), req.getSelect())
-            ) {
-                continue;
-            }
-            ResourcePageRes e = new ResourcePageRes();
-            BeanUtils.copyProperties(resource, e);
-            if (StringUtils.equals(typeCategorization, FileTypeUtil.IMAGE)) {
-                TbPicPojo tbPicPojo = picMap.get(resource.getName());
-                if (Objects.isNull(tbPicPojo)) {
-                    e.setStatus(false);
-                } else {
-                    e.setMd5(tbPicPojo.getMd5());
-                    e.setStatus(true);
-                }
-            } else if (StringUtils.equals(typeCategorization, FileTypeUtil.VIDEO)) {
-                TbMvPojo mvPojo = mvMap.get(resource.getName());
-                if (Objects.isNull(mvPojo)) {
-                    e.setStatus(false);
-                } else {
-                    e.setMd5(mvPojo.getMd5());
-                    e.setStatus(true);
-                }
-            } else if (StringUtils.equals(typeCategorization, FileTypeUtil.AUDIO)) {
-                TbResourcePojo tbResourcePojo = resourceMap.get(resource.getName());
-                if (Objects.isNull(tbResourcePojo)) {
-                    e.setStatus(false);
-                } else {
-                    e.setMd5(tbResourcePojo.getMd5());
-                    e.setStatus(true);
-                }
-            }
-            
-            e.setType(typeCategorization);
-            res.add(e);
-        }
-        String order = req.getOrder();
-        boolean orderFlag = StringUtils.equals("asc", order);
-        switch (req.getOrderBy()) {
-            case "createTime" -> {
-                Comparator<ResourcePageRes> comparing = Comparator.comparing(ResourcePageRes::getCreationTime);
-                CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
-            }
-            case "updateTime" -> {
-                Comparator<ResourcePageRes> comparing = Comparator.comparing(ResourcePageRes::getModificationTime);
-                CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
-            }
-            case "size" -> {
-                Comparator<ResourcePageRes> comparing = Comparator.comparing(ResourcePageRes::getSize);
-                CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
-            }
-            //  case "name"
-            default -> {
-                Comparator<ResourcePageRes> comparing = Comparator.comparing(ResourcePageRes::getName);
-                CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
-            }
-        }
-        return res;
+    private static void fullAudioResource(File file, int rate, String md5, String upload, TbResourcePojo entity, Long userId, String encodeType) {
+        entity.setRate(rate);
+        String level = AudioUtil.getLevel(rate);
+        entity.setLevel(level);
+        entity.setPath(upload);
+        entity.setUserId(userId);
+        entity.setEncodeType(encodeType);
+        entity.setSize(FileUtil.size(file));
+        entity.setMd5(md5);
     }
     
     public Collection<FilterTermsRes> getFilterType(String type) {
@@ -198,20 +138,96 @@ public class ResourceApi {
         return set;
     }
     
-    public ResourceAudioInfoRes getAudioResourceInfo(String path) {
-        Resource resource = remoteStorageService.getMusicResource(path);
-        ResourceAudioInfoRes res = new ResourceAudioInfoRes();
-        BeanUtils.copyProperties(resource, res);
-        TbResourcePojo dbResource = tbResourceService.getResourceByPath(resource.getName());
-        res.setDbResource(dbResource);
+    public List<ResourcePageRes> getResourcePage(ResourcePageReq req) {
+        Set<Resource> resources = remoteStorageService.listResource(true);
+        LinkedList<ResourcePageRes> res = new LinkedList<>();
         
-        ResourceAudioInfoRes.LinkData linkData = new ResourceAudioInfoRes.LinkData();
-        linkData.setId(dbResource.getMusicId());
-        TbMusicPojo byId = tbMusicService.getById(dbResource.getMusicId());
-        linkData.setName(Optional.ofNullable(byId).orElse(new TbMusicPojo()).getMusicName());
-        linkData.setType("music");
-        linkData.setValue("");
-        res.setLinkData(linkData);
+        List<String> filter = req.getFilter();
+        
+        List<TbResourcePojo> resourceList = tbResourceService.list();
+        Map<String, TbResourcePojo> resourceMap = resourceList.parallelStream()
+                                                              .collect(Collectors.toMap(TbResourcePojo::getPath, tbResourcePojo -> tbResourcePojo));
+        List<TbPicPojo> picList = tbPicService.list();
+        Map<String, TbPicPojo> picMap = picList.parallelStream().collect(Collectors.toMap(TbPicPojo::getPath, tbPicPojo -> tbPicPojo));
+        List<TbMvPojo> mvList = tbMvService.list();
+        Map<String, TbMvPojo> mvMap = mvList.parallelStream().collect(Collectors.toMap(TbMvPojo::getPath, s -> s));
+        for (Resource resource : resources) {
+            String typeCategorization = FileTypeUtil.getTypeCategorization(resource.getFileExtension());
+            // 过滤
+            boolean b1 = CollUtil.isNotEmpty(filter)
+                    && !CollUtil.contains(filter,
+                    s -> StringUtils.equals(s,
+                            Boolean.TRUE.equals(req.getFilterType()) ? typeCategorization : resource.getFileExtension()));
+            if (b1
+                    // 查询
+                    || StringUtils.isNotBlank(req.getSelect()) && !StringUtils.equalsAnyIgnoreCase(resource.getName(), req.getSelect())
+            ) {
+                continue;
+            }
+            ResourcePageRes e = new ResourcePageRes();
+            BeanUtils.copyProperties(resource, e);
+            if (StringUtils.equals(typeCategorization, FileTypeUtil.IMAGE)) {
+                TbPicPojo tbPicPojo = picMap.get(resource.getPath());
+                if (Objects.isNull(tbPicPojo)) {
+                    e.setStatus(false);
+                } else {
+                    e.setMd5(tbPicPojo.getMd5());
+                    e.setStatus(true);
+                }
+            } else if (StringUtils.equals(typeCategorization, FileTypeUtil.VIDEO)) {
+                TbMvPojo mvPojo = mvMap.get(resource.getPath());
+                if (Objects.isNull(mvPojo)) {
+                    e.setStatus(false);
+                } else {
+                    e.setMd5(mvPojo.getMd5());
+                    e.setStatus(true);
+                }
+            } else if (StringUtils.equals(typeCategorization, FileTypeUtil.AUDIO)) {
+                TbResourcePojo tbResourcePojo = resourceMap.get(resource.getPath());
+                if (Objects.isNull(tbResourcePojo)) {
+                    e.setStatus(false);
+                } else {
+                    e.setMd5(tbResourcePojo.getMd5());
+                    e.setStatus(true);
+                }
+            }
+            
+            e.setType(typeCategorization);
+            res.add(e);
+        }
+        String order = req.getOrder();
+        boolean orderFlag = StringUtils.equals("asc", order);
+        switch (req.getOrderBy()) {
+            case "createTime" -> {
+                Function<ResourcePageRes, Date> getCreationTime = ResourcePageRes::getCreationTime;
+                if (res.parallelStream().map(getCreationTime).anyMatch(Objects::nonNull)) {
+                    Comparator<ResourcePageRes> comparing = Comparator.comparing(getCreationTime);
+                    CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
+                }
+            }
+            case "updateTime" -> {
+                Function<ResourcePageRes, Date> getModificationTime = ResourcePageRes::getModificationTime;
+                if (res.parallelStream().map(getModificationTime).anyMatch(Objects::nonNull)) {
+                    Comparator<ResourcePageRes> comparing = Comparator.comparing(getModificationTime);
+                    CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
+                }
+            }
+            case "size" -> {
+                Function<ResourcePageRes, Long> getSize = ResourcePageRes::getSize;
+                if (res.parallelStream().map(getSize).anyMatch(Objects::nonNull)) {
+                    Comparator<ResourcePageRes> comparing = Comparator.comparing(getSize);
+                    CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
+                }
+            }
+            //  case "name"
+            default -> {
+                Function<ResourcePageRes, String> getName = ResourcePageRes::getName;
+                if (res.parallelStream().map(getName).anyMatch(Objects::nonNull)) {
+                    Comparator<ResourcePageRes> comparing = Comparator.comparing(getName);
+                    CollUtil.sort(res, orderFlag ? comparing : comparing.reversed());
+                }
+            }
+        }
         return res;
     }
     
@@ -283,17 +299,16 @@ public class ResourceApi {
         ResourceVideoInfoRes res = new ResourceVideoInfoRes();
         BeanUtils.copyProperties(resource, res);
         TbMvPojo mv = tbMvService.getMvByPath(path);
-        ResourceVideoInfoRes.LinkData linkData = null;
+        ResourceVideoInfoRes.LinkData linkData = new ResourceVideoInfoRes.LinkData();
         if (Objects.nonNull(mv)) {
             ResourceVideoInfoRes.MvResource mvResource = new ResourceVideoInfoRes.MvResource();
             BeanUtils.copyProperties(mv, mvResource);
             mvResource.setFileExtension(FileUtil.getSuffix(mvResource.getPath()));
             res.setMvResource(mvResource);
             
-            linkData = new ResourceVideoInfoRes.LinkData();
-            linkData.setId(mv.getId());
             if (Objects.nonNull(mv.getMvId())) {
                 TbMvInfoPojo byId = tbMvInfoService.getById(mv.getMvId());
+                linkData.setId(byId.getId());
                 linkData.setName(byId.getTitle());
             }
             linkData.setValue("");
@@ -423,25 +438,32 @@ public class ResourceApi {
     
     @Transactional(rollbackFor = Exception.class)
     public void linkPicture(LinkPicResourceReq picResource) {
-        // 如果图片关联的数据了其他的图片，则无法关联
-        for (LinkResourceCommon linkResourceCommon : picResource.getLinkList()) {
-            long count = tbMiddlePicService.count(Wrappers.<TbMiddlePicPojo>lambdaQuery()
-                                                          .ne(TbMiddlePicPojo::getPicId, picResource.getId())
-                                                          .eq(TbMiddlePicPojo::getMiddleId, linkResourceCommon.getId())
-                                                          .eq(TbMiddlePicPojo::getType, PicTypeConstant.PIC_TYPE_VALUE.get(linkResourceCommon.getType())));
-            if (count > 0) {
-                throw new BaseException(ResultCode.LINK_PIC_ERROR.getCode(),
-                        String.format(ResultCode.LINK_PIC_ERROR.getResultMsg(), linkResourceCommon.getId()));
+        synchronized (lock) {
+            // 如果图片关联的数据了其他的图片，则无法关联
+            for (LinkResourceCommon linkResourceCommon : picResource.getLinkList()) {
+                long count = tbMiddlePicService.count(Wrappers.<TbMiddlePicPojo>lambdaQuery()
+                                                              .ne(TbMiddlePicPojo::getPicId, picResource.getId())
+                                                              .eq(TbMiddlePicPojo::getMiddleId, linkResourceCommon.getId())
+                                                              .eq(TbMiddlePicPojo::getType,
+                                                                      PicTypeConstant.PIC_TYPE_VALUE.get(linkResourceCommon.getType())));
+                if (count > 0) {
+                    throw new BaseException(ResultCode.LINK_PIC_ERROR.getCode(),
+                            String.format(ResultCode.LINK_PIC_ERROR.getResultMsg(), linkResourceCommon.getId()));
+                }
             }
-        }
-        tbMiddlePicService.remove(Wrappers.<TbMiddlePicPojo>lambdaQuery()
-                                          .eq(TbMiddlePicPojo::getPicId, picResource.getId()));
-        if (CollUtil.isNotEmpty(picResource.getLinkList())) {
-            final List<TbMiddlePicPojo> entityList = picResource.getLinkList().parallelStream().map(linkResourceCommon -> new TbMiddlePicPojo(null,
-                    linkResourceCommon.getId(),
-                    picResource.getId(),
-                    PicTypeConstant.PIC_TYPE_VALUE.get(linkResourceCommon.getType()))).toList();
-            tbMiddlePicService.saveBatch(entityList);
+            tbMiddlePicService.remove(Wrappers.<TbMiddlePicPojo>lambdaQuery()
+                                              .eq(TbMiddlePicPojo::getPicId, picResource.getId()));
+            if (CollUtil.isNotEmpty(picResource.getLinkList())) {
+                final List<TbMiddlePicPojo> entityList = picResource.getLinkList().parallelStream().map(linkResourceCommon -> new TbMiddlePicPojo(null,
+                        linkResourceCommon.getId(),
+                        picResource.getId(),
+                        PicTypeConstant.PIC_TYPE_VALUE.get(linkResourceCommon.getType()))).toList();
+                tbMiddlePicService.saveBatch(entityList);
+                TbPicPojo picPojo = tbPicService.getById(picResource.getId());
+                int count = Optional.ofNullable(picPojo.getCount()).orElse(0) + entityList.size();
+                picPojo.setCount(count);
+                tbPicService.updateById(picPojo);
+            }
         }
     }
     
@@ -449,33 +471,48 @@ public class ResourceApi {
     public void linkVideo(LinkVideoResourceReq videoResourceReq) {
         // 检测mv id是否已经绑定， 已绑定则抛出
         long count = tbMvService.count(Wrappers.<TbMvPojo>lambdaQuery()
-                                               .ne(TbMvPojo::getId, videoResourceReq.getMvId())
+                                               .ne(TbMvPojo::getMvId, videoResourceReq.getMvId())
                                                .eq(TbMvPojo::getPath, videoResourceReq.getPath()));
         if (count > 0) {
             throw new BaseException(ResultCode.LINK_PIC_ERROR.getCode(),
                     String.format(ResultCode.LINK_PIC_ERROR.getResultMsg(), videoResourceReq.getMvId()));
         }
         // 如果没有ID则表示删除关联的path
-        if (Objects.isNull(videoResourceReq.getMvId())) {
-            LambdaUpdateWrapper<TbMvPojo> update = Wrappers.<TbMvPojo>lambdaUpdate()
-                                                           .eq(TbMvPojo::getPath, videoResourceReq.getPath())
-                                                           .set(TbMvPojo::getPath, "");
-            tbMvService.update(update);
-        } else {
-            // 关联文件和MV的DB数据
-            LambdaUpdateWrapper<TbMvPojo> update = Wrappers.<TbMvPojo>lambdaUpdate()
-                                                           .eq(TbMvPojo::getId, videoResourceReq.getMvId())
-                                                           .set(TbMvPojo::getPath, videoResourceReq.getPath());
-            tbMvService.update(update);
-        }
+        // 关联文件和MV的DB数据
+        LambdaUpdateWrapper<TbMvPojo> update = Wrappers.<TbMvPojo>lambdaUpdate()
+                                                       .eq(TbMvPojo::getId, videoResourceReq.getId())
+                                                       .set(TbMvPojo::getMvId, videoResourceReq.getMvId());
+        tbMvService.update(update);
     }
     
+    public ResourceAudioInfoRes getAudioResourceInfo(String path) {
+        Resource resource = remoteStorageService.getMusicResource(path);
+        ResourceAudioInfoRes res = new ResourceAudioInfoRes();
+        BeanUtils.copyProperties(resource, res);
+        
+        ResourceAudioInfoRes.LinkData linkData = new ResourceAudioInfoRes.LinkData();
+        TbResourcePojo dbResource = tbResourceService.getResourceByPath(resource.getPath());
+        if (Objects.nonNull(dbResource)) {
+            res.setDbResource(dbResource);
+            linkData.setId(dbResource.getMusicId());
+            TbMusicPojo byId = tbMusicService.getById(dbResource.getMusicId());
+            linkData.setName(Optional.ofNullable(byId).orElse(new TbMusicPojo()).getMusicName());
+        }
+        linkData.setType("music");
+        linkData.setValue("");
+        res.setLinkData(linkData);
+        return res;
+    }
+    
+    /**
+     * <p>绑定</p>
+     * <p>解除绑定</p>
+     *
+     * @param audioResourceReq
+     */
     @Transactional(rollbackFor = Exception.class)
     public void linkAudio(LinkAudioResourceReq audioResourceReq) {
-        // 校验参数
-        if (Objects.isNull(audioResourceReq.getId()) && StringUtils.isNotBlank(audioResourceReq.getPath())) {
-            throw new BaseException(ResultCode.PARAM_IS_INVALID.name());
-        }
+        ExceptionUtil.isNull(Objects.isNull(audioResourceReq.getId()), ResultCode.PLEASE_SYNCHRONIZE_THE_DATA_FIRST);
         // 关联数据必须是没有已关联的数据
         long count = tbResourceService.count(Wrappers.<TbResourcePojo>lambdaQuery()
                                                      .eq(TbResourcePojo::getMusicId, audioResourceReq.getMusicId())
@@ -484,20 +521,129 @@ public class ResourceApi {
             throw new BaseException(ResultCode.LINK_AUDIO_ERROR.getCode(),
                     String.format(ResultCode.LINK_AUDIO_ERROR.getResultMsg(), audioResourceReq.getMusicId()));
         }
-        // 更新参数
-        // 有ID则表示不上传文件
-        if (Objects.nonNull(audioResourceReq.getId()) && StringUtils.isBlank(audioResourceReq.getPath())) {
-            LambdaUpdateWrapper<TbResourcePojo> set = Wrappers.<TbResourcePojo>lambdaUpdate()
-                                                              .eq(TbResourcePojo::getId, audioResourceReq.getId())
-                                                              .set(TbResourcePojo::getId, audioResourceReq.getId());
-            tbResourceService.update(set);
-        } else {
-            // 保存音乐数据
-            Resource resource = remoteStorageService.getMusicResource(audioResourceReq.getPath());
-            File file = HttpUtil.downloadFileFromUrl(resource.getUrl(),
-                    httpRequestConfig.getTempPathFile(audioResourceReq.getPath()),
-                    httpRequestConfig.getTimeout());
-            musicFlowApi.uploadAutoMusicFile(UserUtil.getUser().getId(), file, audioResourceReq.getMusicId());
+        // 更新
+        LambdaUpdateWrapper<TbResourcePojo> set = Wrappers.<TbResourcePojo>lambdaUpdate()
+                                                          .eq(TbResourcePojo::getId, audioResourceReq.getId())
+                                                          .set(TbResourcePojo::getMusicId, audioResourceReq.getMusicId());
+        tbResourceService.update(set);
+    }
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void syncResource(SyncResourceReq picResource) throws IOException {
+        String path = picResource.getPath();
+        switch (picResource.getType()) {
+            case "audio" -> {
+                Resource musicResource = remoteStorageService.getMusicResource(path);
+                File file = org.core.utils.http.HttpUtil.downloadResource(musicResource, httpRequestConfig);
+                AudioFile audioInfo = AudioUtil.getAudioInfo(file);
+                int rate = Math.toIntExact(audioInfo.getAudioHeader().getBitRateAsNumber()) * 1000;
+                String md5 = DigestUtil.md5Hex(file);
+                TbResourcePojo entity = tbResourceService.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMd5, md5));
+                Long userId = UserUtil.getUser().getId();
+                String encodeType = FileUtil.extName(file.getName());
+                if (Objects.isNull(entity)) {
+                    entity = new TbResourcePojo();
+                    fullAudioResource(file, rate, md5, path, entity, userId, encodeType);
+                    tbResourceService.save(entity);
+                    log.info("文件保存到数据库{}", entity);
+                } else {
+                    fullAudioResource(file, rate, md5, path, entity, userId, encodeType);
+                    tbResourceService.updateById(entity);
+                    log.info("更新成功{}", entity);
+                }
+                FileUtil.del(file);
+                log.info("music");
+            }
+            case "video" -> {
+                Resource musicResource = remoteStorageService.getMvResource(path);
+                File file = org.core.utils.http.HttpUtil.downloadResource(musicResource, httpRequestConfig);
+                String md5 = DigestUtil.md5Hex(file);
+                long videoDuration = VideoUtil.getVideoDuration(file);
+                TbMvPojo one = tbMvService.getOne(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getMd5, md5));
+                
+                Long userId = UserUtil.getUser().getId();
+                if (Objects.isNull(one)) {
+                    TbMvPojo entity = new TbMvPojo();
+                    entity.setDuration(videoDuration);
+                    entity.setMd5(md5);
+                    entity.setPath(path);
+                    entity.setMvId(null);
+                    entity.setUserId(userId);
+                    tbMvService.save(entity);
+                } else {
+                    one.setDuration(videoDuration);
+                    one.setMd5(md5);
+                    one.setPath(path);
+                    one.setMvId(null);
+                    one.setUserId(userId);
+                    tbMvService.updateById(one);
+                }
+                FileUtil.del(file);
+                log.info("video");
+            }
+            case "pic" -> {
+                synchronized (lock) {
+                    Resource musicResource = remoteStorageService.getPicResource(path);
+                    File file = org.core.utils.http.HttpUtil.downloadResource(musicResource, httpRequestConfig);
+                    String md5 = DigestUtil.md5Hex(file);
+                    TbPicPojo one = tbPicService.getOne(Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getMd5, md5));
+                    if (Objects.isNull(one)) {
+                        TbPicPojo entity = new TbPicPojo();
+                        entity.setCount(0);
+                        entity.setMd5(md5);
+                        entity.setPath(path);
+                        tbPicService.save(entity);
+                    } else {
+                        int count = one.getCount();
+                        count++;
+                        one.setCount(count);
+                        one.setMd5(md5);
+                        one.setPath(path);
+                        tbPicService.updateById(one);
+                    }
+                }
+                log.info("pic");
+            }
+            default -> throw new BaseException(ResultCode.PARAM_IS_INVALID);
+        }
+    }
+    
+    public void cleanResource(CleanResourceReq cleanResource) {
+        switch (cleanResource.getType()) {
+            case "audio" -> {
+                if (Boolean.TRUE.equals(cleanResource.getIsForceDelete())) {
+                    LambdaQueryWrapper<TbResourcePojo> eq = Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getId, cleanResource.getId());
+                    tbResourceService.remove(eq);
+                } else {
+                    LambdaUpdateWrapper<TbResourcePojo> set = Wrappers.<TbResourcePojo>lambdaUpdate()
+                                                                      .eq(TbResourcePojo::getId, cleanResource.getId())
+                                                                      .eq(TbResourcePojo::getMusicId, cleanResource.getMiddleId())
+                                                                      .set(TbResourcePojo::getMusicId, null);
+                    tbResourceService.update(set);
+                }
+            }
+            case "video" -> {
+                if (Boolean.TRUE.equals(cleanResource.getIsForceDelete())) {
+                    tbMvService.remove(Wrappers.<TbMvPojo>lambdaUpdate()
+                                               .eq(TbMvPojo::getId, cleanResource.getId())
+                                               .eq(TbMvPojo::getMvId, cleanResource.getMiddleId()));
+                } else {
+                    tbMvService.update(Wrappers.<TbMvPojo>lambdaUpdate()
+                                               .eq(TbMvPojo::getId, cleanResource.getId())
+                                               .eq(TbMvPojo::getMvId, cleanResource.getMiddleId())
+                                               .set(TbMvPojo::getMvId, null));
+                }
+            }
+            case "pic" -> {
+                if (Boolean.TRUE.equals(cleanResource.getIsForceDelete())) {
+                    remoteStorePicService.removePicById(cleanResource.getId(), false);
+                } else {
+                    Byte aByte = PicTypeConstant.PIC_TYPE_VALUE.get(cleanResource.getPicType());
+                    ExceptionUtil.isNull(Objects.isNull(aByte) || Objects.isNull(cleanResource.getMiddleId()), ResultCode.PARAM_IS_INVALID);
+                    remoteStorePicService.removePicMiddle(cleanResource.getMiddleId(), aByte, false);
+                }
+            }
+            default -> throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
     }
 }

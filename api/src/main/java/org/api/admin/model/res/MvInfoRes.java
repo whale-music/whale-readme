@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.admin.model.common.SimpleArtist;
-import org.core.mybatis.pojo.TbMvPojo;
+import org.core.mybatis.pojo.TbMvInfoPojo;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MvInfoRes extends TbMvPojo {
+public class MvInfoRes extends TbMvInfoPojo {
     private String mvUrl;
     private String picUrl;
     private List<String> tags;

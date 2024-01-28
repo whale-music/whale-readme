@@ -40,6 +40,7 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
                                                 user.getUsername()));
         if (count == 0) {
             user.setLastLoginTime(LocalDateTime.now());
+            user.setStatus(true);
             this.save(user);
         } else {
             throw new BaseException(ResultCode.DUPLICATE_USER_NAME_ERROR);

@@ -96,7 +96,9 @@ public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
         TimedCache<String, Resource> cacheResources = cache.get(type);
         TimedCache<String, String> md5MappingPath = cacheMd5.get(type);
         for (String s : col) {
-            List<File> files = PathUtil.loopFiles(Path.of(config.getHost() + "/" + s), deep, pathname -> true);
+            List<File> files = PathUtil.loopFiles(Path.of(config.getHost() + "/" + s),
+                    deep,
+                    pathname -> config.getScanFilter(type).contains(FileUtil.extName(pathname)));
             for (File file : files) {
                 Resource e = new Resource();
                 e.setName(file.getName());

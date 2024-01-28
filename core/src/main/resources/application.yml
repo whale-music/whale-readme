@@ -125,6 +125,10 @@ pagehelper:
 
 # 对象存储
 save-config:
+  scan-filter:
+    audio: mp3, wav, flac, aac, ogg, wma, m4a
+    pic: jpg, jpeg, png, gif, bmp, tiff, tif, webp, svg, raw
+    video: mp4, avi, mkv, mov, wmv, flv, webm, mpeg, rmvb
   # 保存模式
   save-mode: Local
   # 请求对象地址 (必须)

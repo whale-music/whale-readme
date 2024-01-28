@@ -6,11 +6,14 @@ import lombok.NoArgsConstructor;
 import org.core.common.enums.SaveModeEnum;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
+import org.core.oss.service.impl.alist.enums.ResourceEnum;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +24,9 @@ import java.util.List;
 public class SaveConfig {
     // 默认保存模式
     private SaveModeEnum saveMode;
+    
+    // 扫描过滤文件
+    private ScanFilter scanFilter = new ScanFilter();
     
     // 主机
     private String host;
@@ -55,12 +61,65 @@ public class SaveConfig {
     // 访问密钥(密码)
     private String secretKey;
     
+    public ScanFilter getScanFilter() {
+        return scanFilter;
+    }
+    
     public SaveModeEnum getSaveMode() {
         return saveMode;
     }
     
     public void setSaveMode(SaveModeEnum saveMode) {
         this.saveMode = saveMode;
+    }
+    
+    public void setScanFilter(ScanFilter scanFilter) {
+        this.scanFilter = scanFilter;
+    }
+    
+    public Set<String> getScanFilter(ResourceEnum type) {
+        switch (type.name().toLowerCase()) {
+            case "music", "audio" -> {
+                return this.getScanFilter().getAudio();
+            }
+            case "pic" -> {
+                return this.getScanFilter().getPic();
+            }
+            case "video", "mv" -> {
+                return this.getScanFilter().getVideo();
+            }
+            default -> throw new BaseException(ResultCode.PARAM_IS_BLANK);
+        }
+    }
+    
+    public static class ScanFilter {
+        private Set<String> audio = new HashSet<>();
+        private Set<String> pic = new HashSet<>();
+        private Set<String> video = new HashSet<>();
+        
+        public Set<String> getAudio() {
+            return this.audio;
+        }
+        
+        public void setAudio(Set<String> audio) {
+            this.audio = audio;
+        }
+        
+        public Set<String> getPic() {
+            return this.pic;
+        }
+        
+        public void setPic(Set<String> pic) {
+            this.pic = pic;
+        }
+        
+        public Set<String> getVideo() {
+            return this.video;
+        }
+        
+        public void setVideo(Set<String> video) {
+            this.video = video;
+        }
     }
     
     /**

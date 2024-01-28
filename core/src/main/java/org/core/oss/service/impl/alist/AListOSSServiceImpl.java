@@ -144,6 +144,10 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
                     Set<FsList> list1 = AlistUtil.list(config, fsList.getPath(), refresh, loginJwtCache);
                     linkList.addAll(list1);
                 } else {
+                    // 只添加指定后缀
+                    if (!config.getScanFilter(type).contains(FileUtil.extName(fsList.getName()))) {
+                        continue;
+                    }
                     Resource e = new Resource();
                     e.setName(fsList.getName());
                     e.setPath(fsList.getPath());

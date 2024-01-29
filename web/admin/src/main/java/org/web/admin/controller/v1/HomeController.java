@@ -1,6 +1,7 @@
 package org.web.admin.controller.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
@@ -10,7 +11,6 @@ import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController(AdminConfig.ADMIN + "HomeController")
 @RequestMapping("/admin/home")
 @Slf4j
 public class HomeController {
     
-    @Autowired
-    private HoneApi honeApi;
+    private final HoneApi honeApi;
     
     @GetMapping("/count")
     @Operation(summary = "获取数据库统计")

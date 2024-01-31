@@ -798,6 +798,7 @@ public class MusicFlowApi {
         if (StringUtils.isBlank(req.getMusicName())) {
             throw new BaseException(ResultCode.PARAM_IS_BLANK);
         }
+        req.setUserId(Optional.ofNullable(req.getUserId()).orElse(UserUtil.getUser().getId()));
         // 音乐
         musicService.saveOrUpdate(req);
         // 流派

@@ -4,25 +4,28 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.admin.model.res.PluginTaskRes;
+import org.api.admin.model.res.UsersUploadRes;
+import org.api.admin.utils.LineGraphUtil;
 import org.api.common.service.QukuAPI;
 import org.core.mybatis.iservice.*;
-import org.core.mybatis.model.convert.AlbumConvert;
-import org.core.mybatis.model.convert.ArtistConvert;
-import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
+import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
+import org.core.service.RemoteStorePicService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +38,8 @@ public class HoneApi {
     
     private final TbArtistService artistService;
     
+    private final TbMvInfoService mvInfoService;
+    
     private final TbResourceService musicUrlService;
     
     private final TbPluginTaskService pluginTaskService;
@@ -43,9 +48,15 @@ public class HoneApi {
     
     private final QukuAPI qukuAPI;
     
+    private final TbCollectService tbCollectService;
+    
+    private final AccountService accountService;
+    
     private final RemoteStorageService remoteStorageService;
     
-    public HoneApi(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbPluginTaskService pluginTaskService, TbPluginService pluginService, QukuAPI qukuAPI, RemoteStorageService remoteStorageService) {
+    private final RemoteStorePicService remoteStorePicService;
+    
+    public HoneApi(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbPluginTaskService pluginTaskService, TbPluginService pluginService, QukuAPI qukuAPI, RemoteStorageService remoteStorageService, TbMvInfoService mvInfoService, AccountService accountService, TbCollectService tbCollectService, RemoteStorePicService remoteStorePicService) {
         this.musicService = musicService;
         this.albumService = albumService;
         this.artistService = artistService;
@@ -54,6 +65,10 @@ public class HoneApi {
         this.pluginService = pluginService;
         this.qukuAPI = qukuAPI;
         this.remoteStorageService = remoteStorageService;
+        this.mvInfoService = mvInfoService;
+        this.accountService = accountService;
+        this.tbCollectService = tbCollectService;
+        this.remoteStorePicService = remoteStorePicService;
     }
     
     /**
@@ -91,47 +106,27 @@ public class HoneApi {
         }
     }
     
-    public List<MusicConvert> getMusicTop() {
-        LambdaQueryWrapper<TbMusicPojo> queryWrapper = Wrappers.<TbMusicPojo>lambdaQuery().orderByDesc(TbMusicPojo::getCreateTime);
-        Page<TbMusicPojo> objectPage = new Page<>(0, 15);
-        List<TbMusicPojo> records = musicService.page(objectPage, queryWrapper).getRecords();
-        return qukuAPI.getPicMusicList(records);
-    }
-    
-    public List<AlbumConvert> getAlbumTop() {
-        LambdaQueryWrapper<TbAlbumPojo> wrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                          .isNotNull(TbAlbumPojo::getAlbumName)
-                                                          .orderByDesc(TbAlbumPojo::getCreateTime);
-        Page<TbAlbumPojo> objectPage = new Page<>(1, 15);
-        List<TbAlbumPojo> records = albumService.page(objectPage, wrapper).getRecords();
-        return qukuAPI.getPicAlbumList(records);
-    }
-    
-    public List<ArtistConvert> getArtist() {
-        LambdaQueryWrapper<TbArtistPojo> wrapper = Wrappers.<TbArtistPojo>lambdaQuery()
-                                                           .orderByDesc(TbArtistPojo::getCreateTime);
-        Page<TbArtistPojo> page = artistService.page(new Page<>(0, 15), wrapper);
-        return qukuAPI.getPicArtistList(page.getRecords());
-    }
-    
     public Count getMusicCount() {
         long count = musicService.count();
         // 本月
-        Date date = new Date();
+        Date monthDate = new Date();
         LambdaQueryWrapper<TbMusicPojo> ge = Wrappers.<TbMusicPojo>lambdaQuery()
-                                                     .ge(TbMusicPojo::getCreateTime, date)
-                                                     .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
+                                                     .ge(TbMusicPojo::getCreateTime, monthDate)
+                                                     .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(monthDate, 1));
         long localMonth = musicService.count(ge);
         
         // 上一个月
         LambdaQueryWrapper<TbMusicPojo> last = Wrappers.<TbMusicPojo>lambdaQuery()
-                                                       .ge(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, -2))
-                                                       .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
+                                                       .ge(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(monthDate, -2))
+                                                       .lt(TbMusicPojo::getCreateTime, DateUtil.offsetMonth(monthDate, -1));
         long lastMonth = musicService.count(last);
         
-        Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
-        Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
-        return new Count(count, analysisData, fluctuate);
+        // 最近七天上传数量
+        List<Map<String, Object>> maps = musicService.listMaps(
+                Wrappers.<TbMusicPojo>lambdaQuery()
+                        .between(TbMusicPojo::getCreateTime, LocalDate.now().minusDays(6), LocalDate.now())
+                        .groupBy(TbMusicPojo::getCreateTime));
+        return getCount(count, localMonth, lastMonth, maps);
     }
     
     public Count getAlbumCount() {
@@ -149,9 +144,12 @@ public class HoneApi {
                                             .lt(TbAlbumPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
         long lastMonth = albumService.count(last);
         
-        Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
-        Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
-        return new Count(count, analysisData, fluctuate);
+        // 最近七天上传数量
+        List<Map<String, Object>> maps = albumService.listMaps(
+                Wrappers.<TbAlbumPojo>lambdaQuery()
+                        .between(TbAlbumPojo::getCreateTime, LocalDate.now().minusDays(6), LocalDate.now())
+                        .groupBy(TbAlbumPojo::getCreateTime));
+        return getCount(count, localMonth, lastMonth, maps);
     }
     
     public Count getArtistCount() {
@@ -169,9 +167,44 @@ public class HoneApi {
                                              .lt(TbArtistPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
         long lastMonth = artistService.count(last);
         
+        // 最近七天上传数量
+        List<Map<String, Object>> maps = artistService.listMaps(
+                Wrappers.<TbArtistPojo>lambdaQuery()
+                        .between(TbArtistPojo::getCreateTime, LocalDate.now().minusDays(6), LocalDate.now())
+                        .groupBy(TbArtistPojo::getCreateTime));
+        return getCount(count, localMonth, lastMonth, maps);
+    }
+    
+    public Count getMvCount() {
+        long count = mvInfoService.count();
+        // 本月
+        Date date = new Date();
+        Wrapper<TbMvInfoPojo> ge = Wrappers.<TbMvInfoPojo>lambdaQuery()
+                                           .ge(TbMvInfoPojo::getCreateTime, date)
+                                           .lt(TbMvInfoPojo::getCreateTime, DateUtil.offsetMonth(date, 1));
+        long localMonth = mvInfoService.count(ge);
+        
+        // 上一个月
+        Wrapper<TbMvInfoPojo> last = Wrappers.<TbMvInfoPojo>lambdaQuery()
+                                             .ge(TbMvInfoPojo::getCreateTime, DateUtil.offsetMonth(date, -2))
+                                             .lt(TbMvInfoPojo::getCreateTime, DateUtil.offsetMonth(date, -1));
+        long lastMonth = mvInfoService.count(last);
+        
+        // 最近七天上传数量
+        List<Map<String, Object>> maps = mvInfoService.listMaps(
+                Wrappers.<TbMvInfoPojo>lambdaQuery()
+                        .between(TbMvInfoPojo::getCreateTime, LocalDate.now().minusDays(6), LocalDate.now())
+                        .groupBy(TbMvInfoPojo::getCreateTime));
+        return getCount(count, localMonth, lastMonth, maps);
+    }
+    
+    @NotNull
+    private Count getCount(long count, long localMonth, long lastMonth, List<Map<String, Object>> maps) {
+        List<Integer> integers = LineGraphUtil.calculateTheLineGraph(maps);
+        
         Float analysisData = getAnalysisData(Math.toIntExact(lastMonth), Math.toIntExact(localMonth));
         Boolean fluctuate = analysisData == 0 ? null : analysisData > 0;
-        return new Count(count, analysisData, fluctuate);
+        return new Count(count, analysisData, fluctuate, integers);
     }
     
     public List<MusicStatisticsRes> getMusicStatistics() {
@@ -244,5 +277,36 @@ public class HoneApi {
             res.add(e);
         }
         return res;
+    }
+    
+    public List<UsersUploadRes> getUsersUpload() {
+        List<UsersUploadRes> usersUploadRes = new ArrayList<>();
+        Page<SysUserPojo> page = accountService.page(Page.of(1, 8), Wrappers.<SysUserPojo>lambdaQuery().orderByDesc(SysUserPojo::getCreateTime));
+        List<SysUserPojo> records = page.getRecords();
+        for (SysUserPojo user : records) {
+            UsersUploadRes e = new UsersUploadRes();
+            String userAvatarPicPath = remoteStorePicService.getUserAvatarPicPath(user.getId());
+            String avatarContent = String.format("<img class=\"rounded-full\" width=\"50\" height=\"50\" src=\"%s\" alt=\"%s\">",
+                    userAvatarPicPath,
+                    user.getUsername());
+            e.setAvatarUrl(avatarContent);
+            
+            String userNameContent = String.format("<span class='font-bold'>%s</span>", user.getUsername());
+            e.setUsername(userNameContent);
+            long artistCount = artistService.count(Wrappers.<TbArtistPojo>lambdaQuery().eq(TbArtistPojo::getUserId, user.getId()));
+            e.setArtistCount(artistCount);
+            
+            long albumCount = albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getUserId, user.getId()));
+            e.setAlbumCount(albumCount);
+            
+            long musicCount = musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getUserId, user.getId()));
+            e.setMusicCount(musicCount);
+            
+            long collectCount = tbCollectService.count(Wrappers.<TbCollectPojo>lambdaQuery().eq(TbCollectPojo::getUserId, user.getId()));
+            e.setPlaylistCount(collectCount);
+            
+            usersUploadRes.add(e);
+        }
+        return usersUploadRes;
     }
 }

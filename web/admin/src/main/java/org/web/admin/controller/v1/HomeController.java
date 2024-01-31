@@ -5,11 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
+import org.api.admin.model.res.UsersUploadRes;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
-import org.core.mybatis.model.convert.AlbumConvert;
-import org.core.mybatis.model.convert.ArtistConvert;
-import org.core.mybatis.model.convert.MusicConvert;
 import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,28 +32,18 @@ public class HomeController {
         Count musicCount = honeApi.getMusicCount();
         Count albumCount = honeApi.getAlbumCount();
         Count artistCount = honeApi.getArtistCount();
+        Count mvCount = honeApi.getMvCount();
         HashMap<String, Count> map = new HashMap<>();
         map.put("music", musicCount);
         map.put("album", albumCount);
         map.put("artist", artistCount);
+        map.put("mv", mvCount);
         return R.success(map);
     }
     
-    @GetMapping("/musicTop")
-    public R getMusicTop() {
-        List<MusicConvert> hone = honeApi.getMusicTop();
-        return R.success(hone);
-    }
-    
-    @GetMapping("/albumTop")
-    public R getAlbumTop() {
-        List<AlbumConvert> hone = honeApi.getAlbumTop();
-        return R.success(hone);
-    }
-    
-    @GetMapping("/artistTop")
-    public R getArtist() {
-        List<ArtistConvert> hone = honeApi.getArtist();
+    @GetMapping("/users/upload")
+    public R getUsersUpload() {
+        List<UsersUploadRes> hone = honeApi.getUsersUpload();
         return R.success(hone);
     }
     

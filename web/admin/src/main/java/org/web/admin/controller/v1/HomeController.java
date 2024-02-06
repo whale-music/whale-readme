@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
+import org.api.admin.model.res.LastMusicRes;
 import org.api.admin.model.res.UsersUploadRes;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
@@ -39,6 +40,13 @@ public class HomeController {
         map.put("artist", artistCount);
         map.put("mv", mvCount);
         return R.success(map);
+    }
+    
+    @GetMapping("/last/music")
+    @Operation(summary = "获取数据库统计")
+    public R getLastMusic() {
+        List<LastMusicRes> res = honeApi.getLastMusic();
+        return R.success(res);
     }
     
     @GetMapping("/users/upload")

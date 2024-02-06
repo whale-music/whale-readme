@@ -1,6 +1,7 @@
 package org.api.admin.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,11 +10,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.convert.Count;
+import org.api.admin.model.res.LastMusicRes;
 import org.api.admin.model.res.MusicStatisticsRes;
 import org.api.admin.model.res.PluginTaskRes;
 import org.api.admin.model.res.UsersUploadRes;
 import org.api.admin.utils.LineGraphUtil;
 import org.api.common.service.QukuAPI;
+import org.core.common.constant.HistoryConstant;
+import org.core.common.constant.PlayListTypeConstant;
+import org.core.jpa.entity.TbCollectEntity;
+import org.core.jpa.entity.TbCollectMusicEntity;
+import org.core.jpa.entity.TbMusicEntity;
+import org.core.jpa.service.TbCollectMusicEntityService;
+import org.core.jpa.service.TbMusicEntityService;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
@@ -21,6 +30,7 @@ import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,6 +43,8 @@ import java.util.stream.Collectors;
 public class HoneApi {
     
     private final TbMusicService musicService;
+    @Autowired
+    private TbMusicEntityService tbMusicEntityService;
     
     private final TbAlbumService albumService;
     
@@ -55,6 +67,15 @@ public class HoneApi {
     private final RemoteStorageService remoteStorageService;
     
     private final RemoteStorePicService remoteStorePicService;
+    
+    @Autowired
+    private TbHistoryService tbHistoryService;
+    
+    @Autowired
+    private TbCollectMusicService tbCollectMusicService;
+    
+    @Autowired
+    private TbCollectMusicEntityService tbCollectMusicEntityService;
     
     public HoneApi(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbPluginTaskService pluginTaskService, TbPluginService pluginService, QukuAPI qukuAPI, RemoteStorageService remoteStorageService, TbMvInfoService mvInfoService, AccountService accountService, TbCollectService tbCollectService, RemoteStorePicService remoteStorePicService) {
         this.musicService = musicService;
@@ -233,7 +254,7 @@ public class HoneApi {
         e11.setValue(musicList.size() - noSoundSourceCount);
         e11.setName("noSoundSourceCount");
         res.add(e11);
-    
+        
         // 失效音源
         // 查询音乐地址数据在音乐存储地址中是否存在
         long invalidMusicOriginCount = musicUrlList.parallelStream().filter(tbMusicUrlPojo1 ->
@@ -253,7 +274,7 @@ public class HoneApi {
         e2.setValue(musicMD5.size() - discardMusicOriginCount);
         e2.setName("discardMusicOrigin");
         res.add(e2);
-    
+        
         return res;
     }
     
@@ -308,5 +329,61 @@ public class HoneApi {
             usersUploadRes.add(e);
         }
         return usersUploadRes;
+    }
+    
+    public List<LastMusicRes> getLastMusic() {
+        ArrayList<LastMusicRes> res = new ArrayList<>();
+        Page<TbHistoryPojo> page = tbHistoryService.page(Page.of(1, 10),
+                Wrappers.<TbHistoryPojo>lambdaQuery().eq(TbHistoryPojo::getType, HistoryConstant.MUSIC).orderByDesc(TbHistoryPojo::getCount));
+        List<TbHistoryPojo> records = page.getRecords();
+        
+        Map<Long, Integer> playCountMap = records.parallelStream()
+                                                 .collect(Collectors.toMap(TbHistoryPojo::getMiddleId, TbHistoryPojo::getCount, Integer::sum));
+        List<Long> list = records.parallelStream().map(TbHistoryPojo::getMiddleId).toList();
+        
+        Set<TbMusicEntity> musicSet = tbMusicEntityService.list(list);
+        
+        List<TbCollectMusicEntity> tbCollectMusicEntities = tbCollectMusicEntityService.listByMusicIds(list);
+        Map<Long, List<TbCollectMusicEntity>> map = tbCollectMusicEntities.parallelStream()
+                                                                          .collect(Collectors.toMap(TbCollectMusicEntity::getMusicId,
+                                                                                  ListUtil::toList, (objects, objects2) -> {
+                                                                                      objects2.addAll(objects);
+                                                                                      return objects2;
+                                                                                  }));
+        for (TbMusicEntity tbMusicPojo : musicSet) {
+            LastMusicRes e = new LastMusicRes();
+            e.setMusicId(tbMusicPojo.getId());
+            e.setMusicName(tbMusicPojo.getMusicName());
+            e.setMusicNameAlias(tbMusicPojo.getAliasName());
+            e.setMusicPic(remoteStorePicService.getMusicPicUrl(tbMusicPojo.getId()));
+            
+            List<LastMusicRes.ArtistNameId> list1 = tbMusicPojo.getTbMusicArtistsById()
+                                                               .parallelStream()
+                                                               .map(s -> new LastMusicRes.ArtistNameId(s.getTbArtistByArtistId().getId(),
+                                                                       s.getTbArtistByArtistId()
+                                                                        .getArtistName())).toList();
+            e.setArtists(list1);
+            e.setCreateDate(tbMusicPojo.getCreateTime().toLocalDateTime().toLocalDate());
+            
+            // 计算音乐所有用户喜欢, 收藏数
+            List<TbCollectMusicEntity> tbCollectMusicEntities1 = map.get(tbMusicPojo.getId());
+            int loveCount = 0;
+            int ordinaryCount = 0;
+            for (TbCollectMusicEntity tbCollectMusicEntity : tbCollectMusicEntities1) {
+                TbCollectEntity tbCollectByCollectId = tbCollectMusicEntity.getTbCollectByCollectId();
+                if (Objects.equals(tbCollectByCollectId.getType(), PlayListTypeConstant.LIKE)) {
+                    loveCount++;
+                }
+                if (Objects.equals(tbCollectByCollectId.getType(), PlayListTypeConstant.ORDINARY)) {
+                    ordinaryCount++;
+                }
+            }
+            e.setLoveTheData(loveCount);
+            e.setNumberOfFavorites(ordinaryCount);
+            
+            e.setPlayCount(playCountMap.get(tbMusicPojo.getId()));
+            res.add(e);
+        }
+        return res;
     }
 }

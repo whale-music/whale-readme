@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -56,5 +57,9 @@ public class TbCollectMusicEntityService {
     private TbCollectMusicEntity requireOne(Long id) {
         return tbCollectMusicEntityRepository.findById(id)
                                              .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
+    }
+    
+    public List<TbCollectMusicEntity> listByMusicIds(List<Long> list) {
+        return tbCollectMusicEntityRepository.findByMusicIdIn(list);
     }
 }

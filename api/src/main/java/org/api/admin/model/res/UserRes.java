@@ -1,23 +1,28 @@
 package org.api.admin.model.res;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.mybatis.pojo.SysUserPojo;
 
 import java.util.Collection;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class UserRes extends SysUserPojo {
-    @ApiModelProperty("token")
-    private String token;
+@AllArgsConstructor
+public class UserRes {
+    @ApiModelProperty("用户名")
+    private String username;
     
-    @ApiModelProperty("用户角色")
+    @ApiModelProperty("token")
+    private String accessToken;
+    
+    @ApiModelProperty("用于调用刷新`accessToken`的接口时所需的`token`")
+    private String refreshToken;
+    
+    @ApiModelProperty("当前登陆用户的角色")
     private Collection<String> roles;
     
-    @ApiModelProperty("token过期时间")
-    private Long expiryTime;
+    @ApiModelProperty("`accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'）")
+    private Long expires;
 }

@@ -14,7 +14,11 @@ import java.util.Date;
 import java.util.Objects;
 
 public class TokenUtil {
-    private static final String INFO = "info";
+    private static final String USER_INFO = "info";
+    
+    private static final String REFRESH = "refresh";
+    
+    private static final Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
     
     private TokenUtil() {
     }
@@ -26,18 +30,32 @@ public class TokenUtil {
      * @param user   保存用户
      * @return 返回token
      */
-    public static String sign(String userId, SysUserPojo user) {
-        Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
-        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
+    public static String signToken(String userId, SysUserPojo user) {
+        return sign(new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+    }
+    
+    public static String signToken(Date expires, String userId, SysUserPojo user) {
+        return sign(expires, userId, user, USER_INFO);
+    }
+    
+    public static String refreshSignToken(String userId, SysUserPojo user) {
+        return sign(new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, REFRESH);
+    }
+    
+    public static String refreshSignToken(Date expires, String userId, SysUserPojo user) {
+        return sign(expires, userId, user, REFRESH);
+    }
+    
+    private static String sign(Date expires, String userId, SysUserPojo user, String info) {
         String uuid = IdUtil.fastUUID();
         UserCacheServiceUtils.setUserCache(uuid, user);
         return JWT.create()
                   // 将userId保存到token里面
                   .withAudience(userId)
                   // 存放自定义数据
-                  .withClaim(INFO, uuid)
+                  .withClaim(info, uuid)
                   // 根据设定的时间过期
-                  .withExpiresAt(date)
+                  .withExpiresAt(expires)
                   // token的密钥
                   .sign(algorithm);
     }
@@ -62,12 +80,27 @@ public class TokenUtil {
      * @param token token
      * @return 返回自定义数据
      */
-    public static SysUserPojo getInfo(String token) {
+    public static SysUserPojo getUserInfo(String token) {
+        return UserCacheServiceUtils.getUserCache(getInfo(token, USER_INFO));
+    }
+    
+    public static SysUserPojo getRefreshUserInfo(String token) {
+        return UserCacheServiceUtils.getUserCache(getInfo(token, REFRESH));
+    }
+    
+    private static String getInfo(String token, String name) {
         try {
-            return UserCacheServiceUtils.getUserCache(JWT.decode(token).getClaim(INFO).asString());
+            return JWT.decode(token).getClaim(name).asString();
         } catch (JWTDecodeException e) {
             throw new BaseException(e.getMessage());
         }
+    }
+    
+    /**
+     * 判断 jwt 是否过期
+     */
+    public static void isJwtExpired(String token) {
+        JWT.require(algorithm).acceptExpiresAt(JwtConfig.getExpireTime()).build().verify(token);
     }
     
     /**
@@ -76,10 +109,9 @@ public class TokenUtil {
      * @param token token 数据
      */
     public static void checkSign(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
         JWTVerifier verifier = JWT.require(algorithm).build();
         verifier.verify(token);
-        if (Objects.isNull(getInfo(token))) {
+        if (Objects.isNull(getUserInfo(token))) {
             throw new BaseException(ResultCode.COOKIE_INVALID);
         }
     }

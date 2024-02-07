@@ -11,10 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.PageUserReq;
 import org.api.admin.model.req.SaveOrUpdateUserReq;
-import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.PageUserRes;
 import org.api.admin.model.res.SaveOrUpdateUserRes;
-import org.api.admin.model.res.UserRes;
 import org.api.admin.utils.MyPageUtil;
 import org.core.common.constant.RoleConstant;
 import org.core.common.exception.BaseException;
@@ -27,7 +25,6 @@ import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.ExceptionUtil;
-import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -73,18 +70,6 @@ public class UserApi {
         this.remoteStorePicService = remoteStorePicService;
     }
     
-    public void createAccount(UserReq req) {
-        accountService.createAccount(req);
-    }
-    
-    public UserRes login(String phone, String password) {
-        SysUserPojo userPojo = accountService.login(phone, password);
-        String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
-        UserRes userRes = new UserRes();
-        BeanUtils.copyProperties(userPojo, userRes);
-        userRes.setToken(sign);
-        return userRes;
-    }
     
     public UserConvert getUserInfo(Long id) {
         SysUserPojo byId = accountService.getById(id);

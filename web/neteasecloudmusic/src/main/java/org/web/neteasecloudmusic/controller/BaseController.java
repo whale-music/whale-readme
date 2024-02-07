@@ -54,7 +54,7 @@ public class BaseController {
     
     @NotNull
     protected NeteaseResult getNeteaseResult(HttpServletResponse response, SysUserPojo userPojo) {
-        String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
+        String sign = TokenUtil.signToken(userPojo.getUsername(), userPojo);
         // 写入用户信息到cookie
         Cookie cookie = new Cookie(CookieConstant.COOKIE_NAME_MUSIC_U, sign);
         cookie.setPath("/");

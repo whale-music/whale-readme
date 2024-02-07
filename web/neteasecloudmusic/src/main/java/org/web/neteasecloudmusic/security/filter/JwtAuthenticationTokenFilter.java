@@ -57,7 +57,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 String token = first.get();
                 TokenUtil.checkSign(token);
                 // 校验token, 并获取信息
-                SysUserPojo userPojo = TokenUtil.getInfo(token);
+                SysUserPojo userPojo = TokenUtil.getUserInfo(token);
                 if (Objects.nonNull(userPojo)) {
                     UserUtil.setUser(userPojo);
                     UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,

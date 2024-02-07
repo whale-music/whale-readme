@@ -184,7 +184,7 @@ public class LoginController extends BaseController {
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
-        String sign = TokenUtil.sign(userPojo.getUsername(), userPojo);
+        String sign = TokenUtil.signToken(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
         
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);

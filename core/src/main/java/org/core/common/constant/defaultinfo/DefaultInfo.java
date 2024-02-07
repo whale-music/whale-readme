@@ -4,7 +4,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.core.utils.ServletUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +31,6 @@ public class DefaultInfo implements Serializable {
         private EnumNameType album = EnumNameType.DEFAULT;
     }
     
-    @Setter
     public static class Pic implements Serializable {
         public static final long serialVersionUID = 1902222041950251207L;
         
@@ -77,6 +75,34 @@ public class DefaultInfo implements Serializable {
         
         public String getUserBackgroundPic() {
             return getPic(userBackgroundPic);
+        }
+        
+        public void setDefaultPic(String defaultPic) {
+            this.defaultPic = defaultPic;
+        }
+        
+        public void setMusicPic(String musicPic) {
+            this.musicPic = musicPic;
+        }
+        
+        public void setPlayListPic(String playListPic) {
+            this.playListPic = playListPic;
+        }
+        
+        public void setAlbumPic(String albumPic) {
+            this.albumPic = albumPic;
+        }
+        
+        public void setArtistPic(String artistPic) {
+            this.artistPic = artistPic;
+        }
+        
+        public void setUserAvatarPic(String userAvatarPic) {
+            this.userAvatarPic = userAvatarPic;
+        }
+        
+        public void setUserBackgroundPic(String userBackgroundPic) {
+            this.userBackgroundPic = userBackgroundPic;
         }
     }
     

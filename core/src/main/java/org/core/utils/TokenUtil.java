@@ -6,12 +6,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
 import org.core.mybatis.pojo.SysUserPojo;
 
 import java.util.Date;
-import java.util.Objects;
 
 public class TokenUtil {
     private static final String USER_INFO = "info";
@@ -39,7 +37,7 @@ public class TokenUtil {
     }
     
     public static String refreshSignToken(String userId, SysUserPojo user) {
-        return sign(new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, REFRESH);
+        return sign(new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime()), userId, user, REFRESH);
     }
     
     public static String refreshSignToken(Date expires, String userId, SysUserPojo user) {
@@ -111,9 +109,6 @@ public class TokenUtil {
     public static void checkSign(String token) {
         JWTVerifier verifier = JWT.require(algorithm).build();
         verifier.verify(token);
-        if (Objects.isNull(getUserInfo(token))) {
-            throw new BaseException(ResultCode.COOKIE_INVALID);
-        }
     }
 }
 

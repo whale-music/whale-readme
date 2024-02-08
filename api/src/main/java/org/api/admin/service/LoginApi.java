@@ -26,7 +26,7 @@ public class LoginApi {
         SysUserPojo userPojo = accountService.login(phone, password);
         String sign = TokenUtil.signToken(userPojo.getUsername(), userPojo);
         
-        Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        Date date = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
         String refreshToken = TokenUtil.refreshSignToken(date, userPojo.getUsername(), userPojo);
         
         return new UserRes(userPojo.getUsername(), sign, refreshToken, RoleUtil.getRoleNames(userPojo.getRoleName()), date.getTime());
@@ -41,7 +41,7 @@ public class LoginApi {
         TokenUtil.checkSign(refresh);
         
         SysUserPojo userInfo = TokenUtil.getRefreshUserInfo(refresh);
-        Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        Date date = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
         String token = TokenUtil.signToken(date, userInfo.getUsername(), userInfo);
         String newRefresh = TokenUtil.refreshSignToken(date, userInfo.getUsername(), userInfo);
         

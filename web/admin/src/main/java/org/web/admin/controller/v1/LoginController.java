@@ -59,6 +59,7 @@ public class LoginController {
         return R.success();
     }
     
+    @AnonymousAccess
     @PostMapping("/refreshToken")
     public R refreshUserToken(String refresh) {
         RefreshTokenRes res = loginApi.refreshUserToken(refresh);

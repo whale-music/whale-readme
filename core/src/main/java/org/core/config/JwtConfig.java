@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Configuration;
 public class JwtConfig {
     
     private static String seedKey = "";
-    
+    //  单位毫秒
     private static Long expireTime = 0L;
+    private static Long refreshExpireTime = 0L;
     
     
     public static String getSeedKey() {
@@ -27,8 +28,20 @@ public class JwtConfig {
         return expireTime;
     }
     
+    public static Long getRefreshExpireTime() {
+        return refreshExpireTime;
+    }
+    
     /**
-     * 设置
+     * 设置refresh token时间戳
+     */
+    @Value("${jwt-config.refresh-key}")
+    public void setRefreshExpireTime(Long expireTime) {
+        JwtConfig.refreshExpireTime = expireTime;
+    }
+    
+    /**
+     * 设置token时间戳
      */
     @Value("${jwt-config.expire-time}")
     public void setExpireTime(Long expireTime) {

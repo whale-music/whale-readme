@@ -56,7 +56,9 @@ public enum ResultCode implements BaseErrorInfoInterface {
     // 存储路径不存在
     STORAGE_PATH_DOES_NOT_EXIST("10018", "error.messages.storage_path_does_not_exist"),
     // 存储文件不存在
-    STORAGE_FILE_DOES_NOT_EXIST_ERROR("10018", "error.messages.storage_file_does_not_exist"),
+    STORAGE_FILE_DOES_NOT_EXIST_ERROR("10019", "error.messages.storage_file_does_not_exist"),
+    // Token已过期
+    TOKEN_EXPIRED_ERROR("10020", "error.messages.token_expired"),
     
     
     /* 用户错误：20001-29999*/

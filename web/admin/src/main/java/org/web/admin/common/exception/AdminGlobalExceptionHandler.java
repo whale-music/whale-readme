@@ -1,5 +1,6 @@
 package org.web.admin.common.exception;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.DebugConfig;
@@ -68,6 +69,17 @@ public class AdminGlobalExceptionHandler {
         log.error("SQL运行错误原因是:", e);
         Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(ResultCode.SQL_RUN_ERROR));
+    }
+    
+    /**
+     * token 过期 异常
+     */
+    @ExceptionHandler(value = TokenExpiredException.class)
+    @ResponseBody
+    public ResponseEntity<R> exceptionHandler(TokenExpiredException e) {
+        log.debug("token 已过期:", e);
+        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        return ResponseEntity.ok(R.error(ResultCode.TOKEN_EXPIRED_ERROR));
     }
     
     /**

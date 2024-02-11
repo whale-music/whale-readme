@@ -95,7 +95,7 @@ public class InteractivePluginTest implements ComboSearchPlugin {
                 .addHeader("x-requested-with", "XMLHttpRequest")
                 .addHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
                 .build();
-        try (Response response = client.newCall(request).execute();){
+        try (Response response = client.newCall(request).execute()){
             final String body = UnicodeUtil.toString(Objects.requireNonNull(response.body()).string());
             JSONObject jsonObject = JSON.parseObject(body);
             Integer code = MapUtil.get(jsonObject, "code", Integer.class);

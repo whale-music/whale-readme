@@ -1,9 +1,6 @@
 package org.web.admin.security;
 
-import org.core.config.WebConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.web.admin.security.config.AdminPermitAllUrlProperties;
 import org.web.admin.security.filter.JwtAuthenticationTokenFilter;
 import org.web.admin.security.handle.AnonymousAuthenticationEntryPoint;
@@ -28,27 +24,27 @@ public class SecurityConfig {
     /**
      * 匿名用户访问异常
      */
-    @Autowired
-    private AnonymousAuthenticationEntryPoint authenticationEntryPoint;
+    private final AnonymousAuthenticationEntryPoint authenticationEntryPoint;
     
     /**
      * 访问token认证
      */
-    @Autowired
-    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     
-    @Autowired
-    private AdminPermitAllUrlProperties adminPermitAllUrlProperties;
+    /**
+     * 获取匿名访问的url
+     */
+    private final AdminPermitAllUrlProperties adminPermitAllUrlProperties;
     
-    @Autowired
-    @Lazy
-    private RequestMappingHandlerMapping mapping;
-    
+    public SecurityConfig(AnonymousAuthenticationEntryPoint authenticationEntryPoint, JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, AdminPermitAllUrlProperties adminPermitAllUrlProperties) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.adminPermitAllUrlProperties = adminPermitAllUrlProperties;
+    }
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        Set<String> passUrls = adminPermitAllUrlProperties.getRequestMappingUrls(mapping);
-        passUrls.addAll(WebConfig.getPublicList());
+        Set<String> passUrls = adminPermitAllUrlProperties.getUrls();
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它

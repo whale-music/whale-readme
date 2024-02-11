@@ -1,6 +1,7 @@
 package org.starter;
 
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.UnicodeUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
@@ -70,8 +71,8 @@ public class StartSpringBoot {
         if (Boolean.TRUE.equals(DebugConfig.getDebug())) {
             log.info("\n" + sw.prettyPrint(TimeUnit.MILLISECONDS));
         }
-        File file = ResourceUtils.getFile("classpath:start_banner");
-        log.info(UnicodeUtil.toString(FileUtils.readFileToString(file, StandardCharsets.UTF_8)));
+        String startBanner = ResourceUtil.readUtf8Str("start_banner");
+        log.info(UnicodeUtil.toString(startBanner));
     }
     
     

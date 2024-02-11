@@ -137,7 +137,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.20</version>
+            <version>5.8.25</version>
         </dependency>
 
         <!--生成文档-->
@@ -185,13 +185,6 @@
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
             <version>3.15.6.RELEASE</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java -->
-        <dependency>
-            <groupId>com.mashape.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>1.4.9</version>
         </dependency>
 
         <!-- HTTP -->

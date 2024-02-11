@@ -6,7 +6,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.UnicodeUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.api.config.ApplicationStartup;
 import org.core.common.properties.DebugConfig;
 import org.springframework.boot.WebApplicationType;
@@ -23,23 +22,18 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-// 启用Hutool Spring
 @EnableSpringUtil
 @EntityScan(basePackages = "org.core.jpa.entity")
 @EnableJpaRepositories(basePackages = "org.core.jpa.repository")
-// @SpringBootApplication(scanBasePackages = {"org.core", "org.api", "org.oss"}, excludeName = "org.web", exclude = SecurityAutoConfiguration.class)
 @SpringBootApplication(scanBasePackages = "org.core")
 @EnableScheduling // 开启定时任务
 @Slf4j

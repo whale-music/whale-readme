@@ -10,8 +10,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
+import okhttp3.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.TbOriginPojo;
@@ -22,6 +21,7 @@ import org.plugin.service.impl.PluginPackage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class InteractivePluginTest implements ComboSearchPlugin {
     public final static String FILTER = "filter";
@@ -68,36 +68,35 @@ public class InteractivePluginTest implements ComboSearchPlugin {
      */
     @Override
     public List<PluginLabelValue> search(List<PluginLabelValue> params, String name) {
-        int timeout = 60 * 60 * 10000;
-        Unirest.setTimeouts(timeout, timeout);
-        try {
-            HttpResponse<String> response = Unirest.post("https://music.liuzhijin.cn/")
-                                                   .header("authority", "music.liuzhijin.cn")
-                                                   .header("accept", "application/json, text/javascript, */*; q=0.01")
-                                                   .header("accept-language", "zh-CN,zh;q=0.9,en;q=0.8")
-                                                   .header("origin", "https://music.liuzhijin.cn")
-                                                   .header("referer", "https://music.liuzhijin.cn/?name=%E6%9C%89%E4%BD%95%E4%B8%8D%E5%8F%AF&type=netease")
-                                                   .header("sec-ch-ua", "\"Chromium\";v=\"112\", \"Google Chrome\";v=\"112\", \"Not:A-Brand\";v=\"99\"")
-                                                   .header("sec-ch-ua-mobile", "?0")
-                                                   .header("sec-ch-ua-platform", "\"Windows\"")
-                                                   .header("sec-fetch-dest", "empty")
-                                                   .header("sec-fetch-mode", "cors")
-                                                   .header("sec-fetch-site", "same-origin")
-                                                   .header("user-agent",
-                                                           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36")
-                                                   .header("x-requested-with", "XMLHttpRequest")
-                                                   .header("Cookie",
-                                                           "Hm_lvt_50027a9c88cdde04a70f5272a88a10fa=1680694423,1682143355,1683131056; Hm_lpvt_50027a9c88cdde04a70f5272a88a10fa=1683131079")
-                                                   .header("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
-                                                   .field("input", name)
-                                                   .field("filter", getValue(params, FILTER))
-                                                   .field("type", getValue(params, TYPE))
-                                                   .field("page", getValue(params, PAGE))
-                                                   .asString();
-            
-            
-            String body = response.getBody();
-            body = UnicodeUtil.toString(body);
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                                                .build();
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8");
+        String context = String.format("input=%s&filter=%s&type=%s&page=%s",
+                name,
+                getValue(params, FILTER),
+                getValue(params, TYPE),
+                getValue(params, PAGE));
+        RequestBody reqBody = RequestBody.create(context, mediaType);
+        Request request = new Request.Builder()
+                .url("https://music.liuzhijin.cn/")
+                .post(reqBody)
+                .addHeader("authority", "music.liuzhijin.cn")
+                .addHeader("accept", "application/json, text/javascript, */*; q=0.01")
+                .addHeader("accept-language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
+                .addHeader("origin", "https://music.liuzhijin.cn")
+                .addHeader("referer", "https://music.liuzhijin.cn/?name=%E6%8C%BD%E7%A7%8B%E6%80%9D&type=netease")
+                .addHeader("sec-ch-ua", "\"Not A(Brand\";v=\"99\", \"Microsoft Edge\";v=\"121\", \"Chromium\";v=\"121\"")
+                .addHeader("sec-ch-ua-mobile", "?0")
+                .addHeader("sec-ch-ua-platform", "\"Windows\"")
+                .addHeader("sec-fetch-dest", "empty")
+                .addHeader("sec-fetch-mode", "cors")
+                .addHeader("sec-fetch-site", "same-origin")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0")
+                .addHeader("x-requested-with", "XMLHttpRequest")
+                .addHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .build();
+        try (Response response = client.newCall(request).execute();){
+            final String body = UnicodeUtil.toString(Objects.requireNonNull(response.body()).string());
             JSONObject jsonObject = JSON.parseObject(body);
             Integer code = MapUtil.get(jsonObject, "code", Integer.class);
             if (code == null || code != 200) {

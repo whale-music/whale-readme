@@ -60,4 +60,9 @@ public class AdminPermitAllUrlProperties implements ApplicationContextInitialize
             });
         });
     }
+    
+    
+    public String[] getArrayUrls() {
+        return urls.toArray(new String[]{});
+    }
 }

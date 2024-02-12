@@ -1,9 +1,7 @@
 package org.web.neteasecloudmusic.security;
 
-import org.core.config.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,12 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.web.neteasecloudmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
 import org.web.neteasecloudmusic.security.filter.JwtAuthenticationTokenFilter;
 import org.web.neteasecloudmusic.security.handle.AnonymousAuthenticationEntryPoint;
-
-import java.util.Set;
 
 @Component
 public class SecurityConfig {
@@ -37,18 +32,16 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     
+    /**
+     * 获取匿名访问的url
+     */
     @Autowired
     private NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties;
     
-    @Autowired
-    @Lazy
-    private RequestMappingHandlerMapping mapping;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        Set<String> passUrls = permitAllUrlProperties.getRequestMappingUrls(mapping);
-        // 放行本地资源
-        passUrls.addAll(WebConfig.getPublicList());
+        String[] passUrls = permitAllUrlProperties.getArrayUrls();
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它
@@ -57,7 +50,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         // 登录放行
-                        .requestMatchers(passUrls.toArray(new String[]{})).permitAll()
+                        .requestMatchers(passUrls).permitAll()
                         // 忽略静态资源
                         // 其他的所有都需要认证
                         .anyRequest().authenticated());

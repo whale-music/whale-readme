@@ -16,8 +16,6 @@ import org.web.admin.security.config.AdminPermitAllUrlProperties;
 import org.web.admin.security.filter.JwtAuthenticationTokenFilter;
 import org.web.admin.security.handle.AnonymousAuthenticationEntryPoint;
 
-import java.util.Set;
-
 @Component
 public class SecurityConfig {
     
@@ -44,7 +42,7 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        Set<String> passUrls = adminPermitAllUrlProperties.getUrls();
+        String[] passUrls = adminPermitAllUrlProperties.getArrayUrls();
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它
@@ -53,7 +51,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         // 登录放行
-                        .requestMatchers(passUrls.toArray(new String[]{})).permitAll()
+                        .requestMatchers(passUrls).permitAll()
                         // 忽略静态资源
                         .requestMatchers(
                                 "/",

@@ -1,6 +1,6 @@
 <h1 align="center">Whale</h1>
 <div align="center">
-    <a href="https://alist.nn.ci">
+    <a href="">
         <img height="100px" alt="logo" src="./docs/img/logo.svg" />
     </a>
 </div>
@@ -38,8 +38,6 @@ java -jar whale.jar
 
 ## Docker
 
-### CLI
-
 pull
 
 ```bash
@@ -52,27 +50,17 @@ run
 docker run xxx
 ```
 
-### docker-compose
-
-```yaml
-
-```
-
-```bash
-docker-compose up -d
-```
-
 # Build
 
 clone
 
 ```bash
-git clone https://github.com/
+git clone https://github.com/whale-music/whale
 cd whale
 ```
-
+maven build
 ```bash
-mvn clean package
+mvn clean package -DskipTests
 ```
 
 

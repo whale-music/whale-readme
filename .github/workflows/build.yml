@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: WhaleMusic
-          path: whale-music-*.jar
+          path: starter/target/whale-music-*.jar

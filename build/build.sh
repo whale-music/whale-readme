@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MIRROR=https://ghproxy.com/
+# MIRROR=https://ghproxy.com/
 WEB_URL_PATH=${MIRROR}https://github.com/whale-music/whale-music-web/releases/latest/download/dist.tar.gz
 
 # 获取脚本所在目录的绝对路径

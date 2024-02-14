@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # MIRROR=https://ghproxy.com/
-WEB_URL_PATH=${MIRROR}https://github.com/whale-music/whale-music-web/releases/latest/download/dist.tar.gz
+WEB_URL_PATH="${MIRROR}https://github.com/whale-music/whale-music-web/releases/latest/download/dist.tar.gz"
 
 # 获取脚本所在目录的绝对路径
 SCRIPT_PATH=$(readlink -f "$0")
@@ -18,7 +18,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH=$MAVEN_HOME/bin:$PATH
 
 # Download web front-end projects
-if ! curl -fsSLO $WEB_URL_PATH; then
+if ! curl -fsSLO "$WEB_URL_PATH"; then
   echo "\033[31mDownload failed\033[0m"
   exit 1
 fi

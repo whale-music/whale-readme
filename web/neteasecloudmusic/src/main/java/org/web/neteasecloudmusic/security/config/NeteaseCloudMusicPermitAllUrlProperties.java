@@ -5,8 +5,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.RegExUtils;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.config.WebConfig;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -22,22 +20,15 @@ import java.util.regex.Pattern;
 @Setter
 @Getter
 @Configuration
-public class NeteaseCloudMusicPermitAllUrlProperties implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class NeteaseCloudMusicPermitAllUrlProperties  {
     private final static String asterisk = "*";
     private final static Pattern pattern = Pattern.compile("\\{(.*?)}");
     
     private Set<String> urls = new HashSet<>(WebConfig.getPublicList());
     
-    /**
-     * 获取匿名方法注解
-     */
-    @Override
-    public void initialize(ConfigurableApplicationContext applicationContext) {
-        // 必须用这种方式来获取org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-        // 如果用icon注入方式否则会导致Servlet初始化失败
-        RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
-        
-        Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
+    
+    public String[] getArrayUrls(RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
         map.keySet().forEach(info -> {
             HandlerMethod handlerMethod = map.get(info);
             
@@ -54,9 +45,7 @@ public class NeteaseCloudMusicPermitAllUrlProperties implements ApplicationConte
                 }
             });
         });
-    }
-    
-    public String[] getArrayUrls() {
+        
         return urls.toArray(new String[]{});
     }
 }

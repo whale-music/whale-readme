@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.web.admin.security.config.AdminPermitAllUrlProperties;
 import org.web.admin.security.filter.JwtAuthenticationTokenFilter;
 import org.web.admin.security.handle.AnonymousAuthenticationEntryPoint;
@@ -40,9 +41,16 @@ public class SecurityConfig {
         this.adminPermitAllUrlProperties = adminPermitAllUrlProperties;
     }
     
+    /**
+     *
+     * @param http security config
+     * @param requestMappingHandlerMapping 只能注入该类型和名称, 不能改变. 也只能在这注入
+     * @return security config
+     * @throws Exception 异常
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String[] passUrls = adminPermitAllUrlProperties.getArrayUrls();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, RequestMappingHandlerMapping requestMappingHandlerMapping) throws Exception {
+        String[] passUrls = adminPermitAllUrlProperties.getArrayUrls(requestMappingHandlerMapping);
         
         http.csrf(AbstractHttpConfigurer::disable);
         // 将我们的JWT filter添加到UsernamePasswordAuthenticationFilter前面，因为这个Filter是authentication开始的filter，我们要早于它

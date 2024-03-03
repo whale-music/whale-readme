@@ -11,6 +11,9 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRes {
+    @ApiModelProperty("id")
+    private Long id;
+    
     @ApiModelProperty("用户名")
     private String username;
     

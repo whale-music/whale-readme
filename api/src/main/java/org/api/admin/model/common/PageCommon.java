@@ -21,4 +21,15 @@ public class PageCommon implements Serializable {
     
     @ApiModelProperty("总页数")
     private Integer total;
+    
+    public static PageCommon of(Integer pageIndex, Integer pageNum, Integer total) {
+        return new PageCommon(pageIndex, pageNum, total);
+    }
+    
+    public static PageCommon of(Integer pageIndex, Integer pageNum) {
+        PageCommon common = new PageCommon();
+        common.setPageIndex(pageIndex);
+        common.setPageNum(pageNum);
+        return common;
+    }
 }

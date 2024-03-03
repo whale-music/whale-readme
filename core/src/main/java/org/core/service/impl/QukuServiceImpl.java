@@ -109,7 +109,7 @@ public class QukuServiceImpl implements QukuService {
         }));
     }
     
-    private static List<ArtistConvert> getArtistConvertList(List<TbArtistPojo> tbArtistPojos, Map<Long, String> picUrl) {
+    public List<ArtistConvert> getArtistConvertList(List<TbArtistPojo> tbArtistPojos, Map<Long, String> picUrl) {
         return tbArtistPojos.parallelStream().map(tbArtistPojo -> {
             ArtistConvert convert = new ArtistConvert();
             BeanUtils.copyProperties(tbArtistPojo, convert);
@@ -118,7 +118,7 @@ public class QukuServiceImpl implements QukuService {
         }).toList();
     }
     
-    private static List<MusicConvert> getMusicConvertList(List<TbMusicPojo> tbMusicPojos, Map<Long, String> picUrl) {
+    public List<MusicConvert> getMusicConvertList(List<TbMusicPojo> tbMusicPojos, Map<Long, String> picUrl) {
         return tbMusicPojos.parallelStream().map(tbArtistPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbArtistPojo, convert);
@@ -127,7 +127,7 @@ public class QukuServiceImpl implements QukuService {
         }).toList();
     }
     
-    private static List<CollectConvert> getCollectConvertList(List<TbCollectPojo> collectConverts, Map<Long, String> picUrl) {
+    public List<CollectConvert> getCollectConvertList(List<TbCollectPojo> collectConverts, Map<Long, String> picUrl) {
         return collectConverts.parallelStream().map(tbArtistPojo -> {
             CollectConvert convert = new CollectConvert();
             BeanUtils.copyProperties(tbArtistPojo, convert);

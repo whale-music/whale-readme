@@ -3,10 +3,13 @@ package org.web.admin.controller.v1;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.common.PageResCommon;
+import org.api.admin.model.req.AlbumListPageReq;
 import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.RemoveAlbumReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
+import org.api.admin.model.res.AlbumListPageRes;
 import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
@@ -26,9 +29,15 @@ public class AlbumController {
         this.albumApi = albumApi;
     }
     
+    @PostMapping("/list")
+    public R getAllAlbumList(@RequestBody AlbumListPageReq req) {
+        Page<AlbumListPageRes> page = albumApi.getAllAlbumList(req);
+        return R.success(page);
+    }
+    
     @PostMapping("/page")
-    public R getAllAlbumList(@RequestBody AlbumPageReq req) {
-        Page<AlbumPageRes> page = albumApi.getAllAlbumList(req);
+    public R getAlbumPage(@RequestBody AlbumPageReq req) {
+        PageResCommon<AlbumPageRes> page = albumApi.getAlbumPage(req);
         return R.success(page);
     }
     

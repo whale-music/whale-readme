@@ -3,11 +3,14 @@ package org.web.admin.controller.v1;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.AlbumPageReq;
+import org.api.admin.model.common.PageResCommon;
+import org.api.admin.model.req.AlbumListPageReq;
+import org.api.admin.model.req.ArtistPageReq;
 import org.api.admin.model.req.RemoveArtistReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
 import org.api.admin.model.res.ArtistInfoRes;
 import org.api.admin.model.res.ArtistMvListRes;
+import org.api.admin.model.res.ArtistPageRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
@@ -30,7 +33,7 @@ public class ArtistController {
     }
     
     @PostMapping("/allSinger")
-    public R getAllSingerList(@RequestBody AlbumPageReq req) {
+    public R getAllSingerList(@RequestBody AlbumListPageReq req) {
         Page<ArtistRes> page = artistApi.getAllSingerList(req);
         return R.success(page);
     }
@@ -69,5 +72,12 @@ public class ArtistController {
     public R getMvList(@RequestParam("id") Long id) {
         List<ArtistMvListRes> mvList = artistApi.getMvList(id);
         return R.success(mvList);
+    }
+    
+    
+    @PostMapping("/page")
+    public R getArtistPage(@RequestBody ArtistPageReq req) {
+        PageResCommon<ArtistPageRes> res = artistApi.getArtistPage(req);
+        return R.success(res);
     }
 }

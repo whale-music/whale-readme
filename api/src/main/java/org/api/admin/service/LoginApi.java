@@ -6,6 +6,8 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.UserReq;
 import org.api.admin.model.res.RefreshTokenRes;
 import org.api.admin.model.res.UserRes;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
@@ -14,6 +16,7 @@ import org.core.utils.TokenUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 @Service(AdminConfig.ADMIN + "LoginApi")
@@ -30,7 +33,7 @@ public class LoginApi {
         Date refreshDate = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
         String refreshToken = TokenUtil.refreshSignToken(refreshDate, userPojo.getUsername(), userPojo);
         
-        return new UserRes(userPojo.getUsername(), sign, refreshToken, RoleUtil.getRoleNames(userPojo.getRoleName()), date.getTime());
+        return new UserRes(userPojo.getId(), userPojo.getUsername(), sign, refreshToken, RoleUtil.getRoleNames(userPojo.getRoleName()), date.getTime());
     }
     
     public void createAccount(UserReq req) {
@@ -42,6 +45,9 @@ public class LoginApi {
         TokenUtil.checkSign(refresh);
         
         SysUserPojo userInfo = TokenUtil.getRefreshUserInfo(refresh);
+        if (Objects.isNull(userInfo)) {
+            throw new BaseException(ResultCode.TOKEN_EXPIRED_ERROR);
+        }
         Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
         Date refreshDate = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
         String token = TokenUtil.signToken(date, userInfo.getUsername(), userInfo);

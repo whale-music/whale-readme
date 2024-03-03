@@ -7,12 +7,16 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.common.PageResCommon;
+import org.api.admin.model.req.AlbumListPageReq;
 import org.api.admin.model.req.AlbumPageReq;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
+import org.api.admin.model.res.AlbumListPageRes;
 import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.utils.MyPageUtil;
 import org.api.admin.utils.OrderByUtil;
+import org.api.admin.utils.WrapperUtil;
 import org.api.common.service.QukuAPI;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
@@ -20,13 +24,11 @@ import org.core.config.HttpRequestConfig;
 import org.core.mybatis.iservice.TbAlbumArtistService;
 import org.core.mybatis.iservice.TbAlbumService;
 import org.core.mybatis.iservice.TbArtistService;
+import org.core.mybatis.iservice.TbMusicService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
-import org.core.mybatis.pojo.TbAlbumArtistPojo;
-import org.core.mybatis.pojo.TbAlbumPojo;
-import org.core.mybatis.pojo.TbArtistPojo;
-import org.core.mybatis.pojo.TbTagPojo;
+import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -54,23 +56,26 @@ public class AlbumApi {
      */
     private final TbArtistService singerService;
     
+    private final TbMusicService tbMusicService;
+    
     private final QukuAPI qukuService;
     
     private final HttpRequestConfig httpRequestConfig;
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public AlbumApi(TbAlbumService albumService, TbAlbumArtistService albumSingerService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig, RemoteStorePicService remoteStorePicService) {
+    public AlbumApi(TbAlbumService albumService, TbAlbumArtistService albumSingerService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService) {
         this.albumService = albumService;
         this.albumSingerService = albumSingerService;
         this.singerService = singerService;
         this.qukuService = qukuService;
         this.httpRequestConfig = httpRequestConfig;
         this.remoteStorePicService = remoteStorePicService;
+        this.tbMusicService = tbMusicService;
     }
     
     
-    public Page<AlbumPageRes> getAllAlbumList(AlbumPageReq req) {
+    public Page<AlbumListPageRes> getAllAlbumList(AlbumListPageReq req) {
         req.setAlbumName(StringUtils.trim(req.getAlbumName()));
         req.setArtistName(StringUtils.trim(req.getArtistName()));
         
@@ -112,11 +117,11 @@ public class AlbumApi {
             albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
         }
         
-        Page<AlbumPageRes> page = new Page<>();
+        Page<AlbumListPageRes> page = new Page<>();
         BeanUtils.copyProperties(albumPage, page, "records");
         page.setRecords(new ArrayList<>());
         for (AlbumConvert tbAlbumPojo : albumPage.getRecords()) {
-            AlbumPageRes albumRes = new AlbumPageRes();
+            AlbumListPageRes albumRes = new AlbumListPageRes();
             albumRes.setArtistList(new ArrayList<>());
             BeanUtils.copyProperties(tbAlbumPojo, albumRes);
             albumRes.setPicUrl(tbAlbumPojo.getPicUrl());
@@ -172,6 +177,9 @@ public class AlbumApi {
     
     public AlbumInfoRes getAlbumInfo(Long albumId) {
         TbAlbumPojo byId = albumService.getById(albumId);
+        if (Objects.isNull(byId)) {
+            throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
+        }
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
         List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
@@ -214,5 +222,104 @@ public class AlbumApi {
                                                                .collect(Collectors.toSet());
             albumSingerService.saveBatch(albumArtistList);
         }
+    }
+    
+    public PageResCommon<AlbumPageRes> getAlbumPage(AlbumPageReq req) {
+        final String name = StringUtils.trim(req.getName());
+        final String albumName = StringUtils.trim(req.getAlbumName());
+        final String musicName = StringUtils.trim(req.getMusicName());
+        final String artistName = StringUtils.trim(req.getArtistName());
+        
+        List<Long> albumIds = new ArrayList<>();
+        boolean nameNotBlank = StringUtils.isNotBlank(name);
+        // 专辑
+        boolean albumNotBlank = StringUtils.isNotBlank(albumName);
+        if (nameNotBlank || albumNotBlank) {
+            List<TbAlbumPojo> list = albumService.list(WrapperUtil.albumWrapper(nameNotBlank, albumNotBlank, name, albumName));
+            albumIds.addAll(list.stream().map(TbAlbumPojo::getId).toList());
+        }
+        
+        // 音乐
+        boolean musicNotBlank = StringUtils.isNotBlank(musicName);
+        if (nameNotBlank || musicNotBlank) {
+            List<TbMusicPojo> list = tbMusicService.list(WrapperUtil.musicWrapper(nameNotBlank, musicNotBlank, name, musicName));
+            Set<Long> collect = Optional.ofNullable(list).orElse(new ArrayList<>()).stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
+            albumIds.addAll(collect);
+        }
+        // 歌手
+        boolean artistNotBlank = StringUtils.isNotBlank(artistName);
+        if (nameNotBlank || artistNotBlank) {
+            LambdaQueryWrapper<TbArtistPojo> singerWrapper = WrapperUtil.artistWrapper(
+                    nameNotBlank, artistNotBlank, name,
+                    artistName
+            );
+            List<TbArtistPojo> singerList = singerService.list(singerWrapper);
+            // 查询歌手表
+            if (CollUtil.isNotEmpty(singerList)) {
+                List<Long> collect = singerList.stream().map(TbArtistPojo::getId).toList();
+                List<TbAlbumArtistPojo> list = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
+                                                                               .in(TbAlbumArtistPojo::getArtistId, collect));
+                albumIds.addAll(list.stream().map(TbAlbumArtistPojo::getAlbumId).toList());
+            }
+        }
+        
+        // 如果前端传入搜索参数，并且没有查询到数据则直接返回空数据库。防止搜索结果混乱
+        if ((StringUtils.isNotBlank(name)
+                || StringUtils.isNotBlank(musicName)
+                || StringUtils.isNotBlank(albumName)
+                || StringUtils.isNotBlank(artistName))
+                && CollUtil.isEmpty(albumIds)) {
+            return new PageResCommon<>();
+        }
+        
+        LambdaQueryWrapper<TbAlbumPojo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        OrderByUtil.pageOrderByAlbum(req.getOrder(), req.getOrderBy(), lambdaQueryWrapper);
+        lambdaQueryWrapper.in(CollUtil.isNotEmpty(albumIds), TbAlbumPojo::getId, albumIds);
+        
+        // 查询全部专辑数据
+        Page<TbAlbumPojo> albumPojoPage = req.getPageCommon().getPage();
+        Page<AlbumConvert> albumPage = qukuService.getAlbumPage(albumPojoPage, lambdaQueryWrapper);
+        
+        // 获取专辑ID，以供查询歌手信息
+        List<AlbumConvert> records = albumPage.getRecords();
+        
+        // 获取歌手信息
+        Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = new HashMap<>();
+        if (CollUtil.isNotEmpty(records)) {
+            List<Long> collect = records.stream().map(TbAlbumPojo::getId).toList();
+            albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
+        }
+        
+        PageResCommon<AlbumPageRes> res = new PageResCommon<>();
+        
+        res.setCurrent(albumPage.getCurrent());
+        res.setSize(albumPage.getSize());
+        res.setTotal(albumPage.getTotal());
+        ArrayList<AlbumPageRes> content = new ArrayList<>();
+        for (AlbumConvert tbAlbumPojo : records) {
+            AlbumPageRes albumRes = new AlbumPageRes();
+            albumRes.setId(tbAlbumPojo.getId());
+            albumRes.setAlbumName(tbAlbumPojo.getAlbumName());
+            albumRes.setPublishTime(tbAlbumPojo.getPublishTime());
+            albumRes.setPicUrl(tbAlbumPojo.getPicUrl());
+            albumRes.setUserId(tbAlbumPojo.getUserId());
+            albumRes.setUpdateTime(tbAlbumPojo.getUpdateTime());
+            albumRes.setCreateTime(tbAlbumPojo.getCreateTime());
+            
+            // 获取专辑中所有歌手
+            List<ArtistConvert> artistConverts = Optional.ofNullable(albumArtistMapByAlbumIds.get(tbAlbumPojo.getId())).orElse(new ArrayList<>());
+            albumRes.setArtistList(artistConverts.stream().map(AlbumPageRes.AlbumArtistConvert::new).toList());
+            
+            // 获取专辑下歌曲数量
+            albumRes.setAlbumSize(qukuService.getAlbumMusicCountByAlbumId(tbAlbumPojo.getId()).longValue());
+            
+            albumRes.setOrderBy(req.getOrderBy());
+            albumRes.setOrder(req.getOrder());
+            
+            content.add(albumRes);
+        }
+        res.setContent(content);
+        
+        return res;
     }
 }

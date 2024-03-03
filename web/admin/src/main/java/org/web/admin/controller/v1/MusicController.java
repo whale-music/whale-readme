@@ -5,11 +5,10 @@ import cn.hutool.core.map.MapUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
-import org.api.admin.model.req.RemoveMusicReq;
-import org.api.admin.model.req.SaveOrUpdateMusicReq;
-import org.api.admin.model.req.SyncMusicMetaDataReq;
-import org.api.admin.model.req.UploadMusicReq;
+import org.api.admin.model.common.PageResCommon;
+import org.api.admin.model.req.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
+import org.api.admin.model.res.MusicTabsPageRes;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
@@ -214,5 +213,11 @@ public class MusicController {
     public R syncMetaMusicFile(@RequestBody SyncMusicMetaDataReq req) {
         uploadMusic.syncMetaMusicFile(req);
         return R.success();
+    }
+    
+    @PostMapping("/page")
+    public R getMusicPage(@RequestBody MusicTabPageReq req) {
+        PageResCommon<MusicTabsPageRes> page = uploadMusic.getMusicPage(req);
+        return R.success(page);
     }
 }

@@ -12,6 +12,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.digest.MD5;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.houbb.opencc4j.util.ZhConverterUtil;
@@ -815,7 +816,18 @@ public class MusicFlowApi {
         }
         req.setUserId(Optional.ofNullable(req.getUserId()).orElse(UserUtil.getUser().getId()));
         // 音乐
-        musicService.saveOrUpdate(req);
+        if (Objects.isNull(req.getId())) {
+            musicService.save(req);
+        } else {
+            LambdaUpdateWrapper<TbMusicPojo> wrapper = Wrappers.lambdaUpdate();
+            wrapper.eq(TbMusicPojo::getId, req.getId())
+                   .set(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())
+                   .set(TbMusicPojo::getTimeLength, req.getTimeLength())
+                   .set(TbMusicPojo::getPublishTime, req.getPublishTime())
+                   .set(TbMusicPojo::getAliasName, req.getAliasName())
+                   .set(TbMusicPojo::getAlbumId, req.getAlbumId());
+            musicService.update(wrapper);
+        }
         // 流派
         if (StringUtils.isNotBlank(req.getMusicGenre())) {
             qukuService.addMusicGenreLabel(req.getId(), StringUtils.trim(req.getMusicGenre()));

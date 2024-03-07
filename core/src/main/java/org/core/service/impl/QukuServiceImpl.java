@@ -968,23 +968,21 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(middleTagList)) {
             return ids.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> Collections.emptyList()));
         }
-        Map<Long, TbMiddleTagPojo> collect = middleTagList.parallelStream()
-                                                          .collect(Collectors.toMap(TbMiddleTagPojo::getTagId, tbMiddleTagPojo -> tbMiddleTagPojo));
         List<Long> tagIds = middleTagList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
-        List<TbTagPojo> tbTagPojos = tagService.list(Wrappers.<TbTagPojo>lambdaQuery()
+        List<TbTagPojo> tagList = tagService.list(Wrappers.<TbTagPojo>lambdaQuery()
                                                              .in(TbTagPojo::getId, tagIds)
-                                                             .in(CollUtil.isNotEmpty(tagName), TbTagPojo::getTagName, tagName));
-        Map<Long, List<TbTagPojo>> resultMap = tbTagPojos.parallelStream()
-                                                         .collect(Collectors.toMap(tbTagPojo -> collect.get(tbTagPojo.getId()).getMiddleId(),
-                                                                 tbTagPojo -> {
-                                                                     LinkedList<TbTagPojo> add = new LinkedList<>();
-                                                                     add.add(tbTagPojo);
-                                                                     return add;
-                                                                 },
-                                                                 (tbTagPojos1, tbTagPojos2) -> {
-                                                                     tbTagPojos2.addAll(tbTagPojos1);
-                                                                     return tbTagPojos2;
-                                                                 }));
+                                                          .in(CollUtil.isNotEmpty(tagName), TbTagPojo::getTagName, tagName));
+        Map<Long, TbTagPojo> collect = tagList.parallelStream()
+                                              .collect(Collectors.toMap(TbTagPojo::getId, o -> o));
+        Map<Long, List<TbTagPojo>> resultMap = middleTagList.parallelStream()
+                                                            .collect(Collectors.toMap(TbMiddleTagPojo::getMiddleId,
+                                                                    tbTagPojo ->
+                                                                            ListUtil.toList(collect.get(tbTagPojo.getTagId()))
+                                                                    ,
+                                                                    (tbTagPojos1, tbTagPojos2) -> {
+                                                                        tbTagPojos2.addAll(tbTagPojos1);
+                                                                        return tbTagPojos2;
+                                                                    }));
         return DefaultedMap.defaultedMap(resultMap, Collections.emptyList());
     }
     
@@ -1034,28 +1032,26 @@ public class QukuServiceImpl implements QukuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addLabel(Byte target, Long id, List<String> labels) {
-        if (CollUtil.isEmpty(labels)) {
-            return;
-        }
         // 新增tag
-        List<TbTagPojo> list;
         synchronized (addLabelLock) {
-            HashSet<String> hashSet = new HashSet<>(labels);
-            list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, hashSet));
-            Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
-            for (String label : hashSet) {
-                if (StringUtils.isNotBlank(label) && collect.get(label) == null) {
-                    TbTagPojo entity = new TbTagPojo();
-                    entity.setCount(0);
-                    entity.setTagName(label);
-                    list.add(entity);
+            Set<Long> tagIds = null;
+            if (CollUtil.isNotEmpty(labels)) {
+                List<TbTagPojo> list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, labels));
+                Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
+                for (String label : labels) {
+                    if (StringUtils.isNotBlank(label) && collect.get(label) == null) {
+                        TbTagPojo entity = new TbTagPojo();
+                        entity.setCount(0);
+                        entity.setTagName(label);
+                        list.add(entity);
+                    }
                 }
+                tagService.saveOrUpdateBatch(list);
+                tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
             }
-            tagService.saveOrUpdateBatch(list);
+            // 关联到对应ID
+            this.addLabel(target, id, tagIds);
         }
-        Set<Long> tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
-        // 关联到对应ID
-        addLabel(target, id, tagIds);
     }
     
     /**
@@ -1066,14 +1062,16 @@ public class QukuServiceImpl implements QukuService {
      * @param tagIds 标签ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addLabel(Byte target, Long id, Set<Long> tagIds) {
-        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery().eq(TbMiddleTagPojo::getMiddleId, id);
-        
+        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                         .eq(TbMiddleTagPojo::getMiddleId, id)
+                                                         .eq(TbMiddleTagPojo::getType, target);
         // 删除重新添加
         List<TbMiddleTagPojo> middleTagPojoList = middleTagService.list(eq);
         if (CollUtil.isNotEmpty(middleTagPojoList)) {
             List<Long> removeTagIds = new ArrayList<>();
-            List<Long> middleTagIds = middleTagPojoList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
+            List<Long> middleTagIds = middleTagPojoList.parallelStream().map(TbMiddleTagPojo::getId).toList();
             // 删除关联tag后，tag标签自动减一。并且到零时自动删除
             for (TbTagPojo tbTagPojo : tagService.listByIds(middleTagIds)) {
                 tbTagPojo.setCount(tbTagPojo.getCount() - 1);
@@ -1081,20 +1079,26 @@ public class QukuServiceImpl implements QukuService {
                     removeTagIds.add(tbTagPojo.getId());
                 }
             }
-            tagService.removeBatchByIds(removeTagIds);
-            middleTagService.removeBatchByIds(middleTagIds);
+            if (CollUtil.isNotEmpty(middleTagIds)) {
+                middleTagService.removeBatchByIds(middleTagIds);
+            }
+            if (CollUtil.isNotEmpty(removeTagIds)) {
+                tagService.removeBatchByIds(removeTagIds);
+            }
         }
         
-        // 添加tag关联
-        List<TbMiddleTagPojo> middleTagPojos = tagIds.parallelStream().map(aLong -> new TbMiddleTagPojo(null, id, aLong, target)).toList();
-        middleTagService.saveOrUpdateBatch(middleTagPojos);
-        
-        // 关联后tag关联数自动加1
-        List<TbTagPojo> tagPojoList = tagService.listByIds(tagIds);
-        for (TbTagPojo tbTagPojo : tagPojoList) {
-            tbTagPojo.setCount(tbTagPojo.getCount() + 1);
+        if (CollUtil.isNotEmpty(tagIds)) {
+            // 添加tag关联
+            List<TbMiddleTagPojo> middleTagPojos = tagIds.parallelStream().map(aLong -> new TbMiddleTagPojo(null, id, aLong, target)).toList();
+            middleTagService.saveOrUpdateBatch(middleTagPojos);
+            
+            // 关联后tag关联数自动加1
+            List<TbTagPojo> tagPojoList = tagService.listByIds(tagIds);
+            for (TbTagPojo tbTagPojo : tagPojoList) {
+                tbTagPojo.setCount(tbTagPojo.getCount() + 1);
+            }
+            tagService.updateBatchById(tagPojoList);
         }
-        tagService.updateBatchById(tagPojoList);
         
     }
     

@@ -829,13 +829,9 @@ public class MusicFlowApi {
             musicService.update(wrapper);
         }
         // 流派
-        if (StringUtils.isNotBlank(req.getMusicGenre())) {
-            qukuService.addMusicGenreLabel(req.getId(), StringUtils.trim(req.getMusicGenre()));
-        }
+        qukuService.addMusicGenreLabel(req.getId(), req.getMusicGenre().stream().map(StringUtils::trim).toList());
         // 音乐tag
-        if (StringUtils.isNotBlank(req.getMusicTag())) {
-            qukuService.addMusicLabelTag(req.getId(), List.of(StringUtils.split(req.getMusicTag(), ',')).parallelStream().map(StringUtils::trim).toList());
-        }
+        qukuService.addMusicLabelTag(req.getId(), req.getMusicTag().stream().map(StringUtils::trim).toList());
         // 更新封面
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
             File file = requestConfig.getTempPathFile(req.getTempPicFile());
@@ -993,23 +989,58 @@ public class MusicFlowApi {
         TbMusicPojo byId = musicService.getById(id);
         List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId()).get(id);
         List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId()).get(id);
-        // 专辑艺术家
-        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(byId.getAlbumId());
         // 歌曲艺术家
         List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
-        // 专辑
-        TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new AudioInfoReq.AudioAlbum());
         
         MusicInfoRes musicInfoRes = new MusicInfoRes();
-        musicInfoRes.setMusicTag(labelMusic.parallelStream().map(TbTagPojo::getTagName).toList());
-        musicInfoRes.setMusicGenre(musicGenre.parallelStream().map(TbTagPojo::getTagName).findFirst().orElse(""));
-        musicInfoRes.setMusicArtist(musicArtistByMusicId);
-        musicInfoRes.setAlbumArtist(artistListByAlbumIds);
-        musicInfoRes.setAlbumName(albumPojo.getAlbumName());
-        musicInfoRes.setAlbumId(albumPojo.getId());
-        BeanUtils.copyProperties(byId, musicInfoRes);
         musicInfoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
-        musicInfoRes.setPublishTime(albumPojo.getPublishTime());
+        musicInfoRes.setMusicTag(labelMusic.parallelStream().map(TbTagPojo::getTagName).toList());
+        musicInfoRes.setMusicGenre(musicGenre.parallelStream().map(TbTagPojo::getTagName).toList());
+        if (CollUtil.isNotEmpty(musicArtistByMusicId)) {
+            musicInfoRes.setArtists(musicArtistByMusicId.parallelStream()
+                                                        .map(artistConvert -> new MusicInfoRes.Artist(artistConvert.getId(),
+                                                                artistConvert.getArtistName(),
+                                                                artistConvert.getAliasName()))
+                                                        .toList());
+        }
+        // 专辑
+        Long albumId = byId.getAlbumId();
+        if (Objects.nonNull(albumId)) {
+            TbAlbumPojo albumPojo = albumService.getById(albumId);
+            // 专辑艺术家
+            List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
+            // 专辑
+            MusicInfoRes.Album album = new MusicInfoRes.Album();
+            musicInfoRes.setAlbum(album);
+            album.setAlbumId(albumPojo.getId());
+            album.setAlbumName(albumPojo.getAlbumName());
+            if (CollUtil.isNotEmpty(artistListByAlbumIds)) {
+                album.setArtist(artistListByAlbumIds.stream()
+                                                    .map(artistConvert -> new MusicInfoRes.Artist(artistConvert.getId(),
+                                                            artistConvert.getArtistName(),
+                                                            artistConvert.getAliasName())).toList());
+            }
+            musicInfoRes.setPublishTime(albumPojo.getPublishTime());
+        }
+        // 音源
+        List<TbResourcePojo> resources = resourceService.getResources(byId.getId());
+        if (CollUtil.isNotEmpty(resources)) {
+            List<MusicInfoRes.MusicSources> sources = resources.parallelStream()
+                                                               .map(MusicInfoRes.MusicSources::new)
+                                                               .peek(s -> s.setUrl(remoteStorageService.getMusicResourceUrl(s.getPath())))
+                                                               .toList();
+            musicInfoRes.setSources(sources);
+        }
+        // 歌词
+        LambdaQueryWrapper<TbLyricPojo> lyricWrapper = Wrappers.lambdaQuery();
+        List<TbLyricPojo> list = lyricService.list(lyricWrapper.eq(TbLyricPojo::getMusicId, byId.getId()));
+        if (CollUtil.isNotEmpty(list)) {
+            Map<String, MusicInfoRes.Lyrics> lyricMap = list.parallelStream()
+                                                            .map(MusicInfoRes.Lyrics::new)
+                                                            .collect(Collectors.toMap(MusicInfoRes.Lyrics::getType, o -> o));
+            musicInfoRes.setLyrics(lyricMap);
+        }
+        BeanUtils.copyProperties(byId, musicInfoRes);
         return musicInfoRes;
     }
     
@@ -1352,7 +1383,8 @@ public class MusicFlowApi {
             return res;
         }
         
-        Map<Long, String> musicPicUrl = remoteStorePicService.getMusicPicUrl(records.parallelStream().map(TbMusicPojo::getId).toList());
+        List<Long> ids = records.parallelStream().map(TbMusicPojo::getId).toList();
+        Map<Long, String> musicPicUrl = remoteStorePicService.getMusicPicUrl(ids);
         List<MusicConvert> musicConverts = qukuService.getMusicConvertList(records, musicPicUrl);
         
         // 专辑信息
@@ -1369,19 +1401,12 @@ public class MusicFlowApi {
                                                                                                                    .map(TbMusicPojo::getId)
                                                                                                                    .toList());
         // 填充信息
-        Map<Long, TbResourcePojo> urlPojoMap = new HashMap<>();
         // 获取音乐地址
-        try {
-            List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(musicIds, req.getRefresh());
-            urlPojoMap = musicUrlByMusicId.parallelStream()
-                                          .collect(Collectors.toMap(TbResourcePojo::getMusicId,
-                                                  Function.identity(),
-                                                  (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
-        } catch (BaseException ex) {
-            if (!StringUtils.equals(ex.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
-                throw new BaseException(ResultCode.SONG_NOT_EXIST);
-            }
-        }
+        List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(ids, req.getRefresh());
+        Map<Long, TbResourcePojo> urlPojoMap = musicUrlByMusicId.parallelStream()
+                                                                .collect(Collectors.toMap(TbResourcePojo::getMusicId,
+                                                                        Function.identity(),
+                                                                        (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
         
         List<Long> likeMusic = new ArrayList<>();
         List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singletonList(PlayListTypeConstant.LIKE));

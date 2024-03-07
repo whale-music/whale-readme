@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.TbResourcePojo;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,10 +19,10 @@ import java.util.List;
 public class SaveOrUpdateMusicReq extends MusicConvert {
     
     @ApiModelProperty("音乐tag")
-    private String musicTag;
+    private Set<String> musicTag = new HashSet<>();
     
     @ApiModelProperty("音乐流派")
-    private String musicGenre;
+    private Set<String> musicGenre = new HashSet<>();
     
     @ApiModelProperty("歌手名ID")
     private List<Long> artistIds;

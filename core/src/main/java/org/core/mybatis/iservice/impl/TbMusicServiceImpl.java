@@ -1,5 +1,6 @@
 package org.core.mybatis.iservice.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -8,6 +9,11 @@ import org.core.mybatis.iservice.TbMusicService;
 import org.core.mybatis.mapper.TbMusicMapper;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,5 +40,23 @@ public class TbMusicServiceImpl extends ServiceImpl<TbMusicMapper, TbMusicPojo> 
                                                      eq(TbMusicPojo::getMusicName, name)
                                                      .eq(StringUtils.isNoneBlank(alias), TbMusicPojo::getAliasName, alias);
         return this.getOne(eq);
+    }
+    
+    /**
+     * 获取音乐列表
+     *
+     * @param ids music id list
+     * @return 音乐列表
+     */
+    @Override
+    public Map<Long, TbMusicPojo> getMusicList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<TbMusicPojo> list = this.listByIds(ids);
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        return list.parallelStream().collect(Collectors.toMap(TbMusicPojo::getId, s -> s));
     }
 }

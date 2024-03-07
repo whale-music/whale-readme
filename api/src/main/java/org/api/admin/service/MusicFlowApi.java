@@ -28,10 +28,7 @@ import org.api.admin.model.req.SaveOrUpdateMusicReq;
 import org.api.admin.model.req.SyncMusicMetaDataReq;
 import org.api.admin.model.req.UploadMusicReq;
 import org.api.admin.model.req.upload.AudioInfoReq;
-import org.api.admin.model.res.AudioInfoRes;
-import org.api.admin.model.res.MusicFileRes;
-import org.api.admin.model.res.MusicInfoRes;
-import org.api.admin.model.res.MusicTabsPageRes;
+import org.api.admin.model.res.*;
 import org.api.admin.utils.MyPageUtil;
 import org.api.admin.utils.WrapperUtil;
 import org.api.common.service.QukuAPI;
@@ -1517,5 +1514,69 @@ public class MusicFlowApi {
                                                                                singerList.parallelStream().map(TbArtistPojo::getId).toList()));
         
         return list.stream().map(TbMusicArtistPojo::getMusicId).toList();
+    }
+    
+    public List<MusicPlayInfoRes> getMusicPlayInfo(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            throw new BaseException(ResultCode.PARAM_IS_BLANK);
+        }
+        
+        ArrayList<MusicPlayInfoRes> res = new ArrayList<>();
+        Map<Long, TbMusicPojo> maps = musicService.getMusicList(ids);
+        for (Long id : ids) {
+            MusicPlayInfoRes infoRes = new MusicPlayInfoRes();
+            // 音乐
+            TbMusicPojo byId = maps.get(id);
+            infoRes.setMusicName(byId.getMusicName());
+            infoRes.setAliasName(byId.getAliasName());
+            infoRes.setTimeLength(byId.getTimeLength());
+            infoRes.setUserId(byId.getUserId());
+            // 歌曲艺术家
+            List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
+            
+            infoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
+            if (CollUtil.isNotEmpty(musicArtistByMusicId)) {
+                List<MusicPlayInfoRes.MusicPlayArtist> list = musicArtistByMusicId.parallelStream()
+                                                                                  .map(artistConvert -> new MusicPlayInfoRes.MusicPlayArtist(artistConvert.getId(),
+                                                                                          artistConvert.getArtistName(),
+                                                                                          artistConvert.getAliasName()))
+                                                                                  .toList();
+                infoRes.setArtists(list);
+            }
+            // 专辑
+            Long albumId = byId.getAlbumId();
+            if (Objects.nonNull(albumId)) {
+                TbAlbumPojo albumPojo = albumService.getById(albumId);
+                // 专辑
+                MusicPlayInfoRes.MusicPlayAlbum album = new MusicPlayInfoRes.MusicPlayAlbum();
+                album.setId(albumPojo.getId());
+                album.setAlbumName(albumPojo.getAlbumName());
+                infoRes.setAlbum(album);
+                infoRes.setPublishTime(albumPojo.getPublishTime());
+            }
+            // 音源
+            List<TbResourcePojo> resources = resourceService.getResources(byId.getId());
+            if (CollUtil.isNotEmpty(resources)) {
+                List<MusicPlayInfoRes.MusicPlaySources> sources = resources.parallelStream()
+                                                                           .map(MusicPlayInfoRes.MusicPlaySources::new)
+                                                                           .peek(s -> s.setUrl(remoteStorageService.getMusicResourceUrl(s.getPath())))
+                                                                           .toList();
+                infoRes.setSources(sources);
+            }
+            // 歌词
+            LambdaQueryWrapper<TbLyricPojo> lyricWrapper = Wrappers.lambdaQuery();
+            List<TbLyricPojo> list = lyricService.list(lyricWrapper.eq(TbLyricPojo::getMusicId, byId.getId()));
+            if (CollUtil.isNotEmpty(list)) {
+                Map<String, TbLyricPojo> lyricMap = list.parallelStream()
+                                                        .collect(Collectors.toMap(TbLyricPojo::getType, o -> o));
+                
+                MusicPlayInfoRes.MusicPlayLyrics lyrics = new MusicPlayInfoRes.MusicPlayLyrics();
+                lyrics.setLyrics(lyricMap.get(LyricConstant.LYRIC));
+                lyrics.setKLyrics(lyricMap.get(LyricConstant.K_LYRIC));
+                infoRes.setLyrics(lyrics);
+            }
+            res.add(infoRes);
+        }
+        return res;
     }
 }

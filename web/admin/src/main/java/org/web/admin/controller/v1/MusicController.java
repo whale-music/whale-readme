@@ -8,6 +8,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.req.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
+import org.api.admin.model.res.MusicPlayInfoRes;
 import org.api.admin.model.res.MusicTabsPageRes;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.annotation.AnonymousAccess;
@@ -219,5 +220,17 @@ public class MusicController {
     public R getMusicPage(@RequestBody MusicTabPageReq req) {
         PageResCommon<MusicTabsPageRes> page = uploadMusic.getMusicPage(req);
         return R.success(page);
+    }
+    
+    /**
+     * 获取音乐播放需要的信息
+     *
+     * @param req 音乐 ID
+     * @return 音乐信息
+     */
+    @PostMapping("/play/info")
+    public R getMusicPlayInfo(@RequestBody MusicPlayInfoReq req) {
+        List<MusicPlayInfoRes> res = uploadMusic.getMusicPlayInfo(req.getIds());
+        return R.success(res);
     }
 }

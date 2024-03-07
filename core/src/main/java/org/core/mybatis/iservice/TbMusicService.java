@@ -3,6 +3,9 @@ package org.core.mybatis.iservice;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.core.mybatis.pojo.TbMusicPojo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  * 所有音乐列表 服务类
@@ -23,4 +26,12 @@ public interface TbMusicService extends IService<TbMusicPojo> {
      * @return 音乐数据
      */
     TbMusicPojo getMusicByName(String name, String alias);
+    
+    /**
+     * 获取音乐列表
+     *
+     * @param ids music id list
+     * @return 音乐列表
+     */
+    Map<Long, TbMusicPojo> getMusicList(List<Long> ids);
 }

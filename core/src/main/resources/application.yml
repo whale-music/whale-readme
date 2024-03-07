@@ -193,13 +193,13 @@ default-info:
     # 冗余默认封面地址
     default-pic: /assets/default.png
     # 音乐没有封面则默认使用此链接
-    music-pic: /assets/music-player.png
+    music-pic: /assets/music.png
     # 歌单默认封面
-    play-list-pic: /assets/library.png
+    play-list-pic: /assets/playlist.png
     # 专辑默认封面
-    album-pic: /assets/music-album.png
+    album-pic: /assets/album.png
     # 歌手默认封面
-    artist-pic: /assets/microphone.png
+    artist-pic: /assets/artist.png
     # 用户默认头像
     user-avatar-pic: /assets/user.png
     # 用户默认背景

@@ -147,6 +147,11 @@ public class RemoteStorageServiceImpl implements RemoteStorageService {
     }
     
     @Override
+    public String getMusicResourceUrl(String path) {
+        return this.getMusicResourceUrl(path, false);
+    }
+    
+    @Override
     public String getMvResourceUrl(String path, boolean refresh) {
         return ossService.getResource(path, false, ResourceEnum.MV).getUrl();
     }

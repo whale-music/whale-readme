@@ -50,6 +50,8 @@ public interface RemoteStorageService {
     
     String getMusicResourceUrl(String path, boolean refresh);
     
+    String getMusicResourceUrl(String path);
+    
     String getMvResourceUrl(String path, boolean refresh);
     
     String getPicResourceUrl(String path, boolean refresh);

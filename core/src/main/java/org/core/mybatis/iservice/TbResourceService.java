@@ -32,4 +32,12 @@ public interface TbResourceService extends IService<TbResourcePojo> {
      * @return 音乐数据
      */
     TbResourcePojo getResourceByPath(String path);
+    
+    /**
+     * 获取音源列表
+     *
+     * @param ids 音乐id
+     * @return 音乐数据
+     */
+    List<TbResourcePojo> getResources(Long ids);
 }

@@ -8,9 +8,7 @@ import org.core.mybatis.mapper.TbResourceMapper;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +47,19 @@ public class TbResourceServiceImpl extends ServiceImpl<TbResourceMapper, TbResou
     @Override
     public TbResourcePojo getResourceByPath(String path) {
         return this.getOne(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getPath, path));
+    }
+    
+    /**
+     * 获取音源列表
+     *
+     * @param ids 音乐id
+     * @return 音乐数据
+     */
+    @Override
+    public List<TbResourcePojo> getResources(Long ids) {
+        if (Objects.isNull(ids)) {
+            return Collections.emptyList();
+        }
+        return this.list(Wrappers.<TbResourcePojo>lambdaQuery().eq(TbResourcePojo::getMusicId, ids));
     }
 }

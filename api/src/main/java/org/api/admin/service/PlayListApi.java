@@ -410,7 +410,8 @@ public class PlayListApi {
         for (TbCollectPojo tbCollectPojo : list) {
             Children e = new Children();
             e.setName(String.valueOf(tbCollectPojo.getId()));
-            e.setPath("/playlist/" + tbCollectPojo.getId());
+            String jumpRoute = String.format("/playlist/%s", tbCollectPojo.getId());
+            e.setPath(jumpRoute);
             e.setComponent("/src/views/playlist/index.vue");
     
             Meta playListMeta = new Meta();
@@ -418,7 +419,7 @@ public class PlayListApi {
             playListMeta.setTitle(tbCollectPojo.getPlayListName());
             // 普通歌单
             if (tbCollectPojo.getType() == 0) {
-                playListMeta.setIcon("playlist2Bold");
+                playListMeta.setIcon("solar:playlist-2-bold");
             }
             // 喜爱歌单
             if (tbCollectPojo.getType() == 1) {

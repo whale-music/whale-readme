@@ -14,7 +14,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MusicPlayInfoRes {
-    private int id;
+    private Long id;
     private String musicName;
     private String aliasName;
     private String picUrl;

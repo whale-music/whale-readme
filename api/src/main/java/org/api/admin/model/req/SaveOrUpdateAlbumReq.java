@@ -3,16 +3,16 @@ package org.api.admin.model.req;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.core.mybatis.model.convert.AlbumConvert;
+import org.core.mybatis.pojo.TbAlbumPojo;
 
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class SaveOrUpdateAlbumReq extends AlbumConvert {
+public class SaveOrUpdateAlbumReq extends TbAlbumPojo {
     
-    private String albumGenre;
+    private List<String> albumGenre;
     private List<Long> artistIds;
     private String tempFile;
 }

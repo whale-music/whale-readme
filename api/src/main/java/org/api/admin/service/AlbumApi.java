@@ -186,7 +186,7 @@ public class AlbumApi {
         List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
         
         AlbumInfoRes albumRes = new AlbumInfoRes();
-        albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).filter(StringUtils::isNotBlank).findFirst().orElse(""));
+        albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).filter(StringUtils::isNotBlank).toList());
         albumRes.setArtistList(artistListByAlbumIds);
         albumRes.setMusicList(musicListByAlbumId);
         BeanUtils.copyProperties(byId, albumRes);
@@ -206,8 +206,9 @@ public class AlbumApi {
         }
         albumService.saveOrUpdate(req);
         // 保存或更新专辑流派
-        if (StringUtils.isNotBlank(req.getAlbumGenre())) {
-            qukuService.addAlbumGenreLabel(req.getId(), StringUtils.trim(req.getAlbumGenre()));
+        if (CollUtil.isNotEmpty(req.getAlbumGenre())) {
+            List<String> list = req.getAlbumGenre().parallelStream().map(StringUtils::trim).toList();
+            qukuService.addAlbumGenreLabel(req.getId(), list);
         }
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = httpRequestConfig.getTempPathFile(req.getTempFile());

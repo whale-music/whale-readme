@@ -230,7 +230,7 @@ public class MusicController {
      */
     @PostMapping("/play/info")
     public R getMusicPlayInfo(@RequestBody MusicPlayInfoReq req) {
-        List<MusicPlayInfoRes> res = uploadMusic.getMusicPlayInfo(req.getIds());
+        List<MusicPlayInfoRes> res = uploadMusic.getMusicPlayInfo(req.getIds(), req.getIsPlayed());
         return R.success(res);
     }
 }

@@ -1516,7 +1516,7 @@ public class MusicFlowApi {
         return list.stream().map(TbMusicArtistPojo::getMusicId).toList();
     }
     
-    public List<MusicPlayInfoRes> getMusicPlayInfo(List<Long> ids) {
+    public List<MusicPlayInfoRes> getMusicPlayInfo(List<Long> ids, Boolean isPlayed) {
         if (CollUtil.isEmpty(ids)) {
             throw new BaseException(ResultCode.PARAM_IS_BLANK);
         }
@@ -1525,6 +1525,17 @@ public class MusicFlowApi {
         Map<Long, TbMusicPojo> maps = musicService.getMusicList(ids);
         for (Long id : ids) {
             MusicPlayInfoRes infoRes = new MusicPlayInfoRes();
+            // 音源
+            List<TbResourcePojo> resources = resourceService.getResources(id);
+            if (CollUtil.isNotEmpty(resources)) {
+                List<MusicPlayInfoRes.MusicPlaySources> sources = resources.parallelStream()
+                                                                           .map(MusicPlayInfoRes.MusicPlaySources::new)
+                                                                           .peek(s -> s.setUrl(remoteStorageService.getMusicResourceUrl(s.getPath())))
+                                                                           .toList();
+                infoRes.setSources(sources);
+            } else if (Boolean.TRUE.equals(isPlayed)) {
+                continue;
+            }
             // 音乐
             TbMusicPojo byId = maps.get(id);
             infoRes.setId(byId.getId());
@@ -1554,15 +1565,6 @@ public class MusicFlowApi {
                 album.setAlbumName(albumPojo.getAlbumName());
                 infoRes.setAlbum(album);
                 infoRes.setPublishTime(albumPojo.getPublishTime());
-            }
-            // 音源
-            List<TbResourcePojo> resources = resourceService.getResources(byId.getId());
-            if (CollUtil.isNotEmpty(resources)) {
-                List<MusicPlayInfoRes.MusicPlaySources> sources = resources.parallelStream()
-                                                                           .map(MusicPlayInfoRes.MusicPlaySources::new)
-                                                                           .peek(s -> s.setUrl(remoteStorageService.getMusicResourceUrl(s.getPath())))
-                                                                           .toList();
-                infoRes.setSources(sources);
             }
             // 歌词
             LambdaQueryWrapper<TbLyricPojo> lyricWrapper = Wrappers.lambdaQuery();

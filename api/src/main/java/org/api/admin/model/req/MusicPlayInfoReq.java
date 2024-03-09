@@ -11,4 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MusicPlayInfoReq {
     private List<Long> ids;
+    // 是否添加不可播放音乐
+    private Boolean isPlayed = true;
 }

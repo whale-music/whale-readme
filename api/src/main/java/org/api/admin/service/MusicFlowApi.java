@@ -1527,6 +1527,7 @@ public class MusicFlowApi {
             MusicPlayInfoRes infoRes = new MusicPlayInfoRes();
             // 音乐
             TbMusicPojo byId = maps.get(id);
+            infoRes.setId(byId.getId());
             infoRes.setMusicName(byId.getMusicName());
             infoRes.setAliasName(byId.getAliasName());
             infoRes.setTimeLength(byId.getTimeLength());

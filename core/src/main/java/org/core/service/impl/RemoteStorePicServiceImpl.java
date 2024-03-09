@@ -139,7 +139,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
             }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
         });
         // 遍历ID，如果没有查找到，则返回默认数据
-        return middleIds.parallelStream().collect(Collectors.toMap(o -> o, aLong -> {
+        return middleIds.stream().collect(Collectors.toMap(o -> o, aLong -> {
             Long picId = picMiddle.get(new PicMiddleTypeModel(aLong, finalQueryType));
             return picId == null ? getDefaultPicUrl(finalQueryType) : map.get(picId).getPath();
         }, (s, s2) -> s2));

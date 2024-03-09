@@ -853,8 +853,6 @@ public class QukuServiceImpl implements QukuService {
         entity.setUserId(userId);
         userCollectService.save(entity);
         
-        remoteStorePicService.saveOrUpdateCollectPicUrl(collectPojo.getId(), defaultInfo.getPic().getPlayListPic());
-        
         // 封面查询
         CollectConvert convert = new CollectConvert();
         BeanUtils.copyProperties(collectPojo, convert);

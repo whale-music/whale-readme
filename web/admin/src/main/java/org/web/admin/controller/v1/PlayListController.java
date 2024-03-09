@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
+import org.api.admin.model.req.UpdatePlayListReq;
 import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
@@ -47,7 +48,7 @@ public class PlayListController {
     }
     
     @PostMapping("/info")
-    public R updatePlayListInfo(@RequestBody PlayListReq req) {
+    public R updatePlayListInfo(@RequestBody UpdatePlayListReq req) {
         return R.success(playList.updatePlayListInfo(req));
     }
     

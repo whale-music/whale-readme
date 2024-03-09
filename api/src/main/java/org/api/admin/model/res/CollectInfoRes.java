@@ -6,10 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.core.mybatis.model.convert.CollectConvert;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class CollectInfoRes extends CollectConvert {
-    private String collectTag;
+    private String nickname;
+    private List<String> collectTag;
 }

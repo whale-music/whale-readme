@@ -9,6 +9,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
+import org.api.admin.model.req.UpdatePlayListReq;
 import org.api.admin.model.res.CollectInfoRes;
 import org.api.admin.model.res.MusicPageRes;
 import org.api.admin.model.res.PlayListMusicRes;
@@ -27,6 +28,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
+import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.ExceptionUtil;
@@ -69,8 +71,9 @@ public class PlayListApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
+    private final AccountService accountService;
     
-    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo, RemoteStorePicService remoteStorePicService) {
+    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo, RemoteStorePicService remoteStorePicService, AccountService accountService) {
         this.musicService = musicService;
         this.qukuService = qukuService;
         this.albumService = albumService;
@@ -80,6 +83,7 @@ public class PlayListApi {
         this.musicUrlService = musicUrlService;
         this.defaultInfo = defaultInfo;
         this.remoteStorePicService = remoteStorePicService;
+        this.accountService = accountService;
     }
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
@@ -153,14 +157,19 @@ public class PlayListApi {
         for (MusicConvert tbMusicPojo : picMusicList) {
             PlayListMusicRes e1 = new PlayListMusicRes();
             BeanUtils.copyProperties(tbMusicPojo, e1, "lyric");
-        
-            TbAlbumPojo tbAlbumPojo = Optional.ofNullable(albumPojoMap.get(tbMusicPojo.getAlbumId())).orElse(new TbAlbumPojo());
-            tbAlbumPojo.setDescription("");
-            e1.setAlbum(tbAlbumPojo);
-        
+            
+            TbAlbumPojo tbAlbumPojo = albumPojoMap.get(tbMusicPojo.getAlbumId());
+            if (Objects.nonNull(tbAlbumPojo)) {
+                e1.setAlbum(new PlayListMusicRes.PlayListAlbum(tbAlbumPojo.getId(), tbAlbumPojo.getAlbumName()));
+            }
+            
             List<ArtistConvert> tbArtistPojos = artistMaps.get(tbMusicPojo.getId());
-            e1.setArtists(tbArtistPojos);
-        
+            if (CollUtil.isNotEmpty(tbArtistPojos)) {
+                e1.setArtists(tbArtistPojos.stream()
+                                           .map(s -> new PlayListMusicRes.PlayListArtist(s.getId(), s.getArtistName(), s.getAliasName()))
+                                           .toList());
+            }
+            
             playListMusicRes.add(e1);
         }
         // 匹配歌单歌曲顺序
@@ -435,9 +444,14 @@ public class PlayListApi {
         List<TbTagPojo> labelCollectTag = qukuService.getLabelCollectTag(id).get(id);
         CollectInfoRes collectInfoRes = new CollectInfoRes();
         BeanUtils.copyProperties(byId, collectInfoRes);
-        collectInfoRes.setCollectTag(CollUtil.join(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList(), ","));
+        collectInfoRes.setCollectTag(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList());
         String picUrl = remoteStorePicService.getCollectPicUrl(byId.getId());
         collectInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
+        
+        if (Objects.nonNull(byId.getUserId())) {
+            SysUserPojo byId1 = accountService.getById(byId.getUserId());
+            collectInfoRes.setNickname(byId1.getNickname());
+        }
         return collectInfoRes;
     }
     
@@ -506,7 +520,7 @@ public class PlayListApi {
         return playListResPage;
     }
     
-    public TbCollectPojo updatePlayListInfo(PlayListReq req) {
+    public TbCollectPojo updatePlayListInfo(UpdatePlayListReq req) {
         if (req.getId() == null) {
             throw new BaseException(ResultCode.PARAM_IS_INVALID);
         }
@@ -523,10 +537,16 @@ public class PlayListApi {
                 throw new BaseException(ResultCode.USER_LOVE_ERROR);
             }
         }
-    
-        collectService.saveOrUpdate(req);
-        if (StringUtils.isNotBlank(req.getCollectTag())) {
-            qukuService.addCollectLabel(req.getId(), Arrays.stream(StringUtils.split(req.getCollectTag(), ',')).map(StringUtils::trim).toList());
+        
+        TbCollectPojo entity = new TbCollectPojo();
+        entity.setId(req.getId());
+        entity.setPlayListName(req.getPlayListName());
+        entity.setDescription(req.getDescription());
+        entity.setType(req.getType());
+        
+        collectService.saveOrUpdate(entity);
+        if (CollUtil.isNotEmpty(req.getCollectTag())) {
+            qukuService.addCollectLabel(req.getId(), req.getCollectTag().stream().map(StringUtils::trim).toList());
         }
         return collectService.getById(req.getId());
     }

@@ -8,8 +8,11 @@ import org.core.jpa.model.vo.TbHistoryEntityVO;
 import org.core.jpa.repository.TbHistoryEntityRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -30,6 +33,10 @@ public class TbHistoryEntityService {
     
     public void delete(Long id) {
         tbHistoryEntityRepository.deleteById(id);
+    }
+    
+    public void delete(List<Long> ids) {
+        tbHistoryEntityRepository.deleteAllByIdInBatch(ids);
     }
     
     public void update(Long id, TbHistoryEntityUpdateVO vO) {
@@ -56,5 +63,13 @@ public class TbHistoryEntityService {
     private TbHistoryEntity requireOne(Long id) {
         return tbHistoryEntityRepository.findById(id)
                                         .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
+    }
+    
+    public Page<TbHistoryEntity> listByNikeName(String name, Pageable page) {
+        return tbHistoryEntityRepository.findBySysUserByUserId_NicknameLike(name, page);
+    }
+    
+    public Page<TbHistoryEntity> list(PageRequest page) {
+        return tbHistoryEntityRepository.findAll(page);
     }
 }

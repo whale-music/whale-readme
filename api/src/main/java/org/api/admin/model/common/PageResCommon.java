@@ -1,12 +1,10 @@
 package org.api.admin.model.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class PageResCommon<T> {
     private Long current;
     private Long size;
@@ -18,17 +16,23 @@ public class PageResCommon<T> {
         this.size = Long.valueOf(size);
     }
     
+    public PageResCommon(Integer current, Integer size, Long total, List<T> content) {
+        this.current = Long.valueOf(current);
+        this.size = Long.valueOf(size);
+        this.total = total;
+        this.content = content;
+    }
+    
+    public PageResCommon(Long current, Long size, Long total, List<T> content) {
+        this.current = current;
+        this.size = size;
+        this.total = total;
+        this.content = content;
+    }
+    
     public PageResCommon() {
         this.current = 0L;
         this.size = 50L;
-    }
-    
-    public void setCurrent(Long current) {
-        this.current = current;
-    }
-    
-    public void setSize(Long size) {
-        this.size = size;
     }
     
     public void setCurrent(Integer current) {
@@ -43,7 +47,4 @@ public class PageResCommon<T> {
         this.total = Long.valueOf(total);
     }
     
-    public void setTotal(Long total) {
-        this.total = total;
-    }
 }

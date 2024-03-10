@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @CrossOrigin
 @AllArgsConstructor
-public class UploadController {
+public class PicController {
     
     private final PicApi picApi;
     

@@ -3,12 +3,12 @@ package org.api.admin.service;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.core.common.constant.PicTypeConstant;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service(AdminConfig.ADMIN + "PicApi")
 @Slf4j
@@ -82,7 +83,8 @@ public class PicApi {
     
     public String uploadPic(MultipartFile uploadFile, Long id, String type) throws IOException {
         // 下载封面, 保存文件名为md5
-        String randomName = System.currentTimeMillis() + String.valueOf(RandomUtils.nextLong());
+        String originalFilename = Optional.ofNullable(uploadFile.getOriginalFilename()).orElse("");
+        String randomName = FileUtil.mainName(originalFilename) + "-" + UUID.fastUUID().toString(true) + "." + FileUtil.getSuffix(originalFilename);
         File mkdir = FileUtil.touch(requestConfig.getTempPathFile(randomName));
         File file = FileUtil.writeBytes(uploadFile.getBytes(), mkdir);
         byte tempType;

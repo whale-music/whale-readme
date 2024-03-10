@@ -167,7 +167,6 @@ class MusicControllerTest {
                 public SaveOrUpdateAlbumReq call() {
                     Faker faker = new Faker(Locale.SIMPLIFIED_CHINESE);
                     SaveOrUpdateAlbumReq req1 = new SaveOrUpdateAlbumReq();
-                    req1.setPicUrl(faker.avatar().image());
                     req1.setAlbumName(faker.name().name());
                     req1.setCompany(faker.company().name());
                     req1.setDescription(faker.text().text());

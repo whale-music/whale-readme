@@ -56,7 +56,7 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: ${application.config.log}

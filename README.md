@@ -6,7 +6,7 @@
 </div>
 
 
-> 个人音乐管理服务
+> Personal music management service
 
 ---
 

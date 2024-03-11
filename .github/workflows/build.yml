@@ -38,7 +38,8 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          restore-keys: |
+            ${{ runner.os }}-maven-
       # 下载前端, 打包
       - name: Run Maven
         run: bash build/build.sh
@@ -47,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: WhaleMusic
-          path: starter/target/whale-music-*.jar
+          path: starter/target/whale-music.jar

@@ -25,7 +25,8 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          restore-keys: |
+            ${{ runner.os }}-maven-
       # 下载前端, 打包
       - name: Run Maven
         run: bash build/build.sh
@@ -34,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WhaleMusic
-          path: starter/target/whale-music-*.jar
+          path: starter/target/whale-music.jar
 
       # 上传jar包到release
       - name: Upload release asset
@@ -42,6 +43,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           # 上传的文件路径，可以使用通配符
-          files: starter/target/whale-music-*.jar
+          files: starter/target/whale-music.jar
           # 已草稿发布release
           draft: true

@@ -46,7 +46,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.parent.artifactId}-music-${project.version}</finalName>
+        <finalName>${project.parent.artifactId}-music</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

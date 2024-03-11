@@ -11,7 +11,6 @@ import org.api.admin.model.res.UserRes;
 import org.api.admin.service.LoginApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
-import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -54,8 +53,6 @@ public class LoginController {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         
-        // 删除用户
-        UserUtil.removeUser();
         return R.success();
     }
     

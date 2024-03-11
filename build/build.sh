@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#MAVEN_MIRROR=-mirror
 # MIRROR=https://ghproxy.com/
 WEB_URL_PATH="${MIRROR}https://github.com/whale-music/whale-music-web/releases/latest/download/dist.tar.gz"
 
@@ -29,7 +30,7 @@ mv dist/* "${WEB_DIR}"
 rm -rf dist/
 
 # 构建项目, 检查构建是否成功
-if ! sh "$ROOT_PATH/mvnw" -B -f "$ROOT_PATH/pom.xml" -s "$ROOT_PATH/.mvn/settings-mirror.xml" clean package -Dmaven.test.skip=true; then
+if ! sh "$ROOT_PATH/mvnw" -B -f "$ROOT_PATH/pom.xml" -s "$ROOT_PATH/.mvn/settings$MAVEN_MIRROR.xml" clean package -Dmaven.test.skip=true; then
   echo "-------------------------"
   echo "\033[31mBuild failed\033[0m"
 fi

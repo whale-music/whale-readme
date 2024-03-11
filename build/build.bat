@@ -2,6 +2,7 @@
 setlocal
 chcp 65001
 
+set MAVEN_MIRROR=-mirror
 set MIRROR=https://ghproxy.com/
 set WEB_URL_PATH=%MIRROR%https://github.com/whale-music/whale-music-web/releases/latest/download/dist.zip
 
@@ -27,7 +28,7 @@ rmdir /s /q dist\
 cd ..
 
 :: 构建项目，检查构建是否成功
-mvnw.cmd -s .mvn\settings-mirror.xml clean package -Dmaven.test.skip=true
+mvnw.cmd -s .mvn\settings%MAVEN_MIRROR%.xml clean package -Dmaven.test.skip=true
 if %errorlevel% != 0 (
   echo -------------------------
   echo Build failed

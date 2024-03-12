@@ -13,6 +13,8 @@ jobs:
       # Pull code
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }} # 拉取与推送的标签相对应的提交
       # Setup java environment
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -29,14 +31,13 @@ jobs:
             ${{ runner.os }}-maven-
       # 下载前端, 打包
       - name: Run Maven
-        run: bash build/build.sh
+        run: bash build/build-tag.sh ${{ github.ref }}
       # 上传构建jar包
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: WhaleMusic
           path: starter/target/whale-music.jar
-
       # 上传jar包到release
       - name: Upload release asset
         uses: softprops/action-gh-release@v2

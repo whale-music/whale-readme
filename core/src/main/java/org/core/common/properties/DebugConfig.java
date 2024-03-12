@@ -39,4 +39,12 @@ public class DebugConfig {
     public void setDebug(Boolean debug) {
         DebugConfig.DEBUG = debug;
     }
+    
+    private static Boolean empty(Boolean flag) {
+        return Boolean.TRUE.equals(flag) ? true : null;
+    }
+    
+    public static Boolean getDebugOption() {
+        return empty(Boolean.TRUE.equals(DEBUG));
+    }
 }

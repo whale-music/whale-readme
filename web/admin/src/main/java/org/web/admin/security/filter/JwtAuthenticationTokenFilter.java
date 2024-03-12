@@ -33,7 +33,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * 获取到真实的 token 串
      *
      * @param authorizationToken token
-     * @return 真是token
+     * @return 真实token
      */
     private static String getRealAuthorizationToken(String authorizationToken) {
         return StringUtils.trim(StringUtils.remove(authorizationToken, PREFIX_TOKEN));
@@ -61,12 +61,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
         UserUtil.setUser(userPojo);
-        UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
-                null,
-                AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(request, response);
-        UserUtil.removeUser();
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
+                    null,
+                    AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            filterChain.doFilter(request, response);
+        } finally {
+            UserUtil.removeUser();
+        }
     }
 }

@@ -33,7 +33,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> bizExceptionHandler(BaseException e) {
         log.error("发生业务异常！原因是：{}", e.getResultMsg());
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(e.getCode(), e.getResultMsg()));
     }
     
@@ -44,7 +44,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> exceptionHandler8(NullPointerException e) {
         log.error("上传文件太大:", e);
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(e.getMessage()));
     }
     
@@ -56,7 +56,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> exceptionHandler(NullPointerException e) {
         log.error("发生空指针异常！原因是:", e);
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(ResultCode.NULL_POINTER_EXCEPTION));
     }
     
@@ -67,7 +67,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> exceptionHandler(BadSqlGrammarException e) {
         log.error("SQL运行错误原因是:", e);
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(ResultCode.SQL_RUN_ERROR));
     }
     
@@ -78,7 +78,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> exceptionHandler(TokenExpiredException e) {
         log.debug("token 已过期:", e);
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         return ResponseEntity.ok(R.error(ResultCode.TOKEN_EXPIRED_ERROR));
     }
     
@@ -89,7 +89,7 @@ public class AdminGlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<R> exceptionHandler(Exception e) {
         log.error("未知异常！原因是:", e);
-        Optional.of(DebugConfig.getDebug()).ifPresent(aBoolean -> log.error(THROW_STR, e));
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.error(THROW_STR, e));
         R error = R.error(ResultCode.INTERNAL_SERVER_ERROR);
         error.setMessage(error.getMessage() + ": " + e);
         return ResponseEntity.ok(error);

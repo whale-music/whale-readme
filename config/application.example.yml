@@ -78,8 +78,8 @@ spring:
     fallback-to-system-locale: true
     # 设置本地默认语言
     # local: 读取本地语言
-    # zh-cn: 中文-简
-    # en-us: 英语-美
+    # zh-CN: 中文-简
+    # en-US: 英语-美
     default-language: local
 
 # 文档配置

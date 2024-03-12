@@ -3,6 +3,7 @@
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
-    <localRepository>./.mvn/maven-repository</localRepository>
+    <!--<localRepository>./.mvn/maven-repository</localRepository>-->
+    <localRepository>~/.m2/repository</localRepository>
 
 </settings>

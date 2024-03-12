@@ -19,7 +19,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 #export MAVEN_HOME=/path/to/your/maven
 export PATH=$MAVEN_HOME/bin:$PATH
 
-echo "$WEB_URL_PATH"
+echo "Download $WEB_URL_PATH"
 # Download web front-end projects
 if ! curl -fsSLO "$WEB_URL_PATH"; then
   echo "\033[31mDownload failed\033[0m"

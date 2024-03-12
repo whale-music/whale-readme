@@ -43,7 +43,7 @@ public class RootController {
         // 设置布局
         platformConfigRes.setLayout("vertical");
         // 设置主题
-        platformConfigRes.setTheme("default");
+        platformConfigRes.setTheme("light");
         // 设置是否暗黑模式
         platformConfigRes.setDarkMode(false);
         // 设置总体风格

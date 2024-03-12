@@ -1,7 +1,7 @@
 <h1 align="center">Whale</h1>
 <div align="center">
     <a href="">
-        <img height="100px" alt="logo" src="./docs/img/logo.svg" />
+        <img height="100px" alt="logo" src="./docs/logo/logo.svg" />
     </a>
 </div>
 

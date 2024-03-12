@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-maven-
       # 下载前端, 打包
       - name: Run Maven
-        run: bash build/build-tag.sh ${{ github.ref }}
+        run: bash build/build-tag.sh ${{ github.ref_name }}
       # 上传构建jar包
       - name: Upload build
         uses: actions/upload-artifact@v4

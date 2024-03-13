@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class MybatisPlusPaginateConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        // todo 添加多数据源 mysql h2 sqlite
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
         return interceptor;

@@ -1,9 +1,9 @@
 package org.core.utils;
 
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.extra.spring.SpringUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.core.utils.spring.SpringUtil;
 
 public class UserCacheServiceUtils {
     

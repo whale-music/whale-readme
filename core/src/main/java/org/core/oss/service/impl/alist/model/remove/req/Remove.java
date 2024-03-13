@@ -1,39 +1,21 @@
 package org.core.oss.service.impl.alist.model.remove.req;
 
-import com.alibaba.fastjson2.annotation.JSONField;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
+@Setter
+@Getter
+@ToString
 public class Remove {
     
-    @JSONField(name = "names")
+    @JsonProperty("names")
     private List<String> names;
     
-    @JSONField(name = "dir")
+    @JsonProperty("dir")
     private String dir;
-    
-    public List<String> getNames() {
-        return names;
-    }
-    
-    public void setNames(List<String> names) {
-        this.names = names;
-    }
-    
-    public String getDir() {
-        return dir;
-    }
-    
-    public void setDir(String dir) {
-        this.dir = dir;
-    }
-    
-    @Override
-    public String toString() {
-        return
-                "Remove{" +
-                        "names = '" + names + '\'' +
-                        ",dir = '" + dir + '\'' +
-                        "}";
-    }
 }

@@ -3,8 +3,10 @@ package org.core.oss.service.impl.alist.util;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.*;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -66,9 +68,15 @@ public class RequestUtils {
         LoginReq req = new LoginReq();
         req.setUsername(accessKey);
         req.setPassword(secretKey);
-        String resStr = req(host + "/api/auth/login", JSON.toJSONString(req), null);
-        LoginRes loginRes = JSON.parseObject(resStr, LoginRes.class);
-        return Optional.ofNullable(loginRes.getData()).orElse(new DataRes()).getToken();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String resStr = req(host + "/api/auth/login", objectMapper.writeValueAsString(req), null);
+            LoginRes loginRes = objectMapper.readValue(resStr, LoginRes.class);
+            return Optional.ofNullable(loginRes.getData()).orElse(new DataRes()).getToken();
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
     
     public static String upload(String host, String objectSaveConfig, File srcFile, String loginJwtCache) {
@@ -78,7 +86,8 @@ public class RequestUtils {
         headers.put("File-Path", musicAddress);
         
         String resJson = req(host + "/api/fs/form", srcFile, headers);
-        JSONObject parseObject = JSON.parseObject(resJson);
+        
+        JSONObject parseObject = JSONUtil.parseObj(resJson);
         if (!StringUtils.equals(String.valueOf(parseObject.get("code")), String.valueOf(200))) {
             throw new BaseException(ResultCode.OSS_UPLOAD_ERROR);
         }
@@ -107,10 +116,17 @@ public class RequestUtils {
             Remove remove = new Remove();
             remove.setDir(entry.getKey());
             remove.setNames(entry.getValue().parallelStream().map(Resource::getName).toList());
-            String req = req(host + "/api/fs/remove", JSON.toJSONString(remove), headers);
-            Object code = JSONObject.parseObject(req).get("code");
-            if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
-                throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                String req = req(host + "/api/fs/remove", objectMapper.writeValueAsString(remove), headers);
+                Object code = objectMapper.readValue(req, Map.class).get("code");
+                if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
+                    throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+                }
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         }
     }
@@ -120,10 +136,16 @@ public class RequestUtils {
         HashMap<String, String> reqBodyMap = new HashMap<>();
         reqBodyMap.put("path", path);
         reqBodyMap.put("name", newName);
-        String req = req(host + "/api/fs/rename", JSON.toJSONString(reqBodyMap), headers);
-        Object code = JSONObject.parseObject(req).get("code");
-        if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
-            throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String req = req(host + "/api/fs/rename", objectMapper.writeValueAsString(reqBodyMap), headers);
+            Object code = objectMapper.readValue(req, Map.class).get("code");
+            if (code == null || Integer.parseInt(String.valueOf(code)) != 200) {
+                throw new BaseException(ResultCode.OSS_REMOVE_ERROR);
+            }
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

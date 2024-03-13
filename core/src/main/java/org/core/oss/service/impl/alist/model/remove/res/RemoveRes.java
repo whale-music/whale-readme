@@ -1,16 +1,17 @@
 package org.core.oss.service.impl.alist.model.remove.res;
 
-import com.alibaba.fastjson2.annotation.JSONField;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RemoveRes {
     
-    @JSONField(name = "code")
+    @JsonProperty("code")
     private int code;
     
-    @JSONField(name = "data")
+    @JsonProperty("data")
     private Object data;
     
-    @JSONField(name = "message")
+    @JsonProperty("message")
     private String message;
     
     public int getCode() {

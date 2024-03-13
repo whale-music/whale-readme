@@ -2,11 +2,11 @@ package org.core.utils.ip;
 
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.json.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cglib.beans.BeanMap;
 
 /**
  * 获取地址类
@@ -34,9 +34,10 @@ public class AddressUtils {
                 log.error("获取地理位置异常 {}", ip);
                 return UNKNOWN;
             }
-            JSONObject obj = JSON.parseObject(rspStr);
-            String region = obj.getString("pro");
-            String city = obj.getString("city");
+            ObjectMapper objectMapper = new ObjectMapper(rspStr);
+            BeanMap beanMap = BeanMap.create(objectMapper);
+            Object region = beanMap.get("pro");
+            Object city = beanMap.get("city");
             return String.format("%s %s", region, city);
         } catch (Exception e) {
             log.error("获取地理位置异常 {}", ip);

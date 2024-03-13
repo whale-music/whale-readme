@@ -1,8 +1,8 @@
 package org.api.admin.service;
 
 import cn.hutool.core.io.FileUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -164,11 +164,11 @@ public class UserApi {
         String subAccountPassword = sysUserPojo.getSubAccountPassword();
         TypeReference<List<Map<String, String>>> typeReference = new TypeReference<>() {
         };
-        List<Map<String, String>> updateSubAccount = JSON.parseObject(subAccountPassword, typeReference);
+        List<Map<String, String>> updateSubAccount = JSONUtil.toBean(subAccountPassword, typeReference, false);
         Long id = sysUserPojo.getId();
         SysUserPojo byId = accountService.getById(id);
         // 删除缓存，然后重新添加
-        List<Map<String, String>> dbSubAccount = JSON.parseObject(byId.getSubAccountPassword(), typeReference);
+        List<Map<String, String>> dbSubAccount = JSONUtil.toBean(byId.getSubAccountPassword(), typeReference, false);
         for (Map<String, String> stringStringMap : dbSubAccount) {
             userSubPasswordConfig.delAccountCache(stringStringMap.get(UserSubPasswordConfig.ACCOUNT));
         }

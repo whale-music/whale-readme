@@ -9,7 +9,6 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import com.alibaba.fastjson2.JSON;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.plugin.common.CommonPlugin;
 import org.plugin.converter.PluginLabelValue;
+import org.springframework.cglib.beans.BeanMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -329,12 +329,14 @@ class SyncOneMusicPlugin implements CommonPlugin {
      */
     public Map<String, String> getLyric(Long musicId, String cookie) {
         String request = req(host + "/lyric?id=" + musicId, cookie);
-        com.alibaba.fastjson2.JSONObject jsonObject = JSON.parseObject(request);
-        com.alibaba.fastjson2.JSONObject lrc = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("lrc"));
-        String lyricStr = lrc.getString("lyric");
         
-        com.alibaba.fastjson2.JSONObject klyric = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("klyric"));
-        String klyricStr = klyric.getString("lyric");
+        BeanMap beanMap = BeanMap.create(request);
+        
+        BeanMap lrcMap = MapUtil.get(beanMap, "lrc", BeanMap.class);
+        String lyricStr = MapUtil.getStr(lrcMap, "lyric");
+        
+        BeanMap klyricMap = MapUtil.get(beanMap, "klyric", BeanMap.class);
+        String klyricStr = MapUtil.getStr(klyricMap, "lyric");
         
         // String lrc = JsonPath.read(request, "$.lrc.lyric");
         // String klyric = JsonPath.read(request, "$.klyric.lyric");

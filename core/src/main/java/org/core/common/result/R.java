@@ -1,8 +1,13 @@
 package org.core.common.result;
 
-import com.alibaba.fastjson2.JSONObject;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.core.common.exception.BaseErrorInfoInterface;
 
+@Setter
+@Getter
+@ToString
 public class R {
     /**
      * 响应代码
@@ -77,34 +82,4 @@ public class R {
         rb.setData(null);
         return rb;
     }
-    
-    public String getCode() {
-        return code;
-    }
-    
-    public void setCode(String code) {
-        this.code = code;
-    }
-    
-    public String getMessage() {
-        return message;
-    }
-    
-    public void setMessage(String message) {
-        this.message = message;
-    }
-    
-    public Object getData() {
-        return data;
-    }
-    
-    public void setData(Object data) {
-        this.data = data;
-    }
-    
-    @Override
-    public String toString() {
-        return JSONObject.toJSONString(this);
-    }
-    
 }

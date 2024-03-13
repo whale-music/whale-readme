@@ -1,8 +1,8 @@
 package org.core.config;
 
 import cn.hutool.core.collection.CollUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -40,7 +40,7 @@ public class UserSubPasswordConfig {
         
         list.forEach(sysUserPojo -> {
             String subAccountPassword = sysUserPojo.getSubAccountPassword();
-            List<Map<String, String>> subAccount = JSON.parseObject(subAccountPassword, type);
+            List<Map<String, String>> subAccount = JSONUtil.toBean(subAccountPassword, type, false);
             if (CollUtil.isNotEmpty(subAccount)) {
                 subAccount.forEach(stringStringMap -> allSubAccount.put(stringStringMap.get(ACCOUNT), stringStringMap.get(PASSWORD)));
             }
@@ -49,7 +49,7 @@ public class UserSubPasswordConfig {
         Map<String, SysUserPojo> userMap = new HashMap<>();
         for (SysUserPojo sysUserPojo : list) {
             String subAccountPassword = sysUserPojo.getSubAccountPassword();
-            List<Map<String, String>> subAccount = JSON.parseObject(subAccountPassword, type);
+            List<Map<String, String>> subAccount = JSONUtil.toBean(subAccountPassword, type, false);
             if (CollUtil.isEmpty(subAccount)) {
                 continue;
             }

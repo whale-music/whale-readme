@@ -5,10 +5,10 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.PageUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
@@ -210,7 +210,7 @@ public class SongListsApi {
             default:
                 long count = albumService.count();
                 int pageCount = PageUtil.totalPage(Math.toIntExact(count), Math.toIntExact(size));
-                long randomOffset = RandomUtils.nextLong(0, pageCount);
+                long randomOffset = RandomUtil.randomLong(0, pageCount);
                 LambdaQueryWrapper<TbAlbumPojo> randomQueryWrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
                                                                              .between(yearFlag,
                                                                                      TbAlbumPojo::getPublishTime,

@@ -1,6 +1,7 @@
 package org.web.neteasecloudmusic.controller.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.Header;
 import com.alibaba.fastjson2.JSON;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
@@ -116,7 +116,7 @@ public class LoginController extends BaseController {
         String value = "/login-key/index.html?key=" + uuidString;
         String qrUrl = localhost + value;
         r.put("qrurl", qrUrl);
-        r.put("qrimg", Base64Util.encode(qrUrl));
+        r.put("qrimg", Base64.encode(qrUrl));
     }
     
     /**

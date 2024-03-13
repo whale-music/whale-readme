@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 @Data
-@ApiModel("保存 用户关注歌曲家")
+@Schema(title = "保存 用户关注歌曲家")
 public class TbUserArtistEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -18,7 +18,7 @@ public class TbUserArtistEntityVO implements Serializable {
      * 用户ID
      */
     @NotNull(message = "userId can not null")
-    @ApiModelProperty("用户ID")
+    @Schema(name = "用户ID")
     private Long userId;
     
     
@@ -26,7 +26,7 @@ public class TbUserArtistEntityVO implements Serializable {
      * 歌手ID
      */
     @NotNull(message = "artistId can not null")
-    @ApiModelProperty("歌手ID")
+    @Schema(name = "歌手ID")
     private Long artistId;
     
 }

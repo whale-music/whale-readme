@@ -1,6 +1,6 @@
 package org.api.admin.model.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,9 +15,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PlayListReq extends TbCollectPojo {
-    @ApiModelProperty("歌单tag")
+    @Schema(name = "歌单tag")
     private List<String> collectTag;
     
-    @ApiModelProperty("分页数据")
+    @Schema(name = "分页数据")
     private PageCommon page;
 }

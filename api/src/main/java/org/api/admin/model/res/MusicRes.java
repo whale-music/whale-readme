@@ -1,6 +1,6 @@
 package org.api.admin.model.res;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,15 +15,15 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class MusicRes extends TbMusicPojo {
-    @ApiModelProperty("歌手")
+    @Schema(name = "歌手")
     private List<TbArtistPojo> singerList;
     
-    @ApiModelProperty("专辑名")
+    @Schema(name = "专辑名")
     private TbAlbumPojo album;
     
-    @ApiModelProperty("歌曲地址")
+    @Schema(name = "歌曲地址")
     private List<TbResourcePojo> musicUrlList;
     
-    @ApiModelProperty("是否可以播放")
+    @Schema(name = "是否可以播放")
     private Boolean isPlaying;
 }

@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Data
-@ApiModel("保存 插件任务表")
+@Schema(title = "保存 插件任务表")
 public class TbPluginTaskEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -19,7 +19,7 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 任务ID
      */
     @NotNull(message = "id can not null")
-    @ApiModelProperty("任务ID")
+    @Schema(name = "任务ID")
     private Long id;
     
     
@@ -27,7 +27,7 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 插件ID
      */
     @NotNull(message = "pluginId can not null")
-    @ApiModelProperty("插件ID")
+    @Schema(name = "插件ID")
     private Long pluginId;
     
     
@@ -35,14 +35,14 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 当前任务执行状态,0: stop, 1: run, 2: error
      */
     @NotNull(message = "status can not null")
-    @ApiModelProperty("当前任务执行状态,0: stop, 1: run, 2: error")
+    @Schema(name = "当前任务执行状态,0: stop, 1: run, 2: error")
     private Integer status;
     
     
     /**
      * 插件入参
      */
-    @ApiModelProperty("插件入参")
+    @Schema(name = "插件入参")
     private String params;
     
     
@@ -50,7 +50,7 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 用户创建ID
      */
     @NotNull(message = "userId can not null")
-    @ApiModelProperty("用户创建ID")
+    @Schema(name = "用户创建ID")
     private Long userId;
     
     
@@ -58,7 +58,7 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 创建时间
      */
     @NotNull(message = "createTime can not null")
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
     
@@ -66,7 +66,7 @@ public class TbPluginTaskEntityVO implements Serializable {
      * 更新时间
      */
     @NotNull(message = "updateTime can not null")
-    @ApiModelProperty("更新时间")
+    @Schema(name = "更新时间")
     private LocalDateTime updateTime;
     
 }

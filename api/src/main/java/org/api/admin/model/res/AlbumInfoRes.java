@@ -1,6 +1,5 @@
 package org.api.admin.model.res;
 
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,16 +18,16 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AlbumInfoRes extends AlbumConvert {
-    @ApiModelProperty("专辑流派")
+    @Schema(name = "专辑流派")
     private List<String> albumGenre;
     
-    @ApiModelProperty("音乐数据")
+    @Schema(name = "音乐数据")
     private List<AlbumMusic> musicList;
     
-    @ApiModelProperty("专辑歌曲数量")
+    @Schema(name = "专辑歌曲数量")
     private Long albumSize;
     
-    @ApiModelProperty("歌手信息")
+    @Schema(name = "歌手信息")
     private List<AlbumArtist> artistList;
     
     public void setMusicList(Collection<MusicConvert> musicList) {

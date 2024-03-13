@@ -1,6 +1,6 @@
 package org.api.admin.model.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,22 +12,22 @@ import org.api.admin.model.common.PageReqCommon;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MusicTabPageReq extends PageReqCommon {
-    @ApiModelProperty("all name")
+    @Schema(name = "all name")
     private String name;
     
-    @ApiModelProperty("音乐名")
+    @Schema(name = "音乐名")
     private String musicName;
     
-    @ApiModelProperty("歌手")
+    @Schema(name = "歌手")
     private String artistName;
     
-    @ApiModelProperty("专辑")
+    @Schema(name = "专辑")
     private String albumName;
     
-    @ApiModelProperty("是否刷新缓存")
+    @Schema(name = "是否刷新缓存")
     private Boolean refresh;
     
-    @ApiModelProperty("是否只显示无音源")
+    @Schema(name = "是否只显示无音源")
     private Boolean isShowSource;
     
 }

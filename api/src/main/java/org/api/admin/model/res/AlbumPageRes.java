@@ -1,7 +1,6 @@
 package org.api.admin.model.res;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +17,7 @@ public class AlbumPageRes {
     @Schema(title = "专辑表ID")
     private Long id;
     
-    @ApiModelProperty("封面地址")
+    @Schema(title = "封面地址")
     private String picUrl;
     
     @Schema(title = "专辑名")
@@ -36,16 +35,16 @@ public class AlbumPageRes {
     @Schema(title = "创建时间")
     private LocalDateTime createTime;
     
-    @ApiModelProperty("专辑歌曲数量")
+    @Schema(name = "专辑歌曲数量")
     private Long albumSize;
     
-    @ApiModelProperty("歌手信息")
+    @Schema(name = "歌手信息")
     private List<AlbumArtistConvert> artistList;
     
-    @ApiModelProperty(value = "排序", example = "sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序")
+    @Schema(name = "排序", example = "sort歌曲添加顺序, createTime创建日期顺序,updateTime修改日期顺序, id歌曲ID顺序")
     private String orderBy;
     
-    @ApiModelProperty(value = "数据排序", example = "true: ASC, false: DESC")
+    @Schema(name = "数据排序", example = "true: ASC, false: DESC")
     private Boolean order;
     
     @Data
@@ -63,7 +62,7 @@ public class AlbumPageRes {
         @TableField("alias_name")
         private String aliasName;
         
-        @ApiModelProperty("封面地址")
+        @Schema(title = "封面地址")
         private String picUrl;
         
         public AlbumArtistConvert(ArtistConvert artistConvert) {

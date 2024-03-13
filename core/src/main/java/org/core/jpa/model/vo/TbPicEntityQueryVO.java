@@ -1,15 +1,14 @@
 package org.core.jpa.model.vo;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@ApiModel("自定义查询 音乐专辑歌单封面表")
+@Schema(title = "自定义查询 音乐专辑歌单封面表")
 public class TbPicEntityQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -19,7 +18,7 @@ public class TbPicEntityQueryVO implements Serializable {
     /**
      * 音乐网络地址，或路径
      */
-    @ApiModelProperty("音乐网络地址，或路径")
+    @Schema(name = "音乐网络地址，或路径")
     private String url;
     
     private String md5;
@@ -28,14 +27,14 @@ public class TbPicEntityQueryVO implements Serializable {
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")
+    @Schema(name = "更新时间")
     private LocalDateTime updateTime;
     
     
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
 }

@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 @Configuration
 @Slf4j
 public class AdminPermitAllUrlProperties {
-    private final static String asterisk = "*";
-    private final static Pattern pattern = Pattern.compile("\\{(.*?)}");
+    private static final String ASTERISK = "*";
+    private static final Pattern PATTERN = Pattern.compile("\\{(.*?)}");
     
     /**
      * 创建并添加本地文件
@@ -42,13 +42,13 @@ public class AdminPermitAllUrlProperties {
             // 获取方法上边的注解 替代path variable 为 *
             AnonymousAccess method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), AnonymousAccess.class);
             Optional.ofNullable(method)
-                    .ifPresent(anonymous -> info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, pattern, asterisk))));
+                    .ifPresent(anonymous -> info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK))));
             
             // 获取类上边的注解, 替代path variable 为 *
             AnonymousAccess controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), AnonymousAccess.class);
             Optional.ofNullable(controller).ifPresent(anonymous -> {
                 if (Objects.nonNull(info.getPatternsCondition())) {
-                    info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, pattern, asterisk)));
+                    info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, ASTERISK)));
                 }
             });
         });

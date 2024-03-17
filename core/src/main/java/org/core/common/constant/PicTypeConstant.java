@@ -65,6 +65,14 @@ public class PicTypeConstant {
             "userBackground",
             PicTypeConstant.USER_BACKGROUND);
     
+    public static final Map<Byte, Byte> tagToPic = Map.of(
+            TargetTagConstant.TARGET_MV_TAG, PicTypeConstant.MV,
+            TargetTagConstant.TARGET_MUSIC_GENRE, PicTypeConstant.MUSIC,
+            TargetTagConstant.TARGET_MUSIC_TAG, PicTypeConstant.MUSIC,
+            TargetTagConstant.TARGET_ALBUM_GENRE, PicTypeConstant.ALBUM,
+            TargetTagConstant.TARGET_COLLECT_TAG, PicTypeConstant.PLAYLIST
+    );
+    
     private PicTypeConstant() {
     }
 }

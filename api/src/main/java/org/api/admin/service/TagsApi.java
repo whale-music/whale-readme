@@ -46,11 +46,14 @@ public class TagsApi {
         Page<TbMiddleTagPojo> page = new Page<>(req.getPageIndex(), req.getPageNum());
         
         // 查询Tag
-        List<Long> selectTagNameIds = tbTagService.listObjs(Wrappers.<TbTagPojo>lambdaQuery()
-                                                                    .select(TbTagPojo::getId)
-                                                                    .in(TbTagPojo::getTagName, req.getFilterTagContents()));
-        if (CollUtil.isEmpty(selectTagNameIds) && CollUtil.isNotEmpty(req.getFilterTagContents())) {
-            return new PageResCommon<>();
+        List<Long> selectTagNameIds = null;
+        if (CollUtil.isNotEmpty(req.getFilterTagContents())) {
+            selectTagNameIds = tbTagService.listObjs(Wrappers.<TbTagPojo>lambdaQuery()
+                                                             .select(TbTagPojo::getId)
+                                                             .in(TbTagPojo::getTagName, req.getFilterTagContents()));
+            if (CollUtil.isEmpty(selectTagNameIds) && CollUtil.isNotEmpty(req.getFilterTagContents())) {
+                return new PageResCommon<>();
+            }
         }
         // 分组查询数据关联的tag
         List<Byte> typeList = req.getType().parallelStream().filter(Objects::nonNull).map(TargetTagConstant.keyMap::get).toList();

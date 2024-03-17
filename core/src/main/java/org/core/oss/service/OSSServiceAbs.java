@@ -1,14 +1,19 @@
 package org.core.oss.service;
 
 import cn.hutool.cache.CacheUtil;
-import cn.hutool.cache.impl.LFUCache;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
+import org.core.common.result.ResultCode;
+import org.core.mybatis.iservice.TbMvService;
+import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.iservice.TbResourceService;
+import org.core.mybatis.pojo.TbMvPojo;
+import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.model.Resource;
 import org.core.oss.service.impl.alist.enums.ResourceEnum;
@@ -23,8 +28,6 @@ public abstract class OSSServiceAbs {
     
     protected final Map<ResourceEnum, TimedCache<String, Resource>> cache = new EnumMap<>(ResourceEnum.class);
     protected final Map<ResourceEnum, TimedCache<String, String>> cacheMd5 = new EnumMap<>(ResourceEnum.class);
-    // db 数据 key: path
-    protected final LFUCache<String, TbResourcePojo> dbCache = CacheUtil.newLFUCache(5000);
     // 音乐地址创建缓存
     protected TimedCache<String, Resource> musicUrlTimedCache;
     protected TimedCache<String, Resource> picUrlTimedCache;
@@ -34,11 +37,17 @@ public abstract class OSSServiceAbs {
     protected TimedCache<String, String> mvMd5TimedCache;
     
     protected SaveConfig config;
-    protected TbResourceService tbResourceService;
     
-    protected OSSServiceAbs(SaveConfig config, TbResourceService tbResourceService) {
+    protected TbResourceService tbResourceService;
+    protected TbPicService tbPicService;
+    protected TbMvService tbMvService;
+    
+    
+    protected OSSServiceAbs(SaveConfig config, TbResourceService tbResourceService, TbPicService tbPicService, TbMvService tbMvService) {
         this.config = config;
         this.tbResourceService = tbResourceService;
+        this.tbPicService = tbPicService;
+        this.tbMvService = tbMvService;
         
         long timeout = this.config.getBufferTime();
         musicUrlTimedCache = CacheUtil.newTimedCache(timeout);
@@ -112,6 +121,40 @@ public abstract class OSSServiceAbs {
             case MV -> col.addAll(config.getMvSave());
             case PIC -> col.addAll(config.getImgSave());
             case MUSIC -> col.addAll(config.getObjectSave());
+        }
+    }
+    
+    protected void fillMd5Cache(TimedCache<String, String> md5MappingPath, ResourceEnum type, ArrayList<String> path) {
+        if (CollUtil.isEmpty(path)) {
+            return;
+        }
+        switch (type) {
+            case MUSIC -> {
+                List<TbResourcePojo> resourceByPath = tbResourceService.getResourceByPath(path);
+                if (CollUtil.isEmpty(resourceByPath)) {
+                    return;
+                }
+                Map<String, String> collect = resourceByPath.parallelStream().collect(Collectors.toMap(TbResourcePojo::getPath, TbResourcePojo::getMd5));
+                collect.forEach(md5MappingPath::put);
+                
+            }
+            case PIC -> {
+                List<TbPicPojo> resourceByPath = tbPicService.getResourceByPath(path);
+                if (CollUtil.isEmpty(resourceByPath)) {
+                    return;
+                }
+                Map<String, String> collect = resourceByPath.parallelStream().collect(Collectors.toMap(TbPicPojo::getPath, TbPicPojo::getMd5));
+                collect.forEach(md5MappingPath::put);
+            }
+            case MV -> {
+                List<TbMvPojo> resourceByPath = tbMvService.getResourceByPath(path);
+                if (CollUtil.isEmpty(resourceByPath)) {
+                    return;
+                }
+                Map<String, String> collect = resourceByPath.parallelStream().collect(Collectors.toMap(TbMvPojo::getPath, TbMvPojo::getMd5));
+                collect.forEach(md5MappingPath::put);
+            }
+            default -> throw new BaseException(ResultCode.PARAM_TYPE_BIND_ERROR);
         }
     }
     

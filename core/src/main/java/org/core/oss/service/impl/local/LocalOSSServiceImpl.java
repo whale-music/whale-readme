@@ -14,8 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
+import org.core.mybatis.iservice.TbMvService;
+import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.iservice.TbResourceService;
-import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.OSSServiceAbs;
@@ -38,8 +39,8 @@ public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
     
     public static final String SERVICE_NAME = "local";
     
-    public LocalOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService) {
-        super(config, tbResourceService);
+    public LocalOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService, TbPicService tbPicService, TbMvService tbMvService) {
+        super(config, tbResourceService, tbPicService, tbMvService);
     }
     
     /**
@@ -94,7 +95,8 @@ public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
         correspondingData(type, col);
         
         TimedCache<String, Resource> cacheResources = cache.get(type);
-        TimedCache<String, String> md5MappingPath = cacheMd5.get(type);
+        
+        ArrayList<String> paths = new ArrayList<>();
         for (String s : col) {
             List<File> files = PathUtil.loopFiles(Path.of(config.getHost() + "/" + s),
                     deep,
@@ -121,13 +123,13 @@ public class LocalOSSServiceImpl extends OSSServiceAbs implements OSSService {
                     log.warn("read file no create data: {}", ex.getMessage());
                 }
                 
-                TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByPath(e.getPath()));
-                if (Objects.nonNull(tbResourcePojo)) {
-                    md5MappingPath.put(tbResourcePojo.getMd5(), e.getPath());
-                }
+                paths.add(e.getPath());
                 cacheResources.put(e.getPath(), e);
             }
         }
+        
+        TimedCache<String, String> md5MappingPath = cacheMd5.get(type);
+        fillMd5Cache(md5MappingPath, type, paths);
     }
     
     private String getPath(final String uri) {

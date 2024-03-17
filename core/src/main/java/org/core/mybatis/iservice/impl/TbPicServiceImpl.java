@@ -7,6 +7,8 @@ import org.core.mybatis.mapper.TbPicMapper;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 音乐专辑歌单封面表 服务实现类
@@ -25,7 +27,18 @@ public class TbPicServiceImpl extends ServiceImpl<TbPicMapper, TbPicPojo> implem
      * @return 封面信息
      */
     @Override
-    public TbPicPojo getPicResourceByName(String path) {
+    public TbPicPojo getPicResourceByPath(String path) {
         return this.getOne(Wrappers.<TbPicPojo>lambdaQuery().eq(TbPicPojo::getPath, path));
+    }
+    
+    /**
+     * 获取封面数据
+     *
+     * @param paths 封面路径
+     * @return 封面数据
+     */
+    @Override
+    public List<TbPicPojo> getResourceByPath(List<String> paths) {
+        return this.list(Wrappers.<TbPicPojo>lambdaQuery().in(TbPicPojo::getPath, paths));
     }
 }

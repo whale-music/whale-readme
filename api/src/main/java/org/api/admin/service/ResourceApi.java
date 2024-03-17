@@ -235,7 +235,7 @@ public class ResourceApi {
         Resource resource = remoteStorageService.getPicResource(path);
         ResourcePicInfoRes res = new ResourcePicInfoRes();
         BeanUtils.copyProperties(resource, res);
-        TbPicPojo picResourceByName = tbPicService.getPicResourceByName(path);
+        TbPicPojo picResourceByName = tbPicService.getPicResourceByPath(path);
         // artist album music playlist user userBackground mv
         if (Objects.nonNull(picResourceByName)) {
             res.setPicResource(picResourceByName);

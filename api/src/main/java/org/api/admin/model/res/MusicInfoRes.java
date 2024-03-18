@@ -1,6 +1,5 @@
 package org.api.admin.model.res;
 
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,56 +18,56 @@ import java.util.Map;
 @NoArgsConstructor
 public class MusicInfoRes implements Serializable {
     
-    @ApiModelProperty("音乐ID")
+    @Schema(name = "音乐ID")
     private Long id;
     
-    @ApiModelProperty("音乐名")
+    @Schema(name = "音乐名")
     private String musicName;
     
-    @ApiModelProperty("音乐别名")
+    @Schema(name = "音乐别名")
     private String aliasName;
     
-    @ApiModelProperty("音乐tag")
+    @Schema(name = "音乐tag")
     private List<String> musicTag;
     
-    @ApiModelProperty("音乐流派")
+    @Schema(name = "音乐流派")
     private List<String> musicGenre;
     
-    @ApiModelProperty("封面")
+    @Schema(name = "封面")
     private String picUrl;
     
-    @ApiModelProperty("歌手名ID")
+    @Schema(name = "歌手名ID")
     private List<Artist> artists;
     
-    @ApiModelProperty("专辑")
+    @Schema(name = "专辑")
     private Album album;
     
-    @ApiModelProperty("专辑")
+    @Schema(name = "专辑")
     private List<MusicSources> sources;
     
-    @ApiModelProperty("歌词")
+    @Schema(name = "歌词")
     private Map<String, Lyrics> lyrics;
     
-    @ApiModelProperty("歌曲时长")
+    @Schema(name = "歌曲时长")
     private Integer timeLength;
     
-    @ApiModelProperty("发行时间")
+    @Schema(name = "发行时间")
     private LocalDateTime publishTime;
     
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Album implements Serializable {
-        @ApiModelProperty("专辑")
+        @Schema(name = "专辑")
         private Long albumId;
         
-        @ApiModelProperty("专辑")
+        @Schema(name = "专辑")
         private String albumName;
         
-        @ApiModelProperty("歌手名ID")
+        @Schema(name = "歌手名ID")
         private List<Artist> artist;
     }
     

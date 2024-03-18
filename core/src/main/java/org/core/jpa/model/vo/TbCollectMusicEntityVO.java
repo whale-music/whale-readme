@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 @Data
-@ApiModel("保存 歌单和音乐的中间表，用于记录歌单中的每一个音乐")
+@Schema(title = "保存 歌单和音乐的中间表，用于记录歌单中的每一个音乐")
 public class TbCollectMusicEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -18,7 +18,7 @@ public class TbCollectMusicEntityVO implements Serializable {
      * 歌单ID
      */
     @NotNull(message = "collectId can not null")
-    @ApiModelProperty("歌单ID")
+    @Schema(name = "歌单ID")
     private Long collectId;
     
     
@@ -26,7 +26,7 @@ public class TbCollectMusicEntityVO implements Serializable {
      * 音乐ID
      */
     @NotNull(message = "musicId can not null")
-    @ApiModelProperty("音乐ID")
+    @Schema(name = "音乐ID")
     private Long musicId;
     
     
@@ -34,7 +34,7 @@ public class TbCollectMusicEntityVO implements Serializable {
      * 添加顺序
      */
     @NotNull(message = "sort can not null")
-    @ApiModelProperty("添加顺序")
+    @Schema(name = "添加顺序")
     private Long sort;
     
 }

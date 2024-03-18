@@ -11,7 +11,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import com.alibaba.fastjson2.JSON;
+import cn.hutool.json.JSONUtil;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -417,12 +417,9 @@ public class SyncPlayListMusicPlugin implements CommonPlugin {
      */
     public Map<String, String> getLyric(Long musicId, String cookie) {
         String request = req(host + "/lyric?id=" + musicId, cookie);
-        com.alibaba.fastjson2.JSONObject jsonObject = JSON.parseObject(request);
-        com.alibaba.fastjson2.JSONObject lrc = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("lrc"));
-        String lyricStr = MapUtil.get(lrc, "lyric", String.class);
-        
-        com.alibaba.fastjson2.JSONObject klyric = com.alibaba.fastjson2.JSONObject.from(jsonObject.get("klyric"));
-        String klyricStr = MapUtil.get(klyric, "lyric", String.class);
+        JSONObject jsonObject = JSONUtil.parseObj(request);
+        String lyricStr = JSONUtil.parseObj(jsonObject.get("lrc")).get("lyric", String.class);
+        String klyricStr = JSONUtil.parseObj(jsonObject.get("klyric")).get("lyric", String.class);
         
         // String lrc = JsonPath.read(request, "$.lrc.lyric");
         // String klyric = JsonPath.read(request, "$.klyric.lyric");

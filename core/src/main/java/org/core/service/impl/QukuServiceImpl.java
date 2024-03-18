@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.map.DefaultedMap;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.LyricConstant;
 import org.core.common.constant.PicTypeConstant;
@@ -363,7 +362,7 @@ public class QukuServiceImpl implements QukuService {
     public List<MusicConvert> randomMusicList(int count, String genre, Long fromYear, Long toYear) {
         long sumCount = musicService.count();
         int pageCount = PageUtil.totalPage((int) sumCount, count);
-        long randomOffset = RandomUtils.nextLong(0, pageCount);
+        long randomOffset = RandomUtil.randomLong(0, pageCount);
         Page<TbMusicPojo> page = new Page<>(RandomUtil.randomLong(0, randomOffset), count);
         boolean genreFlag = StringUtils.isNotBlank(genre);
         

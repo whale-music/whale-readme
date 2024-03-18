@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -13,7 +14,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
@@ -240,7 +240,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
             return;
         }
         // 下载封面, 保存文件名为md5
-        String randomName = System.currentTimeMillis() + String.valueOf(RandomUtils.nextLong());
+        String randomName = System.currentTimeMillis() + String.valueOf(RandomUtil.randomLong());
         String dirPath = httpRequestConfig.getTempPath() + FileUtil.FILE_SEPARATOR + randomName;
         String md5Hex;
         String upload;

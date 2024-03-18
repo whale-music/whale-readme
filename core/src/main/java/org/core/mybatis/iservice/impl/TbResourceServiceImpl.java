@@ -50,6 +50,17 @@ public class TbResourceServiceImpl extends ServiceImpl<TbResourceMapper, TbResou
     }
     
     /**
+     * 根据路径, 获取音乐数据
+     *
+     * @param paths 音乐路径
+     * @return 音乐列表
+     */
+    @Override
+    public List<TbResourcePojo> getResourceByPath(Collection<String> paths) {
+        return this.list(Wrappers.<TbResourcePojo>lambdaQuery().in(TbResourcePojo::getPath, paths));
+    }
+    
+    /**
      * 获取音源列表
      *
      * @param ids 音乐id

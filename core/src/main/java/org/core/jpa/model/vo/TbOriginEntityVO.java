@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 @Data
-@ApiModel("保存 音乐来源")
+@Schema(title = "保存 音乐来源")
 public class TbOriginEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -21,7 +21,7 @@ public class TbOriginEntityVO implements Serializable {
      * 音乐ID
      */
     @NotNull(message = "musicId can not null")
-    @ApiModelProperty("音乐ID")
+    @Schema(name = "音乐ID")
     private Long musicId;
     
     
@@ -29,7 +29,7 @@ public class TbOriginEntityVO implements Serializable {
      * 源地址ID
      */
     @NotNull(message = "resourceId can not null")
-    @ApiModelProperty("源地址ID")
+    @Schema(name = "源地址ID")
     private Long resourceId;
     
     
@@ -37,14 +37,14 @@ public class TbOriginEntityVO implements Serializable {
      * 来源
      */
     @NotNull(message = "origin can not null")
-    @ApiModelProperty("来源")
+    @Schema(name = "来源")
     private String origin;
     
     
     /**
      * 来源地址
      */
-    @ApiModelProperty("来源地址")
+    @Schema(name = "来源地址")
     private String originUrl;
     
 }

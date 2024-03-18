@@ -1,7 +1,7 @@
 package org.plugin.scheduling;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.core.mybatis.pojo.TbPluginTaskPojo;
@@ -89,8 +89,8 @@ public class DynamicTaskService {
             log.info("task设定cron==> {}", task.getCron());
             log.info("开始时间==> {}", LocalDateTime.now());
             log.info("params: {}", task.getParams());
-            List<PluginLabelValue> pluginLabelValue = JSON.parseObject(task.getParams(), new TypeReference<List<PluginLabelValue>>() {
-            });
+            List<PluginLabelValue> pluginLabelValue = JSONUtil.toBean(task.getParams(), new TypeReference<List<PluginLabelValue>>() {
+            }, false);
             TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(task.getPluginId(), pluginLabelValue, task.getUserId());
             pluginService.execPluginTask(pluginLabelValue, task.getPluginId(), false, pojo);
             stopWatch.stop();

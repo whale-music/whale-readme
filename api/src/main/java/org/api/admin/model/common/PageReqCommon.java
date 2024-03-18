@@ -1,7 +1,7 @@
 package org.api.admin.model.common;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,10 +15,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PageReqCommon implements Serializable {
-    @ApiModelProperty("当前页数")
+    @Schema(name = "当前页数")
     private Integer pageIndex;
     
-    @ApiModelProperty("每页展示行数")
+    @Schema(name = "每页展示行数")
     private Integer pageNum;
     
     

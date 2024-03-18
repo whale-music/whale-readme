@@ -29,7 +29,7 @@ public class PageResCommon<T> {
     }
     
     public PageResCommon() {
-        this.current = 0L;
+        this.current = 1L;
         this.size = 50L;
     }
     

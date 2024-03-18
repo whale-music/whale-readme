@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Data
-@ApiModel("保存 插件表")
+@Schema(title = "保存 插件表")
 public class TbPluginEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -19,7 +19,7 @@ public class TbPluginEntityVO implements Serializable {
      * 插件ID
      */
     @NotNull(message = "id can not null")
-    @ApiModelProperty("插件ID")
+    @Schema(name = "插件ID")
     private Long id;
     
     
@@ -27,14 +27,14 @@ public class TbPluginEntityVO implements Serializable {
      * 插件名称
      */
     @NotNull(message = "pluginName can not null")
-    @ApiModelProperty("插件名称")
+    @Schema(name = "插件名称")
     private String pluginName;
     
     
     /**
      * 插件创建者
      */
-    @ApiModelProperty("插件创建者")
+    @Schema(name = "插件创建者")
     private String createName;
     
     
@@ -42,14 +42,14 @@ public class TbPluginEntityVO implements Serializable {
      * 插件类型
      */
     @NotNull(message = "type can not null")
-    @ApiModelProperty("插件类型")
+    @Schema(name = "插件类型")
     private String type;
     
     
     /**
      * 插件代码
      */
-    @ApiModelProperty("插件代码")
+    @Schema(name = "插件代码")
     private String code;
     
     
@@ -57,14 +57,14 @@ public class TbPluginEntityVO implements Serializable {
      * 插件创建者
      */
     @NotNull(message = "userId can not null")
-    @ApiModelProperty("插件创建者")
+    @Schema(name = "插件创建者")
     private Long userId;
     
     
     /**
      * 插件描述
      */
-    @ApiModelProperty("插件描述")
+    @Schema(name = "插件描述")
     private String description;
     
     
@@ -72,7 +72,7 @@ public class TbPluginEntityVO implements Serializable {
      * 创建时间
      */
     @NotNull(message = "createTime can not null")
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
     
@@ -80,7 +80,7 @@ public class TbPluginEntityVO implements Serializable {
      * 更新时间
      */
     @NotNull(message = "updateTime can not null")
-    @ApiModelProperty("更新时间")
+    @Schema(name = "更新时间")
     private LocalDateTime updateTime;
     
 }

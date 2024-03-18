@@ -1,14 +1,15 @@
 package org.web.neteasecloudmusic.controller.v1;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.Header;
-import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Base64Util;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.api.neteasecloudmusic.model.vo.login.status.LoginStatusRes;
 import org.api.neteasecloudmusic.model.vo.user.UserVo;
@@ -116,7 +117,7 @@ public class LoginController extends BaseController {
         String value = "/login-key/index.html?key=" + uuidString;
         String qrUrl = localhost + value;
         r.put("qrurl", qrUrl);
-        r.put("qrimg", Base64Util.encode(qrUrl));
+        r.put("qrimg", Base64.encode(qrUrl));
     }
     
     /**
@@ -157,7 +158,7 @@ public class LoginController extends BaseController {
     
     @GetMapping("/login/sure")
     @AnonymousAccess
-    public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) {
+    public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) throws JsonProcessingException {
         String data = GlobeDataUtil.getData(codekey);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
@@ -165,13 +166,14 @@ public class LoginController extends BaseController {
             return r.error("800", "二维码不存在或已过期");
         }
         SysUserPojo userPojo = user.login(phone, password);
-        GlobeDataUtil.setData(codekey, JSON.toJSONString(userPojo));
+        ObjectMapper objectMapper = new ObjectMapper();
+        GlobeDataUtil.setData(codekey, objectMapper.writeValueAsString(userPojo));
         return r.success();
     }
     
     @GetMapping("/login/qr/check")
     @AnonymousAccess
-    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
+    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) throws JsonProcessingException {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
@@ -183,7 +185,7 @@ public class LoginController extends BaseController {
             r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("801", "等待扫码");
         }
-        SysUserPojo userPojo = JSON.parseObject(data, SysUserPojo.class);
+        SysUserPojo userPojo = new ObjectMapper().readValue(data, SysUserPojo.class);
         String sign = TokenUtil.signToken(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
         

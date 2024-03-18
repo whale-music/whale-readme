@@ -1,6 +1,6 @@
 package org.api.admin.model.res;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,9 +13,9 @@ import org.core.mybatis.pojo.TbResourcePojo;
 @NoArgsConstructor
 public class MusicFileRes extends TbResourcePojo {
     
-    @ApiModelProperty("文件下载地址")
+    @Schema(name = "文件下载地址")
     private String rawUrl;
     
-    @ApiModelProperty("文件下载地址")
+    @Schema(name = "文件下载地址")
     private Boolean exists;
 }

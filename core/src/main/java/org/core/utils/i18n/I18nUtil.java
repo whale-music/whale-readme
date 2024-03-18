@@ -1,8 +1,8 @@
 package org.core.utils.i18n;
 
+import cn.hutool.extra.spring.SpringUtil;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.core.utils.spring.SpringUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;

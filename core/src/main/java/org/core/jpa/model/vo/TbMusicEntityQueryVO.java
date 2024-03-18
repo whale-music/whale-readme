@@ -1,15 +1,14 @@
 package org.core.jpa.model.vo;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@ApiModel("自定义查询 所有音乐列表")
+@Schema(title = "自定义查询 所有音乐列表")
 public class TbMusicEntityQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -17,63 +16,63 @@ public class TbMusicEntityQueryVO implements Serializable {
     /**
      * 音乐ID
      */
-    @ApiModelProperty("音乐ID")
+    @Schema(name = "音乐ID")
     private Long id;
     
     
     /**
      * 音乐名
      */
-    @ApiModelProperty("音乐名")
+    @Schema(name = "音乐名")
     private String musicName;
     
     
     /**
      * 歌曲别名，数组则使用逗号分割
      */
-    @ApiModelProperty("歌曲别名，数组则使用逗号分割")
+    @Schema(name = "歌曲别名，数组则使用逗号分割")
     private String aliasName;
     
     
     /**
      * 专辑ID
      */
-    @ApiModelProperty("专辑ID")
+    @Schema(name = "专辑ID")
     private Long albumId;
     
     
     /**
      * 排序字段
      */
-    @ApiModelProperty("排序字段")
+    @Schema(name = "排序字段")
     private Long sort;
     
     
     /**
      * 上传用户ID
      */
-    @ApiModelProperty("上传用户ID")
+    @Schema(name = "上传用户ID")
     private Long userId;
     
     
     /**
      * 歌曲时长
      */
-    @ApiModelProperty("歌曲时长")
+    @Schema(name = "歌曲时长")
     private Integer timeLength;
     
     
     /**
      * 更新时间
      */
-    @ApiModelProperty("更新时间")
+    @Schema(name = "更新时间")
     private LocalDateTime updateTime;
     
     
     /**
      * 创建时间
      */
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
 }

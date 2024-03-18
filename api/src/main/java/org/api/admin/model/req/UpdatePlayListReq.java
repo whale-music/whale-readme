@@ -1,6 +1,5 @@
 package org.api.admin.model.req;
 
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +24,6 @@ public class UpdatePlayListReq {
     @Schema(title = "简介")
     private String description;
     
-    @ApiModelProperty("歌单tag")
+    @Schema(name = "歌单tag")
     private List<String> collectTag;
 }

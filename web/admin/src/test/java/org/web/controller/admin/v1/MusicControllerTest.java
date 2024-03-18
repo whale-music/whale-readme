@@ -2,8 +2,8 @@ package org.web.controller.admin.v1;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.RandomUtil;
 import net.datafaker.Faker;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.req.SaveOrUpdateMusicReq;
@@ -231,7 +231,7 @@ class MusicControllerTest {
         ArrayList<AudioInfoReq.AudioArtist> artists = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             AudioInfoReq.AudioArtist e = new AudioInfoReq.AudioArtist();
-            e.setSex(RandomUtils.nextBoolean() ? "男" : "女");
+            e.setSex(RandomUtil.randomBoolean() ? "男" : "女");
             e.setBirth(faker.date().birthday().toLocalDateTime().toLocalDate());
             e.setLocation(faker.address().cityName());
             e.setAliasName(faker.artist().name());

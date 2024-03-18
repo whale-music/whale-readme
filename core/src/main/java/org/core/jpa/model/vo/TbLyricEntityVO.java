@@ -1,7 +1,7 @@
 package org.core.jpa.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Data
-@ApiModel("保存 歌词表")
+@Schema(title = "保存 歌词表")
 public class TbLyricEntityVO implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -19,7 +19,7 @@ public class TbLyricEntityVO implements Serializable {
      * 主键
      */
     @NotNull(message = "id can not null")
-    @ApiModelProperty("主键")
+    @Schema(name = "主键")
     private Long id;
     
     
@@ -27,7 +27,7 @@ public class TbLyricEntityVO implements Serializable {
      * 音乐ID
      */
     @NotNull(message = "musicId can not null")
-    @ApiModelProperty("音乐ID")
+    @Schema(name = "音乐ID")
     private Long musicId;
     
     
@@ -35,7 +35,7 @@ public class TbLyricEntityVO implements Serializable {
      * 歌词类型
      */
     @NotNull(message = "type can not null")
-    @ApiModelProperty("歌词类型")
+    @Schema(name = "歌词类型")
     private String type;
     
     
@@ -43,7 +43,7 @@ public class TbLyricEntityVO implements Serializable {
      * 歌词
      */
     @NotNull(message = "lyric can not null")
-    @ApiModelProperty("歌词")
+    @Schema(name = "歌词")
     private String lyric;
     
     
@@ -51,7 +51,7 @@ public class TbLyricEntityVO implements Serializable {
      * 创建时间
      */
     @NotNull(message = "createTime can not null")
-    @ApiModelProperty("创建时间")
+    @Schema(name = "创建时间")
     private LocalDateTime createTime;
     
     
@@ -59,7 +59,7 @@ public class TbLyricEntityVO implements Serializable {
      * 修改时间
      */
     @NotNull(message = "updateTime can not null")
-    @ApiModelProperty("修改时间")
+    @Schema(name = "修改时间")
     private LocalDateTime updateTime;
     
 }

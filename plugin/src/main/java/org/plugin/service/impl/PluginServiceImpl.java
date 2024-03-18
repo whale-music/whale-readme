@@ -6,9 +6,10 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.api.admin.service.MusicFlowApi;
 import org.api.common.service.QukuAPI;
@@ -286,10 +287,16 @@ public class PluginServiceImpl implements PluginService {
         TbPluginTaskPojo entity = new TbPluginTaskPojo();
         entity.setPluginId(pluginId);
         entity.setUserId(userId);
-        entity.setParams(JSON.toJSONString(pluginLabelValue));
-        entity.setStatus(TaskStatus.RUN_STATUS);
-        pluginTaskService.save(entity);
-        return entity;
+        
+        try {
+            entity.setParams(new ObjectMapper().writeValueAsString(pluginLabelValue));
+            entity.setStatus(TaskStatus.RUN_STATUS);
+            pluginTaskService.save(entity);
+            return entity;
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new BaseException(e.getMessage());
+        }
     }
     
     /**

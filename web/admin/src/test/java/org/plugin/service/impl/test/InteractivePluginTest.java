@@ -6,10 +6,9 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import okhttp3.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.core.mybatis.model.convert.PicConvert;
@@ -97,7 +96,7 @@ public class InteractivePluginTest implements ComboSearchPlugin {
                 .build();
         try (Response response = client.newCall(request).execute()){
             final String body = UnicodeUtil.toString(Objects.requireNonNull(response.body()).string());
-            JSONObject jsonObject = JSON.parseObject(body);
+            JSONObject jsonObject = JSONUtil.parseObj(body);
             Integer code = MapUtil.get(jsonObject, "code", Integer.class);
             if (code == null || code != 200) {
                 return Collections.emptyList();
@@ -120,7 +119,7 @@ public class InteractivePluginTest implements ComboSearchPlugin {
                 PluginLabelValue e = new PluginLabelValue();
                 JSONObject object = (JSONObject) datum;
                 String render = template.render(object);
-                e.setValue(object.toJSONString(JSONWriter.Feature.BrowserSecure));
+                e.setValue(object.toJSONString(0));
                 e.setLabel(render);
                 pluginLabelValues.add(e);
             }
@@ -147,27 +146,27 @@ public class InteractivePluginTest implements ComboSearchPlugin {
         
         for (PluginLabelValue datum : data) {
             pluginPackage.logInfo(datum.getKey(), datum.getValue());
-            JSONObject jsonObject = JSON.parseObject(datum.getValue());
+            JSONObject jsonObject = JSONUtil.parseObj(datum.getValue());
             
             AudioInfoReq dto = new AudioInfoReq();
             AudioInfoReq.AudioMusic music = new AudioInfoReq.AudioMusic();
             
-            music.setMusicName(jsonObject.getObject("title", String.class));
+            music.setMusicName(jsonObject.getStr("title"));
             ArrayList<AudioInfoReq.AudioArtist> artists = new ArrayList<>();
             AudioInfoReq.AudioArtist artistReq = new AudioInfoReq.AudioArtist();
-            artistReq.setArtistName(jsonObject.getObject("author", String.class));
+            artistReq.setArtistName(jsonObject.getStr("author"));
             artists.add(artistReq);
             dto.setArtists(artists);
             
-            music.setLyric(jsonObject.getObject("lrc", String.class));
-            String pic = jsonObject.getObject("pic", String.class);
+            music.setLyric(jsonObject.getStr("lrc"));
+            String pic = jsonObject.getStr("pic");
             PicConvert musicPic = new PicConvert();
             musicPic.setPath(pic);
             music.setPic(musicPic);
             
             AudioInfoReq.AudioSource audioSource = new AudioInfoReq.AudioSource();
             ArrayList<AudioInfoReq.AudioSource> sources = new ArrayList<>();
-            audioSource.setPathTemp(jsonObject.getObject("url", String.class));
+            audioSource.setPathTemp(jsonObject.getStr("url"));
             TbOriginPojo origin = new TbOriginPojo();
             origin.setOrigin("search");
             audioSource.setOrigin(origin);

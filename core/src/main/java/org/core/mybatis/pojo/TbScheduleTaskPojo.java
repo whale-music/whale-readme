@@ -46,7 +46,7 @@ public class TbScheduleTaskPojo extends Model<TbScheduleTaskPojo> implements Ser
     private String params;
     
     @Schema(title = "是否执行(true执行, false不执行)")
-    @TableField(value = "status", insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "status", insertStrategy = FieldStrategy.ALWAYS, updateStrategy = FieldStrategy.ALWAYS)
     private Boolean status;
     
     @Schema(title = "用户ID")

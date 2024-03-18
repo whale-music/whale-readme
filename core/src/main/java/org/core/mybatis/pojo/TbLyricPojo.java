@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("tb_lyric")
-@Schema(name = "TbLyric", description = "歌词表")
+@Schema(title = "TbLyric", description = "歌词表")
 public class TbLyricPojo extends Model<TbLyricPojo> implements Serializable {
     public static final long serialVersionUID = -11962312952892487L;
     

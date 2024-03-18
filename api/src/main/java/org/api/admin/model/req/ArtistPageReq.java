@@ -1,6 +1,6 @@
 package org.api.admin.model.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,15 +12,15 @@ import org.api.admin.model.common.PageReqCommon;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ArtistPageReq extends PageReqCommon {
-    @ApiModelProperty("all name")
+    @Schema(name = "all name")
     private String name;
     
-    @ApiModelProperty("音乐名")
+    @Schema(name = "音乐名")
     private String musicName;
     
-    @ApiModelProperty("歌手")
+    @Schema(name = "歌手")
     private String artistName;
     
-    @ApiModelProperty("专辑")
+    @Schema(name = "专辑")
     private String albumName;
 }

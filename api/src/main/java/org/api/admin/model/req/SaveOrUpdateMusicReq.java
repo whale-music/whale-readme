@@ -1,6 +1,6 @@
 package org.api.admin.model.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,21 +18,21 @@ import java.util.Set;
 @NoArgsConstructor
 public class SaveOrUpdateMusicReq extends MusicConvert {
     
-    @ApiModelProperty("音乐tag")
+    @Schema(name = "音乐tag")
     private Set<String> musicTag = new HashSet<>();
     
-    @ApiModelProperty("音乐流派")
+    @Schema(name = "音乐流派")
     private Set<String> musicGenre = new HashSet<>();
     
-    @ApiModelProperty("歌手名ID")
+    @Schema(name = "歌手名ID")
     private List<Long> artistIds;
     
-    @ApiModelProperty("音源信息")
+    @Schema(name = "音源信息")
     private TbResourcePojo resource;
     
-    @ApiModelProperty("音源临时地址")
+    @Schema(name = "音源临时地址")
     private String tempMusicFile;
     
-    @ApiModelProperty("封面地址")
+    @Schema(name = "封面地址")
     private String tempPicFile;
 }

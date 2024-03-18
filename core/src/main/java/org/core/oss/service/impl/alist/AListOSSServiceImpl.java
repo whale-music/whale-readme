@@ -10,8 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
 import org.core.common.properties.SaveConfig;
 import org.core.common.result.ResultCode;
+import org.core.mybatis.iservice.TbMvService;
+import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.iservice.TbResourceService;
-import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.oss.model.Resource;
 import org.core.oss.service.OSSService;
 import org.core.oss.service.OSSServiceAbs;
@@ -43,8 +44,8 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     public final TimedCache<String, String> loginTimeCacheStr;
     
     
-    public AListOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService) {
-        super(config, tbResourceService);
+    public AListOSSServiceImpl(SaveConfig config, TbResourceService tbResourceService, TbPicService tbPicService, TbMvService tbMvService) {
+        super(config, tbResourceService, tbPicService, tbMvService);
         
         long timeout = this.config.getBufferTime();
         loginTimeCacheStr = CacheUtil.newTimedCache(timeout);
@@ -83,13 +84,13 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     public Map<String, Resource> getResourceList(Collection<String> paths, boolean refresh, ResourceEnum type) {
         TimedCache<String, Resource> cacheResources = cache.get(type);
         TimedCache<String, String> cacheTimeMd5 = this.cacheMd5.get(type);
-        Map<String, Resource> resourceMap = new HashMap<>();
         
-        if (Boolean.TRUE.equals(refresh) || CollUtil.isEmpty(resourceMap)) {
+        if (Boolean.TRUE.equals(refresh) || CollUtil.isEmpty(cacheResources)) {
             cacheResources.clear();
             cacheTimeMd5.clear();
             scanResource(refresh, config.getDeep(), type);
         }
+        Map<String, Resource> resourceMap = new HashMap<>();
         conditionGetItemByPath(paths, cacheResources, resourceMap);
         return resourceMap;
     }
@@ -106,13 +107,13 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
     public Map<String, Resource> getResourceByMd5ToMap(Collection<String> md5Set, boolean refresh, ResourceEnum type) {
         TimedCache<String, Resource> cacheResources = cache.get(type);
         TimedCache<String, String> md5Mapping = cacheMd5.get(type);
-        Map<String, Resource> resourceMap = new HashMap<>();
         
-        if (Boolean.TRUE.equals(refresh) || CollUtil.isEmpty(resourceMap)) {
+        if (Boolean.TRUE.equals(refresh) || CollUtil.isEmpty(cacheResources)) {
             cacheResources.clear();
             md5Mapping.clear();
             scanResource(refresh, config.getDeep(), type);
         }
+        Map<String, Resource> resourceMap = new HashMap<>();
         conditionGetItemByMd5(md5Set, cacheResources, md5Mapping, resourceMap);
         return resourceMap;
     }
@@ -123,14 +124,16 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
         Set<String> col = new LinkedHashSet<>();
         correspondingData(type, col);
         
+        ArrayList<String> paths = new ArrayList<>();
         for (String s : col) {
-            fillingData(refresh, deep, loginJwtCache, s, type);
+            fillingData(refresh, deep, loginJwtCache, s, type, paths);
         }
+        TimedCache<String, String> md5MappingPath = cacheMd5.get(type);
+        fillMd5Cache(md5MappingPath, type, paths);
     }
     
-    private void fillingData(boolean refresh, int deep, String loginJwtCache, String path, ResourceEnum type) {
+    private void fillingData(boolean refresh, int deep, String loginJwtCache, String path, ResourceEnum type, List<String> paths) {
         TimedCache<String, Resource> cacheResources = cache.get(type);
-        TimedCache<String, String> md5MappingPath = cacheMd5.get(type);
         
         Set<FsList> list = AlistUtil.list(config, path, refresh, loginJwtCache);
         Deque<FsList> linkList = new ArrayDeque<>(list);
@@ -157,10 +160,7 @@ public class AListOSSServiceImpl extends OSSServiceAbs implements OSSService {
                     e.setModificationTime(DateUtil.parse(fsList.getModified()));
                     e.setFileExtension(FileUtil.getSuffix(fsList.getName()));
                     
-                    TbResourcePojo tbResourcePojo = dbCache.get(e.getPath(), () -> tbResourceService.getResourceByPath(e.getPath()));
-                    if (Objects.nonNull(tbResourcePojo)) {
-                        md5MappingPath.put(tbResourcePojo.getMd5(), e.getPath());
-                    }
+                    paths.add(e.getPath());
                     cacheResources.put(e.getPath(), e);
                 }
             }

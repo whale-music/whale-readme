@@ -24,12 +24,5 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
-        <!--繁简转换-->
-        <dependency>
-            <groupId>com.github.houbb</groupId>
-            <artifactId>opencc4j</artifactId>
-            <version>1.8.0</version>
-        </dependency>
     </dependencies>
 </project>

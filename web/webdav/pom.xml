@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.milton</groupId>
             <artifactId>milton-server-ce</artifactId>
-            <version>4.0.1.1802</version>
+            <version>4.0.2.2101</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>

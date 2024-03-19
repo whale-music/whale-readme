@@ -31,7 +31,7 @@ public class WebdavConfig {
         // 设置数据是否只读
         registration.addInitParameter("readonly", String.valueOf(true));
         // 设置日志打印等级
-        registration.addInitParameter("debug", String.valueOf(1));
+        registration.addInitParameter("debug", String.valueOf(0));
         return registration;
     }
     

@@ -7,11 +7,13 @@ import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.webresources.AbstractFileResourceSet;
 import org.apache.catalina.webresources.EmptyResource;
 import org.api.webdav.service.WebdavCacheApi;
+import org.core.common.properties.DebugConfig;
 import org.core.model.WebDavResource;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -34,7 +36,7 @@ public class WebdavResourceSet extends AbstractFileResourceSet {
     @Override
     public WebResource getResource(String path) {
         checkPath(path);
-        log.debug("resource: {}", path);
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.debug("resource: {}", path));
         WebResourceRoot root = getRoot();
         WebDavResource fileInfo = cacheApi.getResource(path);
         if (fileInfo == null) {

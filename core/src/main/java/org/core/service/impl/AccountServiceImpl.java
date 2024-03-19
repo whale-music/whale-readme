@@ -13,6 +13,7 @@ import org.core.utils.ip.IpUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service("account")
 public class AccountServiceImpl extends SysUserServiceImpl implements AccountService {
@@ -127,6 +128,27 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
     }
     
     /**
+     * 登录用户，用户名或者子账户
+     *
+     * @param username 登录名
+     * @return 用户信息
+     */
+    @Override
+    public SysUserPojo getUserOrSubAccount(String username) {
+        SysUserPojo user;
+        try {
+            user = this.getUser(username);
+        } catch (BaseException e) {
+            if (StringUtils.equals(ResultCode.USER_NOT_EXIST.getCode(), e.getCode())) {
+                user = this.getSubAccountMasterUserInfoBySubAccount(username);
+            } else {
+                throw new BaseException(e);
+            }
+        }
+        return user;
+    }
+    
+    /**
      * 获取master账户信息
      *
      * @param account 子账户名
@@ -135,6 +157,9 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
     @Override
     public SysUserPojo getSubAccountMasterUserInfoBySubAccount(String account) {
         SysUserPojo subAccount = userSubPasswordConfig.getSubAccount(account);
+        if (Objects.isNull(subAccount)) {
+            throw new BaseException(ResultCode.USER_NOT_EXIST);
+        }
         subAccount.setPassword(userSubPasswordConfig.getSubPassword(account));
         return subAccount;
     }

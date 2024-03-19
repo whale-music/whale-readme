@@ -30,6 +30,7 @@ public interface AccountService extends SysUserService {
      * @param username 用户名
      * @return 用户信息
      */
+    // rename method
     SysUserPojo getUser(String username);
     
     /**
@@ -48,6 +49,15 @@ public interface AccountService extends SysUserService {
      * @return 用户信息
      */
     SysUserPojo loginSub(String account, String password);
+    
+    /**
+     * 登录用户，用户名或者子账户
+     *
+     * @param username 登录名
+     * @return 用户信息
+     */
+    // todo: 替换一些方法
+    SysUserPojo getUserOrSubAccount(String username);
     
     /**
      * 获取master账户信息

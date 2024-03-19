@@ -46,7 +46,8 @@ public class WebdavCacheApi {
     }
     
     /**
-     * 处理字符串， 对字符串中有 <code>/</code> 和 <code>\</code> 的进行转移
+     * 处理音乐名字符串, 防止音乐名出现敏感字符导致前端解析失败
+     * 对字符串中有 <code>/</code> 和 <code>\</code> 的进行转移
      *
      * @return 处理后的字符串
      */
@@ -55,6 +56,21 @@ public class WebdavCacheApi {
         final String o1 = StringUtils.replace(name, "/", replacePlaceholderCharacter);
         return StringUtils.replace(o1, "\\", replacePlaceholderCharacter);
     }
+    
+    /**
+     * 处理歌单名中出现的各种敏感字符
+     *
+     * @param name 歌单名
+     * @return 处理后的字符串
+     */
+    private static String handleCollectName(final String name) {
+        final String replacePlaceholderCharacter = "-";
+        final String o1 = StringUtils.replace(name, "/", replacePlaceholderCharacter);
+        final String o2 = StringUtils.replace(o1, "\\", replacePlaceholderCharacter);
+        return StringUtils.replace(o2, " ", "·");
+    }
+    
+    
     
     public WebDavResource getResource(String path) {
         if (StringUtils.equals(path, "/")) {
@@ -79,7 +95,7 @@ public class WebdavCacheApi {
         String likeStr = I18nUtil.getMsg("webdav.playlist.like_playlist");
         WebDavResource likeResource = WebDavResource.createSelectCollect(likeStr, i18LikeStr());
         List<TbCollectPojo> likeCollect = userPlayList.getLikeCollect();
-        fillLikeCollectMusic(resource, likeCollect, likeResource, Objects.isNull(likeCollect), i18LikeStr());
+        fillCollectMusic(resource, likeCollect, likeResource, Objects.isNull(likeCollect), i18LikeStr());
         // 推荐歌单
         String recommendStr = I18nUtil.getMsg("webdav.playlist.recommended_playlist");
         WebDavResource recommendResource = WebDavResource.createSelectCollect(recommendStr, i18RecommendStr());
@@ -107,6 +123,9 @@ public class WebdavCacheApi {
             ArrayList<WebDavResource> collectResources = new ArrayList<>();
             collectIds.parallelStream().filter(Objects::nonNull).forEach(collectPojo -> {
                 List<PlayListRes> playListMusic = webdavApi.getPlayListMusic(collectPojo.getId());
+                // 处理歌单名
+                String playListName = handleCollectName(collectPojo.getPlayListName());
+                
                 List<WebDavResource> musicResources = playListMusic.parallelStream().map(s -> {
                     Resource musicResource = remoteStorageService.getMusicResource(s.getPath());
                     // 在子目录下不需要填充父目录名,但是在缓存中需要填写父目录名。因为tomcat返回时会自动添加当前文件的父目录路径。
@@ -121,52 +140,21 @@ public class WebdavCacheApi {
                             s.getUpdateTime(),
                             musicResource.getSize());
                     // 缓存音乐填充全路径, 根目录/歌单名/音乐名
-                    webdavCache.put(path + "/" + collectPojo.getPlayListName() + resourcePathStr, r);
+                    webdavCache.put(path + "/" + playListName + resourcePathStr, r);
                     return r;
                 }).toList();
                 // 歌单创建并添加音乐
-                WebDavResource collectResource = WebDavResource.createCollect(collectPojo.getPlayListName(),
-                        "/" + collectPojo.getPlayListName(),
+                WebDavResource collectResource = WebDavResource.createCollect(playListName,
+                        "/" + playListName,
                         DateUtil.date(collectPojo.getCreateTime()),
                         DateUtil.date(collectPojo.getUpdateTime()),
                         musicResources);
                 // 添加歌单
                 collectResources.add(collectResource);
                 // 填充缓存 路径绝对路径
-                webdavCache.put(path + "/" + collectPojo.getPlayListName(), collectResource);
+                webdavCache.put(path + "/" + playListName, collectResource);
             });
             davResource.setResource(collectResources);
-        }
-        resource.add(davResource);
-        webdavCache.put(davResource.getPath(), davResource);
-    }
-    
-    private void fillLikeCollectMusic(List<WebDavResource> resource, List<TbCollectPojo> collectIds, WebDavResource davResource, boolean b, String path) {
-        if (Boolean.FALSE.equals(b)) {
-            List<WebDavResource> webDavResource = new ArrayList<>();
-            collectIds.parallelStream().filter(Objects::nonNull).forEach(collectPojo -> {
-                List<PlayListRes> playListMusic = webdavApi.getPlayListMusic(collectPojo.getId());
-                List<WebDavResource> resources = playListMusic.parallelStream().map(s -> {
-                    Resource musicResource = remoteStorageService.getMusicResource(s.getPath());
-                    // 在子目录下不需要填充父目录名,但是在缓存中需要填写父目录名。因为tomcat返回时会自动添加当前文件的父目录路径。
-                    // 前端请求时也会自动使用绝对路径，所以缓存需要使用绝对路径
-                    String musicName = handleName(s.getMusicName()) + "." + musicResource.getFileExtension();
-                    String resourcePathStr = "/%s/%s".formatted(collectPojo.getPlayListName(), musicName);
-                    WebDavResource r = WebDavResource.createFile(s.getMusicName(),
-                            s.getMd5(),
-                            resourcePathStr,
-                            s.getPath(),
-                            musicResource.getUrl(),
-                            s.getCreateTime(),
-                            s.getUpdateTime(),
-                            musicResource.getSize());
-                    // 缓存填充全路径, 歌单名/音乐名
-                    webdavCache.put(path + resourcePathStr, r);
-                    return r;
-                }).toList();
-                webDavResource.addAll(resources);
-            });
-            davResource.setResource(webDavResource);
         }
         resource.add(davResource);
         webdavCache.put(davResource.getPath(), davResource);

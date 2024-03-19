@@ -3,6 +3,7 @@ package org.core.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.core.model.PicMiddleTypeModel;
+import org.core.model.WebDavResource;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class CacheConfig {
      * 设置Webdav Resource URL 缓存
      */
     @Bean
-    public Cache<String, String> userWebdavPlayListResourceCacheCaffeineCache() {
+    public Cache<String, WebDavResource> userWebdavPlayListResourceCacheCaffeineCache() {
         return Caffeine.newBuilder()
                        // 设置最后一次写入或访问后经过固定时间过期
                        .expireAfterWrite(1, TimeUnit.DAYS)

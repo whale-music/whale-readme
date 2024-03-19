@@ -41,6 +41,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.core.common.properties.DebugConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -1338,11 +1339,13 @@ public class WebdavServlet extends DefaultServlet {
         }
         
         String url = resource.getURL().toString();
-        log.debug("url: {}", url);
         HttpRequest http = HttpUtil.createGet(url);
         String headerRange = "Range";
         String rangeHeader = request.getHeader(headerRange);
-        log.debug("range: {}", rangeHeader);
+        if (Boolean.TRUE.equals(DebugConfig.getDebug())) {
+            log.debug("url: {}", url);
+            log.debug("range: {}", rangeHeader);
+        }
         http.header(headerRange, rangeHeader, true);
         try (HttpResponse execute = http.execute()) {
             IoUtil.copy(execute.bodyStream(), response.getOutputStream());

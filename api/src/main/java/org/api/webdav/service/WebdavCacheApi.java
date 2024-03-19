@@ -82,7 +82,14 @@ public class WebdavCacheApi {
             webdavApi.refreshAllCache();
             return webdavCache.asMap().get(path);
         }
-        return webdavCache.asMap().get(path);
+        // 该数据中无缓存，尝试刷新该数据
+        WebDavResource webDavResource = webdavCache.asMap().get(path);
+        if (Objects.isNull(webDavResource)) {
+            handleRoot();
+            webdavApi.refreshAllCache();
+            return webdavCache.asMap().get(path);
+        }
+        return webDavResource;
     }
     
     private WebDavResource handleRoot() {

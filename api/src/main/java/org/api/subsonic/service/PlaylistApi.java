@@ -59,17 +59,22 @@ public class PlaylistApi {
         SysUserPojo user = accountService.getUser(username);
         List<CollectConvert> userPlayList = qukuApi.getUserPlayList(user.getId(),
                 Arrays.asList(PlayListTypeConstant.ORDINARY, PlayListTypeConstant.ORDINARY));
-        
+        if (CollUtil.isEmpty(userPlayList)) {
+            return new PlaylistsRes();
+        }
+        Map<Long, Integer> collectDurationCount = qukuApi.getCollectDurationCount(userPlayList.parallelStream().map(TbCollectPojo::getId).toList());
         List<PlaylistItem> playlist = new ArrayList<>();
         for (TbCollectPojo collectPojo : userPlayList) {
             PlaylistItem e = new PlaylistItem();
             e.setId(String.valueOf(collectPojo.getId()));
             e.setName(collectPojo.getPlayListName());
-            e.setChanged(LocalDateTimeUtil.format(collectPojo.getUpdateTime(), DatePattern.NORM_DATETIME_FORMATTER));
+            e.setChanged(LocalDateTimeUtil.format(collectPojo.getUpdateTime(), DatePattern.createFormatter(DatePattern.UTC_SIMPLE_PATTERN)));
             e.setSongCount(qukuApi.getCollectMusicCount(collectPojo.getId()));
-            e.setCreated(LocalDateTimeUtil.format(collectPojo.getCreateTime(), DatePattern.NORM_DATETIME_FORMATTER));
+            e.setCreated(LocalDateTimeUtil.format(collectPojo.getCreateTime(), DatePattern.createFormatter(DatePattern.UTC_SIMPLE_PATTERN)));
             e.setCoverArt(String.valueOf(collectPojo.getId()));
             e.setOwner(user.getUsername());
+            e.setDuration(collectDurationCount.get(collectPojo.getId()));
+            e.setJsonMemberPublic(true);
             playlist.add(e);
         }
         PlayLists playlists = new PlayLists();

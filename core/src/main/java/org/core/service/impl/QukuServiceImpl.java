@@ -1463,7 +1463,7 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public Map<Long, AlbumConvert> getMusicAlbumByAlbumIdToMap(Collection<Long> albumIds) {
         List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
-        return tbAlbumPojos.parallelStream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> {
+        return tbAlbumPojos.stream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> {
             AlbumConvert albumConvert = new AlbumConvert();
             BeanUtils.copyProperties(tbAlbumPojo, albumConvert);
             albumConvert.setPicUrl(remoteStorePicService.getPicUrl(tbAlbumPojo.getId(), PicTypeConstant.ALBUM));

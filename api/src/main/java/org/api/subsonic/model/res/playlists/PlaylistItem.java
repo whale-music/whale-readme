@@ -11,21 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlaylistItem {
     
-    @JsonProperty("duration")
+    @JsonProperty("id")
     @JacksonXmlProperty(isAttribute = true)
-    private Integer duration;
-    
-    @JsonProperty("owner")
-    @JacksonXmlProperty(isAttribute = true)
-    private String owner;
-    
-    @JsonProperty("public")
-    @JacksonXmlProperty(isAttribute = true)
-    private Boolean jsonMemberPublic;
-    
-    @JsonProperty("created")
-    @JacksonXmlProperty(isAttribute = true)
-    private String created;
+    private String id;
     
     @JsonProperty("name")
     @JacksonXmlProperty(isAttribute = true)
@@ -35,17 +23,29 @@ public class PlaylistItem {
     @JacksonXmlProperty(isAttribute = true)
     private String comment;
     
-    @JsonProperty("id")
+    @JsonProperty("owner")
     @JacksonXmlProperty(isAttribute = true)
-    private String id;
+    private String owner;
     
-    @JsonProperty("coverArt")
-    @JacksonXmlProperty(isAttribute = true)
-    private String coverArt;
+    @JsonProperty("public")
+    @JacksonXmlProperty(localName = "public", isAttribute = true)
+    private Boolean jsonMemberPublic;
     
     @JsonProperty("songCount")
     @JacksonXmlProperty(isAttribute = true)
     private Integer songCount;
+    
+    @JsonProperty("duration")
+    @JacksonXmlProperty(isAttribute = true)
+    private Integer duration;
+    
+    @JsonProperty("created")
+    @JacksonXmlProperty(isAttribute = true)
+    private String created;
+    
+    @JsonProperty("coverArt")
+    @JacksonXmlProperty(isAttribute = true)
+    private String coverArt;
     
     @JsonProperty("changed")
     @JacksonXmlProperty(isAttribute = true)

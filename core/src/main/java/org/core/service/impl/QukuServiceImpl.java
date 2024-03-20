@@ -20,7 +20,6 @@ import org.core.common.constant.LyricConstant;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.TargetTagConstant;
-import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.model.TagMiddleTypeModel;
@@ -31,6 +30,7 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
+import org.core.service.PlayListService;
 import org.core.service.QukuService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.CollectSortUtil;
@@ -81,7 +81,7 @@ public class QukuServiceImpl implements QukuService {
     
     private final AccountService accountService;
     
-    private final DefaultInfo defaultInfo;
+    private final PlayListService playListService;
     
     private final TbMvArtistService tbMvArtistService;
     
@@ -1482,6 +1482,25 @@ public class QukuServiceImpl implements QukuService {
         HashMap<Long, Integer> resMap = new HashMap<>();
         Map<Long, List<MusicConvert>> musicMapByAlbumId = getMusicMapByAlbumId(albumIds);
         for (Map.Entry<Long, List<MusicConvert>> longListEntry : musicMapByAlbumId.entrySet()) {
+            Integer durationCount = longListEntry.getValue().parallelStream().map(TbMusicPojo::getTimeLength).reduce(0, Integer::sum);
+            resMap.put(longListEntry.getKey(), durationCount);
+        }
+        return resMap;
+    }
+    
+    
+    /**
+     * 获取歌单音乐时长
+     *
+     * @param collectIds 专辑ID
+     * @return 专辑时长
+     */
+    @Override
+    public Map<Long, Integer> getCollectDurationCount(List<Long> collectIds) {
+        HashMap<Long, Integer> resMap = new HashMap<>();
+        Map<Long, List<TbMusicPojo>> playListMusicMap = playListService.getPlayListMusicMap(collectIds);
+        
+        for (Map.Entry<Long, List<TbMusicPojo>> longListEntry : playListMusicMap.entrySet()) {
             Integer durationCount = longListEntry.getValue().parallelStream().map(TbMusicPojo::getTimeLength).reduce(0, Integer::sum);
             resMap.put(longListEntry.getKey(), durationCount);
         }

@@ -1,6 +1,7 @@
 package org.core.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,6 +18,7 @@ import org.core.service.PlayListService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("playListServiceImpl")
 public class PlayListServiceImpl implements PlayListService {
@@ -75,4 +77,37 @@ public class PlayListServiceImpl implements PlayListService {
         return musicService.listByIds(musicIds);
     }
     
+    /**
+     * 获取歌单下的音乐
+     *
+     * @param ids 歌单ID
+     * @return 歌单数据 key id, value playlist
+     */
+    @Override
+    public Map<Long, List<TbMusicPojo>> getPlayListMusicMap(List<Long> ids) {
+        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getCollectId, ids));
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+        Map<Long, List<Long>> collectMusicMaps = list.parallelStream()
+                                                     .collect(Collectors.toMap(TbCollectMusicPojo::getCollectId,
+                                                             tbCollectMusicPojo -> ListUtil.toList(tbCollectMusicPojo.getMusicId()),
+                                                             (o1, o2) -> {
+                                                                 o2.addAll(o1);
+                                                                 return o2;
+                                                             }));
+        List<Long> musicIds = list.stream().map(TbCollectMusicPojo::getMusicId).toList();
+        List<TbMusicPojo> tbMusicPojos = musicService.listByIds(musicIds);
+        if (CollUtil.isEmpty(tbMusicPojos)) {
+            return Collections.emptyMap();
+        }
+        Map<Long, TbMusicPojo> musicMaps = tbMusicPojos.parallelStream().collect(Collectors.toMap(TbMusicPojo::getId, s -> s));
+        
+        HashMap<Long, List<TbMusicPojo>> map = new HashMap<>();
+        for (Map.Entry<Long, List<Long>> collectMusic : collectMusicMaps.entrySet()) {
+            List<TbMusicPojo> musicList = collectMusic.getValue().parallelStream().map(musicMaps::get).toList();
+            map.put(collectMusic.getKey(), musicList);
+        }
+        return map;
+    }
 }

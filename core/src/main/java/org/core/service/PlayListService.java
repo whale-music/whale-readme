@@ -5,6 +5,7 @@ import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PlayListService {
     
@@ -32,4 +33,12 @@ public interface PlayListService {
      * @param id 歌单ID
      */
     List<TbMusicPojo> getPlayListAllMusic(Long id);
+    
+    /**
+     * 获取歌单下的音乐
+     *
+     * @param ids 歌单ID
+     * @return 歌单数据 key id, value playlist
+     */
+    Map<Long, List<TbMusicPojo>> getPlayListMusicMap(List<Long> ids);
 }

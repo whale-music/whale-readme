@@ -12,7 +12,6 @@ import org.core.jpa.entity.TbResourceEntity;
 import org.core.jpa.repository.TbMusicEntityRepository;
 import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
-import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectMusicPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.service.AccountService;
@@ -34,18 +33,14 @@ public class WebdavApi {
     
     private final WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
-    private final AccountService accountService;
-    
     public static final String WEBDAV_COLLECT_TYPE_LIST = "webdav-collect-type-list";
     public static final String WEBDAV_PLAY_LIST = "webdav-play-list";
-    public static final String WEBDAV_USER_POJO = "webdav-user-pojo";
     
     public WebdavApi(TbCollectMusicService collectMusicService, TbMusicEntityRepository tbMusicEntityRepository, TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, AccountService accountService) {
         this.collectMusicService = collectMusicService;
         this.tbMusicEntityRepository = tbMusicEntityRepository;
         this.tbCollectService = tbCollectService;
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
-        this.accountService = accountService;
     }
     
     @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
@@ -60,7 +55,7 @@ public class WebdavApi {
         return collectTypeList;
     }
     
-    @Cacheable(value = "webdav-play-list", key = "#id")
+    @Cacheable(value = WEBDAV_PLAY_LIST, key = "#id")
     public List<PlayListRes> getPlayListMusic(Long id) {
         List<PlayListRes> res = new LinkedList<>();
         List<TbCollectMusicPojo> collectIds = collectMusicService.getCollectIds(Collections.singleton(id));
@@ -88,16 +83,7 @@ public class WebdavApi {
         return res;
     }
     
-    @Cacheable(value = "webdav-user-pojo", key = "#userName")
-    public SysUserPojo getUserByName(String userName) {
-        SysUserPojo userByName = accountService.getUserByName(userName);
-        if (Objects.isNull(userByName)) {
-            return accountService.getSubAccountMasterUserInfoBySubAccount(userName);
-        }
-        return userByName;
-    }
-    
-    @CacheEvict(value = {WEBDAV_COLLECT_TYPE_LIST, WEBDAV_PLAY_LIST, WEBDAV_USER_POJO}, allEntries = true)
+    @CacheEvict(value = {WEBDAV_COLLECT_TYPE_LIST, WEBDAV_PLAY_LIST}, allEntries = true)
     public void refreshAllCache() {
         // refresh webdav all cache
     }

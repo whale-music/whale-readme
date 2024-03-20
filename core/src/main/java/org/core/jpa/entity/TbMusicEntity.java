@@ -1,13 +1,14 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
 @Entity
 @Table(name = "tb_music")
@@ -34,6 +35,9 @@ public class TbMusicEntity implements Serializable {
     @Basic
     @Column(name = "time_length", nullable = true)
     private Integer timeLength;
+    @Basic
+    @Column(name = "comment", nullable = true)
+    private String comment;
     @Basic
     @Column(name = "publish_time", nullable = true)
     private Timestamp publishTime;
@@ -108,6 +112,14 @@ public class TbMusicEntity implements Serializable {
         this.timeLength = timeLength;
     }
     
+    public String getComment() {
+        return comment;
+    }
+    
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+    
     public Timestamp getPublishTime() {
         return publishTime;
     }
@@ -130,27 +142,6 @@ public class TbMusicEntity implements Serializable {
     
     public void setCreateTime(Timestamp createTime) {
         this.createTime = createTime;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TbMusicEntity that = (TbMusicEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(musicName, that.musicName) && Objects.equals(aliasName,
-                that.aliasName) && Objects.equals(albumId, that.albumId) && Objects.equals(
-                userId,
-                that.userId) && Objects.equals(timeLength, that.timeLength) && Objects.equals(updateTime,
-                that.updateTime) && Objects.equals(createTime, that.createTime);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, musicName, aliasName, albumId, userId, timeLength, updateTime, createTime);
     }
     
     public Collection<TbCollectMusicEntity> getTbCollectMusicsById() {
@@ -207,5 +198,59 @@ public class TbMusicEntity implements Serializable {
     
     public void setTbResourcesById(Collection<TbResourceEntity> tbResourcesById) {
         this.tbResourcesById = tbResourcesById;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        
+        TbMusicEntity that = (TbMusicEntity) o;
+        
+        return new EqualsBuilder().append(getId(), that.getId())
+                                  .append(getMusicName(), that.getMusicName())
+                                  .append(getAliasName(), that.getAliasName())
+                                  .append(getAlbumId(), that.getAlbumId())
+                                  .append(getUserId(), that.getUserId())
+                                  .append(getTimeLength(), that.getTimeLength())
+                                  .append(getComment(), that.getComment())
+                                  .append(getPublishTime(), that.getPublishTime())
+                                  .append(getUpdateTime(), that.getUpdateTime())
+                                  .append(getCreateTime(), that.getCreateTime())
+                                  .append(getTbCollectMusicsById(), that.getTbCollectMusicsById())
+                                  .append(getTbLyricsById(), that.getTbLyricsById())
+                                  .append(getTbAlbumByAlbumId(), that.getTbAlbumByAlbumId())
+                                  .append(getSysUserByUserId(), that.getSysUserByUserId())
+                                  .append(getTbMusicArtistsById(), that.getTbMusicArtistsById())
+                                  .append(getTbOriginsById(), that.getTbOriginsById())
+                                  .append(getTbResourcesById(), that.getTbResourcesById())
+                                  .isEquals();
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getId())
+                                          .append(getMusicName())
+                                          .append(getAliasName())
+                                          .append(getAlbumId())
+                                          .append(getUserId())
+                                          .append(getTimeLength())
+                                          .append(getComment())
+                                          .append(getPublishTime())
+                                          .append(getUpdateTime())
+                                          .append(getCreateTime())
+                                          .append(getTbCollectMusicsById())
+                                          .append(getTbLyricsById())
+                                          .append(getTbAlbumByAlbumId())
+                                          .append(getSysUserByUserId())
+                                          .append(getTbMusicArtistsById())
+                                          .append(getTbOriginsById())
+                                          .append(getTbResourcesById())
+                                          .toHashCode();
     }
 }

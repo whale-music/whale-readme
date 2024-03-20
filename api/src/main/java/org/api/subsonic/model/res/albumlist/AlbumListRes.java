@@ -2,6 +2,7 @@ package org.api.subsonic.model.res.albumlist;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class AlbumListRes extends SubsonicResult {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class AlbumList {
+        
+        @JacksonXmlElementWrapper(useWrapping = false)
         private List<Album> album;
     }
     

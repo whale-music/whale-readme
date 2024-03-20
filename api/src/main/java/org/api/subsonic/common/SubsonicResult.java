@@ -30,8 +30,16 @@ public class SubsonicResult {
     @JacksonXmlProperty(isAttribute = true)
     private String status = "ok";
     
+    @Schema(name = "subsonic api 版本")
     @JacksonXmlProperty(isAttribute = true)
     private String version = "1.16.1";
+    
+    @Schema(name = "服务器版本")
+    @JacksonXmlProperty(isAttribute = true)
+    private String serverVersion = "1.0.0";
+    
+    @JacksonXmlProperty(isAttribute = true)
+    private Boolean openSubsonic = true;
     
     @JacksonXmlProperty(isAttribute = true)
     private String type = "whale";

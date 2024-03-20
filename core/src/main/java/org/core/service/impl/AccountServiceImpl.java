@@ -135,15 +135,13 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
      */
     @Override
     public SysUserPojo getUserOrSubAccount(String username) {
-        SysUserPojo user;
-        try {
-            user = this.getUser(username);
-        } catch (BaseException e) {
-            if (StringUtils.equals(ResultCode.USER_NOT_EXIST.getCode(), e.getCode())) {
-                user = this.getSubAccountMasterUserInfoBySubAccount(username);
-            } else {
-                throw new BaseException(e);
-            }
+        SysUserPojo userByName = this.getUserByName(username);
+        if (Objects.nonNull(userByName)) {
+            return userByName;
+        }
+        SysUserPojo user = this.getSubAccountMasterUserInfoBySubAccount(username);
+        if (Objects.isNull(user)) {
+            throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
         return user;
     }

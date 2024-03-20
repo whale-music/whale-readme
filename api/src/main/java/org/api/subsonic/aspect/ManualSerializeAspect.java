@@ -14,19 +14,22 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
-import org.core.service.AccountService;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanMap;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 @Aspect
 @Slf4j
 public class ManualSerializeAspect {
     
-    @Autowired
-    private AccountService accountService;
+    private final SubsonicUserCache subsonicUserCache;
+    
+    public ManualSerializeAspect(SubsonicUserCache subsonicUserCache) {
+        this.subsonicUserCache = subsonicUserCache;
+    }
     
     @Pointcut("@annotation(org.api.subsonic.ManualSerialize)")
     public void pointCut() {
@@ -40,21 +43,17 @@ public class ManualSerializeAspect {
      */
     @Around(value = "pointCut()")
     public Object doAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) {
-        log.info("@Around环绕通知：" + proceedingJoinPoint.getSignature().toString());
-        try {
-            Object[] args = proceedingJoinPoint.getArgs();
-            BeanMap beanMap = BeanMap.create(args[0]);
-            String from = String.valueOf(beanMap.get("f"));
-            String user = String.valueOf(beanMap.get("u"));
-            String password = String.valueOf(beanMap.get("p"));
-            String version = String.valueOf(beanMap.get("v"));
-            String token = String.valueOf(beanMap.get("t"));
-            String salt = String.valueOf(beanMap.get("s"));
-            return getStringResponseEntity(proceedingJoinPoint, from, user, password, version, token, salt);
-        } catch (Exception throwable) {
-            throwable.printStackTrace();
-            throw new BaseException(throwable.getMessage());
-        }
+        log.info("@Around环绕通知: {}", proceedingJoinPoint.getSignature());
+        Object[] args = proceedingJoinPoint.getArgs();
+        // 取请求中第一个公共参数
+        BeanMap beanMap = BeanMap.create(args[0]);
+        String from = Objects.toString(beanMap.get("f"), null);
+        String user = Objects.toString(beanMap.get("u"), null);
+        String password = Objects.toString(beanMap.get("p"), null);
+        String version = Objects.toString(beanMap.get("v"), null);
+        String token = Objects.toString(beanMap.get("t"), null);
+        String salt = Objects.toString(beanMap.get("s"), null);
+        return getStringResponseEntity(proceedingJoinPoint, from, user, password, version, token, salt);
     }
     
     @NotNull
@@ -66,13 +65,15 @@ public class ManualSerializeAspect {
         } catch (BaseException e) {
             log.error(e.getResultMsg(), e);
             // 用户登录错误
-            if (StringUtils.equals(e.getCode(), ResultCode.USER_NOT_EXIST.getCode()) || StringUtils.equals(e.getCode(),
-                    ResultCode.PASSWORD_ERROR.getCode())) {
+            if (StringUtils.equals(e.getCode(), ResultCode.USER_NOT_EXIST.getCode())
+                    || StringUtils.equals(e.getCode(), ResultCode.PASSWORD_ERROR.getCode())
+            ) {
                 return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.WRONG_USERNAME_OR_PASSWORD);
             }
             throw new BaseException();
         } catch (Throwable e) {
-            e.printStackTrace();
+            // 不能使用spring boot 异常拦截器, 返回值需要根据请求参数进行转换
+            log.error(e.getMessage(), e);
             return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.A_GENERIC_ERROR);
         }
     }
@@ -82,26 +83,7 @@ public class ManualSerializeAspect {
         // 目标API版本为1.12.0或更低版本，则通过以明文或十六进制编码的形式发送密码来执行身份验证。示例：
         // http://your-server/rest/ping.view?u=joe&p=sesame&v=1.12.0&c=myapp
         // http://your-server/rest/ping.view?u=joe&p=enc:736573616d65&v=1.12.0&c=myapp
-        String tempPassword;
-        if (compare <= 0 && StringUtils.isNotBlank(password) && !StringUtils.equals("null", password)) {
-            if (StringUtils.startsWithIgnoreCase(password, "enc:")) {
-                String replace = StringUtils.replace(password, "enc:", "");
-                tempPassword = HexUtil.decodeHexStr(replace);
-            } else {
-                tempPassword = password;
-            }
-            try {
-                accountService.login(user, tempPassword);
-            } catch (BaseException e) {
-                // 登录错误则使用子账户
-                if (StringUtils.equals(e.getCode(), ResultCode.USER_ACCOUNT_FORBIDDEN.getCode())
-                        || StringUtils.equals(e.getCode(), ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD.getCode())) {
-                    accountService.loginSub(user, password);
-                } else {
-                    throw new BaseException(e);
-                }
-            }
-        } else {
+        if (compare > 0 || StringUtils.isBlank(password) || StringUtils.equals("null", password)) {
             // 从API版本1.13.0开始，推荐的身份验证方案是发送身份验证令牌，计算为密码的单向加盐哈希。
             // This involves two steps: 这涉及两个步骤：
             //
@@ -116,18 +98,21 @@ public class ManualSerializeAspect {
             // 例如：如果口令是sesame，随机盐是c19 b2 d，则token = md5（“sesamec 19 b2 d”）= 26719 a1196 d2 a940705 a59634 eb 18 eab。相应的请求URL变为：
             //
             // http://your-server/rest/ping.view?u=joe&t=26719a1196d2a940705a59634eb18eab&s=c19b2d&v=1.12.0&c=myapp
-            SysUserPojo pojo;
-            try {
-                pojo = accountService.getUser(user);
-            } catch (BaseException e) {
-                if (StringUtils.equals(ResultCode.USER_NOT_EXIST.getCode(), e.getCode())) {
-                    pojo = accountService.getSubAccountMasterUserInfoBySubAccount(user);
-                } else {
-                    throw new BaseException(e);
-                }
-            }
+            SysUserPojo pojo = subsonicUserCache.checkUser(user);
             String originToken = SecureUtil.md5(pojo.getPassword() + salt);
             if (!StringUtils.equals(originToken, token)) {
+                throw new BaseException(ResultCode.PASSWORD_ERROR);
+            }
+        } else {
+            String tempPassword = password;
+            // 对前端请求密码参数处理
+            if (StringUtils.startsWithIgnoreCase(password, "enc:")) {
+                // 删除多余前缀
+                String replace = StringUtils.replace(password, "enc:", "");
+                tempPassword = HexUtil.decodeHexStr(replace);
+            }
+            SysUserPojo account = subsonicUserCache.checkUser(user);
+            if (!StringUtils.equals(account.getPassword(), tempPassword)) {
                 throw new BaseException(ResultCode.PASSWORD_ERROR);
             }
         }

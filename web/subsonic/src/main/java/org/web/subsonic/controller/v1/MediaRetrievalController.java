@@ -29,7 +29,7 @@ public class MediaRetrievalController {
     @GetMapping({"/getCoverArt.view", "/getCoverArt"})
     public RedirectView getCoverArt(SubsonicCommonReq req,
                                     @Parameter(description = "歌曲、专辑或艺术家的ID")
-                                    @RequestParam(value = "id") Long id,
+                                    @RequestParam(value = "id") String id,
                                     
                                     @Parameter(description = "如果指定，将图像缩放到此大小", deprecated = true)
                                     @RequestParam(value = "size", required = false) Long size

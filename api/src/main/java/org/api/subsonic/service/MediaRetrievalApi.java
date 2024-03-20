@@ -34,9 +34,32 @@ public class MediaRetrievalApi {
         this.remoteStorePicService = remoteStorePicService;
     }
     
-    public String getCoverArt(SubsonicCommonReq req, Long id, Long size) {
-        log.debug(req.toString());
-        String picUrl = remoteStorePicService.getPicUrl(id, null);
+    public String getCoverArt(SubsonicCommonReq req, String id, Long size) {
+        log.debug("cover id: {}", id);
+        // 与封面关联的id，比如歌单，音乐，专辑，歌手
+        long middlePic;
+        // 处理一些前端会添加 歌单封面前缀 pl-
+        String playPrefix = "pl-";
+        String albumPrefix = "al-";
+        // 可能是media file 媒体文件缩写
+        String mfPrefix = "mf-";
+        if (StringUtils.startsWithIgnoreCase(id, playPrefix)) {
+            String playListPic = StringUtils.replace(id, playPrefix, "");
+            middlePic = Long.parseLong(playListPic);
+        } else if (StringUtils.startsWithIgnoreCase(id, albumPrefix)) {
+            String playListPic = StringUtils.replace(id, albumPrefix, "");
+            middlePic = Long.parseLong(playListPic);
+        } else if (StringUtils.startsWithIgnoreCase(id, mfPrefix)) {
+            String playListPic = StringUtils.replace(id, mfPrefix, "");
+            middlePic = Long.parseLong(playListPic);
+        } else {
+            try {
+                middlePic = Long.parseLong(id);
+            } catch (NumberFormatException e) {
+                return defaultInfo.getPic().getDefaultPic();
+            }
+        }
+        String picUrl = remoteStorePicService.getPicUrl(middlePic, null);
         if (StringUtils.isNotBlank(picUrl)) {
             return picUrl;
         }

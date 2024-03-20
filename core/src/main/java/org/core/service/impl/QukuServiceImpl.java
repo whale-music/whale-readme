@@ -366,6 +366,8 @@ public class QukuServiceImpl implements QukuService {
         Page<TbMusicPojo> page = new Page<>(RandomUtil.randomLong(0, randomOffset), count);
         boolean genreFlag = StringUtils.isNotBlank(genre);
         
+        Date toYearDate = Objects.isNull(toYear) ? null : new Date(toYear);
+        Date fromYearDate = Objects.isNull(fromYear) ? null : new Date(fromYear);
         if (genreFlag) {
             LambdaQueryWrapper<TbTagPojo> eq = Wrappers.<TbTagPojo>lambdaQuery().eq(TbTagPojo::getTagName, genre);
             List<TbTagPojo> list = tagService.list(eq);
@@ -376,15 +378,15 @@ public class QukuServiceImpl implements QukuService {
                     List<Long> middleTagIds = middleList.parallelStream().map(TbMiddleTagPojo::getTagId).toList();
                     LambdaQueryWrapper<TbMusicPojo> wrappers = Wrappers.<TbMusicPojo>lambdaQuery()
                                                                        .in(TbMusicPojo::getId, middleTagIds)
-                                                                       .le(Objects.nonNull(toYear), TbMusicPojo::getPublishTime, new Date(toYear))
-                                                                       .ge(Objects.nonNull(fromYear), TbMusicPojo::getPublishTime, new Date(fromYear));
+                                                                       .le(Objects.nonNull(toYearDate), TbMusicPojo::getPublishTime, toYearDate)
+                                                                       .ge(Objects.nonNull(fromYearDate), TbMusicPojo::getPublishTime, fromYearDate);
                     musicService.page(page, wrappers);
                 }
             }
         } else {
             LambdaQueryWrapper<TbMusicPojo> wrappers = Wrappers.<TbMusicPojo>lambdaQuery()
-                                                               .le(Objects.nonNull(toYear), TbMusicPojo::getPublishTime, new Date(toYear))
-                                                               .ge(Objects.nonNull(fromYear), TbMusicPojo::getPublishTime, new Date(fromYear));
+                                                               .le(Objects.nonNull(toYearDate), TbMusicPojo::getPublishTime, toYearDate)
+                                                               .ge(Objects.nonNull(fromYearDate), TbMusicPojo::getPublishTime, fromYearDate);
             musicService.page(page, wrappers);
         }
         List<TbMusicPojo> tbMusicPojos = Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>());

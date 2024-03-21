@@ -1,5 +1,6 @@
 package org.api.subsonic.utils.spring;
 
+import cn.hutool.core.collection.CollUtil;
 import org.api.subsonic.config.SubsonicResourceReturnStrategyConfig;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,9 @@ public class SubsonicResourceReturnStrategyUtil {
      * @return 文件数据
      */
     public TbResourcePojo handleResource(List<TbResourcePojo> resources) {
+        if (CollUtil.isEmpty(resources)) {
+            return null;
+        }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
             case FIRST -> {
                 return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());

@@ -164,6 +164,15 @@ public interface QukuService {
     List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
     
     /**
+     * 通过歌手ID获取专辑列表
+     *
+     * @param artistId 歌手ID
+     */
+    default List<AlbumConvert> getAlbumListByArtistIds(Long artistId) {
+        return this.getAlbumListByArtistIds(Collections.singletonList(artistId));
+    }
+    
+    /**
      * 获取Mv歌手
      *
      * @param mvIds 用户信息

@@ -42,7 +42,7 @@ public class MusicInfoRes implements Serializable {
     @Schema(name = "专辑")
     private Album album;
     
-    @Schema(name = "专辑")
+    @Schema(name = "音源")
     private List<MusicSources> sources;
     
     @Schema(name = "歌词")

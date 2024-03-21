@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MusicDirectoryRes extends SubsonicResult {
-    private Directory directory;
+    private Directory directory = new Directory();
     
     
     @Data
@@ -196,7 +196,7 @@ public class MusicDirectoryRes extends SubsonicResult {
         private String mediaType;
         
         @Schema(name = "musicBrainzId")
-        @JsonProperty("mediaType")
+        @JsonProperty("musicBrainzId")
         @JacksonXmlProperty(isAttribute = true)
         private String musicBrainzId = "";
         

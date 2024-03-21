@@ -33,6 +33,8 @@ import org.api.subsonic.model.res.videoinfo.VideoInfoRes;
 import org.api.subsonic.model.res.videos.VideosRes;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.PicTypeConstant;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -42,6 +44,7 @@ import org.core.service.RemoteStorePicService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.net.URLConnection;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -231,8 +234,85 @@ public class BrowsingApi {
         return indexesRes;
     }
     
-    public MusicDirectoryRes getMusicDirectory(SubsonicCommonReq req) {
-        return new MusicDirectoryRes();
+    public MusicDirectoryRes getMusicDirectory(SubsonicCommonReq req, Long id) {
+        List<MusicConvert> musicListByAlbumId;
+        TbAlbumPojo albumInfo = albumService.getById(id);
+        List<Long> albumIds = new ArrayList<>();
+        if (Objects.isNull(albumInfo)) {
+            TbArtistPojo artistInfo = tbArtistService.getById(id);
+            if (Objects.isNull(artistInfo)) {
+                throw new BaseException(ResultCode.PARAM_IS_INVALID);
+            }
+            List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
+            albumIds.addAll(albumListByArtistIds.parallelStream().map(TbAlbumPojo::getId).toList());
+        } else {
+            albumIds.add(albumInfo.getId());
+        }
+        musicListByAlbumId = qukuService.getMusicListByAlbumId(albumIds);
+        if (CollUtil.isEmpty(musicListByAlbumId)) {
+            return new MusicDirectoryRes();
+        }
+        
+        List<Long> musicIds = musicListByAlbumId.parallelStream()
+                                                .map(TbMusicPojo::getId)
+                                                .toList();
+        Map<Long, AlbumConvert> albumMaps = qukuService.getMusicAlbumByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        MusicDirectoryRes res = new MusicDirectoryRes();
+        Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
+        ArrayList<MusicDirectoryRes.Child> child = new ArrayList<>();
+        for (int i = 0; i < musicListByAlbumId.size(); i++) {
+            MusicConvert s = musicListByAlbumId.get(i);
+            
+            MusicDirectoryRes.Child c = new MusicDirectoryRes.Child();
+            c.setId(s.getId());
+            c.setParent(id);
+            c.setIsDir(false);
+            c.setTitle(s.getMusicName());
+            
+            TbAlbumPojo albumPojo = albumMaps.get(s.getId());
+            if (Objects.nonNull(albumPojo)) {
+                c.setAlbumId(albumPojo.getId());
+                c.setAlbum(albumPojo.getAlbumName());
+                c.setYear(albumPojo.getPublishTime().getYear());
+            }
+            
+            List<ArtistConvert> albumArtistListByAlbumIds = artistMaps.get(s.getId());
+            if (CollUtil.isNotEmpty(albumArtistListByAlbumIds) && Objects.nonNull(albumArtistListByAlbumIds.getFirst())) {
+                ArtistConvert first = albumArtistListByAlbumIds.getFirst();
+                c.setArtist(first.getArtistName());
+                c.setArtistId(first.getId());
+            }
+            List<TbTagPojo> labelAlbumGenre = qukuService.getLabelAlbumGenre(id);
+            if (CollUtil.isNotEmpty(labelAlbumGenre)) {
+                c.setGenre(CollUtil.join(labelAlbumGenre, ","));
+            }
+            c.setTrack(i);
+            TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(s.getId()));
+            c.setCoverArt(s.getId());
+            c.setSize(tbResourcePojo.getSize());
+            c.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+            c.setSuffix(tbResourcePojo.getEncodeType());
+            c.setBitRate(tbResourcePojo.getRate());
+            c.setPath(tbResourcePojo.getPath());
+            c.setPlayCount(0);
+            c.setType("music");
+            c.setUserRating((byte) 0);
+            c.setIsVideo(false);
+            c.setPlayed(LocalDateTimeUtil.format(s.getUpdateTime(), DatePattern.UTC_MS_PATTERN));
+            c.setComment(s.getComment());
+            c.setSortName(s.getAliasName());
+            c.setMediaType("song");
+            c.setCreated(LocalDateTimeUtil.format(s.getCreateTime(), DatePattern.UTC_MS_PATTERN));
+            c.setDuration(s.getTimeLength());
+            c.setBpm((byte) 0);
+            
+            child.add(c);
+        }
+        MusicDirectoryRes.Directory directory = new MusicDirectoryRes.Directory();
+        directory.setChild(child);
+        res.setDirectory(directory);
+        return res;
     }
     
     public GenresRes getGenres(SubsonicCommonReq req) {

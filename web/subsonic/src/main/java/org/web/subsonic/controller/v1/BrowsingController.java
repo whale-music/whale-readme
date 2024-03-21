@@ -75,7 +75,7 @@ public class BrowsingController {
         return res.success(req);
     }
     
-    @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数. 暂时未实现")
+    @Operation(summary = "获取音乐目录", description = "返回音乐目录中所有文件的列表。通常用于获取艺术家的专辑列表或专辑的歌曲列表")
     @ApiResponse(responseCode = HttpStatusStr.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
@@ -84,8 +84,10 @@ public class BrowsingController {
     )
     @GetMapping({"/getMusicDirectory.view", "/getMusicDirectory"})
     @ManualSerialize
-    public ResponseEntity<String> getMusicDirectory(SubsonicCommonReq req) {
-        MusicDirectoryRes res = browsingApi.getMusicDirectory(req);
+    public ResponseEntity<String> getMusicDirectory(SubsonicCommonReq req,
+                                                    @Parameter(description = "可能是专辑ID或者艺术家ID")
+                                                    Long id) {
+        MusicDirectoryRes res = browsingApi.getMusicDirectory(req, id);
         return res.success(req);
     }
     

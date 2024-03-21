@@ -610,7 +610,7 @@ public class QukuServiceImpl implements QukuService {
         }
         List<TbMusicArtistPojo> musicArtistList = musicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery()
                                                                                   .in(TbMusicArtistPojo::getArtistId, artistIds));
-        if (CollUtil.isEmpty(artistIds)) {
+        if (CollUtil.isEmpty(musicArtistList)) {
             return Collections.emptyMap();
         }
         Map<Long, List<Long>> artistMusicMaps = musicArtistList.parallelStream()

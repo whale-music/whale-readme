@@ -593,7 +593,7 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public Integer getArtistAlbumCountBySingerId(Long id) {
         // todo
-        return MapUtil.get(this.getArtistAlbumCount(Collections.singletonList(id)), id, Integer.class);
+        return MapUtil.get(this.getArtistAlbumCount(Collections.singletonList(id)), id, Integer.class, 0);
     }
     
     /**

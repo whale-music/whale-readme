@@ -7,7 +7,6 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
@@ -140,7 +139,6 @@ public class BrowsingApi {
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
         List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
         List<TbResourcePojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
-        TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new ArtistConvert() : artistByMusicId.get(0);
         Song song = new Song();
         song.setId(String.valueOf(musicPojo.getId()));
@@ -153,21 +151,20 @@ public class BrowsingApi {
         song.setTrack(0);
         song.setYear(albumByAlbumId.getPublishTime().getYear());
         song.setCoverArt(String.valueOf(musicPojo.getId()));
-        song.setSize(Math.toIntExact((tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize())));
-        
-        if (StringUtils.equalsIgnoreCase(tbMusicUrlPojo.getEncodeType(), "mp3")) {
-            song.setContentType("audio/mpeg");
-        } else {
-            song.setContentType("audio/" + tbMusicUrlPojo.getEncodeType());
+        TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
+        if (Objects.isNull(tbMusicUrlPojo)) {
+            throw new BaseException(ResultCode.RESOURCE_DATA_NOT_EXISTED);
         }
-        
-        song.setDiscNumber(String.valueOf(0));
+        song.setSize(Math.toIntExact((tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize())));
+        song.setContentType(URLConnection.guessContentTypeFromName(tbMusicUrlPojo.getPath()));
         song.setSuffix(tbMusicUrlPojo.getEncodeType());
+        song.setBitRate(tbMusicUrlPojo.getRate());
+        song.setPath(tbMusicUrlPojo.getPath());
+        
         song.setStarred(musicPojo.getUpdateTime().toString());
         song.setDuration(musicPojo.getTimeLength() / 1000);
-        song.setBitRate(tbMusicUrlPojo.getRate());
         song.setParent(String.valueOf(albumByAlbumId.getId()));
-        song.setPath(tbMusicUrlPojo.getPath());
+        song.setDiscNumber(String.valueOf(0));
         song.setPlayCount(0);
         song.setPlayed(musicPojo.getUpdateTime().toString());
         song.setCreated(LocalDateTimeUtil.format(musicPojo.getCreateTime(), DatePattern.UTC_MS_PATTERN));
@@ -289,6 +286,10 @@ public class BrowsingApi {
             }
             c.setTrack(i);
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(s.getId()));
+            // 跳过无音源
+            if (Objects.isNull(tbResourcePojo)) {
+                continue;
+            }
             c.setCoverArt(s.getId());
             c.setSize(tbResourcePojo.getSize());
             c.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
@@ -578,18 +579,15 @@ public class BrowsingApi {
             e.setCoverArt(String.valueOf(musicPojo.getId()));
             List<TbResourcePojo> musicPath = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(musicPath);
-            if (Objects.nonNull(tbResourcePojo)) {
-                e.setSize(Math.toIntExact(tbResourcePojo.getSize() == null ? 0 : tbResourcePojo.getSize()));
-                e.setSuffix(tbResourcePojo.getEncodeType());
-                e.setBitRate(tbResourcePojo.getRate());
-                e.setPath(tbResourcePojo.getPath());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    // TODO 需要修改为Mime，不要使用魔法值
-                    e.setContentType("audio/mpeg");
-                } else {
-                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
+            if (Objects.isNull(tbResourcePojo)) {
+                continue;
             }
+            e.setSize(Math.toIntExact(tbResourcePojo.getSize() == null ? 0 : tbResourcePojo.getSize()));
+            e.setSuffix(tbResourcePojo.getEncodeType());
+            e.setBitRate(tbResourcePojo.getRate());
+            e.setPath(tbResourcePojo.getPath());
+            e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+            
             e.setStarred(musicPojo.getUpdateTime().toString());
             e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setPlayCount(0);
@@ -716,16 +714,16 @@ public class BrowsingApi {
             e.setTrack(0);
             e.setCoverArt(musicConvert.getPicUrl());
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(musicConvert.getId()));
-            e.setSize(tbResourcePojo.getSize());
-            if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                e.setContentType("audio/mpeg");
-            } else {
-                e.setContentType("audio/" + tbResourcePojo.getEncodeType());
+            if (Objects.isNull(tbResourcePojo)) {
+                continue;
             }
+            e.setSize(tbResourcePojo.getSize());
+            e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             e.setSuffix(tbResourcePojo.getEncodeType());
-            e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setBitRate(tbResourcePojo.getRate());
             e.setPath(tbResourcePojo.getPath());
+            
+            e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setPlayCount(0);
             e.setPlayed(new Date());
             e.setDiscNumber(0);
@@ -778,16 +776,16 @@ public class BrowsingApi {
             e.setTrack(0);
             e.setCoverArt(musicConvert.getPicUrl());
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(musicConvert.getId()));
-            e.setSize(tbResourcePojo.getSize());
-            if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                e.setContentType("audio/mpeg");
-            } else {
-                e.setContentType("audio/" + tbResourcePojo.getEncodeType());
+            if (Objects.isNull(tbResourcePojo)) {
+                continue;
             }
+            e.setSize(tbResourcePojo.getSize());
+            e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             e.setSuffix(tbResourcePojo.getEncodeType());
-            e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setBitRate(tbResourcePojo.getRate());
             e.setPath(tbResourcePojo.getPath());
+            
+            e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setPlayCount(0);
             e.setPlayed(new Date());
             e.setDiscNumber(0);
@@ -834,6 +832,18 @@ public class BrowsingApi {
                 topSongs.setCreated(LocalDateTimeUtil.format(tbMusicPojo.getCreateTime(), DatePattern.UTC_PATTERN));
                 topSongs.setIsVideo(false);
                 
+                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(tbMusicPojo.getId()));
+                if (Objects.isNull(tbResourcePojo)) {
+                    continue;
+                }
+                topSongs.setBitRate(tbResourcePojo.getRate());
+                topSongs.setPath(tbResourcePojo.getPath());
+                topSongs.setSize(tbResourcePojo.getSize());
+                topSongs.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+                topSongs.setSuffix(tbResourcePojo.getEncodeType());
+                topSongs.setPlayCount(0);
+                topSongs.setPlayed(new Date());
+                
                 AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(tbMusicPojo.getAlbumId());
                 if (Objects.nonNull(albumConvert)) {
                     topSongs.setAlbum(albumConvert.getAlbumName());
@@ -848,20 +858,6 @@ public class BrowsingApi {
                     topSongs.setArtist(tbArtistPojo.getArtistName());
                     topSongs.setArtistId(String.valueOf(tbArtistPojo.getId()));
                 }
-                
-                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(tbMusicPojo.getId()));
-                topSongs.setBitRate(tbResourcePojo.getRate());
-                topSongs.setPath(tbResourcePojo.getPath());
-                topSongs.setSize(tbResourcePojo.getSize());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    topSongs.setContentType("audio/mpeg");
-                } else {
-                    topSongs.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
-                topSongs.setSuffix(tbResourcePojo.getEncodeType());
-                topSongs.setPlayCount(0);
-                topSongs.setPlayed(new Date());
-                
                 
                 list.add(topSongs);
             }

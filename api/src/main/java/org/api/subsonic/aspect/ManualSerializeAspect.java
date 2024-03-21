@@ -64,15 +64,14 @@ public class ManualSerializeAspect {
             return proceedingJoinPoint.proceed();
         } catch (BaseException e) {
             log.error(e.getResultMsg(), e);
-            // 用户登录错误
-            if (StringUtils.equals(e.getCode(), ResultCode.USER_NOT_EXIST.getCode())
-                    || StringUtils.equals(e.getCode(), ResultCode.PASSWORD_ERROR.getCode())
-            ) {
-                return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.WRONG_USERNAME_OR_PASSWORD);
+            // 对自定义异常进行转换
+            ErrorEnum errorEnum = ExceptionTransform.get(e);
+            if (Objects.isNull(errorEnum)) {
+                throw e;
             }
-            throw new BaseException();
+            return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), errorEnum);
         } catch (Throwable e) {
-            // 不能使用spring boot 异常拦截器, 返回值需要根据请求参数进行转换
+            // 不能使用spring boot 异常拦截器, 因为返回值需要根据请求参数进行转换
             log.error(e.getMessage(), e);
             return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.A_GENERIC_ERROR);
         }

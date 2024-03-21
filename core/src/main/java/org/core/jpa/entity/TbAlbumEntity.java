@@ -47,8 +47,6 @@ public class TbAlbumEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
-    @OneToMany(mappedBy = "tbAlbumByAlbumId", fetch = FetchType.EAGER)
-    private Collection<TbAlbumArtistEntity> tbAlbumArtistsById;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
     private Collection<TbMusicEntity> tbMusicsById;
     @OneToMany(mappedBy = "tbAlbumByAlbumId")
@@ -152,14 +150,6 @@ public class TbAlbumEntity implements Serializable {
     
     public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
         this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbAlbumArtistEntity> getTbAlbumArtistsById() {
-        return tbAlbumArtistsById;
-    }
-    
-    public void setTbAlbumArtistsById(Collection<TbAlbumArtistEntity> tbAlbumArtistsById) {
-        this.tbAlbumArtistsById = tbAlbumArtistsById;
     }
     
     public Collection<TbMusicEntity> getTbMusicsById() {

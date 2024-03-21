@@ -1,5 +1,6 @@
 package org.api.neteasecloudmusic.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -15,16 +16,14 @@ import org.api.neteasecloudmusic.model.vo.artist.artist.ArtistRes;
 import org.api.neteasecloudmusic.model.vo.artist.artist.HotSongsItem;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.ArtistSubListRes;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.DataItem;
-import org.core.mybatis.iservice.TbAlbumArtistService;
 import org.core.mybatis.iservice.TbAlbumService;
 import org.core.mybatis.iservice.TbArtistService;
+import org.core.mybatis.iservice.TbMusicArtistService;
+import org.core.mybatis.iservice.TbMusicService;
 import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
-import org.core.mybatis.pojo.SysUserPojo;
-import org.core.mybatis.pojo.TbAlbumArtistPojo;
-import org.core.mybatis.pojo.TbAlbumPojo;
-import org.core.mybatis.pojo.TbArtistPojo;
+import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.springframework.stereotype.Service;
@@ -39,21 +38,24 @@ import java.util.Optional;
 public class ArtistApi {
     private final QukuAPI qukuService;
     
-    private final TbAlbumArtistService albumSingerService;
-    
     private final TbAlbumService albumService;
     
     private final TbArtistService singerService;
     
+    private final TbMusicArtistService tbMusicArtistService;
+    
     private final RemoteStorePicService remoteStorePicService;
     
+    private final TbMusicService tbMusicService;
     
-    public ArtistApi(QukuAPI qukuService, TbAlbumArtistService albumSingerService, TbAlbumService albumService, TbArtistService singerService, RemoteStorePicService remoteStorePicService) {
+    
+    public ArtistApi(QukuAPI qukuService, TbAlbumService albumService, TbArtistService singerService, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService, TbMusicArtistService tbMusicArtistService) {
         this.qukuService = qukuService;
-        this.albumSingerService = albumSingerService;
         this.albumService = albumService;
         this.singerService = singerService;
         this.remoteStorePicService = remoteStorePicService;
+        this.tbMusicService = tbMusicService;
+        this.tbMusicArtistService = tbMusicArtistService;
     }
     
     public ArtistSubListRes artistSublist(SysUserPojo user) {
@@ -77,9 +79,18 @@ public class ArtistApi {
     }
     
     public ArtistAlbumRes artistAlbum(Long id, Long limit, Long offset) {
-        Page<TbAlbumArtistPojo> page = new Page<>(offset, limit);
-        albumSingerService.page(page, Wrappers.<TbAlbumArtistPojo>lambdaQuery().eq(TbAlbumArtistPojo::getArtistId, id));
-        List<Long> albumIds = page.getRecords().stream().map(TbAlbumArtistPojo::getAlbumId).toList();
+        Page<TbMusicPojo> page = new Page<>(offset, limit);
+        // todo: 检查 and rename field
+        List<Long> musicIds = tbMusicArtistService.listObjs(Wrappers.<TbMusicArtistPojo>lambdaQuery()
+                                                                    .select(TbMusicArtistPojo::getMusicId)
+                                                                    .eq(TbMusicArtistPojo::getArtistId, id));
+        
+        LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                          .select(TbMusicPojo::getAlbumId)
+                                                          .in(TbMusicPojo::getId, musicIds)
+                                                          .groupBy(TbMusicPojo::getAlbumId);
+        tbMusicService.page(page, wrapper);
+        List<Long> albumIds = page.getRecords().stream().map(TbMusicPojo::getAlbumId).toList();
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
     
         Artist artist = new Artist();

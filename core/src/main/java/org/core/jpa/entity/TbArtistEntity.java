@@ -47,8 +47,6 @@ public class TbArtistEntity implements Serializable {
     @Basic
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
-    @OneToMany(mappedBy = "tbArtistByArtistId")
-    private Collection<TbAlbumArtistEntity> tbAlbumArtistsById;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
@@ -157,14 +155,6 @@ public class TbArtistEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, artistName, aliasName, sex, birth, location, introduction, userId, createTime, updateTime);
-    }
-    
-    public Collection<TbAlbumArtistEntity> getTbAlbumArtistsById() {
-        return tbAlbumArtistsById;
-    }
-    
-    public void setTbAlbumArtistsById(Collection<TbAlbumArtistEntity> tbAlbumArtistsById) {
-        this.tbAlbumArtistsById = tbAlbumArtistsById;
     }
     
     public SysUserEntity getSysUserByUserId() {

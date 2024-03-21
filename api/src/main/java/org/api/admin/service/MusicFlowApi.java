@@ -48,7 +48,6 @@ import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.oss.model.Resource;
-import org.core.oss.service.OSSService;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
@@ -115,8 +114,6 @@ public class MusicFlowApi {
      */
     private final TbAlbumService albumService;
     
-    private final TbAlbumArtistService albumSingerService;
-    
     private final AccountService accountService;
     
     private final QukuAPI qukuService;
@@ -136,8 +133,6 @@ public class MusicFlowApi {
     private final TbResourceEntityRepository resourceEntityRepository;
     
     private final UploadConfig uploadConfig;
-    
-    private final OSSService ossService;
     
     private final RemoteStorageService remoteStorageService;
     
@@ -431,22 +426,24 @@ public class MusicFlowApi {
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                            .eq(TbMusicPojo::getMusicName, dto.getMusic().getMusicName()));
         Set<Long> albumSets = list.parallelStream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
-        if (CollUtil.isNotEmpty(albumSets)) {
-            Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
-                                                           .parallelStream()
-                                                           .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
-            for (Long albumSet : albumSets) {
-                List<TbAlbumArtistPojo> list1 = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                                .eq(TbAlbumArtistPojo::getAlbumId, albumSet));
-                Set<Long> tempArtistList = list1.parallelStream().map(TbAlbumArtistPojo::getArtistId).collect(Collectors.toSet());
-                if (CollUtil.isEqualList(tempArtistList, artistIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
-                    Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
-                            StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusic().getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(),
-                                    albumSet)
-                    ).findFirst();
-                    if (first.isPresent()) {
-                        return saveMusicInfoTable(dto, albumPojo, first.get(), aliaNames);
-                    }
+        if (CollUtil.isEmpty(list)) {
+            return null;
+        }
+        Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
+                                                       .parallelStream()
+                                                       .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
+        Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumSets);
+        // 检索专辑关联歌手，并且数据与数据库中不相等，专辑为空的情况下才会保存歌曲
+        for (Long albumSet : albumSets) {
+            List<ArtistConvert> list1 = albumArtistMapByAlbumIds.get(albumSet);
+            Set<Long> tempArtistList = list1.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet());
+            if (CollUtil.isEqualList(tempArtistList, artistIds) && StringUtils.isEmpty(albumMaps.get(albumSet).getAlbumName())) {
+                Optional<TbMusicPojo> first = list.parallelStream().filter(tbMusicPojo ->
+                        StringUtils.equals(tbMusicPojo.getMusicName(), dto.getMusic().getMusicName()) && Objects.equals(tbMusicPojo.getAlbumId(),
+                                albumSet)
+                ).findFirst();
+                if (first.isPresent()) {
+                    return saveMusicInfoTable(dto, albumPojo, first.get(), aliaNames);
                 }
             }
         }
@@ -514,51 +511,19 @@ public class MusicFlowApi {
             return album;
         }
         // 查询专辑名在数据库中是否存在专辑
-        List<TbAlbumPojo> list = albumService.list(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, album.getAlbumName()));
-        // 获取所有专辑ID
-        List<Long> albumList = list.stream().map(TbAlbumPojo::getId).toList();
-        Set<Long> albumIds = new HashSet<>();
-        // 根据歌手和专辑ID查找关联ID，如果有则更新专辑表。
-        if (IterUtil.isNotEmpty(albumList) && IterUtil.isNotEmpty(singerIds)) {
-            // 专辑表找到后，在中间表同时满足专辑ID和歌手ID两个列表，只找到同一个专辑ID
-            List<TbAlbumArtistPojo> tbAlbumArtistPojoList = albumSingerService.list(Wrappers.<TbAlbumArtistPojo>lambdaQuery()
-                                                                                            .in(TbAlbumArtistPojo::getArtistId, singerIds)
-                                                                                            .in(TbAlbumArtistPojo::getAlbumId, albumList));
-            albumIds = tbAlbumArtistPojoList.stream().map(TbAlbumArtistPojo::getAlbumId).collect(Collectors.toSet());
-        }
-        ExceptionUtil.isNull(albumIds.size() > 1, ResultCode.ALBUM_NOT_EXIST);
-        TbAlbumPojo albumPojo = new TbAlbumPojo();
+        TbAlbumPojo albumPojo = albumService.getOne(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getAlbumName, album.getAlbumName()));
         // 数据库中有数据，并且保证数据中的专辑ID和根据专辑名查询出来的ID相同，否则直接抛出异常
-        if (albumIds.size() == 1) {
-            // 获取关联的专辑表ID
-            Long id = albumIds.iterator().next();
+        if (Objects.isNull(albumPojo)) {
+            albumPojo = new TbAlbumPojo();
+            BeanUtils.copyProperties(album, albumPojo, "picId");
+            // 新增专辑
+            albumService.save(albumPojo);
+        } else {
             // 获取关联的专辑表数据
-            Optional<TbAlbumPojo> first = list.stream()
-                                              .filter(tbAlbumPojo -> Objects.equals(tbAlbumPojo.getId(), id))
-                                              .findFirst();
-            albumPojo = first.orElseThrow(() -> new BaseException(ResultCode.ALBUM_ERROR));
             BeanUtils.copyProperties(album, albumPojo, "id", "updateTime", "createTime", "picId");
             // 更新专辑表
             albumService.updateById(albumPojo);
             return albumPojo;
-        }
-        // 如果没有歌手数据则只新增专辑表
-        if (CollUtil.isEmpty(albumIds)) {
-            albumPojo = new TbAlbumPojo();
-            BeanUtils.copyProperties(album, albumPojo, "picId");
-            // 新增专辑
-            albumService.saveOrUpdate(albumPojo);
-            // 更新歌手和专辑中间表
-            if (IterUtil.isNotEmpty(singerIds)) {
-                List<TbAlbumArtistPojo> albumSingerPojoArrayList = new ArrayList<>();
-                for (Long id : singerIds) {
-                    TbAlbumArtistPojo e = new TbAlbumArtistPojo();
-                    e.setAlbumId(albumPojo.getId());
-                    e.setArtistId(id);
-                    albumSingerPojoArrayList.add(e);
-                }
-                albumSingerService.saveBatch(albumSingerPojoArrayList);
-            }
         }
         return albumPojo;
     }

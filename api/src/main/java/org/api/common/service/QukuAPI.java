@@ -26,13 +26,12 @@ public class QukuAPI extends QukuServiceImpl {
     private final RemoteStorageService remoteStorageService;
     
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbAlbumArtistService albumArtistService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, PlayListService playListService, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, RemoteStorePicService remoteStorePicService, RemoteStorageService remoteStorageService) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, PlayListService playListService, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, RemoteStorePicService remoteStorePicService, RemoteStorageService remoteStorageService) {
         super(musicService,
                 albumService,
                 artistService,
                 musicUrlService,
                 userAlbumService,
-                albumArtistService,
                 musicArtistService,
                 userSingerService,
                 collectMusicService,

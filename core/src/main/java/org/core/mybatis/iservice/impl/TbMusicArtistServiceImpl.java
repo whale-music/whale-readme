@@ -1,10 +1,13 @@
 package org.core.mybatis.iservice.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.core.mybatis.iservice.TbMusicArtistService;
 import org.core.mybatis.mapper.TbMusicArtistMapper;
 import org.core.mybatis.pojo.TbMusicArtistPojo;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +19,17 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TbMusicArtistServiceImpl extends ServiceImpl<TbMusicArtistMapper, TbMusicArtistPojo> implements TbMusicArtistService {
-
+    
+    /**
+     * 获取音乐ID
+     *
+     * @param artistIds 歌手Id
+     * @return 音乐ID
+     */
+    @Override
+    public List<Long> getMusicIdsByArtistIds(List<Long> artistIds) {
+        return this.listObjs(Wrappers.<TbMusicArtistPojo>lambdaQuery()
+                                     .select(TbMusicArtistPojo::getMusicId)
+                                     .in(TbMusicArtistPojo::getArtistId, artistIds));
+    }
 }

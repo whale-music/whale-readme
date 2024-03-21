@@ -1,33 +1,33 @@
 package org.api.webdav.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import org.api.webdav.config.WebdavConfig;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.common.constant.PlayListTypeConstant;
-import org.core.jpa.entity.TbMusicEntity;
-import org.core.jpa.entity.TbResourceEntity;
-import org.core.jpa.repository.TbMusicEntityRepository;
-import org.core.mybatis.iservice.TbCollectMusicService;
 import org.core.mybatis.iservice.TbCollectService;
-import org.core.mybatis.pojo.TbCollectMusicPojo;
+import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.pojo.TbCollectPojo;
-import org.core.service.AccountService;
+import org.core.mybatis.pojo.TbMusicPojo;
+import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.service.PlayListService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Service(WebdavConfig.WEBDAV + "WebdavApi")
 public class WebdavApi {
-    private final TbCollectMusicService collectMusicService;
     
-    private final TbMusicEntityRepository tbMusicEntityRepository;
+    private final PlayListService playListService;
+    
+    private final TbResourceService tbResourceService;
     
     private final TbCollectService tbCollectService;
     
@@ -36,11 +36,11 @@ public class WebdavApi {
     public static final String WEBDAV_COLLECT_TYPE_LIST = "webdav-collect-type-list";
     public static final String WEBDAV_PLAY_LIST = "webdav-play-list";
     
-    public WebdavApi(TbCollectMusicService collectMusicService, TbMusicEntityRepository tbMusicEntityRepository, TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, AccountService accountService) {
-        this.collectMusicService = collectMusicService;
-        this.tbMusicEntityRepository = tbMusicEntityRepository;
+    public WebdavApi(TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, PlayListService playListService, TbResourceService tbResourceService) {
         this.tbCollectService = tbCollectService;
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
+        this.playListService = playListService;
+        this.tbResourceService = tbResourceService;
     }
     
     @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
@@ -58,22 +58,23 @@ public class WebdavApi {
     @Cacheable(value = WEBDAV_PLAY_LIST, key = "#id")
     public List<PlayListRes> getPlayListMusic(Long id) {
         List<PlayListRes> res = new LinkedList<>();
-        List<TbCollectMusicPojo> collectIds = collectMusicService.getCollectIds(Collections.singleton(id));
-        List<Long> allMusicIds = collectIds.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
-        if (CollUtil.isEmpty(allMusicIds)) {
+        
+        List<TbMusicPojo> playListAllMusic = playListService.getPlayListAllMusic(id);
+        if (CollUtil.isEmpty(playListAllMusic)) {
             return Collections.emptyList();
         }
         
-        Set<TbMusicEntity> allMusicEntityList = tbMusicEntityRepository.findByIdIn(allMusicIds);
-        Map<Long, TbMusicEntity> musicMaps = allMusicEntityList.parallelStream()
-                                                               .collect(Collectors.toMap(TbMusicEntity::getId, tbMusicEntity -> tbMusicEntity));
-        for (Long likeMusicId : allMusicIds) {
+        List<Long> musicIds = playListAllMusic.parallelStream()
+                                              .map(TbMusicPojo::getId)
+                                              .toList();
+        Map<Long, List<TbResourcePojo>> resourceList = tbResourceService.getResourceMap(musicIds);
+        for (TbMusicPojo likeMusicId : playListAllMusic) {
             PlayListRes e = new PlayListRes();
-            TbMusicEntity tbMusicEntity = musicMaps.get(likeMusicId);
-            BeanUtils.copyProperties(tbMusicEntity, e);
+            BeanUtils.copyProperties(likeMusicId, e);
+            List<TbResourcePojo> tbResourcePoos = resourceList.get(likeMusicId.getId());
             
-            if (CollUtil.isNotEmpty(tbMusicEntity.getTbResourcesById())) {
-                TbResourceEntity tbResourcePojo = resourceReturnStrategyUtil.handleResourceEntity(ListUtil.toList(tbMusicEntity.getTbResourcesById()));
+            if (CollUtil.isNotEmpty(tbResourcePoos)) {
+                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(tbResourcePoos);
                 e.setMd5(tbResourcePojo.getMd5());
                 e.setPath(tbResourcePojo.getPath());
                 e.setSize(tbResourcePojo.getSize());

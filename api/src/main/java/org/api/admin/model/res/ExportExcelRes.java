@@ -51,7 +51,7 @@ public class ExportExcelRes {
         private String verbatimLyrics;
         
         @ColumnWidth(36)
-        @ExcelProperty(value = "歌曲艺术家, 使用逗号分割", index = 8)
+        @ExcelProperty(value = "歌手, 使用逗号分割", index = 8)
         private String musicArtist;
         
         @ColumnWidth(24)
@@ -83,10 +83,6 @@ public class ExportExcelRes {
         @ExcelProperty(value = "专辑流派", index = 3)
         private String albumGenre;
         
-        @ColumnWidth(55)
-        @ExcelProperty(value = "专辑艺术家", index = 4)
-        private String albumArtist;
-        
         @ColumnWidth(24)
         @ExcelProperty(value = "专辑版本（比如录音室版，现场版）", index = 5)
         private String albumSubType;
@@ -109,11 +105,11 @@ public class ExportExcelRes {
     @NoArgsConstructor
     public static class ArtistInfo {
         @ColumnWidth(20)
-        @ExcelProperty(value = "艺术家ID", index = 0)
+        @ExcelProperty(value = "歌手ID", index = 0)
         private String artistId;
         
         @ColumnWidth(14)
-        @ExcelProperty(value = "艺术家名", index = 1)
+        @ExcelProperty(value = "歌手名", index = 1)
         private String artistName;
         
         @ColumnWidth(14)
@@ -121,11 +117,11 @@ public class ExportExcelRes {
         private String artistAliasName;
         
         @ColumnWidth(14)
-        @ExcelProperty(value = "艺术家性别", index = 3)
+        @ExcelProperty(value = "歌手性别", index = 3)
         private String artistSex;
         
         @ColumnWidth(10)
-        @ExcelProperty(value = "艺术家头像ID", index = 4)
+        @ExcelProperty(value = "歌手头像ID", index = 4)
         private String artistPicId;
         
         @ColumnWidth(18)
@@ -133,11 +129,11 @@ public class ExportExcelRes {
         private String artistBirth;
         
         @ColumnWidth(20)
-        @ExcelProperty(value = "艺术家居住地", index = 6)
+        @ExcelProperty(value = "歌手居住地", index = 6)
         private String artistLocation;
         
         @ColumnWidth(50)
-        @ExcelProperty(value = "艺术家介绍", index = 7)
+        @ExcelProperty(value = "歌手介绍", index = 7)
         private String artistDescribe;
     }
     

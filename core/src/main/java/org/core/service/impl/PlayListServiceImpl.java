@@ -69,11 +69,12 @@ public class PlayListServiceImpl implements PlayListService {
      * @param id 歌单ID
      */
     public List<TbMusicPojo> getPlayListAllMusic(Long id) {
-        List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, id));
-        if (CollUtil.isEmpty(list)) {
+        List<Long> musicIds = collectMusicService.listObjs(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                   .select(TbCollectMusicPojo::getMusicId)
+                                                                   .eq(TbCollectMusicPojo::getCollectId, id));
+        if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }
-        List<Long> musicIds = list.stream().map(TbCollectMusicPojo::getMusicId).toList();
         return musicService.listByIds(musicIds);
     }
     

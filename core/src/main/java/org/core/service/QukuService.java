@@ -26,9 +26,17 @@ public interface QukuService {
     
     /**
      * 批量获取专辑数据
-     * Long -> music ID
+     * @param musicIds music ID
      */
     List<AlbumConvert> getAlbumListByMusicId(List<Long> musicIds);
+    
+    /**
+     * 批量获取专辑数据
+     *
+     * @param musicIds 音乐ID
+     * @return 专辑ID
+     */
+    List<Long> getAlbumIdsByMusicId(List<Long> musicIds);
     
     /**
      * 批量获取专辑数据
@@ -164,6 +172,13 @@ public interface QukuService {
     List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
     
     /**
+     * 通过歌手ID获取专辑ID
+     *
+     * @param artistIds 歌手ID
+     */
+    List<Long> getAlbumIdsByArtistIds(List<Long> artistIds);
+    
+    /**
      * 通过歌手ID获取专辑列表
      *
      * @param artistId 歌手ID
@@ -218,7 +233,7 @@ public interface QukuService {
      * 获取歌手所有专辑数量
      *
      * @param artistIds 歌手ID
-     * @return 歌手下的所有专辑
+     * @return 歌手下的所有专辑 key: artist id, value: album 数量
      */
     Map<Long, Integer> getArtistAlbumCount(List<Long> artistIds);
     

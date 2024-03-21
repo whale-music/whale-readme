@@ -156,7 +156,6 @@ public class ExchangeApi {
             List<TbTagPojo> tbTagPojos = MapUtil.get(labelAlbumGenre, entity.getId(), new TypeReference<>() {
             }, Collections.emptyList());
             albumInfo.setAlbumGenre(CollUtil.join(tbTagPojos.parallelStream().map(TbTagPojo::getTagName).toList(), ","));
-            albumInfo.setAlbumArtist(CollUtil.join(entity.getTbAlbumArtistsById().parallelStream().map(TbAlbumArtistEntity::getArtistId).toList(), ","));
             albumInfo.setAlbumSubType(entity.getSubType());
             albumInfo.setAlbumCompany(entity.getCompany());
             albumInfo.setAlbumPublicTime(String.valueOf(Objects.isNull(entity.getPublishTime()) ? null : entity.getPublishTime().getTime()));

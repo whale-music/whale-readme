@@ -178,6 +178,8 @@ public enum ResultCode implements BaseErrorInfoInterface {
     OSS_DATA_DOES_NOT_EXIST("50020", "error.messages.oss_data_does_not_exist"),
     // 请先同步数据
     PLEASE_SYNCHRONIZE_THE_DATA_FIRST("50021", "error.messages.please_synchronize_the_data_first"),
+    // 音源不存在
+    RESOURCE_DATA_NOT_EXISTED("50022", "error.messages.resource_data_not_existed"),
     
     
     /* 接口错误：60001-69999 */

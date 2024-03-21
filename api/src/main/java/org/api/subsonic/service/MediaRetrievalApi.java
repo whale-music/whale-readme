@@ -8,6 +8,7 @@ import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.defaultinfo.DefaultInfo;
+import org.core.common.properties.DebugConfig;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.RemoteStorePicService;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class MediaRetrievalApi {
     }
     
     public String getCoverArt(SubsonicCommonReq req, String id, Long size) {
-        log.debug("cover id: {}", id);
+        Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(o -> log.debug("cover id: {}", id));
         // 与封面关联的id，比如歌单，音乐，专辑，歌手
         long middlePic;
         // 处理一些前端会添加 歌单封面前缀 pl-

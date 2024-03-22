@@ -1,19 +1,23 @@
 package org.api.webdav.service;
 
 import cn.hutool.core.collection.CollUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.api.webdav.config.WebdavConfig;
+import org.api.webdav.constant.WebdavCacheConstant;
 import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
+import org.core.mybatis.pojo.SysUserPojo;
 import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.RemoteStorageService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,19 +35,22 @@ public class WebdavApi {
     
     private final TbCollectService tbCollectService;
     
+    private final AccountService accountService;
+    
+    private final RemoteStorageService remoteStorageService;
+    
     private final WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
-    public static final String WEBDAV_COLLECT_TYPE_LIST = "webdav-collect-type-list";
-    public static final String WEBDAV_PLAY_LIST = "webdav-play-list";
-    
-    public WebdavApi(TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, PlayListService playListService, TbResourceService tbResourceService) {
+    public WebdavApi(TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, PlayListService playListService, TbResourceService tbResourceService, RemoteStorageService remoteStorageService, AccountService accountService) {
         this.tbCollectService = tbCollectService;
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
         this.playListService = playListService;
         this.tbResourceService = tbResourceService;
+        this.remoteStorageService = remoteStorageService;
+        this.accountService = accountService;
     }
     
-    @Cacheable(value = WEBDAV_COLLECT_TYPE_LIST, key = "#id")
+    @Cacheable(value = WebdavCacheConstant.WEBDAV_COLLECT_TYPE_LIST, key = "#id")
     public CollectTypeList getUserPlayList(Long id) {
         List<TbCollectPojo> ordinaryCollect = tbCollectService.getUserCollect(id, PlayListTypeConstant.ORDINARY);
         List<TbCollectPojo> likeCollect = tbCollectService.getUserCollect(id, PlayListTypeConstant.LIKE);
@@ -55,7 +62,7 @@ public class WebdavApi {
         return collectTypeList;
     }
     
-    @Cacheable(value = WEBDAV_PLAY_LIST, key = "#id")
+    @Cacheable(value = WebdavCacheConstant.WEBDAV_PLAY_LIST, key = "#id")
     public List<PlayListRes> getPlayListMusic(Long id) {
         List<PlayListRes> res = new LinkedList<>();
         
@@ -64,28 +71,34 @@ public class WebdavApi {
             return Collections.emptyList();
         }
         
-        List<Long> musicIds = playListAllMusic.parallelStream()
-                                              .map(TbMusicPojo::getId)
-                                              .toList();
+        List<Long> musicIds = playListAllMusic.parallelStream().map(TbMusicPojo::getId).toList();
         Map<Long, List<TbResourcePojo>> resourceList = tbResourceService.getResourceMap(musicIds);
         for (TbMusicPojo likeMusicId : playListAllMusic) {
             PlayListRes e = new PlayListRes();
             BeanUtils.copyProperties(likeMusicId, e);
             List<TbResourcePojo> tbResourcePoos = resourceList.get(likeMusicId.getId());
-            
-            if (CollUtil.isNotEmpty(tbResourcePoos)) {
-                TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(tbResourcePoos);
-                e.setMd5(tbResourcePojo.getMd5());
-                e.setPath(tbResourcePojo.getPath());
-                e.setSize(tbResourcePojo.getSize());
-                res.add(e);
+            if (CollUtil.isEmpty(tbResourcePoos)) {
+                continue;
             }
+            // 先过滤存储中不存在的音源，防止数据库中与文件不一致导致播放错误
+            List<TbResourcePojo> list = tbResourcePoos.parallelStream()
+                                                      .filter(tbResourcePojo -> StringUtils.isNotBlank(remoteStorageService.getMusicResourceUrl(
+                                                              tbResourcePojo.getPath())))
+                                                      .toList();
+            if (CollUtil.isEmpty(list)) {
+                continue;
+            }
+            TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(list);
+            e.setMd5(tbResourcePojo.getMd5());
+            e.setPath(tbResourcePojo.getPath());
+            e.setSize(tbResourcePojo.getSize());
+            res.add(e);
         }
         return res;
     }
     
-    @CacheEvict(value = {WEBDAV_COLLECT_TYPE_LIST, WEBDAV_PLAY_LIST}, allEntries = true)
-    public void refreshAllCache() {
-        // refresh webdav all cache
+    @Cacheable(value = WebdavCacheConstant.WEBDAV_USER_POJO, key = "#userName")
+    public SysUserPojo getUserByName(String userName) {
+        return accountService.getUserOrSubAccount(userName);
     }
 }

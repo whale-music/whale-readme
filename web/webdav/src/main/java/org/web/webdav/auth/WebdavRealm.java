@@ -6,6 +6,8 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.api.webdav.service.WebdavApi;
+import org.api.webdav.utils.WebdavAccountUtil;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
@@ -19,6 +21,9 @@ import java.util.List;
 
 @Component
 public class WebdavRealm extends RealmBase {
+    
+    private final WebdavApi webdavApi;
+    
     private static final List<String> DEFAULT_ROLES = List.of("webdav");
     /**
      * 删除资源 Options、Head、Trace、Get、PropFind、PropFind、Mkcol、Put、Post、Copy、Move、Delete。
@@ -79,8 +84,9 @@ public class WebdavRealm extends RealmBase {
     private final AccountService accountService;
     
     
-    public WebdavRealm(AccountService accountService) {
+    public WebdavRealm(AccountService accountService, WebdavApi webdavApi) {
         this.accountService = accountService;
+        this.webdavApi = webdavApi;
     }
     
     @Override
@@ -96,7 +102,8 @@ public class WebdavRealm extends RealmBase {
     @Override
     public Principal authenticate(String username, String password) {
         try {
-            SysUserPojo account = accountService.getUserOrSubAccount(username);
+            SysUserPojo account = webdavApi.getUserByName(username);
+            WebdavAccountUtil.setAccount(account);
             return getPrincipal(account.getUsername());
         } catch (BaseException e) {
             if (ResultCode.USER_NOT_EXIST.getCode().equals(e.getCode())) {
@@ -113,7 +120,7 @@ public class WebdavRealm extends RealmBase {
      * @param response    Response we are creating
      * @param constraints Security constraint we are enforcing
      * @param context     The Context to which client of this class is attached.
-     * @return
+     * @return 是否通过
      */
     @Override
     public boolean hasResourcePermission(Request request, Response response, SecurityConstraint[] constraints, Context context) {

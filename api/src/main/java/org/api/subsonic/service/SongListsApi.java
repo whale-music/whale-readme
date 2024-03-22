@@ -360,7 +360,7 @@ public class SongListsApi {
         List<Long> albumIds = musicListByAlbumId.parallelStream()
                                                 .map(TbMusicPojo::getId)
                                                 .toList();
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
                                                                                                     .map(TbMusicPojo::getId)
@@ -445,7 +445,7 @@ public class SongListsApi {
         List<TbMusicPojo> musicListByAlbumId = tbMusicService.listByIds(musicIds);
         List<Long> albumIds = musicListByAlbumId.parallelStream().map(TbMusicPojo::getAlbumId).toList();
         
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
         ArrayList<SongsByGenreRes.Song> song = new ArrayList<>();
@@ -518,7 +518,7 @@ public class SongListsApi {
         List<TbMusicPojo> musicListByAlbumId = tbMusicService.listByIds(musicIds);
         List<Long> albumIds = musicListByAlbumId.parallelStream().map(TbMusicPojo::getAlbumId).toList();
         
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
         Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
@@ -644,7 +644,7 @@ public class SongListsApi {
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
             List<TbMusicPojo> tbMusicPojos = tbMusicService.listByIds(musicIds);
             List<Long> albumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
-            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
             Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
@@ -785,7 +785,7 @@ public class SongListsApi {
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
             List<TbMusicPojo> tbMusicPojos = tbMusicService.listByIds(musicIds);
             List<Long> albumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
-            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
             Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);

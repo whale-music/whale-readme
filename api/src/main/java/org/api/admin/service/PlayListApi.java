@@ -144,7 +144,7 @@ public class PlayListApi {
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
         Map<Long, TbAlbumPojo> albumPojoMap = albumPojoList.stream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
         
-        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getArtistByMusicIdToMap(musicIds);
         ArrayList<PlayListMusicRes> playListMusicRes = new ArrayList<>();
         List<MusicConvert> picMusicList = qukuService.getPicMusicList(musicPojoList);
         for (MusicConvert tbMusicPojo : picMusicList) {
@@ -222,7 +222,7 @@ public class PlayListApi {
     
         List<Long> musicIds = page.getRecords().parallelStream().map(TbMusicPojo::getId).toList();
         // 歌手信息
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         // 填充信息
         Map<Long, TbResourcePojo> urlPojoMap = new HashMap<>();
         // 获取音乐地址

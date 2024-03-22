@@ -143,10 +143,10 @@ public interface QukuService {
     /**
      * 获取歌曲歌手列表
      *
-     * @param musicId 歌手ID
+     * @param musicIds 歌手ID
      * @return 歌手列表
      */
-    Map<Long, List<ArtistConvert>> getMusicArtistByMusicIdToMap(Collection<Long> musicId);
+    Map<Long, List<ArtistConvert>> getArtistByMusicIdToMap(Collection<Long> musicIds);
     
     /**
      * 通过歌手ID获取专辑列表

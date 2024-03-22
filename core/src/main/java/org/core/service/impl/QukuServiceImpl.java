@@ -447,7 +447,7 @@ public class QukuServiceImpl implements QukuService {
             return Collections.emptyMap();
         }
         List<Long> musicIds = albumMusicMap.values().parallelStream().flatMap(Collection::parallelStream).toList();
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = this.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = this.getArtistByMusicIdToMap(musicIds);
         
         HashMap<Long, List<ArtistConvert>> res = new HashMap<>();
         // key album id, value music id
@@ -487,15 +487,12 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 获取歌曲歌手列表
      *
-     * @param musicId 歌手ID
+     * @param musicIds 歌手ID
      * @return 歌手列表
      */
     @Override
-    public Map<Long, List<ArtistConvert>> getMusicArtistByMusicIdToMap(Collection<Long> musicId) {
-        if (CollUtil.isEmpty(musicId)) {
-            return Collections.emptyMap();
-        }
-        List<TbMusicArtistPojo> list = musicArtistService.list(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicId));
+    public Map<Long, List<ArtistConvert>> getArtistByMusicIdToMap(Collection<Long> musicIds) {
+        List<TbMusicArtistPojo> list = musicArtistService.getMusicArtistByMusicIds(musicIds);
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyMap();
         }

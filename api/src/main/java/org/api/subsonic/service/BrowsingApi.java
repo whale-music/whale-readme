@@ -254,7 +254,7 @@ public class BrowsingApi {
                                                 .map(TbMusicPojo::getId)
                                                 .toList();
         Map<Long, AlbumConvert> albumMaps = qukuService.getMusicAlbumByMusicIdToMap(musicIds);
-        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getArtistByMusicIdToMap(musicIds);
         MusicDirectoryRes res = new MusicDirectoryRes();
         Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
         ArrayList<MusicDirectoryRes.Child> child = new ArrayList<>();
@@ -691,7 +691,7 @@ public class BrowsingApi {
                                            .map(MusicConvert::getAlbumId)
                                            .toList();
         Map<Long, AlbumConvert> musicAlbumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
         for (MusicConvert musicConvert : musicConverts) {
             SimilarSongsRes.Song e = new SimilarSongsRes.Song();
@@ -753,7 +753,7 @@ public class BrowsingApi {
                                                  .map(MusicConvert::getAlbumId)
                                                  .collect(Collectors.toSet());
         Map<Long, AlbumConvert> musicAlbumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(musicIds);
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
         for (MusicConvert musicConvert : musicConverts) {
             SimilarSongs2Res.Song e = new SimilarSongs2Res.Song();

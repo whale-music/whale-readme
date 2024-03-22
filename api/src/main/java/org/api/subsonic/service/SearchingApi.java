@@ -176,7 +176,7 @@ public class SearchingApi {
                                                                                                             .map(TbMusicPojo::getAlbumId)
                                                                                                             .toList());
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuApi.getLabelMusicGenre(musicIds);
-            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getMusicArtistByMusicIdToMap(musicIds);
+            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getArtistByMusicIdToMap(musicIds);
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {
                 Search2Res.Song e = new Search2Res.Song();
@@ -327,7 +327,7 @@ public class SearchingApi {
                                                                                                             .map(TbMusicPojo::getAlbumId)
                                                                                                             .toList());
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuApi.getLabelMusicGenre(musicIds);
-            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getMusicArtistByMusicIdToMap(musicIds);
+            Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getArtistByMusicIdToMap(musicIds);
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {
                 Search3Res.Song e = new Search3Res.Song();

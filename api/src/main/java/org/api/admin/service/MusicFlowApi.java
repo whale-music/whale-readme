@@ -1359,9 +1359,9 @@ public class MusicFlowApi {
         }
         
         // 歌手信息
-        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getMusicArtistByMusicIdToMap(records.stream()
-                                                                                                                   .map(TbMusicPojo::getId)
-                                                                                                                   .toList());
+        Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(records.stream()
+                                                                                                              .map(TbMusicPojo::getId)
+                                                                                                              .toList());
         // 填充信息
         // 获取音乐地址
         List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(ids, req.getRefresh());

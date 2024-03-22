@@ -1,5 +1,6 @@
 package org.core.mybatis.iservice.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.core.mybatis.iservice.TbMusicArtistService;
@@ -7,6 +8,8 @@ import org.core.mybatis.mapper.TbMusicArtistMapper;
 import org.core.mybatis.pojo.TbMusicArtistPojo;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,5 +34,20 @@ public class TbMusicArtistServiceImpl extends ServiceImpl<TbMusicArtistMapper, T
         return this.listObjs(Wrappers.<TbMusicArtistPojo>lambdaQuery()
                                      .select(TbMusicArtistPojo::getMusicId)
                                      .in(TbMusicArtistPojo::getArtistId, artistIds));
+    }
+    
+    
+    /**
+     * 根据音乐关联歌手
+     *
+     * @param musicIds 音乐id
+     * @return {@link List<TbMusicArtistPojo>}
+     */
+    @Override
+    public List<TbMusicArtistPojo> getMusicArtistByMusicIds(Collection<Long> musicIds) {
+        if (CollUtil.isEmpty(musicIds)) {
+            return Collections.emptyList();
+        }
+        return this.list(Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicIds));
     }
 }

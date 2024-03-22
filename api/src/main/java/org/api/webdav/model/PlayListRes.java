@@ -11,8 +11,6 @@ import org.core.mybatis.pojo.TbMusicPojo;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PlayListRes extends TbMusicPojo {
-    private Integer rate;
-    
     public PlayListRes(TbMusicPojo pojo) {
         super(pojo.getId(),
                 pojo.getMusicName(),
@@ -25,7 +23,11 @@ public class PlayListRes extends TbMusicPojo {
                 pojo.getUpdateTime(),
                 pojo.getCreateTime());
     }
+    
     private String md5;
     private String path;
     private Long size;
+    
+    private Integer rate;
+    private String artistName;
 }

@@ -145,12 +145,16 @@ public class WebdavGenerateDirTreeApi {
                     if (Objects.isNull(musicResource) || StringUtils.isBlank(musicResource.getPath()) || StringUtils.isBlank(musicResource.getUrl())) {
                         continue;
                     }
+                    
                     // 在子目录下不需要填充父目录名,但是在缓存中需要填写父目录名。因为tomcat返回时会自动添加当前文件的父目录路径。
                     // 前端请求时也会自动使用绝对路径，所以缓存需要使用绝对路径
-                    // todo: webdav 音乐名显示优化
                     final String aliasName = StringUtils.isBlank(s.getAliasName()) ? "" : ' ' + s.getAliasName();
-                    final String artistName = "";
-                    String resourcePathStr = "/%s%s%s.%s".formatted(handleName(s.getMusicName()), aliasName, artistName, musicResource.getFileExtension());
+                    final String artistName = StringUtils.isBlank(s.getArtistName()) ? "" : '-' + s.getArtistName();
+                    String resourcePathStr = "/%s%s%s-%s.%s".formatted(handleName(s.getMusicName()),
+                            aliasName,
+                            artistName,
+                            s.getRate(),
+                            musicResource.getFileExtension());
                     WebDavResource r = WebDavResource.createFile(s.getMusicName(),
                             s.getMd5(),
                             resourcePathStr,

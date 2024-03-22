@@ -10,10 +10,8 @@ import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
-import org.core.mybatis.pojo.SysUserPojo;
-import org.core.mybatis.pojo.TbCollectPojo;
-import org.core.mybatis.pojo.TbMusicPojo;
-import org.core.mybatis.pojo.TbResourcePojo;
+import org.core.mybatis.model.convert.ArtistConvert;
+import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.service.QukuService;
@@ -76,6 +74,7 @@ public class WebdavApi {
         
         List<Long> musicIds = playListAllMusic.parallelStream().map(TbMusicPojo::getId).toList();
         Map<Long, List<TbResourcePojo>> resourceList = tbResourceService.getResourceMap(musicIds);
+        Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         for (TbMusicPojo likeMusicId : playListAllMusic) {
             PlayListRes e = new PlayListRes(likeMusicId);
             List<TbResourcePojo> tbResourcePoos = resourceList.get(likeMusicId.getId());
@@ -91,6 +90,11 @@ public class WebdavApi {
                 continue;
             }
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(list);
+            List<ArtistConvert> artistConverts = artistByMusicIdToMap.get(likeMusicId.getId());
+            if (CollUtil.isNotEmpty(artistConverts)) {
+                List<String> artistNames = artistConverts.parallelStream().map(TbArtistPojo::getArtistName).toList();
+                e.setArtistName(CollUtil.join(artistNames, "-"));
+            }
             e.setRate(tbResourcePojo.getRate());
             e.setMd5(tbResourcePojo.getMd5());
             e.setPath(tbResourcePojo.getPath());

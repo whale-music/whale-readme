@@ -127,7 +127,8 @@ public class WebdavStatus {
      * Status code (207) indicating that the response requires providing status for multiple independent operations.
      */
     public static final int SC_MULTI_STATUS = 207;
-    
+    // This one collides with HTTP 1.1
+    // "207 Partial Update OK"
     
     // -------------------------------------------- Extended WebDav status code
     /**
@@ -135,21 +136,21 @@ public class WebdavStatus {
      */
     public static final int SC_UNPROCESSABLE_ENTITY = 418;
     // This one collides with HTTP 1.1
-    // "207 Partial Update OK"
+    // "418 Reauthentication Required"
     /**
      * Status code (419) indicating that the resource does not have sufficient space to record the state of the resource
      * after the execution of this method.
      */
     public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
     // This one collides with HTTP 1.1
-    // "418 Reauthentication Required"
+    // "419 Proxy Reauthentication Required"
     /**
      * Status code (420) indicating the method was not executed on a particular resource within its scope because some
      * part of the method's execution failed causing the entire method to be aborted.
      */
     public static final int SC_METHOD_FAILURE = 420;
-    // This one collides with HTTP 1.1
-    // "419 Proxy Reauthentication Required"
+    
+    
     /**
      * Status code (423) indicating the destination resource of a method is locked, and either the request did not
      * contain a valid Lock-Info header, or the Lock-Info header identifies a lock held by another principal.

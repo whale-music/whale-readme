@@ -6,6 +6,7 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.api.webdav.service.WebdavCacheApi;
+import org.api.webdav.service.WebdavGenerateDirTreeApi;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -22,9 +23,11 @@ import org.web.webdav.tomcat.servlet.WebdavServlet;
 @RequiredArgsConstructor
 public class WebdavConfig {
     
-    private final WebdavCacheApi webdavCacheApi;
+    private final WebdavGenerateDirTreeApi webdavGenerateDirTreeApi;
     
     private final WebdavRealm webdavRealm;
+    
+    private final WebdavCacheApi webdavCacheApi;
     
     @Bean
     public ServletRegistrationBean<WebdavServlet> webdavServlet() {
@@ -47,7 +50,7 @@ public class WebdavConfig {
         return factory -> factory.addContextCustomizers(context -> {
             // 创建一个新的WebResourceRoot实例
             WebdavStandardRoot resources = new WebdavStandardRoot(context);
-            resources.addPreResources(new WebdavResourceSet(resources, "/", webdavCacheApi));
+            resources.addPreResources(new WebdavResourceSet(resources, "/", webdavGenerateDirTreeApi, webdavCacheApi));
             context.setResources(resources);
             // 添加Webdav用户身份校验
             context.getPipeline().addValve(new BasicAuthenticator());

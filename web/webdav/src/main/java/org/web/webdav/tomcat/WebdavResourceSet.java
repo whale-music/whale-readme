@@ -6,9 +6,13 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.webresources.AbstractFileResourceSet;
 import org.apache.catalina.webresources.EmptyResource;
+import org.apache.commons.lang3.StringUtils;
 import org.api.webdav.service.WebdavCacheApi;
+import org.api.webdav.service.WebdavGenerateDirTreeApi;
+import org.api.webdav.utils.WebdavAccountUtil;
 import org.core.common.properties.DebugConfig;
 import org.core.model.WebDavResource;
+import org.core.mybatis.pojo.SysUserPojo;
 
 import java.io.File;
 import java.io.InputStream;
@@ -22,14 +26,17 @@ import java.util.Set;
 @Slf4j
 public class WebdavResourceSet extends AbstractFileResourceSet {
     
-    private final WebdavCacheApi cacheApi;
+    private final WebdavGenerateDirTreeApi cacheApi;
     
-    public WebdavResourceSet(WebResourceRoot root, String base, WebdavCacheApi cacheApi) {
+    private final WebdavCacheApi webdavCacheApi;
+    
+    public WebdavResourceSet(WebResourceRoot root, String base, WebdavGenerateDirTreeApi cacheApi, WebdavCacheApi webdavCacheApi) {
         super("/");
         setRoot(root);
         setWebAppMount("/");
         setBase(base);
         this.cacheApi = cacheApi;
+        this.webdavCacheApi = webdavCacheApi;
     }
     
     
@@ -38,7 +45,14 @@ public class WebdavResourceSet extends AbstractFileResourceSet {
         checkPath(path);
         Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(aBoolean -> log.debug("resource: {}", path));
         WebResourceRoot root = getRoot();
-        WebDavResource fileInfo = cacheApi.getResource(path);
+        SysUserPojo account = WebdavAccountUtil.getAccount();
+        if (Objects.isNull(account)) {
+            return new EmptyResource(root, path);
+        }
+        if (StringUtils.equals(WebdavCacheApi.i18RefreshStr(), path)) {
+            webdavCacheApi.refreshAllCache();
+        }
+        WebDavResource fileInfo = cacheApi.getResource(path, account.getId());
         if (fileInfo == null) {
             return new EmptyResource(root, path);
         }
@@ -50,9 +64,16 @@ public class WebdavResourceSet extends AbstractFileResourceSet {
     @Override
     public String[] list(String path) {
         checkPath(path);
-        WebDavResource cache = cacheApi.getResource(path);
+        SysUserPojo account = WebdavAccountUtil.getAccount();
+        if (Objects.isNull(account)) {
+            return new String[]{};
+        }
+        if (StringUtils.equals(WebdavCacheApi.i18RefreshStr(), path)) {
+            webdavCacheApi.refreshAllCache();
+        }
+        WebDavResource cache = cacheApi.getResource(path, account.getId());
         if (Objects.isNull(cache)) {
-            return new String[0];
+            return new String[]{};
         }
         return cache.getResource().parallelStream().map(WebDavResource::getPath).toArray(String[]::new);
     }

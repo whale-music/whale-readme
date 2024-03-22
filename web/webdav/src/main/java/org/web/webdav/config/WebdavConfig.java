@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.web.webdav.auth.WebdavRealm;
 import org.web.webdav.tomcat.WebdavResourceSet;
 import org.web.webdav.tomcat.WebdavStandardRoot;
+import org.web.webdav.tomcat.servlet.ExtendedWebdavServlet;
 import org.web.webdav.tomcat.servlet.WebdavServlet;
 
 
@@ -27,7 +28,7 @@ public class WebdavConfig {
     
     @Bean
     public ServletRegistrationBean<WebdavServlet> webdavServlet() {
-        WebdavServlet webdavServlet = new WebdavServlet();
+        ExtendedWebdavServlet webdavServlet = new ExtendedWebdavServlet();
         ServletRegistrationBean<WebdavServlet> registration = new ServletRegistrationBean<>(webdavServlet, "/dav/*");
         registration.setName("WebDAV servlet");
         registration.setServlet(webdavServlet);

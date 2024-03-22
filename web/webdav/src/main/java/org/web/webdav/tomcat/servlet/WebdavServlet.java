@@ -16,13 +16,7 @@
  */
 package org.web.webdav.tomcat.servlet;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.io.IORuntimeException;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -39,9 +33,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
-import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.core.common.properties.DebugConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -231,32 +223,8 @@ public class WebdavServlet extends DefaultServlet {
     
     // --------------------------------------------------------- Public Methods
     
-    private static long getStart(Ranges.Entry range, long length) {
-        long start = range.getStart();
-        if (start == -1) {
-            long end = range.getEnd();
-            // If there is no start, then the start is based on the end
-            if (end >= length) {
-                return 0;
-            } else {
-                return length - end;
-            }
-        } else {
-            return start;
-        }
-    }
-    
     
     // ------------------------------------------------------ Protected Methods
-    
-    private static long getEnd(Ranges.Entry range, long length) {
-        long end = range.getEnd();
-        if (range.getStart() == -1 || end == -1 || end >= length) {
-            return length - 1;
-        } else {
-            return end;
-        }
-    }
     
     /**
      * Initialize this servlet.
@@ -281,6 +249,9 @@ public class WebdavServlet extends DefaultServlet {
         }
     }
     
+    
+    // ------------------------------------------------------ Protected Methods
+
     /**
      * Return JAXP document builder instance.
      *
@@ -1308,51 +1279,6 @@ public class WebdavServlet extends DefaultServlet {
         resp.setStatus(WebdavStatus.SC_NO_CONTENT);
     }
     
-    /**
-     * Process a GET request for the specified resource.
-     * 请求Webdav数据
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @throws IOException      if an input/output error occurs
-     * @throws ServletException if a servlet-specified error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String path = getRelativePath(request, true);
-        WebResource resource = resources.getResource(path);
-        response.setHeader("ETag", generateETag(resource));
-        response.setHeader("Last-Modified", resource.getLastModifiedHttp());
-        response.setContentType(resource.getMimeType());
-        long contentLength = resource.getContentLength();
-        response.setContentLength(Math.toIntExact(contentLength));
-        
-        // range header
-        Ranges ranges = parseRange(request, response, resource);
-        if (Objects.nonNull(ranges) && CollUtil.isNotEmpty(ranges.getEntries())) {
-            Ranges.Entry range = ranges.getEntries().getFirst();
-            long start = getStart(range, contentLength);
-            long end = getEnd(range, contentLength);
-            response.addHeader("Content-Range", "bytes " + start + "-" + end + "/" + contentLength);
-            long length = end - start + 1;
-            response.setContentLengthLong(length);
-        }
-        
-        String url = resource.getURL().toString();
-        HttpRequest http = HttpUtil.createGet(url);
-        String headerRange = "Range";
-        String rangeHeader = request.getHeader(headerRange);
-        if (Boolean.TRUE.equals(DebugConfig.getDebug())) {
-            log.debug("url: {}", url);
-            log.debug("range: {}", rangeHeader);
-        }
-        http.header(headerRange, rangeHeader, true);
-        try (HttpResponse execute = http.execute()) {
-            IoUtil.copy(execute.bodyStream(), response.getOutputStream());
-        } catch (IORuntimeException e) {
-            log.warn(e.getMessage());
-        }
-    }
     // -------------------------------------------------------- Private Methods
     
     /**
@@ -2347,7 +2273,7 @@ public class WebdavServlet extends DefaultServlet {
      * references are filtered out for security reasons. See CVE-2007-5461.
      */
     private static class WebdavResolver implements EntityResolver {
-        private ServletContext context;
+        private final ServletContext context;
         
         WebdavResolver(ServletContext theContext) {
             context = theContext;
@@ -2363,4 +2289,3 @@ public class WebdavServlet extends DefaultServlet {
 
 
 // -------------------------------------------------------- WebdavStatus Class
-

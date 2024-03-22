@@ -16,8 +16,8 @@ import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
+import org.core.service.QukuService;
 import org.core.service.RemoteStorageService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +28,8 @@ import java.util.Map;
 
 @Service(WebdavConfig.WEBDAV + "WebdavApi")
 public class WebdavApi {
+    
+    private final QukuService qukuService;
     
     private final PlayListService playListService;
     
@@ -41,13 +43,14 @@ public class WebdavApi {
     
     private final WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil;
     
-    public WebdavApi(TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, PlayListService playListService, TbResourceService tbResourceService, RemoteStorageService remoteStorageService, AccountService accountService) {
+    public WebdavApi(TbCollectService tbCollectService, WebdavResourceReturnStrategyUtil resourceReturnStrategyUtil, PlayListService playListService, TbResourceService tbResourceService, RemoteStorageService remoteStorageService, AccountService accountService, QukuService qukuService) {
         this.tbCollectService = tbCollectService;
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
         this.playListService = playListService;
         this.tbResourceService = tbResourceService;
         this.remoteStorageService = remoteStorageService;
         this.accountService = accountService;
+        this.qukuService = qukuService;
     }
     
     @Cacheable(value = WebdavCacheConstant.WEBDAV_COLLECT_TYPE_LIST, key = "#id")
@@ -74,8 +77,7 @@ public class WebdavApi {
         List<Long> musicIds = playListAllMusic.parallelStream().map(TbMusicPojo::getId).toList();
         Map<Long, List<TbResourcePojo>> resourceList = tbResourceService.getResourceMap(musicIds);
         for (TbMusicPojo likeMusicId : playListAllMusic) {
-            PlayListRes e = new PlayListRes();
-            BeanUtils.copyProperties(likeMusicId, e);
+            PlayListRes e = new PlayListRes(likeMusicId);
             List<TbResourcePojo> tbResourcePoos = resourceList.get(likeMusicId.getId());
             if (CollUtil.isEmpty(tbResourcePoos)) {
                 continue;
@@ -89,6 +91,7 @@ public class WebdavApi {
                 continue;
             }
             TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(list);
+            e.setRate(tbResourcePojo.getRate());
             e.setMd5(tbResourcePojo.getMd5());
             e.setPath(tbResourcePojo.getPath());
             e.setSize(tbResourcePojo.getSize());

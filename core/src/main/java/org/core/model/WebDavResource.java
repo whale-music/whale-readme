@@ -3,6 +3,7 @@ package org.core.model;
 import lombok.Data;
 
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +26,7 @@ public class WebDavResource {
     
     private Boolean isFile;
     
-    private List<WebDavResource> resource;
+    private List<WebDavResource> resource = new ArrayList<>();
     
     
     public WebDavResource() {

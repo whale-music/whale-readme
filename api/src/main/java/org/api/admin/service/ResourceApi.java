@@ -68,8 +68,6 @@ public class ResourceApi {
     
     private final HttpRequestConfig httpRequestConfig;
     
-    private final MusicFlowApi musicFlowApi;
-    
     private final RemoteStorageService remoteStorageService;
     
     private final RemoteStorePicService remoteStorePicService;
@@ -85,7 +83,6 @@ public class ResourceApi {
         this.accountService = accountService;
         this.tbCollectService = tbCollectService;
         this.httpRequestConfig = httpRequestConfig;
-        this.musicFlowApi = musicFlowApi;
         this.remoteStorageService = remoteStorageService;
         this.tbMvInfoService = tbMvInfoService;
         this.remoteStorePicService = remoteStorePicService;
@@ -321,6 +318,7 @@ public class ResourceApi {
     public List<AutocompleteMusicRes> getMusicAutocomplete(String music) {
         LambdaQueryWrapper<TbMusicPojo> like = Wrappers.<TbMusicPojo>lambdaQuery()
                                                        .like(StringUtils.isNotBlank(music), TbMusicPojo::getMusicName, music)
+                                                       .or()
                                                        .like(StringUtils.isNotBlank(music), TbMusicPojo::getAliasName, music);
         Page<TbMusicPojo> page = tbMusicService.page(new Page<>(0, 10), like);
         if (CollUtil.isEmpty(page.getRecords())) {

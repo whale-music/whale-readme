@@ -228,23 +228,6 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 批量获取歌手信息，优化版本
-     * key 值为音乐ID
-     * value 为歌手
-     *
-     * @param albumPojoMap key Music, value ID 专辑信息
-     */
-    @Override
-    public Map<Long, List<ArtistConvert>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap) {
-        // todo: 修改album map
-        Set<Long> collect = albumPojoMap.values().parallelStream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        if (CollUtil.isEmpty(collect)) {
-            return MapUtil.empty();
-        }
-        return this.getMusicArtistByMusicIdToMap(albumPojoMap.keySet());
-    }
-    
-    /**
      * 获取歌手信息
      */
     @Override

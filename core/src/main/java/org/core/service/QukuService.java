@@ -51,15 +51,6 @@ public interface QukuService {
     List<ArtistConvert> getAlbumArtistListByMusicId(List<Long> musicIds);
     
     /**
-     * (此接口用于优化歌单请求过慢)
-     * 批量获取歌手信息，优化版本
-     * key 值为音乐ID
-     * value 为歌手
-     * 并且查询时增加缓存查找，防止多次访问数据库，造成qps过高
-     */
-    Map<Long, List<ArtistConvert>> getAlbumArtistListByMusicIdToMap(Map<Long, TbAlbumPojo> albumPojoMap);
-    
-    /**
      * 获取专辑歌手信息
      */
     List<ArtistConvert> getAlbumArtistByMusicId(Long musicId);

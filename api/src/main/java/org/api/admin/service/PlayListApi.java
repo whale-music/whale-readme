@@ -143,15 +143,8 @@ public class PlayListApi {
         Set<Long> albumIds = musicPojoList.stream().map(TbMusicPojo::getAlbumId).collect(Collectors.toSet());
         List<TbAlbumPojo> albumPojoList = albumService.listByIds(albumIds);
         Map<Long, TbAlbumPojo> albumPojoMap = albumPojoList.stream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
-    
-        HashMap<Long, TbAlbumPojo> map = new HashMap<>();
-        musicPojoList.parallelStream().forEach(tbMusicPojo -> {
-            if (albumPojoMap.get(tbMusicPojo.getAlbumId()) != null) {
-                map.put(tbMusicPojo.getId(), albumPojoMap.get(tbMusicPojo.getAlbumId()));
-            }
-        });
-    
-        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getAlbumArtistListByMusicIdToMap(map);
+        
+        Map<Long, List<ArtistConvert>> artistMaps = qukuService.getMusicArtistByMusicIdToMap(musicIds);
         ArrayList<PlayListMusicRes> playListMusicRes = new ArrayList<>();
         List<MusicConvert> picMusicList = qukuService.getPicMusicList(musicPojoList);
         for (MusicConvert tbMusicPojo : picMusicList) {

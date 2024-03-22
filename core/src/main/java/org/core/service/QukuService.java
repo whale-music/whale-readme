@@ -1,5 +1,6 @@
 package org.core.service;
 
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.core.common.constant.TargetTagConstant;
@@ -28,7 +29,7 @@ public interface QukuService {
      * 批量获取专辑数据
      * @param musicIds music ID
      */
-    List<AlbumConvert> getAlbumListByMusicId(List<Long> musicIds);
+    List<AlbumConvert> getAlbumByMusicIds(List<Long> musicIds);
     
     /**
      * 批量获取专辑数据
@@ -36,7 +37,7 @@ public interface QukuService {
      * @param musicIds 音乐ID
      * @return 专辑ID
      */
-    List<Long> getAlbumIdsByMusicId(List<Long> musicIds);
+    List<Long> getAlbumIdsByMusicIds(List<Long> musicIds);
     
     /**
      * 批量获取专辑数据
@@ -44,16 +45,6 @@ public interface QukuService {
      */
     List<AlbumConvert> getAlbumListByAlbumId(Collection<Long> albumIds);
     
-    /**
-     * 批量获取歌手信息
-     * Long -> music ID
-     */
-    List<ArtistConvert> getAlbumArtistListByMusicId(List<Long> musicIds);
-    
-    /**
-     * 获取专辑歌手信息
-     */
-    List<ArtistConvert> getAlbumArtistByMusicId(Long musicId);
     
     /**
      * 查询数据歌曲下载地址
@@ -107,17 +98,19 @@ public interface QukuService {
      *
      * @param id 歌手ID
      */
-    Long getMusicCountBySingerId(Long id);
+    Long getMusicCountByArtistId(Long id);
     
     /**
-     * 获取专辑歌手列表
+     * 根据专辑歌手列表
      */
-    List<ArtistConvert> getAlbumArtistListByAlbumIds(Long albumIds);
+    List<ArtistConvert> getArtistByAlbumIds(List<Long> albumIds);
     
     /**
-     * 获取专辑歌手列表
+     * 根据专辑歌手列表
      */
-    List<ArtistConvert> getAlbumArtistListByAlbumIds(List<Long> albumIds);
+    default List<ArtistConvert> getArtistByAlbumIds(Long albumIds) {
+        return this.getArtistByAlbumIds(Collections.singletonList(albumIds));
+    }
     
     /**
      * 获取专辑歌手列表
@@ -127,7 +120,7 @@ public interface QukuService {
      *
      * @param albumIds 专辑ID
      */
-    Map<Long, List<ArtistConvert>> getAlbumArtistMapByAlbumIds(Collection<Long> albumIds);
+    Map<Long, List<ArtistConvert>> getArtistByAlbumIdsToMap(Collection<Long> albumIds);
     
     /**
      * 获取歌曲歌手列表
@@ -135,8 +128,8 @@ public interface QukuService {
      * @param musicId 歌手ID
      * @return 歌手列表
      */
-    default List<ArtistConvert> getMusicArtistByMusicId(Long musicId) {
-        return getMusicArtistByMusicId(Collections.singletonList(musicId));
+    default List<ArtistConvert> getArtistByMusicIds(Long musicId) {
+        return getArtistByMusicIds(Collections.singletonList(musicId));
     }
     
     /**
@@ -145,7 +138,7 @@ public interface QukuService {
      * @param musicId 歌手ID
      * @return 歌手列表
      */
-    List<ArtistConvert> getMusicArtistByMusicId(Collection<Long> musicId);
+    List<ArtistConvert> getArtistByMusicIds(Collection<Long> musicId);
     
     /**
      * 获取歌曲歌手列表
@@ -160,7 +153,7 @@ public interface QukuService {
      *
      * @param artistIds 歌手ID
      */
-    List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds);
+    List<AlbumConvert> getAlbumByArtistIds(List<Long> artistIds);
     
     /**
      * 通过歌手ID获取专辑ID
@@ -174,8 +167,8 @@ public interface QukuService {
      *
      * @param artistId 歌手ID
      */
-    default List<AlbumConvert> getAlbumListByArtistIds(Long artistId) {
-        return this.getAlbumListByArtistIds(Collections.singletonList(artistId));
+    default List<AlbumConvert> getAlbumByArtistIds(Long artistId) {
+        return this.getAlbumByArtistIds(Collections.singletonList(artistId));
     }
     
     /**
@@ -215,18 +208,19 @@ public interface QukuService {
     /**
      * 获取歌手所有专辑数量
      *
-     * @param id 歌手ID
+     * @param artistIds 歌手ID
+     * @return 歌手下的所有专辑 key: artist id, value: album 数量
      */
-    Integer getArtistAlbumCountBySingerId(Long id);
-    
+    Map<Long, Integer> getArtistAlbumCountByArtistIds(List<Long> artistIds);
     
     /**
      * 获取歌手所有专辑数量
      *
-     * @param artistIds 歌手ID
-     * @return 歌手下的所有专辑 key: artist id, value: album 数量
+     * @param id 歌手ID
      */
-    Map<Long, Integer> getArtistAlbumCount(List<Long> artistIds);
+    default Integer getArtistAlbumCountByArtistId(Long id) {
+        return MapUtil.get(this.getArtistAlbumCountByArtistIds(Collections.singletonList(id)), id, Integer.class, 0);
+    }
     
     /**
      * 根据专辑ID查找音乐
@@ -255,7 +249,7 @@ public interface QukuService {
      *
      * @param name 歌手
      */
-    List<MusicConvert> getMusicListByArtistName(String name);
+    List<MusicConvert> getMusicByArtistName(String name);
     
     /**
      * 获取歌手下音乐信息

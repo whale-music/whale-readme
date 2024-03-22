@@ -70,7 +70,7 @@ public class ArtistApi {
             String singerAlias = Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("");
             e.setAlias(Arrays.asList(singerAlias.split(",")));
             e.setPicUrl(tbArtistPojo.getPicUrl());
-            e.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(e.getId()));
+            e.setAlbumSize(qukuService.getArtistAlbumCountByArtistId(e.getId()));
             e.setMvSize(0);
             data.add(e);
         }
@@ -102,8 +102,8 @@ public class ArtistApi {
         artist.setAlias(AliasUtil.getAliasList(singerPojo.getArtistName()));
         artist.setPicIdStr(picUrl);
         artist.setPicUrl(picUrl);
-        artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
-        artist.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(singerPojo.getId()));
+        artist.setMusicSize(qukuService.getMusicCountByArtistId(singerPojo.getId()));
+        artist.setAlbumSize(qukuService.getArtistAlbumCountByArtistId(singerPojo.getId()));
     
         ArtistsItem e1 = new ArtistsItem();
         e1.setPicUrl(picUrl);
@@ -151,10 +151,10 @@ public class ArtistApi {
         artist.setPicUrl(picUrl);
         artist.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
         artist.setImg1v1IdStr(picUrl);
-        artist.setMusicSize(qukuService.getMusicCountBySingerId(singerPojo.getId()));
+        artist.setMusicSize(qukuService.getMusicCountByArtistId(singerPojo.getId()));
         artist.setBriefDesc(singerPojo.getIntroduction());
         artist.setImg1v1Url(picUrl);
-        artist.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(id));
+        artist.setAlbumSize(qukuService.getArtistAlbumCountByArtistId(id));
         artistRes.setArtist(artist);
     
         ArrayList<HotSongsItem> hotSongs = new ArrayList<>();
@@ -173,7 +173,7 @@ public class ArtistApi {
             hotSongs.add(hotSongsItem);
             
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
             for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem arItem = new ArItem();
                 arItem.setId(tbArtistPojo.getId());

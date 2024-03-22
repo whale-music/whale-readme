@@ -382,7 +382,7 @@ public class CollectApi {
             ArrayList<ArItem> ar = new ArrayList<>();
     
             // 艺术家数据
-            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
             for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e1 = new ArItem();
                 e1.setId(tbArtistPojo.getId());

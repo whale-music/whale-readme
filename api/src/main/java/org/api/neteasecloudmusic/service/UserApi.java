@@ -318,8 +318,8 @@ public class UserApi {
             song.setName(tbMusicPojo.getMusicName());
             song.setId(tbMusicPojo.getId());
             song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-    
-            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            
+            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
             ArrayList<ArItem> ar = new ArrayList<>();
             for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e = new ArItem();

@@ -90,8 +90,8 @@ public class ArtistApi {
         BeanUtils.copyProperties(page, singerResPage);
         singerResPage.setRecords(new ArrayList<>());
         for (TbArtistPojo singerPojo : page.getRecords()) {
-            long albumSize = qukuService.getArtistAlbumCountBySingerId(singerPojo.getId());
-            long musicSize = qukuService.getMusicCountBySingerId(singerPojo.getId());
+            long albumSize = qukuService.getArtistAlbumCountByArtistId(singerPojo.getId());
+            long musicSize = qukuService.getMusicCountByArtistId(singerPojo.getId());
             
             ArtistRes artistRes = new ArtistRes();
             BeanUtils.copyProperties(singerPojo, artistRes);
@@ -124,7 +124,7 @@ public class ArtistApi {
     }
     
     public List<ArtistConvert> getSingerListByAlbumId(Long albumId) {
-        return qukuService.getAlbumArtistListByAlbumIds(albumId);
+        return qukuService.getArtistByAlbumIds(albumId);
     }
     
     public ArtistInfoRes getArtistById(Long id) {
@@ -135,7 +135,7 @@ public class ArtistApi {
         artistInfoRes.setArtistNames(AliasUtil.getAliasList(pojo.getAliasName()));
         String picUrl = remoteStorePicService.getArtistPicUrl(pojo.getId());
         artistInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
-        List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
+        List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumByArtistIds(Collections.singletonList(id));
         List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);
         artistInfoRes.setAlbumList(albumListByArtistIds);
         artistInfoRes.setMusicList(musicListByArtistId);
@@ -202,18 +202,18 @@ public class ArtistApi {
         boolean musicNotBlank = StringUtils.isNotBlank(musicName);
         if (nameNotBlank || musicNotBlank) {
             List<TbMusicPojo> list = tbMusicService.list(WrapperUtil.musicWrapper(nameNotBlank, musicNotBlank, name, musicName));
-            List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(list.parallelStream()
-                                                                                               .map(TbMusicPojo::getId)
-                                                                                               .collect(Collectors.toSet()));
+            List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(list.parallelStream()
+                                                                                           .map(TbMusicPojo::getId)
+                                                                                           .collect(Collectors.toSet()));
             artistIds.addAll(musicArtistByMusicId.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet()));
         }
         // 专辑
         boolean albumNotBlank = StringUtils.isNotBlank(albumName);
         if (nameNotBlank || albumNotBlank) {
             List<TbAlbumPojo> list = tbAlbumService.list(WrapperUtil.albumWrapper(nameNotBlank, albumNotBlank, name, albumName));
-            List<ArtistConvert> artistConverts = qukuService.getAlbumArtistListByAlbumIds(list.parallelStream()
-                                                                                              .map(TbAlbumPojo::getId)
-                                                                                              .toList());
+            List<ArtistConvert> artistConverts = qukuService.getArtistByAlbumIds(list.parallelStream()
+                                                                                     .map(TbAlbumPojo::getId)
+                                                                                     .toList());
             artistIds.addAll(artistConverts.stream().map(TbArtistPojo::getId).toList());
         }
         // 歌手
@@ -244,8 +244,8 @@ public class ArtistApi {
         
         ArrayList<ArtistPageRes> content = new ArrayList<>();
         for (TbArtistPojo artistPojo : page.getRecords()) {
-            long albumSize = qukuService.getArtistAlbumCountBySingerId(artistPojo.getId());
-            long musicSize = qukuService.getMusicCountBySingerId(artistPojo.getId());
+            long albumSize = qukuService.getArtistAlbumCountByArtistId(artistPojo.getId());
+            long musicSize = qukuService.getMusicCountByArtistId(artistPojo.getId());
             
             ArtistPageRes artistRes = new ArtistPageRes();
             artistRes.setId(artistPojo.getId());

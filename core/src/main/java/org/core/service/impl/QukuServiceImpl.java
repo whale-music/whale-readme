@@ -137,7 +137,7 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public AlbumConvert getAlbumByMusicId(Long musicId) {
-        List<AlbumConvert> albumListByMusicId = getAlbumListByMusicId(Collections.singletonList(musicId));
+        List<AlbumConvert> albumListByMusicId = getAlbumByMusicIds(Collections.singletonList(musicId));
         if (CollUtil.isEmpty(albumListByMusicId)) {
             return null;
         }
@@ -167,8 +167,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 专辑ID
      */
     @Override
-    public List<Long> getAlbumIdsByMusicId(List<Long> musicIds) {
-        // todo
+    public List<Long> getAlbumIdsByMusicIds(List<Long> musicIds) {
         if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }
@@ -180,9 +179,8 @@ public class QukuServiceImpl implements QukuService {
      * Long -> music ID
      */
     @Override
-    public List<AlbumConvert> getAlbumListByMusicId(List<Long> musicIds) {
-        // todo
-        final List<Long> albumIds = this.getAlbumIdsByMusicId(musicIds);
+    public List<AlbumConvert> getAlbumByMusicIds(List<Long> musicIds) {
+        final List<Long> albumIds = this.getAlbumIdsByMusicIds(musicIds);
         return getAlbumListByAlbumId(albumIds);
     }
     
@@ -215,24 +213,6 @@ public class QukuServiceImpl implements QukuService {
                        objects2.addAll(objects);
                        return objects2;
                    }));
-    }
-    
-    /**
-     * 批量获取歌手信息
-     * Long -> music ID
-     */
-    @Override
-    public List<ArtistConvert> getAlbumArtistListByMusicId(List<Long> musicIds) {
-        // todo
-        return getMusicArtistByMusicId(musicIds);
-    }
-    
-    /**
-     * 获取歌手信息
-     */
-    @Override
-    public List<ArtistConvert> getAlbumArtistByMusicId(Long musicId) {
-        return getAlbumArtistListByMusicId(Collections.singletonList(musicId));
     }
     
     @Override
@@ -281,8 +261,7 @@ public class QukuServiceImpl implements QukuService {
      * @param id 歌手ID
      */
     @Override
-    public Long getMusicCountBySingerId(Long id) {
-        // todo
+    public Long getMusicCountByArtistId(Long id) {
         return musicArtistService.count(Wrappers.<TbMusicArtistPojo>lambdaQuery().eq(TbMusicArtistPojo::getArtistId, id));
     }
     
@@ -372,17 +351,8 @@ public class QukuServiceImpl implements QukuService {
         return convertPage;
     }
     
-    /**
-     * 获取专辑歌手列表
-     */
     @Override
-    public List<ArtistConvert> getAlbumArtistListByAlbumIds(Long albumId) {
-        return getAlbumArtistListByAlbumIds(Collections.singletonList(albumId));
-    }
-    
-    @Override
-    public List<AlbumConvert> getAlbumListByArtistIds(List<Long> artistIds) {
-        // todo
+    public List<AlbumConvert> getAlbumByArtistIds(List<Long> artistIds) {
         if (CollUtil.isEmpty(artistIds)) {
             return Collections.emptyList();
         }
@@ -390,7 +360,7 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }
-        return this.getAlbumListByMusicId(musicIds);
+        return this.getAlbumByMusicIds(musicIds);
     }
     
     /**
@@ -400,7 +370,6 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public List<Long> getAlbumIdsByArtistIds(List<Long> artistIds) {
-        // todo
         if (CollUtil.isEmpty(artistIds)) {
             return Collections.emptyList();
         }
@@ -408,7 +377,7 @@ public class QukuServiceImpl implements QukuService {
         if (CollUtil.isEmpty(musicIds)) {
             return Collections.emptyList();
         }
-        return this.getAlbumIdsByMusicId(musicIds);
+        return this.getAlbumIdsByMusicIds(musicIds);
     }
     
     /**
@@ -452,13 +421,12 @@ public class QukuServiceImpl implements QukuService {
      * 通过专辑ID获取歌手列表
      */
     @Override
-    public List<ArtistConvert> getAlbumArtistListByAlbumIds(List<Long> albumIds) {
-        // todo
+    public List<ArtistConvert> getArtistByAlbumIds(List<Long> albumIds) {
         if (CollUtil.isEmpty(albumIds)) {
             return Collections.emptyList();
         }
         List<Long> musicIds = musicService.getMusicIdsByAlbumIds(albumIds);
-        return this.getMusicArtistByMusicId(musicIds);
+        return this.getArtistByMusicIds(musicIds);
     }
     
     /**
@@ -470,8 +438,7 @@ public class QukuServiceImpl implements QukuService {
      * @param albumIds 专辑ID
      */
     @Override
-    public Map<Long, List<ArtistConvert>> getAlbumArtistMapByAlbumIds(Collection<Long> albumIds) {
-        // todo
+    public Map<Long, List<ArtistConvert>> getArtistByAlbumIdsToMap(Collection<Long> albumIds) {
         if (CollUtil.isEmpty(albumIds)) {
             return Collections.emptyMap();
         }
@@ -503,7 +470,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 歌手列表
      */
     @Override
-    public List<ArtistConvert> getMusicArtistByMusicId(Collection<Long> musicId) {
+    public List<ArtistConvert> getArtistByMusicIds(Collection<Long> musicId) {
         if (CollUtil.isEmpty(musicId)) {
             return Collections.emptyList();
         }
@@ -571,23 +538,11 @@ public class QukuServiceImpl implements QukuService {
     /**
      * 获取歌手所有专辑数量
      *
-     * @param id 歌手ID
-     */
-    @Override
-    public Integer getArtistAlbumCountBySingerId(Long id) {
-        // todo
-        return MapUtil.get(this.getArtistAlbumCount(Collections.singletonList(id)), id, Integer.class, 0);
-    }
-    
-    /**
-     * 获取歌手所有专辑数量
-     *
      * @param artistIds 歌手ID
      * @return 歌手下的所有专辑 key: artist id value: album 数量
      */
     @Override
-    public Map<Long, Integer> getArtistAlbumCount(List<Long> artistIds) {
-        // todo
+    public Map<Long, Integer> getArtistAlbumCountByArtistIds(List<Long> artistIds) {
         if (CollUtil.isEmpty(artistIds)) {
             return Collections.emptyMap();
         }
@@ -694,8 +649,7 @@ public class QukuServiceImpl implements QukuService {
      * @param name 歌手
      */
     @Override
-    public List<MusicConvert> getMusicListByArtistName(String name) {
-        // todo
+    public List<MusicConvert> getMusicByArtistName(String name) {
         if (StringUtils.isBlank(name)) {
             return Collections.emptyList();
         }

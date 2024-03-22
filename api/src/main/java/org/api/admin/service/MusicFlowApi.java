@@ -432,7 +432,7 @@ public class MusicFlowApi {
         Map<Long, TbAlbumPojo> albumMaps = albumService.listByIds(albumSets)
                                                        .parallelStream()
                                                        .collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> tbAlbumPojo));
-        Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumSets);
+        Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumSets);
         // 检索专辑关联歌手，并且数据与数据库中不相等，专辑为空的情况下才会保存歌曲
         for (Long albumSet : albumSets) {
             List<ArtistConvert> list1 = albumArtistMapByAlbumIds.get(albumSet);
@@ -824,9 +824,9 @@ public class MusicFlowApi {
                 // 专辑名
                 TbAlbumPojo albumPojo = albumService.getById(byId.getAlbumId());
                 // 音乐歌手
-                List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(byId.getId());
+                List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(byId.getId());
                 // 专辑歌手
-                List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+                List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
                 // 歌词
                 List<TbLyricPojo> musicLyric = qukuService.getMusicLyric(byId.getId());
                 String path = writeMusicMetaAndUploadMusicFile(file, byId,
@@ -952,7 +952,7 @@ public class MusicFlowApi {
         List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId()).get(id);
         List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId()).get(id);
         // 歌曲艺术家
-        List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
+        List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
         
         MusicInfoRes musicInfoRes = new MusicInfoRes();
         musicInfoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
@@ -970,7 +970,7 @@ public class MusicFlowApi {
         if (Objects.nonNull(albumId)) {
             TbAlbumPojo albumPojo = albumService.getById(albumId);
             // 专辑艺术家
-            List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
+            List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumId);
             // 专辑
             MusicInfoRes.Album album = new MusicInfoRes.Album();
             musicInfoRes.setAlbum(album);
@@ -1085,11 +1085,11 @@ public class MusicFlowApi {
         // 专辑名
         TbAlbumPojo albumPojo = Optional.ofNullable(albumService.getById(byId.getAlbumId())).orElse(new TbAlbumPojo());
         // 音乐歌手
-        List<ArtistConvert> musicArtistByMusicId = Optional.ofNullable(qukuService.getMusicArtistByMusicId(musicId)).orElse(Collections.emptyList());
+        List<ArtistConvert> musicArtistByMusicId = Optional.ofNullable(qukuService.getArtistByMusicIds(musicId)).orElse(Collections.emptyList());
         
         List<ArtistConvert> albumArtistListByAlbumIds = new ArrayList<>();
         if (Objects.nonNull(albumPojo.getId())) {
-            albumArtistListByAlbumIds = Optional.ofNullable(qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId())).orElse(Collections.emptyList());
+            albumArtistListByAlbumIds = Optional.ofNullable(qukuService.getArtistByAlbumIds(albumPojo.getId())).orElse(Collections.emptyList());
         }
         // 上传
         List<TbLyricPojo> musicLyric = Optional.ofNullable(qukuService.getMusicLyric(byId.getId())).orElse(Collections.emptyList());
@@ -1509,7 +1509,7 @@ public class MusicFlowApi {
             infoRes.setTimeLength(byId.getTimeLength());
             infoRes.setUserId(byId.getUserId());
             // 歌曲艺术家
-            List<ArtistConvert> musicArtistByMusicId = qukuService.getMusicArtistByMusicId(id);
+            List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
             
             infoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
             if (CollUtil.isNotEmpty(musicArtistByMusicId)) {

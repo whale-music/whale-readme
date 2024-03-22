@@ -29,14 +29,15 @@ public class SimiApi {
     public List<SimiArtistRes> simiArtist(Long id) {
         ArrayList<SimiArtistRes> simiArtistRes = new ArrayList<>();
         List<ArtistConvert> tbArtistPojos = qukuService.randomSinger(20);
+        // todo: 需要优化
         for (ArtistConvert tbArtistPojo : tbArtistPojos) {
             SimiArtistRes artistRes = new SimiArtistRes();
             artistRes.setId(tbArtistPojo.getId());
             artistRes.setPicUrl(tbArtistPojo.getPicUrl());
             artistRes.setName(tbArtistPojo.getArtistName());
             artistRes.setAlias(AliasUtil.getAliasList(tbArtistPojo.getAliasName()));
-            artistRes.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(tbArtistPojo.getId()));
-            artistRes.setMusicSize(qukuService.getMusicCountBySingerId(tbArtistPojo.getId()));
+            artistRes.setAlbumSize(qukuService.getArtistAlbumCountByArtistId(tbArtistPojo.getId()));
+            artistRes.setMusicSize(qukuService.getMusicCountByArtistId(tbArtistPojo.getId()));
             artistRes.setBriefDesc(tbArtistPojo.getIntroduction());
             simiArtistRes.add(artistRes);
         }

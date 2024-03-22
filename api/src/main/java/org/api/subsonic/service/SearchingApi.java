@@ -99,7 +99,10 @@ public class SearchingApi {
         if (CollUtil.isNotEmpty(artistPage.getRecords())) {
             ArrayList<Search2Res.Artist> artist = new ArrayList<>();
             
-            Map<Long, Integer> artistAlbumCount = qukuApi.getArtistAlbumCount(artistPage.getRecords().parallelStream().map(TbArtistPojo::getId).toList());
+            Map<Long, Integer> artistAlbumCount = qukuApi.getArtistAlbumCountByArtistIds(artistPage.getRecords()
+                                                                                                   .parallelStream()
+                                                                                                   .map(TbArtistPojo::getId)
+                                                                                                   .toList());
             for (TbArtistPojo artistPojo : artistPage.getRecords()) {
                 Search2Res.Artist e = new Search2Res.Artist();
                 e.setId(String.valueOf(artistPojo.getId()));
@@ -122,7 +125,7 @@ public class SearchingApi {
             ArrayList<Search2Res.Album> albums = new ArrayList<>();
             
             List<Long> albumIds = albumPage.getRecords().parallelStream().map(TbAlbumPojo::getId).toList();
-            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getAlbumArtistMapByAlbumIds(albumIds);
+            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);
@@ -247,7 +250,10 @@ public class SearchingApi {
         if (CollUtil.isNotEmpty(artistPage.getRecords())) {
             ArrayList<Search3Res.Artist> artist = new ArrayList<>();
             
-            Map<Long, Integer> artistAlbumCount = qukuApi.getArtistAlbumCount(artistPage.getRecords().parallelStream().map(TbArtistPojo::getId).toList());
+            Map<Long, Integer> artistAlbumCount = qukuApi.getArtistAlbumCountByArtistIds(artistPage.getRecords()
+                                                                                                   .parallelStream()
+                                                                                                   .map(TbArtistPojo::getId)
+                                                                                                   .toList());
             for (TbArtistPojo artistPojo : artistPage.getRecords()) {
                 Search3Res.Artist e = new Search3Res.Artist();
                 e.setId(String.valueOf(artistPojo.getId()));
@@ -270,7 +276,7 @@ public class SearchingApi {
             ArrayList<Search3Res.Album> albums = new ArrayList<>();
             
             List<Long> albumIds = albumPage.getRecords().parallelStream().map(TbAlbumPojo::getId).toList();
-            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getAlbumArtistMapByAlbumIds(albumIds);
+            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);

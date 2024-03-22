@@ -104,7 +104,7 @@ public class MusicApi {
             e.setPublishTime(tbMusicPojo.getCreateTime().getNano());
             e.setDt(tbMusicPojo.getTimeLength());
             ArrayList<ArItem> ar = new ArrayList<>();
-            List<ArtistConvert> singerByMusicId = qukuService.getAlbumArtistByMusicId(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
             
             // 歌手
             for (ArtistConvert tbArtistPojo : singerByMusicId) {

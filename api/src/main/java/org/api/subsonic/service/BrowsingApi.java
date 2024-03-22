@@ -137,7 +137,7 @@ public class BrowsingApi {
     public SongRes getSong(Long id) {
         TbMusicPojo musicPojo = musicService.getById(id);
         TbAlbumPojo albumByAlbumId = qukuService.getAlbumByAlbumId(musicPojo.getAlbumId());
-        List<ArtistConvert> artistByMusicId = qukuService.getAlbumArtistByMusicId(musicPojo.getId());
+        List<ArtistConvert> artistByMusicId = qukuService.getArtistByMusicIds(musicPojo.getId());
         List<TbResourcePojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new ArtistConvert() : artistByMusicId.get(0);
         Song song = new Song();
@@ -209,10 +209,10 @@ public class BrowsingApi {
             IndexesRes.Index e = new IndexesRes.Index();
             e.setName(Objects.toString(entryKey.getKey()));
             ArrayList<IndexesRes.Artist> artist = new ArrayList<>();
-            Map<Long, Integer> artistAlbumCountMap = qukuService.getArtistAlbumCount(entryKey.getValue()
-                                                                                             .parallelStream()
-                                                                                             .map(TbArtistPojo::getId)
-                                                                                             .toList());
+            Map<Long, Integer> artistAlbumCountMap = qukuService.getArtistAlbumCountByArtistIds(entryKey.getValue()
+                                                                                                        .parallelStream()
+                                                                                                        .map(TbArtistPojo::getId)
+                                                                                                        .toList());
             for (TbArtistPojo tbArtistPojo : entryKey.getValue()) {
                 IndexesRes.Artist e1 = new IndexesRes.Artist();
                 e1.setId(String.valueOf(tbArtistPojo.getId()));
@@ -240,7 +240,7 @@ public class BrowsingApi {
             if (Objects.isNull(artistInfo)) {
                 throw new BaseException(ResultCode.PARAM_IS_INVALID);
             }
-            List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(id));
+            List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumByArtistIds(Collections.singletonList(id));
             albumIds.addAll(albumListByArtistIds.parallelStream().map(TbAlbumPojo::getId).toList());
         } else {
             albumIds.add(albumInfo.getId());
@@ -370,10 +370,10 @@ public class BrowsingApi {
             ArtistsRes.Index e = new ArtistsRes.Index();
             e.setName(Objects.toString(entryKey.getKey()));
             ArrayList<ArtistsRes.Artist> artist = new ArrayList<>();
-            Map<Long, Integer> artistAlbumCountMap = qukuService.getArtistAlbumCount(entryKey.getValue()
-                                                                                             .parallelStream()
-                                                                                             .map(TbArtistPojo::getId)
-                                                                                             .toList());
+            Map<Long, Integer> artistAlbumCountMap = qukuService.getArtistAlbumCountByArtistIds(entryKey.getValue()
+                                                                                                        .parallelStream()
+                                                                                                        .map(TbArtistPojo::getId)
+                                                                                                        .toList());
             for (TbArtistPojo tbArtistPojo : entryKey.getValue()) {
                 ArtistsRes.Artist e1 = new ArtistsRes.Artist();
                 e1.setId(String.valueOf(tbArtistPojo.getId()));
@@ -400,9 +400,9 @@ public class BrowsingApi {
         artistRes.setName(artist.getArtistName());
         artistRes.setId(String.valueOf(artist.getId()));
         artistRes.setCoverArt(String.valueOf(artist.getId()));
-        artistRes.setAlbumCount(String.valueOf(qukuService.getArtistAlbumCountBySingerId(artist.getId())));
+        artistRes.setAlbumCount(String.valueOf(qukuService.getArtistAlbumCountByArtistId(artist.getId())));
         
-        List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumListByArtistIds(Collections.singletonList(artist.getId()));
+        List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumByArtistIds(Collections.singletonList(artist.getId()));
         List<Long> albumIds = albumListByArtistIds.parallelStream()
                                                   .map(TbAlbumPojo::getId)
                                                   .toList();
@@ -466,7 +466,7 @@ public class BrowsingApi {
         }
         TbAlbumPojo albumPojo = albumService.getById(id);
         if (Objects.nonNull(albumPojo)) {
-            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
             if (CollUtil.isNotEmpty(albumArtistListByAlbumIds)) {
                 ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
                 artistInfo.setLastFmUrl("https://www.last.fm");
@@ -510,7 +510,7 @@ public class BrowsingApi {
         }
         TbAlbumPojo albumPojo = albumService.getById(id);
         if (Objects.nonNull(albumPojo)) {
-            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
             if (CollUtil.isNotEmpty(albumArtistListByAlbumIds)) {
                 ArtistConvert artistConvert = albumArtistListByAlbumIds.get(0);
                 artistInfo.setLastFmUrl("https://www.last.fm");
@@ -544,7 +544,7 @@ public class BrowsingApi {
         Album album = new Album();
         album.setId(String.valueOf(albumPojo.getId()));
         album.setName(albumPojo.getAlbumName());
-        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+        List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
         ArtistConvert artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new ArtistConvert() : artistListByAlbumIds.get(0);
         album.setArtist(artistPojo.getArtistName());
         album.setArtistId(String.valueOf(artistPojo.getId()));
@@ -558,7 +558,7 @@ public class BrowsingApi {
         
         ArrayList<SongItem> song = new ArrayList<>();
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
-        List<ArtistConvert> artistListByAlbumIds1 = qukuService.getAlbumArtistListByAlbumIds(id);
+        List<ArtistConvert> artistListByAlbumIds1 = qukuService.getArtistByAlbumIds(id);
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistListByAlbumIds1) ? new ArtistConvert() : artistListByAlbumIds1.get(0);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
                                                                                                     .map(TbMusicPojo::getId)

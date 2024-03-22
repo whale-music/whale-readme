@@ -108,7 +108,7 @@ public class AlbumApi {
         Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = new HashMap<>();
         if (CollUtil.isNotEmpty(albumPage.getRecords())) {
             List<Long> collect = albumPage.getRecords().stream().map(TbAlbumPojo::getId).toList();
-            albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
+            albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(collect);
         }
         
         Page<AlbumListPageRes> page = new Page<>();
@@ -151,7 +151,7 @@ public class AlbumApi {
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (TbAlbumPojo albumPojo : page.getRecords()) {
             HashMap<String, Object> map = new HashMap<>();
-            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumPojo.getId());
+            List<ArtistConvert> albumArtistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
             List<String> artistName = albumArtistListByAlbumIds
                     .parallelStream()
                     .map(TbArtistPojo::getArtistName)
@@ -177,7 +177,7 @@ public class AlbumApi {
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
         List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
-        List<ArtistConvert> artistListByAlbumIds = qukuService.getAlbumArtistListByAlbumIds(albumId);
+        List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumId);
         
         AlbumInfoRes albumRes = new AlbumInfoRes();
         albumRes.setAlbumGenre(albumGenre.parallelStream().map(TbTagPojo::getTagName).filter(StringUtils::isNotBlank).toList());
@@ -271,7 +271,7 @@ public class AlbumApi {
         Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = new HashMap<>();
         if (CollUtil.isNotEmpty(records)) {
             List<Long> collect = records.stream().map(TbAlbumPojo::getId).toList();
-            albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(collect);
+            albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(collect);
         }
         
         PageResCommon<AlbumPageRes> res = new PageResCommon<>();

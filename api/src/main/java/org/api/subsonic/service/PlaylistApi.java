@@ -129,7 +129,7 @@ public class PlaylistApi {
             e.setParent(tbMusicUrlPojo.getPath());
             e.setPlayCount(0);
             
-            List<ArtistConvert> artistByMusicId = qukuApi.getAlbumArtistByMusicId(musicPojo.getId());
+            List<ArtistConvert> artistByMusicId = qukuApi.getArtistByMusicIds(musicPojo.getId());
             TbArtistPojo artistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
             e.setArtist(artistPojo.getArtistName());
             e.setArtistId(String.valueOf(artistPojo.getId()));

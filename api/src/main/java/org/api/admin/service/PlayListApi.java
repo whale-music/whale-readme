@@ -370,7 +370,7 @@ public class PlayListApi {
      * @return 歌曲ID
      */
     private List<Long> getMusicIDByArtistName(String artistName) {
-        List<MusicConvert> musicListBySingerName = qukuService.getMusicListByArtistName(artistName);
+        List<MusicConvert> musicListBySingerName = qukuService.getMusicByArtistName(artistName);
         if (CollUtil.isEmpty(musicListBySingerName)) {
             return Collections.emptyList();
         }

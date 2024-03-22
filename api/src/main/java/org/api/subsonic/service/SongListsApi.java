@@ -113,7 +113,7 @@ public class SongListsApi {
         }
         List<AlbumItem> albumArrayList = new ArrayList<>();
         Set<Long> albumIds = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumIds);
+        Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumItem e = new AlbumItem();
@@ -320,7 +320,7 @@ public class SongListsApi {
         }
         List<AlbumListRes.Album> albumArrayList = new ArrayList<>();
         Set<Long> albumIds = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
-        Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumIds);
+        Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumListRes.Album e = new AlbumListRes.Album();
@@ -580,7 +580,7 @@ public class SongListsApi {
             List<Long> albumIds = userAlbumList.parallelStream().map(TbUserAlbumPojo::getAlbumId).toList();
             List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
             
-            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumIds);
+            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
             Map<Long, Integer> albumDurationCount = qukuService.getAlbumDurationCount(albumIds);
             List<StarredRes.Album> albums = new ArrayList<>();
@@ -718,7 +718,7 @@ public class SongListsApi {
             List<Long> albumIds = userAlbumList.parallelStream().map(TbUserAlbumPojo::getAlbumId).toList();
             List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
             
-            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getAlbumArtistMapByAlbumIds(albumIds);
+            Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
             Map<Long, Integer> albumDurationCount = qukuService.getAlbumDurationCount(albumIds);

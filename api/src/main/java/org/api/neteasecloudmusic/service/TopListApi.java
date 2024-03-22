@@ -65,7 +65,7 @@ public class TopListApi {
             e.setName(singerPojo.getArtistName());
             e.setAlias(AliasUtil.getAliasList(singerPojo.getAliasName()));
             e.setPicUrl(remoteStorePicService.getArtistPicUrl(singerPojo.getId()));
-            e.setAlbumSize(qukuService.getArtistAlbumCountBySingerId(singerPojo.getId()));
+            e.setAlbumSize(qukuService.getArtistAlbumCountByArtistId(singerPojo.getId()));
             e.setBriefDesc("");
             artists.add(e);
         }

@@ -15,4 +15,5 @@ public class ResourcePageReq {
     private String orderBy;
     private List<String> filter;
     private Boolean filterType;
+    private Boolean refresh = false;
 }

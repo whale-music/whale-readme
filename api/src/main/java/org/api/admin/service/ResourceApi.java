@@ -101,7 +101,7 @@ public class ResourceApi {
     
     public Collection<FilterTermsRes> getFilterType(String type) {
         boolean b = StringUtils.equalsIgnoreCase(type, "type");
-        Set<Resource> resources = remoteStorageService.listResource(true);
+        Set<Resource> resources = remoteStorageService.listResource(false);
         Stream<String> stream = resources.parallelStream().map(Resource::getFileExtension);
         if (Boolean.TRUE.equals(b)) {
             Map<String, Long> collect = stream.filter(Objects::nonNull).map(FileTypeUtil::getTypeCategorization).collect(Collectors.groupingBy(
@@ -136,7 +136,7 @@ public class ResourceApi {
     }
     
     public List<ResourcePageRes> getResourcePage(ResourcePageReq req) {
-        Set<Resource> resources = remoteStorageService.listResource(true);
+        Set<Resource> resources = remoteStorageService.listResource(req.getRefresh());
         LinkedList<ResourcePageRes> res = new LinkedList<>();
         
         List<String> filter = req.getFilter();

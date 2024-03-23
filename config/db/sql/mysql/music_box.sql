@@ -13,8 +13,7 @@ create table if not exists sys_dict_data
     create_time datetime                                  null comment '创建时间',
     update_time datetime                                  null comment '更新时间'
 )
-    comment '字典数据表' engine = InnoDB
-                         row_format = DYNAMIC;
+    comment '字典数据表' row_format = DYNAMIC;
 
 create table if not exists sys_dict_type
 (
@@ -107,21 +106,6 @@ create table if not exists tb_artist
     comment '歌手表' engine = InnoDB
                      row_format = DYNAMIC;
 
-create table if not exists tb_album_artist
-(
-    album_id  bigint not null comment '专辑ID',
-    artist_id bigint not null comment '歌手ID',
-    primary key (album_id, artist_id),
-    constraint tb_album_artist_tb_album_id_fk
-        foreign key (album_id) references tb_album (id)
-            on update cascade on delete cascade,
-    constraint tb_album_artist_tb_artist_id_fk
-        foreign key (artist_id) references tb_artist (id)
-            on update cascade on delete cascade
-)
-    comment '歌手和专辑中间表' engine = InnoDB
-                               row_format = DYNAMIC;
-
 create table if not exists tb_collect
 (
     id             bigint       not null comment '歌单表ID'
@@ -157,7 +141,7 @@ create table if not exists tb_history
     constraint id
         unique (id),
     constraint tb_history_pk
-        unique (middle_id, type),
+        unique (middle_id, type, user_id),
     constraint tb_history_sys_user_id_fk
         foreign key (user_id) references sys_user (id)
             on update cascade on delete cascade
@@ -178,7 +162,8 @@ create table if not exists tb_music
     sort         bigint auto_increment comment '排序字段',
     user_id      bigint       null comment '上传用户ID',
     time_length  int          null comment '歌曲时长',
-    publish_time datetime null comment '歌曲发布时间',
+    comment      varchar(512) null comment '描述',
+    publish_time datetime     null comment '歌曲发布时间',
     create_time  datetime     null comment '创建时间',
     update_time  datetime     null comment '更新时间',
     constraint tb_music_id_music_name_alias_name_album_id_uindex
@@ -262,7 +247,8 @@ create table if not exists tb_mv_info
     constraint id
         unique (id)
 )
-    comment 'Mv信息表' engine = InnoDB;
+    comment 'Mv信息表' engine = InnoDB
+                       row_format = DYNAMIC;
 
 create table if not exists tb_mv
 (
@@ -310,7 +296,7 @@ create table if not exists tb_pic
     id          bigint        not null
         primary key,
     path        varchar(512)  not null comment '音乐网络地址，或路径',
-    md5         char(32)      not null,
+    md5 varchar(32) not null,
     count       int default 0 not null comment '图片关联数量',
     create_time datetime      not null comment '创建时间',
     update_time datetime      not null comment '更新时间',
@@ -364,12 +350,12 @@ create table if not exists tb_plugin
 
 create table if not exists tb_plugin_task
 (
-    id          bigint   not null comment '任务ID'
+    id        bigint  not null comment '任务ID'
         primary key,
-    plugin_id   bigint   not null comment '插件ID',
-    status      tinyint  not null comment '当前任务执行状态,0: stop, 1: run, 2: error',
+    plugin_id bigint  not null comment '插件ID',
+    status    tinyint not null comment '当前任务执行状态,0: stop, 1: run, 2: error',
     params      text     null comment '插件入参',
-    user_id     bigint   not null comment '用户创建ID',
+    user_id   bigint  not null comment '用户创建ID',
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',
     constraint id
@@ -386,12 +372,12 @@ create table if not exists tb_plugin_task
 
 create table if not exists tb_plugin_msg
 (
-    id          bigint   not null comment '插件消息ID'
+    id        bigint  not null comment '插件消息ID'
         primary key,
-    plugin_id   bigint   not null comment '插件ID',
-    task_id     bigint   not null comment '任务ID',
-    user_id     bigint   not null comment '用户ID',
-    level       tinyint  null comment '插件消息等级,0 info 1 debug 2 warn 3 error',
+    plugin_id bigint  not null comment '插件ID',
+    task_id   bigint  not null comment '任务ID',
+    user_id   bigint  not null comment '用户ID',
+    level     tinyint null comment '插件消息等级,0 info 1 debug 2 warn 3 error',
     msg         text     null comment '插件运行消息',
     create_time datetime not null comment '创建时间',
     update_time datetime not null comment '更新时间',

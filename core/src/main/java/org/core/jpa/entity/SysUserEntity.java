@@ -50,7 +50,7 @@ public class SysUserEntity implements Serializable {
     @Column(name = "role_name", nullable = true, length = 512)
     private String roleName;
     @Basic
-    @Column(name = "sub_account_password", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "sub_account_password", nullable = true, length = -1)
     private String subAccountPassword;
     @Basic
     @Column(name = "create_time", nullable = true)

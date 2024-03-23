@@ -65,8 +65,8 @@ public class TbHistoryEntityService {
                                         .orElseThrow(() -> new NoSuchElementException("Resource not found: " + id));
     }
     
-    public Page<TbHistoryEntity> listByNikeName(String name, Pageable page) {
-        return tbHistoryEntityRepository.findBySysUserByUserId_NicknameLike(name, page);
+    public Page<TbHistoryEntity> listByNikeName(Long userId, Byte type, Pageable page) {
+        return tbHistoryEntityRepository.findByUserIdEqualsAndTypeEquals(userId, type, page);
     }
     
     public Page<TbHistoryEntity> list(PageRequest page) {

@@ -4,15 +4,16 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.PageUserReq;
 import org.api.admin.model.req.SaveOrUpdateUserReq;
 import org.api.admin.model.res.PageUserRes;
 import org.api.admin.model.res.SaveOrUpdateUserRes;
+import org.api.admin.model.res.SelectUserRes;
 import org.api.admin.utils.MyPageUtil;
 import org.core.common.constant.RoleConstant;
 import org.core.common.exception.BaseException;
@@ -186,5 +187,17 @@ public class UserApi {
         
         ExceptionUtil.isNull(!Objects.equals(UserUtil.getUser().getId(), id), ResultCode.PERMISSION_NO_ACCESS);
         accountService.updateById(sysUserPojo);
+    }
+    
+    public List<SelectUserRes> getSelectUser(String username) {
+        LambdaQueryWrapper<SysUserPojo> select = Wrappers.<SysUserPojo>lambdaQuery()
+                                                         .select(SysUserPojo::getId, SysUserPojo::getUsername, SysUserPojo::getNickname)
+                                                         .like(StringUtils.isNotBlank(username), SysUserPojo::getNickname, username)
+                                                         .or()
+                                                         .like(StringUtils.isNotBlank(username),
+                                                                 SysUserPojo::getUsername,
+                                                                 username);
+        List<SysUserPojo> list = accountService.list(select);
+        return list.parallelStream().map(s -> new SelectUserRes(s.getId(), s.getUsername())).toList();
     }
 }

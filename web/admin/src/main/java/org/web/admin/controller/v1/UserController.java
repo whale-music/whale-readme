@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.req.PageUserReq;
 import org.api.admin.model.req.SaveOrUpdateUserReq;
+import org.api.admin.model.res.SelectUserRes;
 import org.api.admin.service.UserApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController(AdminConfig.ADMIN + "UserController")
 @RequestMapping("/admin/user")
@@ -52,5 +55,11 @@ public class UserController {
     public R updateUserPassword(@RequestBody SysUserPojo sysUserPojo) {
         userApi.updateUserInfo(sysUserPojo);
         return R.success();
+    }
+    
+    @GetMapping("/select/list")
+    public R getSelectUser(@RequestParam(value = "username", required = false) String username) {
+        List<SelectUserRes> res = userApi.getSelectUser(username);
+        return R.success(res);
     }
 }

@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.res.MusicHistoryRes;
@@ -37,14 +36,13 @@ public class HistoryApi {
     
     private final TbMvInfoService mvInfoService;
     
-    public PageResCommon<MusicHistoryRes> getPageHistory(String name, Integer current, Integer size) {
+    public PageResCommon<MusicHistoryRes> getPageHistory(Long userId, Byte historyType, Integer current, Integer size) {
         org.springframework.data.domain.Page<TbHistoryEntity> tbHistoryEntities;
         PageRequest page = PageRequest.of(current - 1, size);
-        if (StringUtils.isBlank(name)) {
+        if (Objects.isNull(userId) && Objects.isNull(historyType)) {
             tbHistoryEntities = tbHistoryEntityService.list(page);
         } else {
-            tbHistoryEntities = tbHistoryEntityService.listByNikeName(name,
-                    page);
+            tbHistoryEntities = tbHistoryEntityService.listByNikeName(userId, historyType, page);
         }
         if (CollUtil.isEmpty(tbHistoryEntities)) {
             return new PageResCommon<>();

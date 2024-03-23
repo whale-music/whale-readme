@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface TbHistoryEntityRepository extends JpaRepository<TbHistoryEntity, Long>, JpaSpecificationExecutor<TbHistoryEntity> {
     
-    Page<TbHistoryEntity> findBySysUserByUserId_NicknameLike(String nickname, Pageable pageable);
+    Page<TbHistoryEntity> findByUserIdEqualsAndTypeEquals(Long userId, Byte type, Pageable pageable);
 }

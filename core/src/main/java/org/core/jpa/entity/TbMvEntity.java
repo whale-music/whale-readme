@@ -25,7 +25,7 @@ public class TbMvEntity implements Serializable {
     @Column(name = "path", nullable = false)
     private String path;
     @Basic
-    @Column(name = "md5", nullable = false)
+    @Column(name = "md5", nullable = false, length = 32)
     private String md5;
     @Basic
     @Column(name = "duration", nullable = true)

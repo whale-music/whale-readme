@@ -3,6 +3,7 @@ package org.core.config;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.exception.BaseException;
@@ -11,14 +12,14 @@ import org.core.mybatis.iservice.SysUserService;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Configuration
+@Component
 public class UserSubPasswordConfig {
     public static final String ACCOUNT = "account";
     public static final String PASSWORD = "password";
@@ -67,6 +68,10 @@ public class UserSubPasswordConfig {
      * @return true 有值 false 无值
      */
     public boolean accountExistence(String account) {
+        long count = accountService.count(Wrappers.<SysUserPojo>lambdaQuery().eq(SysUserPojo::getUsername, account));
+        if (count > 0) {
+            return true;
+        }
         return StringUtils.isNotBlank(allSubAccount.get(account));
     }
     

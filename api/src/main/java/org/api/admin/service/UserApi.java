@@ -169,7 +169,7 @@ public class UserApi {
         Long id = sysUserPojo.getId();
         SysUserPojo byId = accountService.getById(id);
         // 删除缓存，然后重新添加
-        List<Map<String, String>> dbSubAccount = JSONUtil.toBean(byId.getSubAccountPassword(), typeReference, false);
+        List<Map<String, String>> dbSubAccount = JSONUtil.toBean(Opt.ofBlankAble(byId.getSubAccountPassword()).orElse("{}"), typeReference, false);
         for (Map<String, String> stringStringMap : dbSubAccount) {
             userSubPasswordConfig.delAccountCache(stringStringMap.get(UserSubPasswordConfig.ACCOUNT));
         }

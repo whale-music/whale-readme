@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.RoleUtil;
-import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
+import org.core.utils.token.TokenUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -29,6 +29,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
     public static final String PREFIX_TOKEN = "Bearer";
     
+    private final TokenUtil tokenUtil;
+    
+    public JwtAuthenticationTokenFilter(TokenUtil tokenUtil) {
+        this.tokenUtil = tokenUtil;
+    }
+    
     /**
      * 获取到真实的 token 串
      *
@@ -47,15 +53,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
         try {
-            TokenUtil.isJwtExpired(token);
-            TokenUtil.checkSign(token);
+            tokenUtil.isJwtExpired(token);
+            tokenUtil.checkSign(token);
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
         
         // 校验token, 并获取信息
-        SysUserPojo userPojo = TokenUtil.getUserInfo(token);
+        SysUserPojo userPojo = tokenUtil.getUserInfo(token);
         if (Objects.isNull(userPojo)) {
             filterChain.doFilter(request, response);
             return;

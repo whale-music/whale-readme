@@ -9,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.CookieConstant;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.RoleUtil;
-import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
+import org.core.utils.token.TokenUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -34,8 +34,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
     private final NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties;
     
-    public JwtAuthenticationTokenFilter(NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties) {
+    private final TokenUtil tokenUtil;
+    
+    public JwtAuthenticationTokenFilter(NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties, TokenUtil tokenUtil) {
         this.permitAllUrlProperties = permitAllUrlProperties;
+        this.tokenUtil = tokenUtil;
     }
     
     
@@ -53,11 +56,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                                            .map(Cookie::getValue)
                                            .filter(StringUtils::isNotBlank)
                                            .findFirst();
+            // todo try finally
             if (first.isPresent()) {
                 String token = first.get();
-                TokenUtil.checkSign(token);
+                tokenUtil.checkSign(token);
                 // 校验token, 并获取信息
-                SysUserPojo userPojo = TokenUtil.getUserInfo(token);
+                SysUserPojo userPojo = tokenUtil.getUserInfo(token);
                 if (Objects.nonNull(userPojo)) {
                     UserUtil.setUser(userPojo);
                     UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,

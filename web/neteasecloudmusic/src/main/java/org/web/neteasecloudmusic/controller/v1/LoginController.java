@@ -23,8 +23,8 @@ import org.core.common.result.ResultCode;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
-import org.core.utils.TokenUtil;
 import org.core.utils.UserUtil;
+import org.core.utils.token.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.web.neteasecloudmusic.controller.BaseController;
@@ -53,6 +53,9 @@ public class LoginController extends BaseController {
     @Autowired
     private LoginApi loginApi;
     
+    @Autowired
+    private TokenUtil tokenUtil;
+    
     /**
      * 登录接口, 邮箱
      *
@@ -69,7 +72,7 @@ public class LoginController extends BaseController {
         UserConvert userPojo = user.login(email, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        NeteaseResult r = getNeteaseResult(response, userPojo);
+        NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
     }
@@ -85,7 +88,7 @@ public class LoginController extends BaseController {
         UserConvert userPojo = user.login(phone, password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        NeteaseResult r = getNeteaseResult(response, userPojo);
+        NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
     }
@@ -186,7 +189,7 @@ public class LoginController extends BaseController {
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = new ObjectMapper().readValue(data, SysUserPojo.class);
-        String sign = TokenUtil.signToken(userPojo.getUsername(), userPojo);
+        String sign = tokenUtil.neteasecloudmusicSignToken(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
         
         Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
@@ -241,7 +244,7 @@ public class LoginController extends BaseController {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
-        return getNeteaseResult(response, userPojo);
+        return getNeteaseResult(response, tokenUtil, userPojo);
     }
     
     

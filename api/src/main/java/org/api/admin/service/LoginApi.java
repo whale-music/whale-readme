@@ -12,7 +12,7 @@ import org.core.config.JwtConfig;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.RoleUtil;
-import org.core.utils.TokenUtil;
+import org.core.utils.token.TokenUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,14 +24,15 @@ import java.util.Objects;
 public class LoginApi {
     private final AccountService accountService;
     
+    private final TokenUtil tokenUtil;
     
     public UserRes login(String phone, String password) {
         SysUserPojo userPojo = accountService.login(phone, password);
         Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
-        String sign = TokenUtil.signToken(date, userPojo.getUsername(), userPojo);
+        String sign = tokenUtil.adminSignToken(date, userPojo.getUsername(), userPojo);
         
         Date refreshDate = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
-        String refreshToken = TokenUtil.refreshSignToken(refreshDate, userPojo.getUsername(), userPojo);
+        String refreshToken = tokenUtil.adminRefreshSignToken(refreshDate, userPojo.getUsername(), userPojo);
         
         return new UserRes(userPojo.getId(), userPojo.getUsername(), sign, refreshToken, RoleUtil.getRoleNames(userPojo.getRoleName()), date.getTime());
     }
@@ -41,17 +42,17 @@ public class LoginApi {
     }
     
     public RefreshTokenRes refreshUserToken(String refresh) {
-        TokenUtil.isJwtExpired(refresh);
-        TokenUtil.checkSign(refresh);
+        tokenUtil.isJwtExpired(refresh);
+        tokenUtil.checkSign(refresh);
         
-        SysUserPojo userInfo = TokenUtil.getRefreshUserInfo(refresh);
+        SysUserPojo userInfo = tokenUtil.getRefreshUserInfo(refresh);
         if (Objects.isNull(userInfo)) {
             throw new BaseException(ResultCode.TOKEN_EXPIRED_ERROR);
         }
         Date date = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
         Date refreshDate = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
-        String token = TokenUtil.signToken(date, userInfo.getUsername(), userInfo);
-        String newRefresh = TokenUtil.refreshSignToken(refreshDate, userInfo.getUsername(), userInfo);
+        String token = tokenUtil.adminSignToken(date, userInfo.getUsername(), userInfo);
+        String newRefresh = tokenUtil.adminRefreshSignToken(refreshDate, userInfo.getUsername(), userInfo);
         
         return new RefreshTokenRes(token, newRefresh, date.getTime());
     }

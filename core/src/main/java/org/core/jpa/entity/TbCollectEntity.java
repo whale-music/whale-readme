@@ -33,19 +33,19 @@ public class TbCollectEntity implements Serializable {
     @Column(name = "type", nullable = false)
     private Byte type;
     @Basic
-    @Column(name = "description", nullable = true, length = 512)
+    @Column(name = "description", length = 512)
     private String description;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "sort", nullable = true)
+    @Column(name = "sort")
     private Long sort;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)

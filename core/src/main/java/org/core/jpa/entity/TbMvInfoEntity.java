@@ -29,8 +29,8 @@ public class TbMvInfoEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     
-    @Size(max = 512)
     @NotNull
+    @Size(max = 512)
     @Column(name = "title", nullable = false, length = 512)
     private String title;
     

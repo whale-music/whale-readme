@@ -35,10 +35,10 @@ public class TbPluginMsgEntity implements Serializable {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Basic
-    @Column(name = "level", nullable = true)
+    @Column(name = "level")
     private Byte level;
     @Basic
-    @Column(name = "msg", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "msg", length = Integer.MAX_VALUE)
     private String msg;
     @Basic
     @Column(name = "create_time", nullable = false)

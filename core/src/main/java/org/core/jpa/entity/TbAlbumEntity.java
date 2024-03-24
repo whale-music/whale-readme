@@ -31,25 +31,25 @@ public class TbAlbumEntity implements Serializable {
     @Column(name = "album_name", nullable = false, length = 512)
     private String albumName;
     @Basic
-    @Column(name = "sub_type", nullable = true, length = 128)
+    @Column(name = "sub_type", length = 128)
     private String subType;
     @Basic
-    @Column(name = "description", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
     @Basic
-    @Column(name = "company", nullable = true, length = 256)
+    @Column(name = "company", length = 256)
     private String company;
     @Basic
-    @Column(name = "publish_time", nullable = true)
+    @Column(name = "publish_time")
     private Timestamp publishTime;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)

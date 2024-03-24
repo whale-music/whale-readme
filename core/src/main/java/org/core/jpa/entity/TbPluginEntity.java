@@ -27,22 +27,22 @@ public class TbPluginEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "plugin_name", nullable = false, length = 255)
+    @Column(name = "plugin_name", nullable = false)
     private String pluginName;
     @Basic
-    @Column(name = "create_name", nullable = true, length = 255)
+    @Column(name = "create_name")
     private String createName;
     @Basic
-    @Column(name = "type", nullable = false, length = 255)
+    @Column(name = "type", nullable = false)
     private String type;
     @Basic
-    @Column(name = "code", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "code", length = -1)
     private String code;
     @Basic
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Basic
-    @Column(name = "description", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
     @Basic
     @Column(name = "create_time", nullable = false)

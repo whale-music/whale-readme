@@ -32,19 +32,19 @@ public class TbHistoryEntity implements Serializable {
     @Column(name = "middle_id", nullable = false)
     private Long middleId;
     @Basic
-    @Column(name = "type", nullable = true)
+    @Column(name = "type")
     private Byte type;
     @Basic
-    @Column(name = "count", nullable = true)
+    @Column(name = "count")
     private Integer count;
     @Basic
-    @Column(name = "played_time", nullable = true)
+    @Column(name = "played_time")
     private Long playedTime;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)

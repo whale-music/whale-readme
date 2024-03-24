@@ -33,7 +33,7 @@ public class TbPluginTaskEntity implements Serializable {
     @Column(name = "status", nullable = false)
     private Byte status;
     @Basic
-    @Column(name = "params", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "params", length = Integer.MAX_VALUE)
     private String params;
     @Basic
     @Column(name = "user_id", nullable = false)

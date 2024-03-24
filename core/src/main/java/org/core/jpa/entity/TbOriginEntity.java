@@ -25,16 +25,16 @@ public class TbOriginEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "music_id", nullable = true)
+    @Column(name = "music_id")
     private Long musicId;
     @Basic
-    @Column(name = "resource_id", nullable = true)
+    @Column(name = "resource_id")
     private Long resourceId;
     @Basic
     @Column(name = "origin", nullable = false, length = 256)
     private String origin;
     @Basic
-    @Column(name = "origin_url", nullable = true, length = 256)
+    @Column(name = "origin_url", length = 256)
     private String originUrl;
     @ManyToOne
     @JoinColumn(name = "music_id", referencedColumnName = "id", insertable = false, updatable = false)

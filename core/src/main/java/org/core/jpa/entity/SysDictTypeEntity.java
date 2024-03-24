@@ -26,28 +26,28 @@ public class SysDictTypeEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "dict_name", nullable = true, length = 100)
+    @Column(name = "dict_name", length = 100)
     private String dictName;
     @Basic
-    @Column(name = "dict_type", nullable = true, length = 100)
+    @Column(name = "dict_type", length = 100)
     private String dictType;
     @Basic
-    @Column(name = "status", nullable = true, length = 1)
+    @Column(name = "status", length = 1)
     private String status;
     @Basic
-    @Column(name = "remark", nullable = true, length = 500)
+    @Column(name = "remark", length = 500)
     private String remark;
     @Basic
-    @Column(name = "create_by", nullable = true, length = 64)
+    @Column(name = "create_by", length = 64)
     private String createBy;
     @Basic
-    @Column(name = "update_by", nullable = true, length = 64)
+    @Column(name = "update_by", length = 64)
     private String updateBy;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     
     @Override

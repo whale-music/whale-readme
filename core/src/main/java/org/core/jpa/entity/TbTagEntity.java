@@ -27,16 +27,16 @@ public class TbTagEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "tag_name", nullable = true, length = 128)
+    @Column(name = "tag_name", length = 128)
     private String tagName;
     @Basic
-    @Column(name = "count", nullable = true)
+    @Column(name = "count")
     private Integer count;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @OneToMany(mappedBy = "tbTagByTagId")
     private Collection<TbMiddleTagEntity> tbMiddleTagsById;

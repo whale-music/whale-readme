@@ -35,10 +35,10 @@ public class TbScheduleTaskEntity implements Serializable {
     @Column(name = "cron", nullable = false, length = 128)
     private String cron;
     @Basic
-    @Column(name = "params", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "params", length = Integer.MAX_VALUE)
     private String params;
     @Basic
-    @Column(name = "status", nullable = true)
+    @Column(name = "status")
     private Byte status;
     @Basic
     @Column(name = "user_id", nullable = false)

@@ -27,34 +27,34 @@ public class TbResourceEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "music_id", nullable = true)
+    @Column(name = "music_id")
     private Long musicId;
     @Basic
-    @Column(name = "rate", nullable = true)
+    @Column(name = "rate")
     private Integer rate;
     @Basic
-    @Column(name = "path", nullable = true, length = 512)
+    @Column(name = "path", length = 512)
     private String path;
     @Basic
     @Column(name = "md5", nullable = false, length = 32)
     private String md5;
     @Basic
-    @Column(name = "level", nullable = true, length = 8)
+    @Column(name = "level", length = 8)
     private String level;
     @Basic
-    @Column(name = "encode_type", nullable = true, length = 10)
+    @Column(name = "encode_type", length = 10)
     private String encodeType;
     @Basic
-    @Column(name = "size", nullable = true)
+    @Column(name = "size")
     private Long size;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @OneToMany(mappedBy = "tbResourceByResourceId")
     private Collection<TbOriginEntity> tbOriginsById;

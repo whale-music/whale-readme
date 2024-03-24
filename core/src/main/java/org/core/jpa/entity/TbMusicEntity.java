@@ -27,34 +27,34 @@ public class TbMusicEntity implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     @Basic
-    @Column(name = "music_name", nullable = true, length = 128)
+    @Column(name = "music_name", length = 128)
     private String musicName;
     @Basic
-    @Column(name = "alias_name", nullable = true, length = 512)
+    @Column(name = "alias_name", length = 512)
     private String aliasName;
     @Basic
-    @Column(name = "album_id", nullable = true)
+    @Column(name = "album_id")
     private Long albumId;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "time_length", nullable = true)
+    @Column(name = "time_length")
     private Integer timeLength;
     @Basic
-    @Column(name = "comment", nullable = true)
+    @Column(name = "comment")
     private String comment;
     @Basic
-    @Column(name = "language", nullable = true)
+    @Column(name = "language")
     private String language;
     @Basic
-    @Column(name = "publish_time", nullable = true)
+    @Column(name = "publish_time")
     private Timestamp publishTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbCollectMusicEntity> tbCollectMusicsById;

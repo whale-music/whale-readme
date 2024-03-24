@@ -34,37 +34,37 @@ public class SysUserEntity implements Serializable {
     @Column(name = "nickname", nullable = false, length = 128)
     private String nickname;
     @Basic
-    @Column(name = "password", nullable = true, length = 20)
+    @Column(name = "password", length = 20)
     private String password;
     @Basic
-    @Column(name = "signature", nullable = true, length = 50)
+    @Column(name = "signature", length = 50)
     private String signature;
     @Basic
-    @Column(name = "account_type", nullable = true)
+    @Column(name = "account_type")
     private Integer accountType;
     @Basic
-    @Column(name = "status", nullable = true)
+    @Column(name = "status")
     private Boolean status;
     @Basic
-    @Column(name = "last_login_ip", nullable = true, length = 20)
+    @Column(name = "last_login_ip", length = 20)
     private String lastLoginIp;
     @Basic
-    @Column(name = "last_login_time", nullable = true)
+    @Column(name = "last_login_time")
     private Timestamp lastLoginTime;
     @Basic
-    @Column(name = "login_device", nullable = true)
+    @Column(name = "login_device")
     private String loginDevice;
     @Basic
-    @Column(name = "role_name", nullable = true, length = 512)
+    @Column(name = "role_name", length = 512)
     private String roleName;
     @Basic
-    @Column(name = "sub_account_password", nullable = true, length = -1)
+    @Column(name = "sub_account_password", length = -1)
     private String subAccountPassword;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @OneToMany(mappedBy = "sysUserByUserId")
     private Collection<TbAlbumEntity> tbAlbumsById;

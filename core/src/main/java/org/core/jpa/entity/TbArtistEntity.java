@@ -31,28 +31,28 @@ public class TbArtistEntity implements Serializable {
     @Column(name = "artist_name", nullable = false, length = 128)
     private String artistName;
     @Basic
-    @Column(name = "alias_name", nullable = true, length = 255)
+    @Column(name = "alias_name")
     private String aliasName;
     @Basic
-    @Column(name = "sex", nullable = true, length = 64)
+    @Column(name = "sex", length = 64)
     private String sex;
     @Basic
-    @Column(name = "birth", nullable = true)
+    @Column(name = "birth")
     private Date birth;
     @Basic
-    @Column(name = "location", nullable = true, length = 64)
+    @Column(name = "location", length = 64)
     private String location;
     @Basic
-    @Column(name = "introduction", nullable = true, length = Integer.MAX_VALUE)
+    @Column(name = "introduction", length = Integer.MAX_VALUE)
     private String introduction;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)

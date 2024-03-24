@@ -36,16 +36,16 @@ public class TbMvEntity implements Serializable {
     @Column(name = "md5", nullable = false, length = 32)
     private String md5;
     @Basic
-    @Column(name = "duration", nullable = true)
+    @Column(name = "duration")
     private Long duration;
     @Basic
-    @Column(name = "user_id", nullable = true)
+    @Column(name = "user_id")
     private Long userId;
     @Basic
-    @Column(name = "create_time", nullable = true)
+    @Column(name = "create_time")
     private Timestamp createTime;
     @Basic
-    @Column(name = "update_time", nullable = true)
+    @Column(name = "update_time")
     private Timestamp updateTime;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)

@@ -8,6 +8,8 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.res.MusicHistoryRes;
 import org.core.common.constant.HistoryConstant;
+import org.core.common.exception.BaseException;
+import org.core.common.result.ResultCode;
 import org.core.jpa.entity.SysUserEntity;
 import org.core.jpa.entity.TbHistoryEntity;
 import org.core.jpa.service.TbHistoryEntityService;
@@ -39,8 +41,8 @@ public class HistoryApi {
     public PageResCommon<MusicHistoryRes> getPageHistory(Long userId, Byte historyType, Integer current, Integer size) {
         org.springframework.data.domain.Page<TbHistoryEntity> tbHistoryEntities;
         PageRequest page = PageRequest.of(current - 1, size);
-        if (Objects.isNull(userId) && Objects.isNull(historyType)) {
-            tbHistoryEntities = tbHistoryEntityService.list(page);
+        if (Objects.isNull(userId) || Objects.isNull(historyType)) {
+            throw new BaseException(ResultCode.PARAM_IS_BLANK);
         } else {
             tbHistoryEntities = tbHistoryEntityService.listByNikeName(userId, historyType, page);
         }

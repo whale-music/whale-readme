@@ -53,6 +53,10 @@ public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable {
     @TableField("comment")
     private String comment;
     
+    @Schema(title = "音乐语种")
+    @TableField("language")
+    private String language;
+    
     @Schema(title = "歌曲发布时间")
     @TableField("publish_time")
     private LocalDateTime publishTime;

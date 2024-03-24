@@ -39,6 +39,9 @@ public class TbMusicEntity implements Serializable {
     @Column(name = "comment", nullable = true)
     private String comment;
     @Basic
+    @Column(name = "language", nullable = true)
+    private String language;
+    @Basic
     @Column(name = "publish_time", nullable = true)
     private Timestamp publishTime;
     @Basic
@@ -198,6 +201,14 @@ public class TbMusicEntity implements Serializable {
     
     public void setTbResourcesById(Collection<TbResourceEntity> tbResourcesById) {
         this.tbResourcesById = tbResourcesById;
+    }
+    
+    public String getLanguage() {
+        return language;
+    }
+    
+    public void setLanguage(String language) {
+        this.language = language;
     }
     
     @Override

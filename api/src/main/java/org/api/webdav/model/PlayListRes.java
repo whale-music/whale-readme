@@ -19,6 +19,7 @@ public class PlayListRes extends TbMusicPojo {
                 pojo.getUserId(),
                 pojo.getTimeLength(),
                 pojo.getComment(),
+                pojo.getLanguage(),
                 pojo.getPublishTime(),
                 pojo.getUpdateTime(),
                 pojo.getCreateTime());

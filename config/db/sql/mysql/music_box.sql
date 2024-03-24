@@ -156,6 +156,7 @@ create table if not exists tb_music
     sort         bigint auto_increment comment '排序字段',
     user_id      bigint       null comment '上传用户ID',
     time_length  int          null comment '歌曲时长',
+    language varchar(128) null comment '歌曲语种',
     comment      varchar(512) null comment '描述',
     publish_time datetime(6) null comment '歌曲发布时间',
     create_time  datetime(6) null comment '创建时间',

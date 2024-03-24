@@ -4,12 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 public class TbMusicArtistEntityPK implements Serializable {
-    public static final long serialVersionUID = 1036972429906703454L;
+    @Serial
+    private static final long serialVersionUID = 1036972429906703454L;
     
     @Column(name = "music_id", nullable = false)
     @Id
@@ -20,36 +27,23 @@ public class TbMusicArtistEntityPK implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long artistId;
     
-    public Long getMusicId() {
-        return musicId;
-    }
-    
-    public void setMusicId(Long musicId) {
-        this.musicId = musicId;
-    }
-    
-    public Long getArtistId() {
-        return artistId;
-    }
-    
-    public void setArtistId(Long artistId) {
-        this.artistId = artistId;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbMusicArtistEntityPK that = (TbMusicArtistEntityPK) o;
-        return Objects.equals(musicId, that.musicId) && Objects.equals(artistId, that.artistId);
+        
+        return new EqualsBuilder().append(musicId, that.musicId).append(artistId, that.artistId).isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(musicId, artistId);
+        return new HashCodeBuilder(17, 37).append(musicId).append(artistId).toHashCode();
     }
 }

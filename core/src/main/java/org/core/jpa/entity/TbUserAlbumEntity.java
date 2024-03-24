@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_user_album")
 @IdClass(TbUserAlbumEntityPK.class)
 public class TbUserAlbumEntity implements Serializable {
-    public static final long serialVersionUID = 2405172432150251807L;
+    @Serial
+    private static final long serialVersionUID = 2405172432150251807L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -30,52 +37,23 @@ public class TbUserAlbumEntity implements Serializable {
     @JoinColumn(name = "album_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbAlbumEntity tbAlbumByAlbumId;
     
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Long getAlbumId() {
-        return albumId;
-    }
-    
-    public void setAlbumId(Long albumId) {
-        this.albumId = albumId;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbUserAlbumEntity that = (TbUserAlbumEntity) o;
-        return Objects.equals(userId, that.userId) && Objects.equals(albumId, that.albumId);
+        
+        return new EqualsBuilder().append(userId, that.userId).append(albumId, that.albumId).isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(userId, albumId);
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public TbAlbumEntity getTbAlbumByAlbumId() {
-        return tbAlbumByAlbumId;
-    }
-    
-    public void setTbAlbumByAlbumId(TbAlbumEntity tbAlbumByAlbumId) {
-        this.tbAlbumByAlbumId = tbAlbumByAlbumId;
+        return new HashCodeBuilder(17, 37).append(userId).append(albumId).toHashCode();
     }
 }

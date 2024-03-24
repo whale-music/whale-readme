@@ -1,19 +1,25 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_music")
 public class TbMusicEntity implements Serializable {
-    public static final long serialVersionUID = 3852731638450316352L;
+    @Serial
+    private static final long serialVersionUID = 3852731638450316352L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -67,150 +73,6 @@ public class TbMusicEntity implements Serializable {
     @OneToMany(mappedBy = "tbMusicByMusicId", fetch = FetchType.EAGER)
     private Collection<TbResourceEntity> tbResourcesById;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getMusicName() {
-        return musicName;
-    }
-    
-    public void setMusicName(String musicName) {
-        this.musicName = musicName;
-    }
-    
-    public String getAliasName() {
-        return aliasName;
-    }
-    
-    public void setAliasName(String aliasName) {
-        this.aliasName = aliasName;
-    }
-    
-    public Long getAlbumId() {
-        return albumId;
-    }
-    
-    public void setAlbumId(Long albumId) {
-        this.albumId = albumId;
-    }
-    
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Integer getTimeLength() {
-        return timeLength;
-    }
-    
-    public void setTimeLength(Integer timeLength) {
-        this.timeLength = timeLength;
-    }
-    
-    public String getComment() {
-        return comment;
-    }
-    
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-    
-    public Timestamp getPublishTime() {
-        return publishTime;
-    }
-    
-    public void setPublishTime(Timestamp publishTime) {
-        this.publishTime = publishTime;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
-    public Collection<TbCollectMusicEntity> getTbCollectMusicsById() {
-        return tbCollectMusicsById;
-    }
-    
-    public void setTbCollectMusicsById(Collection<TbCollectMusicEntity> tbCollectMusicsById) {
-        this.tbCollectMusicsById = tbCollectMusicsById;
-    }
-    
-    public Collection<TbLyricEntity> getTbLyricsById() {
-        return tbLyricsById;
-    }
-    
-    public void setTbLyricsById(Collection<TbLyricEntity> tbLyricsById) {
-        this.tbLyricsById = tbLyricsById;
-    }
-    
-    public TbAlbumEntity getTbAlbumByAlbumId() {
-        return tbAlbumByAlbumId;
-    }
-    
-    public void setTbAlbumByAlbumId(TbAlbumEntity tbAlbumByAlbumId) {
-        this.tbAlbumByAlbumId = tbAlbumByAlbumId;
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbMusicArtistEntity> getTbMusicArtistsById() {
-        return tbMusicArtistsById;
-    }
-    
-    public void setTbMusicArtistsById(Collection<TbMusicArtistEntity> tbMusicArtistsById) {
-        this.tbMusicArtistsById = tbMusicArtistsById;
-    }
-    
-    public Collection<TbOriginEntity> getTbOriginsById() {
-        return tbOriginsById;
-    }
-    
-    public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
-        this.tbOriginsById = tbOriginsById;
-    }
-    
-    public Collection<TbResourceEntity> getTbResourcesById() {
-        return tbResourcesById;
-    }
-    
-    public void setTbResourcesById(Collection<TbResourceEntity> tbResourcesById) {
-        this.tbResourcesById = tbResourcesById;
-    }
-    
-    public String getLanguage() {
-        return language;
-    }
-    
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -223,45 +85,33 @@ public class TbMusicEntity implements Serializable {
         
         TbMusicEntity that = (TbMusicEntity) o;
         
-        return new EqualsBuilder().append(getId(), that.getId())
-                                  .append(getMusicName(), that.getMusicName())
-                                  .append(getAliasName(), that.getAliasName())
-                                  .append(getAlbumId(), that.getAlbumId())
-                                  .append(getUserId(), that.getUserId())
-                                  .append(getTimeLength(), that.getTimeLength())
-                                  .append(getComment(), that.getComment())
-                                  .append(getPublishTime(), that.getPublishTime())
-                                  .append(getUpdateTime(), that.getUpdateTime())
-                                  .append(getCreateTime(), that.getCreateTime())
-                                  .append(getTbCollectMusicsById(), that.getTbCollectMusicsById())
-                                  .append(getTbLyricsById(), that.getTbLyricsById())
-                                  .append(getTbAlbumByAlbumId(), that.getTbAlbumByAlbumId())
-                                  .append(getSysUserByUserId(), that.getSysUserByUserId())
-                                  .append(getTbMusicArtistsById(), that.getTbMusicArtistsById())
-                                  .append(getTbOriginsById(), that.getTbOriginsById())
-                                  .append(getTbResourcesById(), that.getTbResourcesById())
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(musicName, that.musicName)
+                                  .append(aliasName, that.aliasName)
+                                  .append(albumId, that.albumId)
+                                  .append(userId, that.userId)
+                                  .append(timeLength, that.timeLength)
+                                  .append(comment, that.comment)
+                                  .append(language, that.language)
+                                  .append(publishTime, that.publishTime)
+                                  .append(updateTime, that.updateTime)
+                                  .append(createTime, that.createTime)
                                   .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getId())
-                                          .append(getMusicName())
-                                          .append(getAliasName())
-                                          .append(getAlbumId())
-                                          .append(getUserId())
-                                          .append(getTimeLength())
-                                          .append(getComment())
-                                          .append(getPublishTime())
-                                          .append(getUpdateTime())
-                                          .append(getCreateTime())
-                                          .append(getTbCollectMusicsById())
-                                          .append(getTbLyricsById())
-                                          .append(getTbAlbumByAlbumId())
-                                          .append(getSysUserByUserId())
-                                          .append(getTbMusicArtistsById())
-                                          .append(getTbOriginsById())
-                                          .append(getTbResourcesById())
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(musicName)
+                                          .append(aliasName)
+                                          .append(albumId)
+                                          .append(userId)
+                                          .append(timeLength)
+                                          .append(comment)
+                                          .append(language)
+                                          .append(publishTime)
+                                          .append(updateTime)
+                                          .append(createTime)
                                           .toHashCode();
     }
 }

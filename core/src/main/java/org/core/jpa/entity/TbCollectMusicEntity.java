@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_collect_music")
 @IdClass(TbCollectMusicEntityPK.class)
 public class TbCollectMusicEntity implements Serializable {
-    public static final long serialVersionUID = 385211638450316352L;
+    @Serial
+    private static final long serialVersionUID = 385211638450316352L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -33,61 +40,26 @@ public class TbCollectMusicEntity implements Serializable {
     @JoinColumn(name = "music_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMusicEntity tbMusicByMusicId;
     
-    public Long getCollectId() {
-        return collectId;
-    }
-    
-    public void setCollectId(Long collectId) {
-        this.collectId = collectId;
-    }
-    
-    public Long getMusicId() {
-        return musicId;
-    }
-    
-    public void setMusicId(Long musicId) {
-        this.musicId = musicId;
-    }
-    
-    public Long getSort() {
-        return sort;
-    }
-    
-    public void setSort(Long sort) {
-        this.sort = sort;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbCollectMusicEntity that = (TbCollectMusicEntity) o;
-        return Objects.equals(collectId, that.collectId) && Objects.equals(musicId, that.musicId) && Objects.equals(sort,
-                that.sort);
+        
+        return new EqualsBuilder().append(collectId, that.collectId)
+                                  .append(musicId, that.musicId)
+                                  .append(sort, that.sort)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(collectId, musicId, sort);
-    }
-    
-    public TbCollectEntity getTbCollectByCollectId() {
-        return tbCollectByCollectId;
-    }
-    
-    public void setTbCollectByCollectId(TbCollectEntity tbCollectByCollectId) {
-        this.tbCollectByCollectId = tbCollectByCollectId;
-    }
-    
-    public TbMusicEntity getTbMusicByMusicId() {
-        return tbMusicByMusicId;
-    }
-    
-    public void setTbMusicByMusicId(TbMusicEntity tbMusicByMusicId) {
-        this.tbMusicByMusicId = tbMusicByMusicId;
+        return new HashCodeBuilder(17, 37).append(collectId).append(musicId).append(sort).toHashCode();
     }
 }

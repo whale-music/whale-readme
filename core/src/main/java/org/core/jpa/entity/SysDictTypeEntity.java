@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "sys_dict_type")
 public class SysDictTypeEntity implements Serializable {
-    public static final long serialVersionUID = 2405432543551807L;
+    @Serial
+    private static final long serialVersionUID = 2405432543551807L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -43,96 +50,41 @@ public class SysDictTypeEntity implements Serializable {
     @Column(name = "create_time", nullable = true)
     private Timestamp createTime;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getDictName() {
-        return dictName;
-    }
-    
-    public void setDictName(String dictName) {
-        this.dictName = dictName;
-    }
-    
-    public String getDictType() {
-        return dictType;
-    }
-    
-    public void setDictType(String dictType) {
-        this.dictType = dictType;
-    }
-    
-    public String getStatus() {
-        return status;
-    }
-    
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
-    public String getRemark() {
-        return remark;
-    }
-    
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-    
-    public String getCreateBy() {
-        return createBy;
-    }
-    
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
-    }
-    
-    public String getUpdateBy() {
-        return updateBy;
-    }
-    
-    public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         SysDictTypeEntity that = (SysDictTypeEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(dictName, that.dictName) && Objects.equals(dictType,
-                that.dictType) && Objects.equals(status, that.status) && Objects.equals(remark, that.remark) && Objects.equals(
-                createBy,
-                that.createBy) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime,
-                that.updateTime) && Objects.equals(createTime, that.createTime);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(dictName, that.dictName)
+                                  .append(dictType, that.dictType)
+                                  .append(status, that.status)
+                                  .append(remark, that.remark)
+                                  .append(createBy, that.createBy)
+                                  .append(updateBy, that.updateBy)
+                                  .append(updateTime, that.updateTime)
+                                  .append(createTime, that.createTime)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, dictName, dictType, status, remark, createBy, updateBy, updateTime, createTime);
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(dictName)
+                                          .append(dictType)
+                                          .append(status)
+                                          .append(remark)
+                                          .append(createBy)
+                                          .append(updateBy)
+                                          .append(updateTime)
+                                          .append(createTime)
+                                          .toHashCode();
     }
 }

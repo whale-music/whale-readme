@@ -1,16 +1,23 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_middle_pic")
 public class TbMiddlePicEntity implements Serializable {
-    public static final long serialVersionUID = 5853627265539648374L;
+    @Serial
+    private static final long serialVersionUID = 5853627265539648374L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -30,61 +37,27 @@ public class TbMiddlePicEntity implements Serializable {
     @JoinColumn(name = "pic_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbPicEntity tbPicByPicId;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Long getMiddleId() {
-        return middleId;
-    }
-    
-    public void setMiddleId(Long middleId) {
-        this.middleId = middleId;
-    }
-    
-    public Long getPicId() {
-        return picId;
-    }
-    
-    public void setPicId(Long picId) {
-        this.picId = picId;
-    }
-    
-    public Byte getType() {
-        return type;
-    }
-    
-    public void setType(Byte type) {
-        this.type = type;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbMiddlePicEntity that = (TbMiddlePicEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(middleId, that.middleId) && Objects.equals(picId,
-                that.picId) && Objects.equals(type, that.type);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(middleId, that.middleId)
+                                  .append(picId, that.picId)
+                                  .append(type, that.type)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, middleId, picId, type);
-    }
-    
-    public TbPicEntity getTbPicByPicId() {
-        return tbPicByPicId;
-    }
-    
-    public void setTbPicByPicId(TbPicEntity tbPicByPicId) {
-        this.tbPicByPicId = tbPicByPicId;
+        return new HashCodeBuilder(17, 37).append(id).append(middleId).append(picId).append(type).toHashCode();
     }
 }

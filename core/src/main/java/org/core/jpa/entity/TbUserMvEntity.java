@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_user_mv")
 @IdClass(TbUserMvEntityPK.class)
 public class TbUserMvEntity implements Serializable {
-    public static final long serialVersionUID = 2405432543551807L;
+    @Serial
+    private static final long serialVersionUID = 2405432543551807L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -30,52 +37,24 @@ public class TbUserMvEntity implements Serializable {
     @JoinColumn(name = "mv_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbMvEntity tbMvByMvId;
     
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Long getMvId() {
-        return mvId;
-    }
-    
-    public void setMvId(Long mvId) {
-        this.mvId = mvId;
-    }
     
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbUserMvEntity that = (TbUserMvEntity) o;
-        return Objects.equals(userId, that.userId) && Objects.equals(mvId, that.mvId);
+        
+        return new EqualsBuilder().append(userId, that.userId).append(mvId, that.mvId).isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(userId, mvId);
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public TbMvEntity getTbMvByMvId() {
-        return tbMvByMvId;
-    }
-    
-    public void setTbMvByMvId(TbMvEntity tbMvByMvId) {
-        this.tbMvByMvId = tbMvByMvId;
+        return new HashCodeBuilder(17, 37).append(userId).append(mvId).toHashCode();
     }
 }

@@ -1,18 +1,25 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_collect")
 public class TbCollectEntity implements Serializable {
-    public static final long serialVersionUID = 3852731611450316352L;
+    @Serial
+    private static final long serialVersionUID = 3852731611450316352L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -48,112 +55,39 @@ public class TbCollectEntity implements Serializable {
     @OneToMany(mappedBy = "tbCollectByCollectId")
     private Collection<TbUserCollectEntity> tbUserCollectsById;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getPlayListName() {
-        return playListName;
-    }
-    
-    public void setPlayListName(String playListName) {
-        this.playListName = playListName;
-    }
-    
-    public Byte getType() {
-        return type;
-    }
-    
-    public void setType(Byte type) {
-        this.type = type;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Long getSort() {
-        return sort;
-    }
-    
-    public void setSort(Long sort) {
-        this.sort = sort;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbCollectEntity that = (TbCollectEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(playListName, that.playListName) && Objects.equals(type,
-                that.type) && Objects.equals(description, that.description) && Objects.equals(userId,
-                that.userId) && Objects.equals(sort, that.sort) && Objects.equals(createTime, that.createTime) && Objects.equals(
-                updateTime,
-                that.updateTime);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(playListName, that.playListName)
+                                  .append(type, that.type)
+                                  .append(description, that.description)
+                                  .append(userId, that.userId)
+                                  .append(sort, that.sort)
+                                  .append(createTime, that.createTime)
+                                  .append(updateTime, that.updateTime)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, playListName, type, description, userId, sort, createTime, updateTime);
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbCollectMusicEntity> getTbCollectMusicsById() {
-        return tbCollectMusicsById;
-    }
-    
-    public void setTbCollectMusicsById(Collection<TbCollectMusicEntity> tbCollectMusicsById) {
-        this.tbCollectMusicsById = tbCollectMusicsById;
-    }
-    
-    public Collection<TbUserCollectEntity> getTbUserCollectsById() {
-        return tbUserCollectsById;
-    }
-    
-    public void setTbUserCollectsById(Collection<TbUserCollectEntity> tbUserCollectsById) {
-        this.tbUserCollectsById = tbUserCollectsById;
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(playListName)
+                                          .append(type)
+                                          .append(description)
+                                          .append(userId)
+                                          .append(sort)
+                                          .append(createTime)
+                                          .append(updateTime)
+                                          .toHashCode();
     }
 }

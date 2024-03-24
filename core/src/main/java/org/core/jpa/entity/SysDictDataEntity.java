@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "sys_dict_data")
 public class SysDictDataEntity implements Serializable {
-    public static final long serialVersionUID = 2405432543551807L;
+    @Serial
+    private static final long serialVersionUID = 2405432543551807L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -49,112 +56,45 @@ public class SysDictDataEntity implements Serializable {
     @Column(name = "update_time", nullable = true)
     private Timestamp updateTime;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Integer getDictSort() {
-        return dictSort;
-    }
-    
-    public void setDictSort(Integer dictSort) {
-        this.dictSort = dictSort;
-    }
-    
-    public String getDictLabel() {
-        return dictLabel;
-    }
-    
-    public void setDictLabel(String dictLabel) {
-        this.dictLabel = dictLabel;
-    }
-    
-    public String getDictValue() {
-        return dictValue;
-    }
-    
-    public void setDictValue(String dictValue) {
-        this.dictValue = dictValue;
-    }
-    
-    public String getDictType() {
-        return dictType;
-    }
-    
-    public void setDictType(String dictType) {
-        this.dictType = dictType;
-    }
-    
-    public String getStatus() {
-        return status;
-    }
-    
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
-    public String getCreateBy() {
-        return createBy;
-    }
-    
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
-    }
-    
-    public String getUpdateBy() {
-        return updateBy;
-    }
-    
-    public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy;
-    }
-    
-    public String getRemark() {
-        return remark;
-    }
-    
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         SysDictDataEntity that = (SysDictDataEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(dictSort, that.dictSort) && Objects.equals(dictLabel,
-                that.dictLabel) && Objects.equals(dictValue, that.dictValue) && Objects.equals(dictType,
-                that.dictType) && Objects.equals(status, that.status) && Objects.equals(createBy,
-                that.createBy) && Objects.equals(updateBy, that.updateBy) && Objects.equals(remark,
-                that.remark) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(dictSort, that.dictSort)
+                                  .append(dictLabel, that.dictLabel)
+                                  .append(dictValue, that.dictValue)
+                                  .append(dictType, that.dictType)
+                                  .append(status, that.status)
+                                  .append(createBy, that.createBy)
+                                  .append(updateBy, that.updateBy)
+                                  .append(remark, that.remark)
+                                  .append(createTime, that.createTime)
+                                  .append(updateTime, that.updateTime)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, dictSort, dictLabel, dictValue, dictType, status, createBy, updateBy, remark, createTime, updateTime);
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(dictSort)
+                                          .append(dictLabel)
+                                          .append(dictValue)
+                                          .append(dictType)
+                                          .append(status)
+                                          .append(createBy)
+                                          .append(updateBy)
+                                          .append(remark)
+                                          .append(createTime)
+                                          .append(updateTime)
+                                          .toHashCode();
     }
 }

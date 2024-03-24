@@ -1,17 +1,24 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_mv_artist")
 @IdClass(TbMvArtistEntityPK.class)
 public class TbMvArtistEntity implements Serializable {
-    public static final long serialVersionUID = 2405432543551807L;
+    @Serial
+    private static final long serialVersionUID = 2405432543551807L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -30,52 +37,23 @@ public class TbMvArtistEntity implements Serializable {
     @JoinColumn(name = "artist_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     private TbArtistEntity tbArtistByArtistId;
     
-    public Long getMvId() {
-        return mvId;
-    }
-    
-    public void setMvId(Long mvId) {
-        this.mvId = mvId;
-    }
-    
-    public Long getArtistId() {
-        return artistId;
-    }
-    
-    public void setArtistId(Long artistId) {
-        this.artistId = artistId;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbMvArtistEntity that = (TbMvArtistEntity) o;
-        return Objects.equals(mvId, that.mvId) && Objects.equals(artistId, that.artistId);
+        
+        return new EqualsBuilder().append(mvId, that.mvId).append(artistId, that.artistId).isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(mvId, artistId);
-    }
-    
-    public TbMvEntity getTbMvByMvId() {
-        return tbMvByMvId;
-    }
-    
-    public void setTbMvByMvId(TbMvEntity tbMvByMvId) {
-        this.tbMvByMvId = tbMvByMvId;
-    }
-    
-    public TbArtistEntity getTbArtistByArtistId() {
-        return tbArtistByArtistId;
-    }
-    
-    public void setTbArtistByArtistId(TbArtistEntity tbArtistByArtistId) {
-        this.tbArtistByArtistId = tbArtistByArtistId;
+        return new HashCodeBuilder(17, 37).append(mvId).append(artistId).toHashCode();
     }
 }

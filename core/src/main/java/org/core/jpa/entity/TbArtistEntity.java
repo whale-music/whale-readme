@@ -1,19 +1,26 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_artist")
 public class TbArtistEntity implements Serializable {
-    public static final long serialVersionUID = 3852731638450316352L;
+    @Serial
+    private static final long serialVersionUID = 3852731638450316352L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -57,135 +64,44 @@ public class TbArtistEntity implements Serializable {
     @OneToMany(mappedBy = "tbArtistByArtistId")
     private Collection<TbUserArtistEntity> tbUserArtistsById;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getArtistName() {
-        return artistName;
-    }
-    
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
-    }
-    
-    public String getAliasName() {
-        return aliasName;
-    }
-    
-    public void setAliasName(String aliasName) {
-        this.aliasName = aliasName;
-    }
-    
-    public String getSex() {
-        return sex;
-    }
-    
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-    
-    public Date getBirth() {
-        return birth;
-    }
-    
-    public void setBirth(Date birth) {
-        this.birth = birth;
-    }
-    
-    public String getLocation() {
-        return location;
-    }
-    
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    
-    public String getIntroduction() {
-        return introduction;
-    }
-    
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
-    
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
     
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbArtistEntity that = (TbArtistEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(artistName, that.artistName) && Objects.equals(aliasName,
-                that.aliasName) && Objects.equals(sex, that.sex) && Objects.equals(birth, that.birth) && Objects.equals(location,
-                that.location) && Objects.equals(introduction, that.introduction) && Objects.equals(userId,
-                that.userId) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(artistName, that.artistName)
+                                  .append(aliasName, that.aliasName)
+                                  .append(sex, that.sex)
+                                  .append(birth, that.birth)
+                                  .append(location, that.location)
+                                  .append(introduction, that.introduction)
+                                  .append(userId, that.userId)
+                                  .append(createTime, that.createTime)
+                                  .append(updateTime, that.updateTime)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, artistName, aliasName, sex, birth, location, introduction, userId, createTime, updateTime);
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
-    
-    public Collection<TbMusicArtistEntity> getTbMusicArtistsById() {
-        return tbMusicArtistsById;
-    }
-    
-    public void setTbMusicArtistsById(Collection<TbMusicArtistEntity> tbMusicArtistsById) {
-        this.tbMusicArtistsById = tbMusicArtistsById;
-    }
-    
-    public Collection<TbMvArtistEntity> getTbMvArtistsById() {
-        return tbMvArtistsById;
-    }
-    
-    public void setTbMvArtistsById(Collection<TbMvArtistEntity> tbMvArtistsById) {
-        this.tbMvArtistsById = tbMvArtistsById;
-    }
-    
-    public Collection<TbUserArtistEntity> getTbUserArtistsById() {
-        return tbUserArtistsById;
-    }
-    
-    public void setTbUserArtistsById(Collection<TbUserArtistEntity> tbUserArtistsById) {
-        this.tbUserArtistsById = tbUserArtistsById;
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(artistName)
+                                          .append(aliasName)
+                                          .append(sex)
+                                          .append(birth)
+                                          .append(location)
+                                          .append(introduction)
+                                          .append(userId)
+                                          .append(createTime)
+                                          .append(updateTime)
+                                          .toHashCode();
     }
 }

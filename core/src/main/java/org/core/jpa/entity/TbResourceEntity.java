@@ -1,18 +1,25 @@
 package org.core.jpa.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.core.jpa.config.ManualInsertGenerator;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "tb_resource")
 public class TbResourceEntity implements Serializable {
-    public static final long serialVersionUID = 3852711638450316352L;
+    @Serial
+    private static final long serialVersionUID = 3852711638450316352L;
     
     @Id
     @GeneratedValue(generator = "IdGenerator", strategy = GenerationType.AUTO)
@@ -58,136 +65,46 @@ public class TbResourceEntity implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private SysUserEntity sysUserByUserId;
     
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Long getMusicId() {
-        return musicId;
-    }
-    
-    public void setMusicId(Long musicId) {
-        this.musicId = musicId;
-    }
-    
-    public Integer getRate() {
-        return rate;
-    }
-    
-    public void setRate(Integer rate) {
-        this.rate = rate;
-    }
-    
-    public String getPath() {
-        return path;
-    }
-    
-    public void setPath(String path) {
-        this.path = path;
-    }
-    
-    public String getMd5() {
-        return md5;
-    }
-    
-    public void setMd5(String md5) {
-        this.md5 = md5;
-    }
-    
-    public String getLevel() {
-        return level;
-    }
-    
-    public void setLevel(String level) {
-        this.level = level;
-    }
-    
-    public String getEncodeType() {
-        return encodeType;
-    }
-    
-    public void setEncodeType(String encodeType) {
-        this.encodeType = encodeType;
-    }
-    
-    public Long getSize() {
-        return size;
-    }
-    
-    public void setSize(Long size) {
-        this.size = size;
-    }
-    
-    public Long getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-    
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-    
-    public Timestamp getUpdateTime() {
-        return updateTime;
-    }
-    
-    public void setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
+        
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         TbResourceEntity that = (TbResourceEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(musicId, that.musicId) && Objects.equals(rate,
-                that.rate) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(level,
-                that.level) && Objects.equals(encodeType, that.encodeType) && Objects.equals(size, that.size) && Objects.equals(
-                userId,
-                that.userId) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
+        
+        return new EqualsBuilder().append(id, that.id)
+                                  .append(musicId, that.musicId)
+                                  .append(rate, that.rate)
+                                  .append(path, that.path)
+                                  .append(md5, that.md5)
+                                  .append(level, that.level)
+                                  .append(encodeType, that.encodeType)
+                                  .append(size, that.size)
+                                  .append(userId, that.userId)
+                                  .append(createTime, that.createTime)
+                                  .append(updateTime, that.updateTime)
+                                  .isEquals();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, musicId, rate, path, md5, level, encodeType, size, userId, createTime, updateTime);
+        return new HashCodeBuilder(17, 37).append(id)
+                                          .append(musicId)
+                                          .append(rate)
+                                          .append(path)
+                                          .append(md5)
+                                          .append(level)
+                                          .append(encodeType)
+                                          .append(size)
+                                          .append(userId)
+                                          .append(createTime)
+                                          .append(updateTime)
+                                          .toHashCode();
     }
     
-    public Collection<TbOriginEntity> getTbOriginsById() {
-        return tbOriginsById;
-    }
-    
-    public void setTbOriginsById(Collection<TbOriginEntity> tbOriginsById) {
-        this.tbOriginsById = tbOriginsById;
-    }
-    
-    public TbMusicEntity getTbMusicByMusicId() {
-        return tbMusicByMusicId;
-    }
-    
-    public void setTbMusicByMusicId(TbMusicEntity tbMusicByMusicId) {
-        this.tbMusicByMusicId = tbMusicByMusicId;
-    }
-    
-    public SysUserEntity getSysUserByUserId() {
-        return sysUserByUserId;
-    }
-    
-    public void setSysUserByUserId(SysUserEntity sysUserByUserId) {
-        this.sysUserByUserId = sysUserByUserId;
-    }
 }

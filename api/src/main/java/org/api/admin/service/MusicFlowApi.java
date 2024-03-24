@@ -1310,7 +1310,9 @@ public class MusicFlowApi {
             if (CollUtil.isEmpty(union)) {
                 return new PageResCommon<>(0, 50);
             }
-            LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getId, union);
+            LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                              .in(TbMusicPojo::getId, union)
+                                                              .orderByDesc(TbMusicPojo::getCreateTime);
             page = musicService.page(Page.of(pageReqCommon.getPageIndex(), pageReqCommon.getPageNum()), wrapper);
         } else {
             final String name = StringUtils.trim(req.getName());
@@ -1333,7 +1335,8 @@ public class MusicFlowApi {
                 return new PageResCommon<>();
             }
             LambdaQueryWrapper<TbMusicPojo> wrapper = WrapperUtil.musicWrapper(StringUtils.isNotBlank(name), StringUtils.isNotBlank(music), name, music)
-                                                                 .in(CollUtil.isNotEmpty(musicIds), TbMusicPojo::getId, musicIds);
+                                                                 .in(CollUtil.isNotEmpty(musicIds), TbMusicPojo::getId, musicIds)
+                                                                 .orderByDesc(TbMusicPojo::getCreateTime);
             page = musicService.page(req.getPage(), wrapper);
         }
         res.setTotal(page.getTotal());

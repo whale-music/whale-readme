@@ -1,6 +1,8 @@
 package org.api.admin.service;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -145,16 +147,18 @@ public class UserApi {
         if (byId.getIsAdmin()) {
             throw new BaseException(ResultCode.ADMIN_CANNOT_DELETE);
         }
-        // 删除用户专辑
+        // 删除用户关注专辑
         userAlbumService.remove(Wrappers.<TbUserAlbumPojo>lambdaQuery().eq(TbUserAlbumPojo::getUserId, id));
         // 删除用户关注歌手
         userArtistService.remove(Wrappers.<TbUserArtistPojo>lambdaQuery().eq(TbUserArtistPojo::getUserId, id));
-        LambdaQueryWrapper<TbUserCollectPojo> userCollect = Wrappers.<TbUserCollectPojo>lambdaQuery().eq(TbUserCollectPojo::getUserId, id);
         // 删除用户创建歌单
-        List<TbUserCollectPojo> userCollectPojoList = userCollectService.list(userCollect);
-        List<Long> collectIds = userCollectPojoList.parallelStream().map(TbUserCollectPojo::getCollectId).toList();
-        collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, collectIds));
-        userCollectService.remove(userCollect);
+        List<Long> collectIds = userCollectService.listObjs(Wrappers.<TbUserCollectPojo>lambdaQuery()
+                                                                    .select(TbUserCollectPojo::getCollectId)
+                                                                    .eq(TbUserCollectPojo::getUserId, id));
+        if (CollUtil.isNotEmpty(collectIds)) {
+            collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().eq(TbCollectMusicPojo::getCollectId, collectIds));
+            userCollectService.remove(Wrappers.<TbUserCollectPojo>lambdaQuery().eq(TbUserCollectPojo::getUserId, id));
+        }
         // 删除用户MV
         userMvService.remove(Wrappers.<TbUserMvPojo>lambdaQuery().eq(TbUserMvPojo::getUserId, id));
         // 删除用户

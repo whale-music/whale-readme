@@ -14,7 +14,7 @@ import org.api.subsonic.model.res.createplaylist.CreatePlaylistRes;
 import org.api.subsonic.model.res.playlist.PlaylistRes;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
 import org.api.subsonic.service.PlaylistApi;
-import org.core.model.HttpStatusStr;
+import org.core.common.constant.HttpStatusStrConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,7 @@ public class PlaylistController {
     }
     
     @Operation(summary = "返回允许用户播放的所有播放列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -51,7 +51,7 @@ public class PlaylistController {
     }
     
     @Operation(summary = "返回已保存播放列表中的文件列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -67,7 +67,7 @@ public class PlaylistController {
     }
     
     @Operation(summary = "创建（或更新）播放列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -90,7 +90,7 @@ public class PlaylistController {
     }
     
     @Operation(summary = "创建（或更新）播放列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -122,7 +122,7 @@ public class PlaylistController {
     }
     
     @Operation(summary = "删除保存的播放列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)

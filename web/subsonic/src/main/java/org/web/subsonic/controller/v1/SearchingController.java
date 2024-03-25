@@ -13,7 +13,7 @@ import org.api.subsonic.model.res.search.SearchRes;
 import org.api.subsonic.model.res.search2.Search2Res;
 import org.api.subsonic.model.res.search3.Search3Res;
 import org.api.subsonic.service.SearchingApi;
-import org.core.model.HttpStatusStr;
+import org.core.common.constant.HttpStatusStrConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class SearchingController {
     }
     
     @Operation(summary = "返回明星歌曲，专辑和艺术家", description = "该功能未实现", deprecated = true)
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -69,7 +69,7 @@ public class SearchingController {
     }
     
     @Operation(summary = "搜索2", description = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -109,7 +109,7 @@ public class SearchingController {
     }
     
     @Operation(summary = "返回符合给定搜索条件的专辑、艺术家和歌曲。支持对结果进行分页", description = "类似于`/search2`，但根据ID3标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)

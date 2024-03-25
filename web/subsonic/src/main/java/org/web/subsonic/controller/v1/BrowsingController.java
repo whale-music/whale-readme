@@ -27,7 +27,7 @@ import org.api.subsonic.model.res.topsongs.TopSongsRes;
 import org.api.subsonic.model.res.videoinfo.VideoInfoRes;
 import org.api.subsonic.model.res.videos.VideosRes;
 import org.api.subsonic.service.BrowsingApi;
-import org.core.model.HttpStatusStr;
+import org.core.common.constant.HttpStatusStrConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +46,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回所有已配置的顶级音乐文件夹。不带额外的参数")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -60,7 +60,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回所有艺术家的索引结构", description = "忽略musicFolderId和ifModifiedSince参数")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -76,7 +76,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "获取音乐目录", description = "返回音乐目录中所有文件的列表。通常用于获取艺术家的专辑列表或专辑的歌曲列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -92,7 +92,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回所有流派", description = "返回音乐和专辑流派")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -106,7 +106,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "与'/getIndexes'类似，但根据 ID3 标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -122,7 +122,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回艺术家的详细信息，包括唱片集列表。此方法根据ID3标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -138,7 +138,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回专辑的详细信息，包括歌曲列表。此方法根据ID3标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -154,7 +154,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回歌曲的详细信息")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -170,7 +170,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回所有视频文件", description = "未实现")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -184,7 +184,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "返回所有视频文件", description = "未实现")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -200,7 +200,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "艺术家信息", description = "返回带有传记、图像 URL 和类似艺术家的艺术家信息。")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -222,7 +222,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "类似于 '/getArtistInfo'", description = "类似于 getArtistInfo ，但根据ID3标签组织音乐。")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -245,7 +245,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -262,7 +262,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "专辑信息", description = "返回专辑注释，图像URL等")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -279,7 +279,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "获取相似歌曲", description = "使用last.fm中的数据返回给定艺术家和类似艺术家的随机歌曲集合。通常用于艺术家广播功能。(该功能未实现，返回的数据只是一个随机的歌曲集合)")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -299,7 +299,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "获取相似歌曲", description = "类似于 getSimilarSongs ，但根据ID3标签组织音乐。")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -319,7 +319,7 @@ public class BrowsingController {
     }
     
     @Operation(summary = "获取热门歌曲", description = "使用last.fm中的数据返回给定艺术家的热门歌曲。(实际上是返回歌手最近上传歌曲)")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)

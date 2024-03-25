@@ -21,7 +21,7 @@ import org.api.subsonic.model.res.songsbygenre.SongsByGenreRes;
 import org.api.subsonic.model.res.starred.StarredRes;
 import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.api.subsonic.service.SongListsApi;
-import org.core.model.HttpStatusStr;
+import org.core.common.constant.HttpStatusStrConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +39,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "返回一个随机的，最新的，最高评级等列表")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -85,7 +85,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "类似于 getAlbumList ，但根据ID3标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -130,7 +130,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "返回符合给定条件的随机歌曲")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -159,7 +159,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "返回给定流派的歌曲")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -185,7 +185,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "返回所有用户当前正在播放的内容。不需要额外的参数")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -199,7 +199,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "返回明星歌曲，专辑和艺术家")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -216,7 +216,7 @@ public class AlbumAndSongListsController {
     }
     
     @Operation(summary = "类似于 getStarred ，但根据ID3标签组织音乐")
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -238,7 +238,7 @@ public class AlbumAndSongListsController {
                        "更新媒体文件的播放次数和上次播放时间戳。（自1.11.0版起）" +
                        "使媒体文件显示在Web应用程序的“正在播放”页面中，并显示在 getNowPlaying （自1.11.0起）返回的歌曲列表中"
     )
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)

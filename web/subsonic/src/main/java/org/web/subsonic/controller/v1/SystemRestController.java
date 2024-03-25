@@ -9,7 +9,7 @@ import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.license.LicenseRes;
-import org.core.model.HttpStatusStr;
+import org.core.common.constant.HttpStatusStrConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SystemRestController {
     
     @GetMapping(value = {"/ping.view", "/ping"})
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
@@ -37,7 +37,7 @@ public class SystemRestController {
     }
     
     @GetMapping(value = {"/getLicense.view", "/getLicense"})
-    @ApiResponse(responseCode = HttpStatusStr.OK,
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
                  content = {
                          @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)

@@ -43,7 +43,7 @@ public class ManualSerializeAspect {
      */
     @Around(value = "pointCut()")
     public Object doAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) {
-        log.info("@Around环绕通知: {}", proceedingJoinPoint.getSignature());
+        log.debug("@ManualSerialize环绕通知: {}", proceedingJoinPoint.getSignature());
         Object[] args = proceedingJoinPoint.getArgs();
         // 取请求中第一个公共参数
         BeanMap beanMap = BeanMap.create(args[0]);

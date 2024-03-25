@@ -20,6 +20,7 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.ClassUtils;
 
@@ -35,7 +36,10 @@ import java.util.concurrent.TimeUnit;
 @EntityScan(basePackages = "org.core.jpa.entity")
 @EnableJpaRepositories(basePackages = "org.core.jpa.repository")
 @SpringBootApplication(scanBasePackages = "org.core")
-@EnableScheduling // 开启定时任务
+// 开启异步注解
+@EnableAsync
+// 开启定时任务
+@EnableScheduling
 @Slf4j
 public class StartSpringBoot {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {

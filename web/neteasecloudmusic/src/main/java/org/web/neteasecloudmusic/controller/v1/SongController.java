@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.service.MusicApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class SongController {
     /**
      * 获取歌曲详情
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/song/detail", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult songDetail(@RequestParam("ids") List<Long> ids) {
@@ -50,7 +51,7 @@ public class SongController {
     /**
      * 获取歌曲下载地址
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/song/url", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult songUrl(@RequestParam("id") List<Long> id, @RequestParam(value = "br", required = false, defaultValue = "999000") Integer br) {
         SongUrlRes songUrlRes = musicApi.songUrl(id, br);
@@ -59,7 +60,7 @@ public class SongController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/lyric", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult lyric(@RequestParam("id") Long id) {
@@ -69,7 +70,7 @@ public class SongController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/scrobble")
     public NeteaseResult scrobble(@RequestParam("id") Long id, @RequestParam("sourceid") Long sourceid, @RequestParam(value = "time", required = false) Long time) {
         musicApi.scrobble(id, sourceid, time);

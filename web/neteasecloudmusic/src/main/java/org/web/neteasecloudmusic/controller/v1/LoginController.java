@@ -21,6 +21,7 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
 import org.core.common.result.ResultCode;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.GlobeDataUtil;
@@ -62,7 +63,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回登录结果
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult loginMail(HttpServletResponse response, @RequestParam Map<String, String> req) {
@@ -84,7 +85,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回登录结果
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @AnonymousAccess
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult loginPhone(HttpServletResponse response, String phone, String password) {
@@ -101,7 +102,7 @@ public class LoginController extends BaseController {
      *
      * @return 返回登录结果
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/cellphone/existence/check", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult cellphoneCheck(@RequestParam("phone") Long phone, @RequestParam(value = "countrycode", required = false, defaultValue = "86") String countrycode) {
         UserConvert userPojo = user.checkPhone(phone, countrycode);
@@ -134,7 +135,7 @@ public class LoginController extends BaseController {
      * @param request HttpServlet
      * @return NeteaseResult
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login/qr/key", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult qrKey(HttpServletRequest request) {
@@ -151,7 +152,7 @@ public class LoginController extends BaseController {
         return r.success(map);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/qr/create")
     @AnonymousAccess
     public NeteaseResult qrCreate(HttpServletRequest request, @RequestParam("key") String key) {
@@ -165,7 +166,7 @@ public class LoginController extends BaseController {
         return r.success(map);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/sure")
     @AnonymousAccess
     public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) throws JsonProcessingException {
@@ -181,7 +182,7 @@ public class LoginController extends BaseController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/qr/check")
     @AnonymousAccess
     public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) throws JsonProcessingException {
@@ -211,7 +212,7 @@ public class LoginController extends BaseController {
         return r;
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login/status", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult loginStatus(@RequestParam(value = "uid", required = false) Long uid) {
         uid = uid == null ? UserUtil.getUser().getId() : uid;
@@ -230,7 +231,7 @@ public class LoginController extends BaseController {
      * @return 返回成功信息
      */
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/register/account")
     public NeteaseResult addUser(String account, String password, String nickname) {
         SysUserPojo userPojo = new SysUserPojo();
@@ -247,7 +248,7 @@ public class LoginController extends BaseController {
      * @param response servlet response
      * @return 返回token and Cookie
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/refresh")
     public NeteaseResult refresh(HttpServletResponse response) {
         SysUserPojo userPojo = UserUtil.getUser();
@@ -264,7 +265,7 @@ public class LoginController extends BaseController {
      *
      * @param allParam 所有方法
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userLogout(HttpServletResponse response, @RequestParam Map<String, String> allParam) {
         return this.logout(response);

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.api.neteasecloudmusic.config.NeteaseCloudConfig;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.Collections;
 @Slf4j
 public class FalseInterfaceController {
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/mv/sublist")
     public NeteaseResult mvSublist() {
         NeteaseResult r = new NeteaseResult();
@@ -23,7 +24,7 @@ public class FalseInterfaceController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/user/cloud")
     public NeteaseResult userCloud() {
         NeteaseResult r = new NeteaseResult();
@@ -36,7 +37,7 @@ public class FalseInterfaceController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/album/detail/dynamic")
     public NeteaseResult albumDetailDynamic(@RequestParam("id") Long id) {
         NeteaseResult r = new NeteaseResult();
@@ -56,7 +57,7 @@ public class FalseInterfaceController {
         return r.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/daily_signin", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult dailySignin(String type) {
         NeteaseResult r = new NeteaseResult();

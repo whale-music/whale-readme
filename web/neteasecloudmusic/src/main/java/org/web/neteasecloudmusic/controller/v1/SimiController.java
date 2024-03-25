@@ -6,6 +6,7 @@ import org.api.neteasecloudmusic.model.vo.simi.SimiArtistRes;
 import org.api.neteasecloudmusic.service.SimiApi;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +29,7 @@ public class SimiController {
      *
      * @param id 歌手ID
      */
-    @WebLog
+    @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/simi/artist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult simiArtist(@RequestParam("id") Long id) {
         List<SimiArtistRes> res = simiApi.simiArtist(id);

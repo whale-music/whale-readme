@@ -29,6 +29,7 @@ import org.api.subsonic.model.res.videos.VideosRes;
 import org.api.subsonic.service.BrowsingApi;
 import org.core.common.constant.HttpStatusStrConstant;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +54,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getMusicFolders.view", "/getMusicFolders"})
     @ManualSerialize
     public ResponseEntity<String> getMusicFolders(SubsonicCommonReq req) {
@@ -68,7 +69,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getIndexes.view", "/getIndexes"})
     @ManualSerialize
     public ResponseEntity<String> getIndexes(SubsonicCommonReq req,
@@ -85,7 +86,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getMusicDirectory.view", "/getMusicDirectory"})
     @ManualSerialize
     public ResponseEntity<String> getMusicDirectory(SubsonicCommonReq req,
@@ -102,7 +103,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getGenres.view", "/getGenres"})
     @ManualSerialize
     public ResponseEntity<String> getGenres(SubsonicCommonReq req) {
@@ -117,7 +118,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getArtists.view", "/getArtists"})
     @ManualSerialize
     public ResponseEntity<String> getArtists(SubsonicCommonReq req,
@@ -134,7 +135,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getArtist.view", "/getArtist"})
     @ManualSerialize
     public ResponseEntity<String> getArtist(SubsonicCommonReq req,
@@ -151,7 +152,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getAlbum.view", "/getAlbum"})
     @ManualSerialize
     public ResponseEntity<String> getAlbum(SubsonicCommonReq req,
@@ -168,7 +169,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getSong.view", "/getSong"})
     @ManualSerialize
     public ResponseEntity<String> getSong(SubsonicCommonReq req,
@@ -185,7 +186,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getVideos.view", "/getSong"})
     @ManualSerialize
     public ResponseEntity<String> getVideos(SubsonicCommonReq req) {
@@ -200,7 +201,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getVideoInfo.view", "/getVideoInfo"})
     @ManualSerialize
     public ResponseEntity<String> getVideoInfo(SubsonicCommonReq req,
@@ -217,7 +218,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getArtistInfo.view", "/getArtistInfo"})
     @ManualSerialize
     public ResponseEntity<String> getArtistInfo(SubsonicCommonReq req,
@@ -240,7 +241,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getArtistInfo2.view", "/getArtistInfo2"})
     @ManualSerialize
     public ResponseEntity<String> getArtistInfo2(SubsonicCommonReq req,
@@ -264,7 +265,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getAlbumInfo.view", "/getAlbumInfo"})
     @ManualSerialize
     public ResponseEntity<String> getAlbumInfo(SubsonicCommonReq req,
@@ -282,7 +283,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getAlbumInfo2.view", "/getAlbumInfo2"})
     @ManualSerialize
     public ResponseEntity<String> getAlbumInfo2(SubsonicCommonReq req,
@@ -300,7 +301,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getSimilarSongs.view", "/getSimilarSongs"})
     @ManualSerialize
     public ResponseEntity<String> getSimilarSongs(SubsonicCommonReq req,
@@ -321,7 +322,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getSimilarSongs2.view", "/getSimilarSongs2"})
     @ManualSerialize
     public ResponseEntity<String> getSimilarSongs2(SubsonicCommonReq req,
@@ -342,7 +343,7 @@ public class BrowsingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getTopSongs.view", "/getTopSongs"})
     @ManualSerialize
     public ResponseEntity<String> getTopSongs(SubsonicCommonReq req,

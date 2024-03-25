@@ -16,6 +16,7 @@ import org.api.subsonic.model.res.playlists.PlaylistsRes;
 import org.api.subsonic.service.PlaylistApi;
 import org.core.common.constant.HttpStatusStrConstant;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,7 @@ public class PlaylistController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getPlaylists.view", "/getPlaylists"})
     @ManualSerialize
     public ResponseEntity<String> getPlaylists(SubsonicCommonReq req,
@@ -59,7 +60,7 @@ public class PlaylistController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getPlaylist.view", "/getPlaylist"})
     @ManualSerialize
     public ResponseEntity<String> getPlaylist(SubsonicCommonReq req,
@@ -76,7 +77,7 @@ public class PlaylistController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/createPlaylist.view", "/createPlaylist"})
     @ManualSerialize
     public ResponseEntity<String> createPlaylist(SubsonicCommonReq req,
@@ -100,7 +101,7 @@ public class PlaylistController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/updatePlaylist.view", "/updatePlaylist"})
     @ManualSerialize
     public ResponseEntity<String> updatePlaylist(SubsonicCommonReq req,
@@ -133,7 +134,7 @@ public class PlaylistController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/deletePlaylist.view", "/deletePlaylist"})
     @ManualSerialize
     public ResponseEntity<String> deletePlaylist(SubsonicCommonReq req,

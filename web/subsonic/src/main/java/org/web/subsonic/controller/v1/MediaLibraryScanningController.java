@@ -13,6 +13,7 @@ import org.api.subsonic.model.res.scanstatus.ScanStatusRes;
 import org.api.subsonic.service.MediaLibraryScanningApi;
 import org.core.common.constant.HttpStatusStrConstant;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class MediaLibraryScanningController {
     
     @Operation(summary = "返回媒体库扫描的当前状态。不需要额外的参数")
     @ApiResponse(responseCode = HttpStatusStrConstant.OK, content = @Content)
-    @WebLog
+    @WebLog(LogNameConstant.SUBSONIC)
     @GetMapping({"/getScanStatus.view", "/getScanStatus"})
     @ManualSerialize
     public ResponseEntity<String> getScanStatus(SubsonicCommonReq req) {

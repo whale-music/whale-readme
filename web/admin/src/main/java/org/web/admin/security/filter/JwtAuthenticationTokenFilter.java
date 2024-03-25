@@ -10,6 +10,7 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.RoleUtil;
 import org.core.utils.UserUtil;
 import org.core.utils.token.TokenUtil;
+import org.core.utils.token.UserCacheServiceUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -31,8 +32,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
     private final TokenUtil tokenUtil;
     
-    public JwtAuthenticationTokenFilter(TokenUtil tokenUtil) {
+    private final UserCacheServiceUtil userCacheServiceUtil;
+    
+    public JwtAuthenticationTokenFilter(TokenUtil tokenUtil, UserCacheServiceUtil userCacheServiceUtil) {
         this.tokenUtil = tokenUtil;
+        this.userCacheServiceUtil = userCacheServiceUtil;
     }
     
     /**
@@ -53,9 +57,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
         try {
+            // 校验token
             tokenUtil.isJwtExpired(token);
             tokenUtil.checkSign(token);
         } catch (Exception e) {
+            userCacheServiceUtil.clearUserCache(token);
             filterChain.doFilter(request, response);
             return;
         }

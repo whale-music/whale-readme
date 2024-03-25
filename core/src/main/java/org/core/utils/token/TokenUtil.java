@@ -8,9 +8,11 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.core.common.constant.UserCacheTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.config.JwtConfig;
+import org.core.model.UserLoginCacheModel;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -45,7 +47,7 @@ public class TokenUtil {
     }
     
     public String neteasecloudmusicSignToken(String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NETEASECLOUDMUSIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+        return sign(UserCacheTypeConstant.NMUSIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
     }
     
     public String adminSignToken(String userId, SysUserPojo user) {
@@ -63,7 +65,7 @@ public class TokenUtil {
     }
     
     public String neteasecloudmusicSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NETEASECLOUDMUSIC, expires, userId, user, USER_INFO);
+        return sign(UserCacheTypeConstant.NMUSIC, expires, userId, user, USER_INFO);
     }
     
     public String adminSignToken(Date expires, String userId, SysUserPojo user) {
@@ -72,19 +74,19 @@ public class TokenUtil {
     
     // ---------------------------------------------------------------- refresh
     public String webdavRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.WEBDAV, expires, userId, user, REFRESH);
+        return sign(UserCacheTypeConstant.WEBDAV_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String subsonicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.SUBSONIC, expires, userId, user, REFRESH);
+        return sign(UserCacheTypeConstant.SUBSONIC_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String neteasecloudmusicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NETEASECLOUDMUSIC, expires, userId, user, REFRESH);
+        return sign(UserCacheTypeConstant.NMUSIC_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String adminRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.ADMIN, expires, userId, user, REFRESH);
+        return sign(UserCacheTypeConstant.ADMIN_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String refreshSignToken(String type, Date expires, String userId, SysUserPojo user) {
@@ -93,7 +95,7 @@ public class TokenUtil {
     
     private String sign(String type, Date expires, String userId, SysUserPojo user, String info) {
         String uuid = type + IdUtil.fastUUID();
-        userCacheServiceUtil.setUserCache(uuid, user);
+        userCacheServiceUtil.setUserCache(uuid, new UserLoginCacheModel(user, LocalDateTime.now()));
         return JWT.create()
                   // 将userId保存到token里面
                   .withAudience(userId)

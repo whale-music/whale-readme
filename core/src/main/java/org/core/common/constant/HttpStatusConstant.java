@@ -1,4 +1,4 @@
-package org.core.model;
+package org.core.common.constant;
 
 /**
  * HTTP状态码
@@ -7,7 +7,7 @@ package org.core.model;
  * @author Ningqingsheng
  * @see java.net.HttpURLConnection
  */
-public class HttpStatusNum {
+public class HttpStatusConstant {
 	/**
 	 * HTTP Status-Code 100: Continue.
 	 */
@@ -269,7 +269,7 @@ public class HttpStatusNum {
 	 */
 	public static final int HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;
 	
-	private HttpStatusNum() {
+	private HttpStatusConstant() {
 	}
 	
 	/**

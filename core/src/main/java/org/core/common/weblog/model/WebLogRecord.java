@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WebLogRecord implements Serializable {
-    
+    /**
+     * 日志名称
+     */
+    private String logName;
     /**
      * 执行时间(毫秒)
      */

@@ -26,6 +26,7 @@ public class SysLogWriteServiceImpl implements SysLogWriteService {
     @Override
     public void writeWebLogRecord(WebLogRecord webLogRecord) {
         SysLogPojo sysLogPojo = new SysLogPojo();
+        sysLogPojo.setLogName(webLogRecord.getLogName());
         sysLogPojo.setExecutionTime(webLogRecord.getExecutionTime());
         sysLogPojo.setStartTime(webLogRecord.getStartTime());
         sysLogPojo.setEndTime(webLogRecord.getEndTime());

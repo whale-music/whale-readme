@@ -14,7 +14,9 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.core.common.exception.BaseException;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.model.WebLogRecord;
 import org.core.service.SysLogWriteService;
 import org.jetbrains.annotations.NotNull;
@@ -27,10 +29,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Aspect
@@ -136,6 +140,10 @@ public class WeblogAspect {
             webLogRecord.setEndTime(LocalDateTime.now());
             // 方法执行时间
             webLogRecord.setExecutionTime((int) sw.getLastTaskTimeMillis());
+            MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
+            Method method = signature.getMethod();
+            WebLog webLog = method.getAnnotation(WebLog.class);
+            webLogRecord.setLogName(webLog.value());
             // 记录前端请求
             WebLogRecord.WebRequest webRequest = getWebRequest();
             webLogRecord.setWebRequest(webRequest);
@@ -160,8 +168,14 @@ public class WeblogAspect {
         } catch (JsonProcessingException e) {
             methodCallDetail.setMethodParamsData("Json parsing error");
         }
-        List<String> paramNames = Arrays.stream(proceedingJoinPoint.getArgs()).map(Object::getClass).map(Class::getName).toList();
-        methodCallDetail.setMethodParamsType(CollUtil.join(paramNames, ","));
+        List<Object> list = Arrays.stream(proceedingJoinPoint.getArgs()).filter(Objects::nonNull).toList();
+        if (CollUtil.isNotEmpty(list)) {
+            List<String> paramNames = list.stream()
+                                          .map(Object::getClass)
+                                          .map(Class::getName)
+                                          .toList();
+            methodCallDetail.setMethodParamsType(CollUtil.join(paramNames, ","));
+        }
         methodCallDetail.setMethodName(signature.getDeclaringTypeName() + '#' + signature.getName());
         methodCallDetail.setMethodResultParamType(proceed == null ? null : proceed.getClass().getName());
         return methodCallDetail;

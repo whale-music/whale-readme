@@ -8,6 +8,7 @@ import org.api.admin.model.req.PageTagsReq;
 import org.api.admin.model.res.PageTagsRes;
 import org.api.admin.service.TagsApi;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.web.bind.annotation.*;
 
 @RestController(AdminConfig.ADMIN + "TagsController")
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class TagsController {
     private final TagsApi tagsApi;
     
+    @WebLog
     @PostMapping("/page")
     public R getPageTags(@RequestBody PageTagsReq req) {
         final PageResCommon<PageTagsRes> res = tagsApi.getPageTags(req);

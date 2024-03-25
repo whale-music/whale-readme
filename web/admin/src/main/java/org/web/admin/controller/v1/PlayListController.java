@@ -12,6 +12,7 @@ import org.api.admin.model.res.PlayListRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,16 +38,19 @@ public class PlayListController {
      * @param req 条件参数
      * @return 返回数据
      */
+    @WebLog
     @PostMapping("/music/page")
     public R getMusicPage(@RequestBody MusicPageReq req) {
         return R.success(playList.getMusicPage(req));
     }
     
+    @WebLog
     @GetMapping("/info/{id}")
     public R getPlayListInfo(@PathVariable("id") Long id) {
         return R.success(playList.getPlayListInfo(id));
     }
     
+    @WebLog
     @PostMapping("/info")
     public R updatePlayListInfo(@RequestBody UpdatePlayListReq req) {
         return R.success(playList.updatePlayListInfo(req));
@@ -58,6 +62,7 @@ public class PlayListController {
      * @param playId 歌单ID
      * @return 返回数据
      */
+    @WebLog
     @RequestMapping(value = "/{playId}", method = {RequestMethod.GET, RequestMethod.POST})
     public R getAllMusic(@PathVariable("playId") String playId, @RequestBody(required = false) MusicPageReq page) {
         return R.success(playList.getAllMusic(playId, page));
@@ -69,23 +74,27 @@ public class PlayListController {
      * @param name 歌单名
      * @return 歌单创建信息
      */
+    @WebLog
     @PutMapping(value = "/{name}")
     public R createPlayList(@PathVariable("name") String name) {
         return R.success(playList.createPlayList(name));
     }
     
+    @WebLog
     @DeleteMapping("/{id}")
     public R deletePlayList(@PathVariable("id") List<Long> id) {
         playList.deletePlayList(UserUtil.getUser().getId(), id);
         return R.success();
     }
     
+    @WebLog
     @GetMapping("/user/{userId}")
     public R getUserPlayList(@PathVariable("userId") Long userId) {
         List<PlayListRes> collectPojoList = playList.getUserPlayList(userId);
         return R.success(collectPojoList);
     }
     
+    @WebLog
     @RequestMapping(value = "/tracks", method = {RequestMethod.GET, RequestMethod.POST})
     public R addMusicToPlayList(
             @RequestParam(value = "userId", required = false) Long userId,
@@ -104,6 +113,7 @@ public class PlayListController {
         return R.success();
     }
     
+    @WebLog
     @GetMapping("/like/{status}")
     public R like(@PathVariable("status") String status, @RequestParam("id") Long id) {
         playList.like(UserUtil.getUser().getId(), id, StringUtils.equals(status, "add"));
@@ -116,6 +126,7 @@ public class PlayListController {
      * @param uid 用户ID
      * @return 动态路由歌单数据
      */
+    @WebLog
     @GetMapping("/getAsyncRoutes")
     public R getAsyncRoutes(@RequestParam(value = "uid", required = false) Long uid) {
         uid = uid == null ? UserUtil.getUser().getId() : uid;
@@ -123,6 +134,7 @@ public class PlayListController {
         return R.success(playListRouters);
     }
     
+    @WebLog
     @PostMapping("/page")
     public R getPlayListPage(@RequestBody PlayListReq req) {
         Page<PlayListRes> playListPage = playList.getPlayListPage(req);

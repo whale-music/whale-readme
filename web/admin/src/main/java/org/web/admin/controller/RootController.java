@@ -3,6 +3,7 @@ package org.web.admin.controller;
 import org.api.admin.model.res.PlatformConfigRes;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.constant.WebMappingConstant;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,12 +18,14 @@ public class RootController {
     }
     
     @AnonymousAccess
+    @WebLog
     @GetMapping("/")
     public ModelAndView web() {
         return new ModelAndView(webMappingConstant.getPath());
     }
     
     @AnonymousAccess
+    @WebLog
     @GetMapping("/web/platform-config.json")
     public PlatformConfigRes platformConfig() {
         PlatformConfigRes platformConfigRes = new PlatformConfigRes();

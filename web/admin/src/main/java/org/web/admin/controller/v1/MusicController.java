@@ -13,6 +13,7 @@ import org.api.admin.model.res.MusicTabsPageRes;
 import org.api.admin.service.MusicFlowApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.config.HttpRequestConfig;
 import org.core.mybatis.pojo.MusicDetails;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -49,6 +50,7 @@ public class MusicController {
      * @return 返回音乐数据
      */
     @AnonymousAccess
+    @WebLog
     @PostMapping("/upload/music/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
         return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
@@ -60,6 +62,7 @@ public class MusicController {
      * @param musicTempFile 临时文件
      * @return 字节数据
      */
+    @WebLog
     @GetMapping("/get/temp/{music}")
     public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("music") String musicTempFile) {
         return uploadMusic.getMusicTempFile(musicTempFile);
@@ -71,6 +74,7 @@ public class MusicController {
      * @param dto 音乐信息
      * @return 返回成功信息
      */
+    @WebLog
     @PostMapping("/upload/info")
     public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) {
         MusicDetails musicDetails = uploadMusic.saveMusicInfo(dto);
@@ -84,6 +88,7 @@ public class MusicController {
      * @param refresh 是否刷新
      * @return url
      */
+    @WebLog
     @GetMapping("/url/{musicId}")
     public R getMusicUrl(@PathVariable("musicId") Set<String> musicId, @RequestParam(value = "refresh", required = false, defaultValue = "false") Boolean refresh) {
         return R.success(uploadMusic.getMusicUrl(musicId, refresh));
@@ -95,6 +100,7 @@ public class MusicController {
      * @param musicId 音乐ID
      * @return 歌词列表
      */
+    @WebLog
     @GetMapping("/lyric/{musicId}")
     public R getMusicLyric(@PathVariable("musicId") Long musicId) {
         return R.success(uploadMusic.getMusicLyric(musicId));
@@ -108,6 +114,7 @@ public class MusicController {
      * @param compel  是否强制删除
      * @return 成功信息
      */
+    @WebLog
     @DeleteMapping("/")
     public R deleteMusic(@RequestBody RemoveMusicReq musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
         uploadMusic.deleteMusic(musicId.getIds(), compel);
@@ -122,6 +129,7 @@ public class MusicController {
      * @param lyric   歌词
      * @return 成功信息
      */
+    @WebLog
     @PostMapping("/lyric/{musicId}")
     public R saveOrUpdateLyric(@PathVariable("musicId") Long musicId, @RequestParam("type") String type, @RequestBody Map<String, String> lyric) {
         uploadMusic.saveOrUpdateLyric(musicId, type, MapUtil.get(lyric, "lyric", String.class));
@@ -134,6 +142,7 @@ public class MusicController {
      * @param id 歌曲ID
      * @return 歌曲信息
      */
+    @WebLog
     @GetMapping("/musicInfo/{id}")
     public R getMusicInfo(@PathVariable("id") Long id) {
         return R.success(uploadMusic.getMusicInfo(id));
@@ -145,6 +154,7 @@ public class MusicController {
      * @param req 音乐信息
      * @return 成功信息
      */
+    @WebLog
     @PostMapping("/")
     public R updateMusic(@RequestBody SaveOrUpdateMusicReq req) {
         uploadMusic.saveOrUpdateMusic(req);
@@ -159,6 +169,7 @@ public class MusicController {
      * @param musicId    音乐ID
      * @return 成功信息
      */
+    @WebLog
     @PostMapping("/auto/upload")
     @AnonymousAccess
     public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) throws IOException {
@@ -174,6 +185,7 @@ public class MusicController {
      * @param musicSource 音乐信息
      * @return 成功信息
      */
+    @WebLog
     @PostMapping("/manual/upload")
     public R uploadManualMusic(@RequestBody UploadMusicReq musicSource) {
         uploadMusic.uploadManualMusic(musicSource);
@@ -186,6 +198,7 @@ public class MusicController {
      * @param source 音源信息
      * @return 成功信息
      */
+    @WebLog
     @PostMapping("/update/source")
     public R updateSource(@RequestBody TbResourcePojo source) {
         uploadMusic.updateSource(source);
@@ -198,24 +211,28 @@ public class MusicController {
      * @param id 音源ID
      * @return 成功信息
      */
+    @WebLog
     @DeleteMapping("/delete/source/{id}")
     public R deleteSource(@PathVariable("id") Long id) {
         uploadMusic.deleteSource(id);
         return R.success();
     }
     
+    @WebLog
     @GetMapping("/select")
     public R selectResources(@RequestParam(value = "md5", required = false) String md5) {
         List<Map<String, Object>> maps = uploadMusic.selectResources(md5);
         return R.success(maps);
     }
     
+    @WebLog
     @PostMapping("/sync/metadata")
     public R syncMetaMusicFile(@RequestBody SyncMusicMetaDataReq req) {
         uploadMusic.syncMetaMusicFile(req);
         return R.success();
     }
     
+    @WebLog
     @PostMapping("/page")
     public R getMusicPage(@RequestBody MusicTabPageReq req) {
         PageResCommon<MusicTabsPageRes> page = uploadMusic.getMusicPage(req);
@@ -228,6 +245,7 @@ public class MusicController {
      * @param req 音乐 ID
      * @return 音乐信息
      */
+    @WebLog
     @PostMapping("/play/info")
     public R getMusicPlayInfo(@RequestBody MusicPlayInfoReq req) {
         List<MusicPlayInfoRes> res = uploadMusic.getMusicPlayInfo(req.getIds(), req.getIsPlayed());

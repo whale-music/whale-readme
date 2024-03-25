@@ -14,6 +14,7 @@ import org.api.admin.model.res.ArtistPageRes;
 import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,42 +33,49 @@ public class ArtistController {
         this.artistApi = artistApi;
     }
     
+    @WebLog
     @PostMapping("/allSinger")
     public R getAllSingerList(@RequestBody AlbumListPageReq req) {
         Page<ArtistRes> page = artistApi.getAllSingerList(req);
         return R.success(page);
     }
     
+    @WebLog
     @GetMapping("/select")
     public R getSelectedSinger(@RequestParam(value = "name", required = false) String name) {
         List<Map<String, Object>> maps = artistApi.getSelectedSinger(name);
         return R.success(maps);
     }
     
+    @WebLog
     @GetMapping("/getArtistByAlbumId")
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
         List<ArtistConvert> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
     }
     
+    @WebLog
     @GetMapping("/{id}")
     public R getArtistById(@PathVariable("id") Long id) {
         ArtistInfoRes artist = artistApi.getArtistById(id);
         return R.success(artist);
     }
     
+    @WebLog
     @DeleteMapping("/")
     public R deleteArtist(@RequestBody RemoveArtistReq req) {
         artistApi.deleteArtist(req.getIds());
         return R.success();
     }
     
+    @WebLog
     @PostMapping("/")
     public R saveOrUpdateArtist(@RequestBody SaveOrUpdateArtistReq req) {
         artistApi.saveOrUpdateArtist(req);
         return R.success();
     }
     
+    @WebLog
     @GetMapping("/mv")
     public R getMvList(@RequestParam("id") Long id) {
         List<ArtistMvListRes> mvList = artistApi.getMvList(id);
@@ -75,6 +83,7 @@ public class ArtistController {
     }
     
     
+    @WebLog
     @PostMapping("/page")
     public R getArtistPage(@RequestBody ArtistPageReq req) {
         PageResCommon<ArtistPageRes> res = artistApi.getArtistPage(req);

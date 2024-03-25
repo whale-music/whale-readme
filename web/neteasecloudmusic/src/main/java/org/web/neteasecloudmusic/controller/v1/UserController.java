@@ -11,6 +11,7 @@ import org.api.neteasecloudmusic.model.vo.user.record.UserRecordRes;
 import org.api.neteasecloudmusic.service.UserApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
@@ -46,6 +47,7 @@ public class UserController extends BaseController {
      *
      * @return 返回用户信息
      */
+    @WebLog
     @GetMapping("/user/account")
     public NeteaseResult getUser() {
         SysUserPojo userPojo = UserUtil.getUser();
@@ -62,6 +64,7 @@ public class UserController extends BaseController {
     /**
      * 初始化用户昵称
      */
+    @WebLog
     @GetMapping("/activate/init/profile")
     @AnonymousAccess
     public NeteaseResult initUser(@RequestParam("nickname") String nickname) {
@@ -77,6 +80,7 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      * @return 返回用户歌单
      */
+    @WebLog
     @RequestMapping(value = "/user/playlist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Long pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Long pageSize) {
         uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
@@ -94,6 +98,7 @@ public class UserController extends BaseController {
      *
      * @return 计数
      */
+    @WebLog
     @GetMapping("/user/subcount")
     public NeteaseResult getSubcount() {
         SysUserPojo userPojo = UserUtil.getUser();
@@ -122,6 +127,7 @@ public class UserController extends BaseController {
      *
      * @param uid 用户ID
      */
+    @WebLog
     @GetMapping("/user/record")
     public NeteaseResult userRecord(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
         Long userId = Objects.isNull(uid) ? UserUtil.getUser().getId() : uid;
@@ -135,6 +141,7 @@ public class UserController extends BaseController {
         return r.success();
     }
     
+    @WebLog
     @RequestMapping(value = "/user/detail", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userDetail(@RequestParam("uid") Long uid) {
         UserDetailRes res = user.userDetail(uid);

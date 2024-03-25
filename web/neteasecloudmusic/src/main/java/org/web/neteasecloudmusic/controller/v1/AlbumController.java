@@ -8,6 +8,7 @@ import org.api.neteasecloudmusic.model.vo.album.detail.AlbumDetailRes;
 import org.api.neteasecloudmusic.model.vo.album.sublist.AlbumSubListRes;
 import org.api.neteasecloudmusic.service.AlbumApi;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class AlbumController {
         this.albumApi = albumApi;
     }
     
+    @WebLog
     @GetMapping("/album")
     public NeteaseResult album(@RequestParam("id") Long id) {
         AlbumRes res = albumApi.album(id);
@@ -34,6 +36,7 @@ public class AlbumController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/album/sublist")
     public NeteaseResult albumSubList(@RequestParam(value = "limit", defaultValue = "25") Long limit, @RequestParam(value = "offset", defaultValue = "0") Long offset) {
         SysUserPojo user = UserUtil.getUser();
@@ -43,6 +46,7 @@ public class AlbumController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/album/detail")
     public NeteaseResult albumDetail(@RequestParam("id") Long id) {
         AlbumDetailRes res = albumApi.albumDetail(id);

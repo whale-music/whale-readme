@@ -11,6 +11,7 @@ import org.api.neteasecloudmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.api.neteasecloudmusic.service.CollectApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.model.convert.CollectConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.SysUserPojo;
@@ -48,6 +49,7 @@ public class PlayListController {
      *
      * @param name 歌单名
      */
+    @WebLog
     @RequestMapping(value = "/playlist/create", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult createPlayList(@RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
@@ -76,6 +78,7 @@ public class PlayListController {
      * @param name      歌单名
      * @return 返回状态吗
      */
+    @WebLog
     @GetMapping("/playlist/name/update")
     public NeteaseResult updatePlayListName(@RequestParam("id") Long collectId, @RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
@@ -94,6 +97,7 @@ public class PlayListController {
      * @param desc      描述
      * @return 返回成功信息
      */
+    @WebLog
     @GetMapping("/playlist/desc/update")
     public NeteaseResult updatePlayListDesc(@RequestParam("id") Long collectId, @RequestParam("desc") String desc) {
         SysUserPojo user = UserUtil.getUser();
@@ -112,6 +116,7 @@ public class PlayListController {
      * @param tags      描述
      * @return 返回成功信息
      */
+    @WebLog
     @GetMapping("/playlist/tags/update")
     public NeteaseResult updatePlayListTag(@RequestParam("id") Long collectId, @RequestParam("tags") String tags) {
         SysUserPojo user = UserUtil.getUser();
@@ -124,6 +129,7 @@ public class PlayListController {
     /**
      * 删除歌单
      */
+    @WebLog
     @GetMapping("/playlist/delete")
     public NeteaseResult removePlayList(@RequestParam("id") List<Long> collectIds) {
         SysUserPojo user = UserUtil.getUser();
@@ -137,6 +143,7 @@ public class PlayListController {
      * @param collectId 歌单ID
      * @param flag      取消/收藏 1:收藏,2:取消收藏
      */
+    @WebLog
     @GetMapping("/playlist/subscribe")
     public NeteaseResult subscribePlayList(@RequestParam("id") Long collectId, @RequestParam("t") Integer flag) {
         SysUserPojo user = UserUtil.getUser();
@@ -151,6 +158,7 @@ public class PlayListController {
      * @param pageSize  每页条数
      * @param pageIndex 当前多少页
      */
+    @WebLog
     @GetMapping("/playlist/track/all")
     public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false, defaultValue = "9223372036854775807") Long pageSize, @RequestParam(value = "offset", required = false, defaultValue = "0") Long pageIndex) {
         Page<MusicConvert> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
@@ -239,6 +247,7 @@ public class PlayListController {
      * @param collectId 歌单ID
      * @param songIds   歌曲ID
      */
+    @WebLog
     @RequestMapping(value = "/playlist/tracks", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult addSongToCollect(@RequestParam("op") String op, @RequestParam("pid") Long collectId, @RequestParam("tracks") List<Long> songIds, @RequestParam(value = "userId", required = false) Long userId) {
         boolean flag;
@@ -263,6 +272,7 @@ public class PlayListController {
      * @param id   歌曲ID
      * @param like true 添加歌曲，false 删除歌曲
      */
+    @WebLog
     @GetMapping("/like")
     public NeteaseResult like(@RequestParam("id") Long id, @RequestParam("like") Boolean like, @RequestParam(value = "userId", required = false) Long userId) {
         userId = Optional.ofNullable(userId).orElse(UserUtil.getUser().getId());
@@ -273,6 +283,7 @@ public class PlayListController {
         return r.success();
     }
     
+    @WebLog
     @RequestMapping(value = "/likelist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult likelist(@RequestParam(value = "uid", required = false) Long uid) {
         uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
@@ -288,6 +299,7 @@ public class PlayListController {
      *
      * @return ID
      */
+    @WebLog
     @RequestMapping(value = "/playlist/detail", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult playlistDetail(@RequestParam("id") Long id) {

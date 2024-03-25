@@ -14,6 +14,7 @@ import org.api.subsonic.model.res.search2.Search2Res;
 import org.api.subsonic.model.res.search3.Search3Res;
 import org.api.subsonic.service.SearchingApi;
 import org.core.common.constant.HttpStatusStrConstant;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class SearchingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/search.view", "/search"})
     @ManualSerialize
     public ResponseEntity<String> search(SubsonicCommonReq req,
@@ -75,6 +77,7 @@ public class SearchingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/search2.view", "/search2"})
     @ManualSerialize
     public ResponseEntity<String> search2(SubsonicCommonReq req,
@@ -115,6 +118,7 @@ public class SearchingController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/search3.view", "/search3"})
     @ManualSerialize
     public ResponseEntity<String> search3(SubsonicCommonReq req,

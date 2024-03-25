@@ -9,6 +9,7 @@ import org.api.neteasecloudmusic.model.vo.toplist.toplist.TopListRes;
 import org.api.neteasecloudmusic.service.TopListApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,7 @@ public class TopListController {
         this.topListApi = topListApi;
     }
     
+    @WebLog
     @GetMapping("/toplist")
     public NeteaseResult toplist() {
         TopListRes res = topListApi.toplist();
@@ -32,6 +34,7 @@ public class TopListController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/top/playlist")
     public NeteaseResult topPlaylist(@RequestParam(value = "order", required = false, defaultValue = "hot") String order, String cat, @RequestParam(value = "limit", required = false, defaultValue = "50") String limit, @RequestParam(value = "offset", required = false, defaultValue = "0") String offset) {
         TopListPlayListRes res = topListApi.topPlaylist(order, cat, Long.valueOf(offset), Long.valueOf(limit));
@@ -40,6 +43,7 @@ public class TopListController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/toplist/artist")
     @AnonymousAccess
     public NeteaseResult artist(String type) {

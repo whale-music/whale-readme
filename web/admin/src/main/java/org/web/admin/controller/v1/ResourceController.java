@@ -6,6 +6,7 @@ import org.api.admin.model.req.*;
 import org.api.admin.model.res.*;
 import org.api.admin.service.ResourceApi;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,48 +25,56 @@ public class ResourceController {
         this.resourceApi = resourceApi;
     }
     
+    @WebLog
     @PostMapping("/list")
     public R getResourcePage(@RequestBody ResourcePageReq req) {
         List<ResourcePageRes> res = resourceApi.getResourcePage(req);
         return R.success(res);
     }
     
+    @WebLog
     @GetMapping("/filter")
     public R getFilterType(@RequestParam("type") String type) {
         Collection<FilterTermsRes> types = resourceApi.getFilterType(type);
         return R.success(types);
     }
     
+    @WebLog
     @GetMapping("/audio")
     public R getAudioResourceInfo(@RequestParam("path") String path) {
         ResourceAudioInfoRes fileInfo = resourceApi.getAudioResourceInfo(path);
         return R.success(fileInfo);
     }
     
+    @WebLog
     @GetMapping("/pic")
     public R getPicResourceInfo(@RequestParam("path") String path) {
         ResourcePicInfoRes res = resourceApi.getPicResourceInfo(path);
         return R.success(res);
     }
     
+    @WebLog
     @GetMapping("/video")
     public R getVideoResourceInfo(@RequestParam("path") String path) {
         ResourceVideoInfoRes res = resourceApi.getVideoResourceInfo(path);
         return R.success(res);
     }
     
+    @WebLog
     @GetMapping("/auto/music")
     public R getMusicAutocomplete(@RequestParam("name") String name) {
         List<AutocompleteMusicRes> res = resourceApi.getMusicAutocomplete(name);
         return R.success(res);
     }
     
+    @WebLog
     @GetMapping("/auto/mv")
     public R getMvAutocomplete(@RequestParam("name") String name) {
         List<AutocompleteMvRes> res = resourceApi.getMvAutocomplete(name);
         return R.success(res);
     }
     
+    @WebLog
     @GetMapping("/auto/pic")
     public R getPicAutocomplete(@RequestParam("name") String name, @RequestParam("type") String type) {
         List<AutocompletePicRes> res = resourceApi.getPicAutocomplete(name, type);
@@ -78,18 +87,21 @@ public class ResourceController {
      * @param picResource 需要关联数据
      * @return 返回数据
      */
+    @WebLog
     @PostMapping("/link/pic")
     public R linkPicture(@RequestBody @Validated LinkPicResourceReq picResource) {
         resourceApi.linkPicture(picResource);
         return R.success();
     }
     
+    @WebLog
     @PostMapping("/link/video")
     public R linkVideo(@RequestBody @Validated LinkVideoResourceReq videoResourceReq) {
         resourceApi.linkVideo(videoResourceReq);
         return R.success();
     }
     
+    @WebLog
     @PostMapping("/link/audio")
     public R linkAudio(@RequestBody @Validated LinkAudioResourceReq audioResourceReq) {
         resourceApi.linkAudio(audioResourceReq);
@@ -102,6 +114,7 @@ public class ResourceController {
      * @param resource 需要关联数据
      * @return 返回数据
      */
+    @WebLog
     @PostMapping("/sync/resource")
     public R syncResource(@RequestBody @Validated SyncResourceReq resource) throws IOException {
         resourceApi.syncResource(resource);
@@ -114,6 +127,7 @@ public class ResourceController {
      * @param cleanResource 关联数据
      * @return 返回数据
      */
+    @WebLog
     @PostMapping("/clean/resource")
     public R cleanResource(@RequestBody @Validated CleanResourceReq cleanResource) {
         resourceApi.cleanResource(cleanResource);

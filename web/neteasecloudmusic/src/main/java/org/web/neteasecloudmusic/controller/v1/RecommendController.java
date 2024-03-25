@@ -12,6 +12,7 @@ import org.api.neteasecloudmusic.model.vo.recommend.songs.RecommendSongerRes;
 import org.api.neteasecloudmusic.service.RecommendApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class RecommendController {
     /**
      * 推荐FM
      */
+    @WebLog
     @RequestMapping(value = "/personal_fm", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult personalFM() {
@@ -54,6 +56,7 @@ public class RecommendController {
      *
      * @param limit 取出数量 , 默认为 30 (不支持 offset)
      */
+    @WebLog
     @RequestMapping(value = "/personalized", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult personalized(@RequestParam(value = "limit", required = false, defaultValue = "30") Long limit) {
@@ -66,6 +69,7 @@ public class RecommendController {
     /**
      * 每日推荐歌单
      */
+    @WebLog
     @GetMapping("/recommend/resource")
     public NeteaseResult recommendResource() {
         List<DailyRecommendResourceRes> res = recommendApi.recommendResource(20);
@@ -79,6 +83,7 @@ public class RecommendController {
     /**
      * 推荐歌曲
      */
+    @WebLog
     @RequestMapping(value = "/recommend/songs", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult recommendSongs() {
         RecommendSongerRes res = recommendApi.recommendSongs(31);
@@ -89,6 +94,7 @@ public class RecommendController {
     /**
      * 全部新碟
      */
+    @WebLog
     @GetMapping("/album/new")
     @AnonymousAccess
     public NeteaseResult albumNew(String area,@RequestParam(value = "offset",required = false,defaultValue = "0") Long offset, @RequestParam(value = "limit",required = false,defaultValue = "30") Long limit) {

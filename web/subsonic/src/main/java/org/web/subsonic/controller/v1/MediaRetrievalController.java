@@ -10,6 +10,7 @@ import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.service.MediaRetrievalApi;
 import org.core.common.constant.HttpStatusStrConstant;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -26,6 +27,7 @@ public class MediaRetrievalController {
     
     @Operation(summary = "返回封面艺术图像")
     @ApiResponse(responseCode = HttpStatusStrConstant.MOVED_TEMP, content = @Content)
+    @WebLog
     @GetMapping({"/getCoverArt.view", "/getCoverArt"})
     public RedirectView getCoverArt(SubsonicCommonReq req,
                                     @Parameter(description = "歌曲、专辑或艺术家的ID")
@@ -40,6 +42,7 @@ public class MediaRetrievalController {
     
     @Operation(summary = "流式传输给定的媒体文件, 实际是返回302重定向地址")
     @ApiResponse(responseCode = HttpStatusStrConstant.MOVED_TEMP, content = @Content)
+    @WebLog
     @GetMapping({"/stream.view", "/stream"})
     public RedirectView stream(SubsonicCommonReq req,
                                @Parameter(description = "唯一标识要流传输的文件的字符串。通过调用getMusicDirectory获得")

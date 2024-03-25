@@ -10,6 +10,7 @@ import org.api.neteasecloudmusic.model.vo.artist.mvs.ArtistMvRes;
 import org.api.neteasecloudmusic.model.vo.artist.sublist.ArtistSubListRes;
 import org.api.neteasecloudmusic.service.ArtistApi;
 import org.core.common.result.NeteaseResult;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class ArtistController {
      *
      * @param id 歌手ID
      */
+    @WebLog
     @GetMapping("/artists")
     public NeteaseResult artists(@RequestParam("id") Long id) {
         ArtistRes res = artistApi.artists(id);
@@ -48,6 +50,7 @@ public class ArtistController {
     }
     
     
+    @WebLog
     @GetMapping("/artist/sublist")
     public NeteaseResult artistSublist() {
         SysUserPojo user = UserUtil.getUser();
@@ -57,6 +60,7 @@ public class ArtistController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/artist/album")
     public NeteaseResult artistAlbum(@RequestParam("id") Long id, @RequestParam(value = "offset", required = false, defaultValue = "0") Long offset, @RequestParam(value = "limit", required = false, defaultValue = "30") Long limit) {
         ArtistAlbumRes res = artistApi.artistAlbum(id, limit, offset);
@@ -65,6 +69,7 @@ public class ArtistController {
         return r.success();
     }
     
+    @WebLog
     @GetMapping("/artist/mv")
     public NeteaseResult artistMv() {
         // TODO MV 填充

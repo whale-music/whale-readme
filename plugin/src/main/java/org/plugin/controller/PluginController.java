@@ -1,6 +1,7 @@
 package org.plugin.controller;
 
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.core.mybatis.pojo.TbPluginMsgPojo;
 import org.core.mybatis.pojo.TbPluginTaskPojo;
 import org.core.mybatis.pojo.TbScheduleTaskPojo;
@@ -25,6 +26,7 @@ public class PluginController {
         this.pluginService = pluginService;
     }
     
+    @WebLog
     @PostMapping("/saveOrUpdatePlugin")
     public R saveOrUpdatePlugin(@RequestBody PluginReq req) {
         PluginRes res = pluginService.saveOrUpdatePlugin(req);
@@ -37,6 +39,7 @@ public class PluginController {
      * @param userId 用户ID
      * @return 插件信息
      */
+    @WebLog
     @GetMapping("/getAllPlugins")
     public R getAllPlugin(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "name", required = false) String name, @RequestParam(value = "id", required = false) List<Long> id) {
         List<PluginRes> list = pluginService.getAllPlugin(userId == null ? UserUtil.getUser().getId() : userId, id, name);
@@ -49,6 +52,7 @@ public class PluginController {
      * @param pluginId 插件ID
      * @return 插件入参
      */
+    @WebLog
     @GetMapping("/getPluginParams")
     public R getPluginParams(@RequestParam("pluginId") Long pluginId) {
         PluginRunParamsRes pluginParams = pluginService.getPluginParams(pluginId);
@@ -56,6 +60,7 @@ public class PluginController {
     }
     
     
+    @WebLog
     @PostMapping("/interactive/search")
     public R getInteractiveSearch(@RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam("pluginId") Long pluginId, @RequestParam("name") String name) {
         List<PluginLabelValue> list = pluginService.getInteractiveSearch(pluginLabelValue, pluginId, name);
@@ -67,6 +72,7 @@ public class PluginController {
      *
      * @param pluginId 插件ID
      */
+    @WebLog
     @PostMapping("/execPluginTask/common")
     public R execCommonPluginTask(@RequestParam("pluginId") Long pluginId, @RequestBody List<PluginLabelValue> pluginLabelValue, @RequestParam(value = "onLine", required = false, defaultValue = "true") Boolean onLine) {
         TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, pluginLabelValue, UserUtil.getUser().getId());
@@ -84,6 +90,7 @@ public class PluginController {
      *
      * @param pluginId 插件ID
      */
+    @WebLog
     @PostMapping("/execPluginTask/interactive")
     public R execInteractivePluginTask(@RequestParam("pluginId") Long pluginId, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "id", required = false) Long id, @RequestBody List<PluginLabelValue> pluginLabelValue) {
         TbPluginTaskPojo pojo = pluginService.getTbPluginTaskPojo(pluginId, pluginLabelValue, UserUtil.getUser().getId());
@@ -92,24 +99,28 @@ public class PluginController {
         return R.success(res);
     }
     
+    @WebLog
     @PostMapping("/getTask")
     public R getTask(@RequestParam(value = "type", required = false) String type, @RequestBody TbPluginTaskPojo taskPojo) {
         List<TbPluginTaskPojo> list = pluginService.getTask(UserUtil.getUser().getId(), type, taskPojo);
         return R.success(list);
     }
     
+    @WebLog
     @GetMapping("/getPluginRuntimeMessages")
     public R getPluginRuntimeMessages(@RequestParam("runtimeId") Long runtimeId) {
         List<PluginMsgRes> list = pluginService.getPluginRuntimeMessages(runtimeId);
         return R.success(list);
     }
     
+    @WebLog
     @GetMapping("/deleteTask")
     public R deleteTask(@RequestParam("id") List<Long> id) {
         pluginService.deleteTask(id);
         return R.success();
     }
     
+    @WebLog
     @GetMapping("/deletePlugin/{id}")
     public R deletePlugin(@PathVariable("id") Long id) {
         pluginService.deletePlugin(id);
@@ -120,6 +131,7 @@ public class PluginController {
     /**
      * 查看动态任务
      */
+    @WebLog
     @PostMapping("/schedule/get/task")
     public R getStartingDynamicTask(@RequestBody(required = false) TbScheduleTaskPojo req, @RequestParam(value = "id", required = false) Long id) {
         TbScheduleTaskPojo pojo = Optional.ofNullable(req).orElse(new TbScheduleTaskPojo());
@@ -134,6 +146,7 @@ public class PluginController {
      *
      * @param task 任务信息
      */
+    @WebLog
     @PostMapping("/schedule/task")
     public R saveOrUpdateDynamicTask(@RequestBody TbScheduleTaskPojo task, @RequestParam("isRun") Boolean isRun) {
         pluginService.saveOrUpdateDynamicTask(task, isRun);
@@ -145,6 +158,7 @@ public class PluginController {
      *
      * @param id 动态任务ID
      */
+    @WebLog
     @GetMapping("/schedule/task/status")
     public R modifyStateDynamicTask(@RequestParam("id") Long id, @RequestParam("status") Boolean status) {
         if (Boolean.TRUE.equals(status)) {
@@ -160,6 +174,7 @@ public class PluginController {
      *
      * @param id 定时任务ID
      */
+    @WebLog
     @DeleteMapping("/schedule/task/{id}")
     public R removeOrPauseDynamicTask(@PathVariable("id") Long id) {
         pluginService.removeOrPauseDynamicTask(id);

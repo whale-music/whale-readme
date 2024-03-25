@@ -6,6 +6,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.service.PicApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class PicController {
      * @return 字节数据
      */
     @AnonymousAccess
+    @WebLog
     @GetMapping("/get/temp/{file}")
     public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("file") String musicTempFile) {
         return picApi.getMusicTempFile(musicTempFile);
@@ -42,6 +44,7 @@ public class PicController {
      * @return 返回音乐数据
      */
     @AnonymousAccess
+    @WebLog
     @PostMapping("/temp/upload")
     public R uploadPicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws IOException {
         return R.success(picApi.uploadPicFile(uploadFile, url));
@@ -49,6 +52,7 @@ public class PicController {
     
     
     @AnonymousAccess
+    @WebLog
     @PostMapping("/upload")
     public R uploadPic(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id, @RequestParam("type") String type) throws IOException {
         String picUrl = picApi.uploadPic(uploadFile, id, type);

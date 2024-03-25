@@ -22,6 +22,7 @@ import org.api.subsonic.model.res.starred.StarredRes;
 import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.api.subsonic.service.SongListsApi;
 import org.core.common.constant.HttpStatusStrConstant;
+import org.core.common.weblog.annotation.WebLog;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getAlbumList.view", "/getAlbumList"})
     @ManualSerialize
     public ResponseEntity<String> getAlbumList(SubsonicCommonReq req,
@@ -91,6 +93,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getAlbumList2.view", "/getAlbumList2"})
     @ManualSerialize
     public ResponseEntity<String> getAlbumList2(SubsonicCommonReq req,
@@ -136,6 +139,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getRandomSongs.view", "/getRandomSongs"})
     @ManualSerialize
     public ResponseEntity<String> getRandomSongs(SubsonicCommonReq req,
@@ -165,6 +169,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getSongsByGenre.view", "/getSongsByGenre"})
     @ManualSerialize
     public ResponseEntity<String> getSongsByGenre(SubsonicCommonReq req,
@@ -191,6 +196,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getNowPlaying.view", "/getNowPlaying"})
     @ManualSerialize
     public ResponseEntity<String> getNowPlaying(SubsonicCommonReq req) {
@@ -205,6 +211,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getStarred.view", "/getStarred"})
     @ManualSerialize
     public ResponseEntity<String> getStarred(SubsonicCommonReq req,
@@ -222,6 +229,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/getStarred2.view", "/getStarred2"})
     @ManualSerialize
     public ResponseEntity<String> getStarred2(SubsonicCommonReq req,
@@ -244,6 +252,7 @@ public class AlbumAndSongListsController {
                          @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
                  }
     )
+    @WebLog
     @GetMapping({"/scrobble.view", "/scrobble"})
     @ManualSerialize
     public ResponseEntity<String> scrobble(SubsonicCommonReq req,

@@ -21,6 +21,18 @@ public class SysLogPojo extends Model<SysLogPojo> implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
     
+    @Schema(name = "线程名称")
+    @TableField("thread_name")
+    private String threadName;
+    
+    @Schema(name = "线程ID")
+    @TableField("thread_id")
+    private Long threadId;
+    
+    @Schema(name = "进程ID")
+    @TableField("process_id")
+    private Long processId;
+    
     @TableField("execution_time")
     @Schema(description = "执行时间（毫秒）")
     private Integer executionTime;

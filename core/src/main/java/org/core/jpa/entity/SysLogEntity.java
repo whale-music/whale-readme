@@ -23,6 +23,16 @@ public class SysLogEntity {
     @Column(name = "id", nullable = false)
     private Long id;
     
+    @Size(max = 128)
+    @Column(name = "thread_name", length = 128)
+    private String threadName;
+    
+    @Column(name = "thread_id")
+    private Long threadId;
+    
+    @Column(name = "process_id")
+    private Long processId;
+    
     @Column(name = "execution_time")
     private Integer executionTime;
     
@@ -133,6 +143,9 @@ public class SysLogEntity {
         SysLogEntity that = (SysLogEntity) o;
         
         return new EqualsBuilder().append(id, that.id)
+                                  .append(threadName, that.threadName)
+                                  .append(threadId, that.threadId)
+                                  .append(processId, that.processId)
                                   .append(executionTime, that.executionTime)
                                   .append(startTime, that.startTime)
                                   .append(endTime, that.endTime)
@@ -165,6 +178,9 @@ public class SysLogEntity {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id)
+                                          .append(threadName)
+                                          .append(threadId)
+                                          .append(processId)
                                           .append(executionTime)
                                           .append(startTime)
                                           .append(endTime)

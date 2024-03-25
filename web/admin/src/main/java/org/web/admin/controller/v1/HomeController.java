@@ -10,6 +10,7 @@ import org.api.admin.model.res.UsersUploadRes;
 import org.api.admin.service.HoneApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.core.utils.UserUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class HomeController {
     
     private final HoneApi honeApi;
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/count")
     @Operation(summary = "获取数据库统计")
     public R getCount() {
@@ -44,7 +45,7 @@ public class HomeController {
         return R.success(map);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/last/music")
     @Operation(summary = "获取数据库统计")
     public R getLastMusic() {
@@ -52,20 +53,20 @@ public class HomeController {
         return R.success(res);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/users/upload")
     public R getUsersUpload() {
         List<UsersUploadRes> hone = honeApi.getUsersUpload();
         return R.success(hone);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/music/statistics")
     public R getMusicStatistics() {
         return R.success(honeApi.getMusicStatistics());
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/music/task")
     public R getPluginTask(@RequestParam(value = "id", required = false) Long id) {
         id = Optional.ofNullable(id).orElse(UserUtil.getUser().getId());

@@ -6,6 +6,7 @@ import org.api.admin.service.ExchangeApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class ExchangeController {
     private ExchangeApi exchangeApi;
     
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/import/excel")
     public R importExcel(@RequestBody MultipartFile file) throws IOException {
         exchangeApi.importExcel(file);
@@ -33,7 +34,7 @@ public class ExchangeController {
     }
     
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/export/excel")
     public ResponseEntity<StreamingResponseBody> exportExcel() {
         HttpHeaders headers = new HttpHeaders();

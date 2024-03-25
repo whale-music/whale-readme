@@ -7,6 +7,7 @@ import org.api.admin.model.res.ActivityDeviceRes;
 import org.api.admin.service.DevicesApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,14 +24,14 @@ public class DevicesController {
         this.devicesApi = devicesApi;
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/server/activity")
     public R getActivityDevice() {
         ActivityDeviceRes res = devicesApi.getActivityDevice();
         return R.success(res);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/remove/{id}")
     public R removeActivityDevice(@PathVariable("id") String id) {
         devicesApi.removeActivityDevice(id);

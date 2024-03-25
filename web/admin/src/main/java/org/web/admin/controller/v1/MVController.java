@@ -11,6 +11,7 @@ import org.api.admin.service.MvApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +29,7 @@ public class MVController {
         this.mvApi = mvApi;
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/")
     public R getMvPage(
             @RequestParam(value = "title", required = false) String title,
@@ -45,35 +46,35 @@ public class MVController {
     
     @CrossOrigin
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/upload/file")
     public R updateMvFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long id) throws IOException {
         String url = mvApi.updateMvFile(uploadFile, id);
         return R.success(url);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/{id}")
     public R getMvInfo(@PathVariable("id") Long id) {
         MvInfoRes res = mvApi.getMvInfo(id);
         return R.success(res);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @DeleteMapping("/")
     public R removeMv(@RequestBody RemoveMvReq req) {
         mvApi.removeMv(req.getIds());
         return R.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/save")
     public R saveMvInfo(@RequestBody SaveMvReq request) throws IOException {
         mvApi.saveMvInfo(request);
         return R.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/update")
     public R updateMvInfo(@RequestBody SaveMvReq request) {
         mvApi.updateMvInfo(request);

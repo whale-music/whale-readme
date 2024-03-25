@@ -14,6 +14,7 @@ import org.api.admin.model.res.AlbumPageRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,21 +31,21 @@ public class AlbumController {
         this.albumApi = albumApi;
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/list")
     public R getAllAlbumList(@RequestBody AlbumListPageReq req) {
         Page<AlbumListPageRes> page = albumApi.getAllAlbumList(req);
         return R.success(page);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/page")
     public R getAlbumPage(@RequestBody AlbumPageReq req) {
         PageResCommon<AlbumPageRes> page = albumApi.getAlbumPage(req);
         return R.success(page);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/{id}")
     public R getAlbumInfo(@PathVariable("id") Long id) {
         AlbumInfoRes res = albumApi.getAlbumInfo(id);
@@ -56,21 +57,21 @@ public class AlbumController {
      *
      * @param name 专辑ID
      */
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/select")
     public R getSelectAlbumList(@RequestParam(value = "name", required = false) String name) {
         List<Map<String, Object>> albums = albumApi.getSelectAlbumList(name);
         return R.success(albums);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @DeleteMapping("/")
     public R deleteAlbum(@RequestBody RemoveAlbumReq ids, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
         albumApi.deleteAlbum(ids.getIds(), compel);
         return R.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/")
     public R saveOrUpdateAlbum(@RequestBody SaveOrUpdateAlbumReq req) {
         albumApi.saveOrUpdateAlbum(req);

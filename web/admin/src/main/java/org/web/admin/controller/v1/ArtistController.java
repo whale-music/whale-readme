@@ -15,6 +15,7 @@ import org.api.admin.model.res.ArtistRes;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,49 +34,49 @@ public class ArtistController {
         this.artistApi = artistApi;
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/allSinger")
     public R getAllSingerList(@RequestBody AlbumListPageReq req) {
         Page<ArtistRes> page = artistApi.getAllSingerList(req);
         return R.success(page);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/select")
     public R getSelectedSinger(@RequestParam(value = "name", required = false) String name) {
         List<Map<String, Object>> maps = artistApi.getSelectedSinger(name);
         return R.success(maps);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/getArtistByAlbumId")
     public R getArtistListByAlbumId(@RequestParam(value = "id") Long albumId) {
         List<ArtistConvert> byAlbumId = artistApi.getSingerListByAlbumId(albumId);
         return R.success(byAlbumId);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/{id}")
     public R getArtistById(@PathVariable("id") Long id) {
         ArtistInfoRes artist = artistApi.getArtistById(id);
         return R.success(artist);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @DeleteMapping("/")
     public R deleteArtist(@RequestBody RemoveArtistReq req) {
         artistApi.deleteArtist(req.getIds());
         return R.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/")
     public R saveOrUpdateArtist(@RequestBody SaveOrUpdateArtistReq req) {
         artistApi.saveOrUpdateArtist(req);
         return R.success();
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/mv")
     public R getMvList(@RequestParam("id") Long id) {
         List<ArtistMvListRes> mvList = artistApi.getMvList(id);
@@ -83,7 +84,7 @@ public class ArtistController {
     }
     
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/page")
     public R getArtistPage(@RequestBody ArtistPageReq req) {
         PageResCommon<ArtistPageRes> res = artistApi.getArtistPage(req);

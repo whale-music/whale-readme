@@ -12,6 +12,7 @@ import org.api.admin.service.LoginApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -26,7 +27,7 @@ public class LoginController {
      * 登录接口
      */
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/login")
     public R login(@RequestBody UserReq dto) {
         UserRes userPojo = loginApi.login(dto.getUsername(), dto.getPassword());
@@ -37,7 +38,7 @@ public class LoginController {
      * 注册接口
      */
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/register")
     public R addUser(@RequestBody UserReq req) {
         loginApi.createAccount(req);
@@ -48,7 +49,7 @@ public class LoginController {
      * 登出接口
      */
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/logout")
     public R userLogout(HttpServletResponse response) {
         // 删除cookie
@@ -61,7 +62,7 @@ public class LoginController {
     }
     
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/refreshToken")
     public R refreshUserToken(@RequestBody RefreshTokenRes refresh) {
         RefreshTokenRes res = loginApi.refreshUserToken(refresh.getRefreshToken());

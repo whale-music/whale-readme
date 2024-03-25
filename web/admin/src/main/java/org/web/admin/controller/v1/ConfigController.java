@@ -8,6 +8,7 @@ import org.core.common.annotation.AnonymousAccess;
 import org.core.common.properties.DebugConfig;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
+import org.core.common.weblog.constant.LogNameConstant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,7 @@ public class ConfigController {
     private final DebugConfig debugConfig;
     
     @AnonymousAccess
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/")
     public R getConfig() {
         Map<String, Object> map = BeanUtil.beanToMap(debugConfig,
@@ -35,7 +36,7 @@ public class ConfigController {
         return R.success(map);
     }
     
-    @WebLog
+    @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/enable/plugin")
     public R getEnablePlugin() {
         return R.success(debugConfig.getEnablePlugin());

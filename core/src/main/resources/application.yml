@@ -17,10 +17,10 @@ logging:
     io.milton.common: off
   pattern:
     # 控制输出的格式
-    #格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} %clr(%5p) %clr(%C.%M[%line]){cyan} [%thread] %msg%n"
+    #格式化输出：%d:表示日期    %thread:表示线程名  ${PID} 进程ID  %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} ${PID} %clr([%thread]){magenta} %clr(%5p){green} %clr(%C.%M[%line]){cyan} %msg%n"
     # 文件输出的格式
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} ${PID} [%thread] %-5level %logger - %msg%n"
   file:
     # 日志文件名
     #    path: logs
@@ -38,6 +38,10 @@ logging:
 
 #spring
 spring:
+  # 启用虚拟线程
+  threads:
+    virtual:
+      enabled: true
   application:
     name: whale
     # config:

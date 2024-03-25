@@ -83,7 +83,7 @@ public class SysLogPojo extends Model<SysLogPojo> implements Serializable {
     
     @Schema(description = "是否为移动平台")
     @TableField("mobile")
-    private Character mobile;
+    private Boolean mobile;
     
     @Schema(description = "浏览器类型")
     @TableField("browser")

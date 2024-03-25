@@ -79,7 +79,7 @@ public class SysLogEntity {
     private String userAgentContent;
     
     @Column(name = "mobile")
-    private Character mobile;
+    private Boolean mobile;
     
     @Size(max = 128)
     @Column(name = "browser", length = 128)

@@ -51,12 +51,21 @@ public interface AccountService extends SysUserService {
     SysUserPojo loginSub(String account, String password);
     
     /**
+     * 登录用户或用户子账户, 密码与md5互斥
+     *
+     * @param account     账户
+     * @param password    密码
+     * @param md5Password 密码md5
+     * @return 用户信息
+     */
+    SysUserPojo loginUserOrSubAccount(String account, String password, String md5Password);
+    
+    /**
      * 登录用户，用户名或者子账户
      *
      * @param username 登录名
      * @return 用户信息
      */
-    // todo: 替换一些方法
     SysUserPojo getUserOrSubAccount(String username);
     
     /**

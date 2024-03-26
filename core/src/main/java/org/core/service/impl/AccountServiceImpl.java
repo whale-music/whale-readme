@@ -11,7 +11,9 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.core.utils.ip.IpUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -125,6 +127,29 @@ public class AccountServiceImpl extends SysUserServiceImpl implements AccountSer
         }
         SysUserPojo sysUserPojo = userSubPasswordConfig.getSubAccount(account);
         return this.login(sysUserPojo.getUsername(), sysUserPojo.getPassword());
+    }
+    
+    /**
+     * 登录用户或用户子账户
+     *
+     * @param account     账户
+     * @param password    密码
+     * @param md5Password 密码md5
+     * @return 用户信息
+     */
+    @Override
+    public SysUserPojo loginUserOrSubAccount(String account, String password, String md5Password) {
+        SysUserPojo userPojo = this.getUserOrSubAccount(account);
+        String md5 = StringUtils.isBlank(password) ? md5Password : DigestUtils.md5DigestAsHex(StringUtils.getBytes(password, StandardCharsets.UTF_8));
+        if (StringUtils.equals(md5, DigestUtils.md5DigestAsHex(StringUtils.getBytes(userPojo.getPassword(), StandardCharsets.UTF_8)))) {
+            return userPojo;
+        }
+        // 校验子账户
+        String subPassword = userSubPasswordConfig.getSubPassword(account);
+        if (StringUtils.equals(md5, DigestUtils.md5DigestAsHex(StringUtils.getBytes(subPassword, StandardCharsets.UTF_8)))) {
+            return userPojo;
+        }
+        throw new BaseException(ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD);
     }
     
     /**

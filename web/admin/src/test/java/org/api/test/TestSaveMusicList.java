@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.service.MusicFlowApi;
-import org.api.neteasecloudmusic.service.CollectApi;
+import org.api.nmusic.service.CollectApi;
 import org.api.utils.RequestMusic163;
 import org.core.mybatis.model.convert.PicConvert;
 import org.core.mybatis.pojo.*;

@@ -50,36 +50,36 @@ public class SysLogEntity {
     @Column(name = "method_params_data")
     private String methodParamsData;
     
-    @Size(max = 128)
-    @Column(name = "method_params_type", length = 128)
+    @Size(max = 512)
+    @Column(name = "method_params_type", length = 512)
     private String methodParamsType;
     
-    @Size(max = 128)
-    @Column(name = "method_result_param_type", length = 128)
+    @Size(max = 512)
+    @Column(name = "method_result_param_type", length = 512)
     private String methodResultParamType;
     
-    @Size(max = 128)
-    @Column(name = "methodName", length = 128)
+    @Size(max = 512)
+    @Column(name = "methodName", length = 512)
     private String methodName;
     
     @Size(max = 24)
     @Column(name = "request_method", length = 24)
     private String requestMethod;
     
-    @Size(max = 256)
-    @Column(name = "full_path", length = 256)
+    @Size(max = 512)
+    @Column(name = "full_path", length = 512)
     private String fullPath;
     
     @Size(max = 128)
     @Column(name = "remote_host", length = 128)
     private String remoteHost;
     
-    @Size(max = 256)
-    @Column(name = "mapping_path", length = 256)
+    @Size(max = 512)
+    @Column(name = "mapping_path", length = 512)
     private String mappingPath;
     
-    @Size(max = 256)
-    @Column(name = "user_agent_content", length = 256)
+    @Size(max = 512)
+    @Column(name = "user_agent_content", length = 512)
     private String userAgentContent;
     
     @Column(name = "mobile")

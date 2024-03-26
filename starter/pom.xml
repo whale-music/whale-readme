@@ -27,7 +27,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.web.neteasecloudmusic</groupId>
+            <groupId>org.web.nmusic</groupId>
             <artifactId>nmusic</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

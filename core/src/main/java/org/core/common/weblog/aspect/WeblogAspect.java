@@ -147,7 +147,7 @@ public class WeblogAspect {
             // 记录前端请求
             WebLogRecord.WebRequest webRequest = getWebRequest();
             webLogRecord.setWebRequest(webRequest);
-            log.debug("path: [{}]", webRequest.getMappingPath());
+            log.debug("uri: {}", webRequest.getMappingPath());
             // 方法执行信息
             webLogRecord.setMethodCallDetail(getMethodCallDetail(proceedingJoinPoint, proceed));
             long threadId = Thread.currentThread().threadId();

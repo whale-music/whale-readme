@@ -35,7 +35,9 @@ import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,23 +119,18 @@ public class UserApi {
     /**
      * 用户登录
      *
-     * @param phone    账号
-     * @param password 密码
+     * @param phone       账号
+     * @param password    密码
+     * @param md5Password md5密码
      * @return 返回用户信息
      */
-    public UserConvert login(String phone, String password) {
-        SysUserPojo login = null;
-        try {
-            login = accountService.login(phone, password);
-        } catch (BaseException e) {
-            // 登录错误则使用子账户
-            if (StringUtils.equals(e.getCode(), ResultCode.USER_ACCOUNT_FORBIDDEN.getCode())
-                    || StringUtils.equals(e.getCode(), ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD.getCode())) {
-                login = accountService.loginSub(phone, password);
-            } else {
-                throw new BaseException(e);
-            }
+    public UserConvert login(String phone, String password, String md5Password) {
+        SysUserPojo login = accountService.getUserOrSubAccount(phone);
+        String md5 = StringUtils.isBlank(password) ? md5Password : DigestUtils.md5DigestAsHex(StringUtils.getBytes(password, StandardCharsets.UTF_8));
+        if (!StringUtils.equals(md5, md5Password)) {
+            throw new BaseException(ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD);
         }
+        
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(login, userConvert);
         userConvert.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(login.getId()));

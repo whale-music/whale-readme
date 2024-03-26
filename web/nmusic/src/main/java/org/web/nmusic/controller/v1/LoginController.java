@@ -72,7 +72,8 @@ public class LoginController extends BaseController {
         }
         String email = req.get("email");
         String password = req.get("password");
-        UserConvert userPojo = user.login(email, password);
+        String md5Password = req.get("md5_password");
+        UserConvert userPojo = user.login(email, password, md5Password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
@@ -88,8 +89,12 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @AnonymousAccess
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult loginPhone(HttpServletResponse response, String phone, String password) {
-        UserConvert userPojo = user.login(phone, password);
+    public NeteaseResult loginPhone(HttpServletResponse response,
+                                    @RequestParam(value = "phone", required = false) String phone,
+                                    @RequestParam(value = "password", required = false) String password,
+                                    @RequestParam(value = "md5_password", required = false) String md5Password
+    ) {
+        UserConvert userPojo = user.login(phone, password, md5Password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
         NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
@@ -169,14 +174,14 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/sure")
     @AnonymousAccess
-    public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password) throws JsonProcessingException {
+    public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password, @RequestParam(value = "md5_password", required = false) String md5Password) throws JsonProcessingException {
         String data = GlobeDataUtil.getData(codekey);
         NeteaseResult r = new NeteaseResult();
         if (data == null) {
             r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("800", "二维码不存在或已过期");
         }
-        SysUserPojo userPojo = user.login(phone, password);
+        SysUserPojo userPojo = user.login(phone, password, md5Password);
         ObjectMapper objectMapper = new ObjectMapper();
         GlobeDataUtil.setData(codekey, objectMapper.writeValueAsString(userPojo));
         return r.success();

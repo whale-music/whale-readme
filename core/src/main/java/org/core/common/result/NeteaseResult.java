@@ -16,16 +16,16 @@ public class NeteaseResult extends HashMap<String, Object> {
     /**
      * 响应代码
      */
-    private String code;
+    private Integer code;
     private String message;
     
     /**
      * 成功
      */
     public NeteaseResult success() {
-        this.code = ResultCode.SUCCESS.getCode();
+        this.code = Integer.valueOf(ResultCode.SUCCESS.getCode());
         this.message = ResultCode.SUCCESS.getResultMsg();
-        put("code", Integer.valueOf(code));
+        put("code", code);
         put("msg", message);
         return this;
     }
@@ -34,7 +34,7 @@ public class NeteaseResult extends HashMap<String, Object> {
      * 成功
      */
     public NeteaseResult success(Object o) {
-        this.code = ResultCode.SUCCESS.getCode();
+        this.code = Integer.valueOf(ResultCode.SUCCESS.getCode());
         this.message = ResultCode.SUCCESS.getResultMsg();
         put("data", o);
         put("code", code);
@@ -46,7 +46,7 @@ public class NeteaseResult extends HashMap<String, Object> {
      * 失败
      */
     public NeteaseResult error(String code) {
-        this.code = code;
+        this.code = Integer.valueOf(code);
         put("code", Integer.valueOf(code));
         return this;
     }
@@ -55,7 +55,7 @@ public class NeteaseResult extends HashMap<String, Object> {
      * 失败,填入信息
      */
     public NeteaseResult error(String code, String message) {
-        this.code = code;
+        this.code = Integer.valueOf(code);
         this.message = message;
         put("code", Integer.valueOf(code));
         put("msg", message);

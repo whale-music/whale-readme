@@ -1,11 +1,12 @@
 package org.web.nmusic.controller.v1;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.qrcode.QrConfig;
 import cn.hutool.http.Header;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,10 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.web.nmusic.controller.BaseController;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>
@@ -130,7 +128,9 @@ public class LoginController extends BaseController {
         String value = "/login-key/index.html?key=" + uuidString;
         String qrUrl = localhost + value;
         r.put("qrurl", qrUrl);
-        r.put("qrimg", Base64.encode(qrUrl));
+        byte[] pngBytes = QrCodeUtil.generatePng(qrUrl, new QrConfig(180, 180));
+        String encode = "data:image/png;base64,%s".formatted(Base64.getEncoder().encodeToString(pngBytes));
+        r.put("qrimg", encode);
     }
     
     /**
@@ -182,8 +182,7 @@ public class LoginController extends BaseController {
             return r.error("800", "二维码不存在或已过期");
         }
         SysUserPojo userPojo = user.login(phone, password, md5Password);
-        ObjectMapper objectMapper = new ObjectMapper();
-        GlobeDataUtil.setData(codekey, objectMapper.writeValueAsString(userPojo));
+        GlobeDataUtil.setData(codekey, JSONUtil.toJsonStr(userPojo));
         return r.success();
     }
     
@@ -202,7 +201,7 @@ public class LoginController extends BaseController {
             r.put(CookieConstant.COOKIE_NAME_MUSIC_U, "");
             return r.error("801", "等待扫码");
         }
-        SysUserPojo userPojo = new ObjectMapper().readValue(data, SysUserPojo.class);
+        SysUserPojo userPojo = JSONUtil.toBean(data, SysUserPojo.class);
         String sign = tokenUtil.neteasecloudmusicSignToken(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
         

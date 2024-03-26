@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.playlist.Creator;
@@ -35,9 +34,7 @@ import org.core.utils.AliasUtil;
 import org.core.utils.CollectSortUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,12 +122,7 @@ public class UserApi {
      * @return 返回用户信息
      */
     public UserConvert login(String phone, String password, String md5Password) {
-        SysUserPojo login = accountService.getUserOrSubAccount(phone);
-        String md5 = StringUtils.isBlank(password) ? md5Password : DigestUtils.md5DigestAsHex(StringUtils.getBytes(password, StandardCharsets.UTF_8));
-        if (!StringUtils.equals(md5, md5Password)) {
-            throw new BaseException(ResultCode.ACCOUNT_DOES_NOT_EXIST_OR_WRONG_PASSWORD);
-        }
-        
+        SysUserPojo login = accountService.loginUserOrSubAccount(phone, password, md5Password);
         UserConvert userConvert = new UserConvert();
         BeanUtils.copyProperties(login, userConvert);
         userConvert.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(login.getId()));

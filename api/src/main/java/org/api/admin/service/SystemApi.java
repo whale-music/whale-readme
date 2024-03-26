@@ -34,7 +34,7 @@ public class SystemApi {
     public PageResCommon<SystemLogRes> getSystemLogPage(SystemLogReq req) {
         LambdaQueryWrapper<SysLogPojo> wrapper = Wrappers.lambdaQuery();
         
-        boolean order = StringUtils.equals(req.getOrder(), "desc");
+        boolean order = StringUtils.equals(req.getOrder(), "asc");
         switch (req.getOrderBy()) {
             case "executionTime" -> wrapper.orderBy(true, order, SysLogPojo::getExecutionTime);
             case "updateTime" -> wrapper.orderBy(true, order, SysLogPojo::getUpdateTime);

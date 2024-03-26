@@ -22,8 +22,8 @@ public class DebugConfig {
     @Value("${application.enable.admin-spring-boot-application}")
     private Boolean enableAdminSpringBootApplication;
     
-    @Value("${application.enable.netease-cloud-music-spring-boot-application}")
-    private Boolean enableNeteaseCloudMusicSpringBootApplication;
+    @Value("${application.enable.n-music-spring-boot-application}")
+    private Boolean enableNMusicSpringBootApplication;
     
     @Value("${application.enable.subsonic-spring-boot-application}")
     private Boolean enableSubsonicSpringBootApplication;

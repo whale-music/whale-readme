@@ -2,10 +2,11 @@ package org.starter;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.text.UnicodeUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.config.ApplicationStartup;
 import org.core.common.properties.DebugConfig;
 import org.springframework.boot.WebApplicationType;
@@ -55,7 +56,7 @@ public class StartSpringBoot {
         for (Class<?> aClass : org) {
             sw.start(aClass.getSimpleName());
             Object o = aClass.getDeclaredConstructor().newInstance();
-            String simpleName = CharSequenceUtil.toSymbolCase(aClass.getSimpleName(), '-');
+            String simpleName = StringUtils.toRootLowerCase(NamingCase.toSymbolCase(aClass.getSimpleName(), '-'));
             String property = context.getEnvironment().getProperty("application.enable." + simpleName);
             if (Boolean.parseBoolean(property)) {
                 if (o instanceof ApplicationStartup startup) {

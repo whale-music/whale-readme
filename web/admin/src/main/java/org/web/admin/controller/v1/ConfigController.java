@@ -31,7 +31,7 @@ public class ConfigController {
                 "enablePlugin",
                 "logEnable",
                 "enableAdminSpringBootApplication",
-                "enableNeteaseCloudMusicSpringBootApplication",
+                "enableNMusicSpringBootApplication",
                 "enableSubsonicSpringBootApplication");
         return R.success(map);
     }

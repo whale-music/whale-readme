@@ -12,8 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 // 开启安全校验
 @EnableWebSecurity
 @EnableMethodSecurity
-@PropertySource(value = "classpath:application-neteasecloudmusic.yml", factory = YamlPropertySourceFactory.class)
-@PropertySource("classpath:application-neteasecloudmusic.properties")
+@PropertySource(value = "classpath:application-nmusic.yml", factory = YamlPropertySourceFactory.class)
+@PropertySource("classpath:application-nmusic.properties")
 @SpringBootApplication
-public class NeteaseCloudMusicSpringBootApplication implements ApplicationStartup {
+public class NMusicSpringBootApplication implements ApplicationStartup {
 }

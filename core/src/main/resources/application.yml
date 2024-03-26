@@ -215,7 +215,7 @@ application:
     log: false
   enable:
     admin-spring-boot-application: true
-    netease-cloud-music-spring-boot-application: false
+    n-music-spring-boot-application: false
     subsonic-spring-boot-application: false
     web-dav-spring-boot-application: false
 

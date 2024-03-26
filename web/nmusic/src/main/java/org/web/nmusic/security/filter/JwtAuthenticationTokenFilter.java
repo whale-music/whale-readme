@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.CookieConstant;
 import org.core.mybatis.pojo.SysUserPojo;
@@ -30,6 +32,7 @@ import java.util.Optional;
  * token过滤器 验证token有效性，然后注入到线程变量中
  */
 @Component
+@Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
     private final NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties;
@@ -51,14 +54,31 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         ) {
             filterChain.doFilter(request, response);
         } else {
+            // 获取cookie
             Optional<String> first = Arrays.stream(request.getCookies() == null ? new Cookie[]{} : request.getCookies())
                                            .filter(cookie -> StringUtils.equalsIgnoreCase(CookieConstant.COOKIE_NAME_MUSIC_U, cookie.getName()))
                                            .map(Cookie::getValue)
                                            .filter(StringUtils::isNotBlank)
                                            .findFirst();
+            // cookie中没有则从其他参数中获取
+            String token = null;
+            if (first.isPresent()) {
+                token = first.get();
+            } else {
+                try {
+                    // get parameters
+                    String cookie = request.getParameterMap().get("cookie")[0];
+                    if (StringUtils.isBlank(cookie)) {
+                        // post body
+                        cookie = IOUtils.toString(request.getReader());
+                    }
+                    token = cookie.split("=")[1];
+                } catch (Exception e) {
+                    log.error("Failed to parse cookie, origin msgs: {}", e.getMessage());
+                }
+            }
             try {
-                if (first.isPresent()) {
-                    String token = first.get();
+                if (StringUtils.isNotBlank(token)) {
                     tokenUtil.checkSign(token);
                     // 校验token, 并获取信息
                     SysUserPojo userPojo = tokenUtil.getUserInfo(token);

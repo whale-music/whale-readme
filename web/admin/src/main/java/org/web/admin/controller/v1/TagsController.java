@@ -10,12 +10,14 @@ import org.api.admin.service.TagsApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController(AdminConfig.ADMIN + "TagsController")
 @RequestMapping("/admin/tags")
 @Slf4j
-@CrossOrigin
 @RequiredArgsConstructor
 public class TagsController {
     private final TagsApi tagsApi;

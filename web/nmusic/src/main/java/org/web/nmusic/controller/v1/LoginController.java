@@ -29,14 +29,17 @@ import org.core.utils.GlobeDataUtil;
 import org.core.utils.UserUtil;
 import org.core.utils.token.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.web.nmusic.controller.BaseController;
 
 import java.util.*;
 
 /**
  * <p>
- * NeteaseCloudMusicApi 登录控制器
+ * NMusicApi 登录控制器
  * </p>
  *
  * @author Sakura
@@ -158,7 +161,7 @@ public class LoginController extends BaseController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/login/qr/create")
+    @RequestMapping(value = "/login/qr/create", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult qrCreate(HttpServletRequest request, @RequestParam("key") String key) {
         NeteaseResult r = new NeteaseResult();
@@ -172,7 +175,7 @@ public class LoginController extends BaseController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/login/sure")
+    @RequestMapping(value = "/login/sure", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult qrSure(@RequestParam("codekey") String codekey, String phone, String password, @RequestParam(value = "md5_password", required = false) String md5Password) throws JsonProcessingException {
         String data = GlobeDataUtil.getData(codekey);
@@ -187,7 +190,7 @@ public class LoginController extends BaseController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/login/qr/check")
+    @RequestMapping(value = "/login/qr/check", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
         String data = GlobeDataUtil.getData(key);
@@ -236,7 +239,7 @@ public class LoginController extends BaseController {
      */
     @AnonymousAccess
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/register/account")
+    @RequestMapping(value = "/register/account", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult addUser(String account, String password, String nickname) {
         SysUserPojo userPojo = new SysUserPojo();
         userPojo.setUsername(account);
@@ -253,7 +256,7 @@ public class LoginController extends BaseController {
      * @return 返回token and Cookie
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/login/refresh")
+    @RequestMapping(value = "/login/refresh", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult refresh(HttpServletResponse response) {
         SysUserPojo userPojo = UserUtil.getUser();
         if (userPojo == null) {

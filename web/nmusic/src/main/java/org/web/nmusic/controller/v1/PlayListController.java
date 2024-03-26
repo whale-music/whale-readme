@@ -20,14 +20,17 @@ import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.utils.UserUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * <p>
- * NeteaseCloudMusicApi 歌单控制器
+ * NMusicApi 歌单控制器
  * </p>
  *
  * @author Sakura
@@ -80,7 +83,7 @@ public class PlayListController {
      * @return 返回状态吗
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/name/update")
+    @RequestMapping(value = "/playlist/name/update", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult updatePlayListName(@RequestParam("id") Long collectId, @RequestParam("name") String name) {
         SysUserPojo user = UserUtil.getUser();
         TbCollectPojo collectPojo = new TbCollectPojo();
@@ -99,7 +102,7 @@ public class PlayListController {
      * @return 返回成功信息
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/desc/update")
+    @RequestMapping(value = "/playlist/desc/update", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult updatePlayListDesc(@RequestParam("id") Long collectId, @RequestParam("desc") String desc) {
         SysUserPojo user = UserUtil.getUser();
         TbCollectPojo collectPojo = new TbCollectPojo();
@@ -118,7 +121,7 @@ public class PlayListController {
      * @return 返回成功信息
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/tags/update")
+    @RequestMapping(value = "/playlist/tags/update", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult updatePlayListTag(@RequestParam("id") Long collectId, @RequestParam("tags") String tags) {
         SysUserPojo user = UserUtil.getUser();
         String[] split = tags.split(",");
@@ -131,7 +134,7 @@ public class PlayListController {
      * 删除歌单
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/delete")
+    @RequestMapping(value = "/playlist/delete", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult removePlayList(@RequestParam("id") List<Long> collectIds) {
         SysUserPojo user = UserUtil.getUser();
         collect.removePlayList(user.getId(), collectIds);
@@ -145,7 +148,7 @@ public class PlayListController {
      * @param flag      取消/收藏 1:收藏,2:取消收藏
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/subscribe")
+    @RequestMapping(value = "/playlist/subscribe", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult subscribePlayList(@RequestParam("id") Long collectId, @RequestParam("t") Integer flag) {
         SysUserPojo user = UserUtil.getUser();
         collect.subscribePlayList(user.getId(), collectId, flag == 1);
@@ -160,7 +163,7 @@ public class PlayListController {
      * @param pageIndex 当前多少页
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/playlist/track/all")
+    @RequestMapping(value = "/playlist/track/all", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult playListAll(@RequestParam("id") Long collectId, @RequestParam(value = "limit", required = false, defaultValue = "9223372036854775807") Long pageSize, @RequestParam(value = "offset", required = false, defaultValue = "0") Long pageIndex) {
         Page<MusicConvert> playListAllSong = collect.getPlayListAllSong(collectId, pageIndex, pageSize);
         List<Long> musicIds = playListAllSong.getRecords()
@@ -274,7 +277,7 @@ public class PlayListController {
      * @param like true 添加歌曲，false 删除歌曲
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/like")
+    @RequestMapping(value = "/like", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult like(@RequestParam("id") Long id, @RequestParam("like") Boolean like, @RequestParam(value = "userId", required = false) Long userId) {
         userId = Optional.ofNullable(userId).orElse(UserUtil.getUser().getId());
         collect.like(userId, id, like);

@@ -16,7 +16,10 @@ import org.core.common.weblog.constant.LogNameConstant;
 import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.web.nmusic.controller.BaseController;
 
 import java.util.List;
@@ -25,7 +28,7 @@ import java.util.Optional;
 
 /**
  * <p>
- * NeteaseCloudMusicApi 用户控制器
+ * NMusicApi 用户控制器
  * </p>
  *
  * @author Sakura
@@ -49,7 +52,7 @@ public class UserController extends BaseController {
      * @return 返回用户信息
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/user/account")
+    @RequestMapping(value = "/user/account", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult getUser() {
         SysUserPojo userPojo = UserUtil.getUser();
         // 查找用户
@@ -66,7 +69,7 @@ public class UserController extends BaseController {
      * 初始化用户昵称
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/activate/init/profile")
+    @RequestMapping(value = "/activate/init/profile", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult initUser(@RequestParam("nickname") String nickname) {
         SysUserPojo userPojo = UserUtil.getUser();
@@ -100,7 +103,7 @@ public class UserController extends BaseController {
      * @return 计数
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/user/subcount")
+    @RequestMapping(value = "/user/subcount", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult getSubcount() {
         SysUserPojo userPojo = UserUtil.getUser();
         
@@ -129,7 +132,7 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/user/record")
+    @RequestMapping(value = "/user/record", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userRecord(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "type", required = false, defaultValue = "0") Long type) {
         Long userId = Objects.isNull(uid) ? UserUtil.getUser().getId() : uid;
         List<UserRecordRes> res = user.userRecord(userId, type);

@@ -25,7 +25,7 @@ public class FalseInterfaceController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/user/cloud")
+    @RequestMapping(value = "/user/cloud", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userCloud() {
         NeteaseResult r = new NeteaseResult();
         r.put("data", Collections.emptyList());
@@ -38,7 +38,7 @@ public class FalseInterfaceController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/album/detail/dynamic")
+    @RequestMapping(value = "/album/detail/dynamic", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult albumDetailDynamic(@RequestParam("id") Long id) {
         NeteaseResult r = new NeteaseResult();
         r.put("onSale", false);

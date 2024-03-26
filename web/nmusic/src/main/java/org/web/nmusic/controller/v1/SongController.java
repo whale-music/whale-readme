@@ -11,13 +11,16 @@ import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
  * <p>
- * NeteaseCloudMusicApi 歌曲控制器
+ * NMusicApi 歌曲控制器
  * </p>
  *
  * @author Sakura
@@ -71,7 +74,7 @@ public class SongController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/scrobble")
+    @RequestMapping(value = "/scrobble", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult scrobble(@RequestParam("id") Long id, @RequestParam("sourceid") Long sourceid, @RequestParam(value = "time", required = false) Long time) {
         musicApi.scrobble(id, sourceid, time);
         NeteaseResult r = new NeteaseResult();

@@ -14,14 +14,17 @@ import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 
 /**
  * <p>
- * NeteaseCloudMusicApi 推荐控制器
+ * NMusicApi 推荐控制器
  * </p>
  *
  * @author Sakura
@@ -71,7 +74,7 @@ public class RecommendController {
      * 每日推荐歌单
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/recommend/resource")
+    @RequestMapping(value = "/recommend/resource", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult recommendResource() {
         List<DailyRecommendResourceRes> res = recommendApi.recommendResource(20);
         NeteaseResult r = new NeteaseResult();
@@ -96,7 +99,7 @@ public class RecommendController {
      * 全部新碟
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/album/new")
+    @RequestMapping(value = "/album/new", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult albumNew(String area,@RequestParam(value = "offset",required = false,defaultValue = "0") Long offset, @RequestParam(value = "limit",required = false,defaultValue = "30") Long limit) {
         Page<RecommendAlbumNewRes> res = recommendApi.albumNew(area, offset, limit);

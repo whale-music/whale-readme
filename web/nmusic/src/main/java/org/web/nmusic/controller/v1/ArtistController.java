@@ -14,8 +14,8 @@ import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.UserUtil;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +42,7 @@ public class ArtistController {
      * @param id 歌手ID
      */
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/artists")
+    @RequestMapping(value = "/artists", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult artists(@RequestParam("id") Long id) {
         ArtistRes res = artistApi.artists(id);
         NeteaseResult r = new NeteaseResult();
@@ -52,7 +52,7 @@ public class ArtistController {
     
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/artist/sublist")
+    @RequestMapping(value = "/artist/sublist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult artistSublist() {
         SysUserPojo user = UserUtil.getUser();
         ArtistSubListRes res = artistApi.artistSublist(user);
@@ -62,7 +62,7 @@ public class ArtistController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/artist/album")
+    @RequestMapping(value = "/artist/album", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult artistAlbum(@RequestParam("id") Long id, @RequestParam(value = "offset", required = false, defaultValue = "0") Long offset, @RequestParam(value = "limit", required = false, defaultValue = "30") Long limit) {
         ArtistAlbumRes res = artistApi.artistAlbum(id, limit, offset);
         NeteaseResult r = new NeteaseResult();
@@ -71,7 +71,7 @@ public class ArtistController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/artist/mv")
+    @RequestMapping(value = "/artist/mv", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult artistMv() {
         // TODO MV 填充
         ArtistMvRes res = new ArtistMvRes();

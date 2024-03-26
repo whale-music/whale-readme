@@ -11,8 +11,8 @@ import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
 import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +27,7 @@ public class TopListController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/toplist")
+    @RequestMapping(value = "/toplist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult toplist() {
         TopListRes res = topListApi.toplist();
         NeteaseResult r = new NeteaseResult();
@@ -36,7 +36,7 @@ public class TopListController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/top/playlist")
+    @RequestMapping(value = "/top/playlist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult topPlaylist(@RequestParam(value = "order", required = false, defaultValue = "hot") String order, String cat, @RequestParam(value = "limit", required = false, defaultValue = "50") String limit, @RequestParam(value = "offset", required = false, defaultValue = "0") String offset) {
         TopListPlayListRes res = topListApi.topPlaylist(order, cat, Long.valueOf(offset), Long.valueOf(limit));
         NeteaseResult r = new NeteaseResult();
@@ -45,7 +45,7 @@ public class TopListController {
     }
     
     @WebLog(LogNameConstant.N_MUSIC)
-    @GetMapping("/toplist/artist")
+    @RequestMapping(value = "/toplist/artist", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
     public NeteaseResult artist(String type) {
         TopListArtistRes res = topListApi.artist(type);

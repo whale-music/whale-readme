@@ -189,7 +189,7 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @GetMapping("/login/qr/check")
     @AnonymousAccess
-    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) throws JsonProcessingException {
+    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();

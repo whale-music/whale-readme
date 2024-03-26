@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>admin</module>
-        <module>neteasecloudmusic</module>
+        <module>nmusic</module>
         <module>subsonic</module>
         <module>webdav</module>
     </modules>

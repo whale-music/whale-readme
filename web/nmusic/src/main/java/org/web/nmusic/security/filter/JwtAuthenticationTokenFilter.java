@@ -56,23 +56,25 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                                            .map(Cookie::getValue)
                                            .filter(StringUtils::isNotBlank)
                                            .findFirst();
-            // todo try finally
-            if (first.isPresent()) {
-                String token = first.get();
-                tokenUtil.checkSign(token);
-                // 校验token, 并获取信息
-                SysUserPojo userPojo = tokenUtil.getUserInfo(token);
-                if (Objects.nonNull(userPojo)) {
-                    UserUtil.setUser(userPojo);
-                    UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
-                            null,
-                            AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            try {
+                if (first.isPresent()) {
+                    String token = first.get();
+                    tokenUtil.checkSign(token);
+                    // 校验token, 并获取信息
+                    SysUserPojo userPojo = tokenUtil.getUserInfo(token);
+                    if (Objects.nonNull(userPojo)) {
+                        UserUtil.setUser(userPojo);
+                        UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,
+                                null,
+                                AuthorityUtils.createAuthorityList(RoleUtil.getRoleNames(userPojo.getRoleName())));
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
                 }
+                filterChain.doFilter(request, response);
+            } finally {
+                UserUtil.removeUser();
             }
-            filterChain.doFilter(request, response);
-            UserUtil.removeUser();
         }
     }
 }

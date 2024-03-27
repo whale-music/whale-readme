@@ -154,9 +154,12 @@ public class UserApi {
         PlayListVo playListVo = new PlayListVo();
         playListVo.setPlaylist(new ArrayList<>());
         playListVo.setVersion("0");
-    
+        
+        // 只查询喜爱歌单和普通歌单
+        List<Byte> playlistType = Arrays.asList(PlayListTypeConstant.LIKE, PlayListTypeConstant.ORDINARY);
         LambdaQueryWrapper<TbCollectPojo> lambdaQueryWrapper = Wrappers.<TbCollectPojo>lambdaQuery()
                                                                        .eq(TbCollectPojo::getUserId, uid)
+                                                                       .in(TbCollectPojo::getType, playlistType)
                                                                        .orderByAsc(TbCollectPojo::getSort);
         Page<TbCollectPojo> collectPojoPage = collectService.page(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
     

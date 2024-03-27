@@ -401,13 +401,15 @@ public class CollectApi {
             }
             
             // 专辑数据
-            AlbumConvert albumByAlbumId = Optional.ofNullable(musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId())).orElse(new AlbumConvert());
-            Al al = new Al();
-            al.setId(albumByAlbumId.getId());
-            al.setName(albumByAlbumId.getAlbumName());
-            al.setPicUrl(albumByAlbumId.getPicUrl());
-            e.setAl(al);
-    
+            AlbumConvert albumByAlbumId = musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId());
+            if (Objects.nonNull(albumByAlbumId)) {
+                Al al = new Al();
+                al.setId(albumByAlbumId.getId());
+                al.setName(albumByAlbumId.getAlbumName());
+                al.setPicUrl(albumByAlbumId.getPicUrl());
+                e.setAl(al);
+            }
+            
             tracks.add(e);
     
     

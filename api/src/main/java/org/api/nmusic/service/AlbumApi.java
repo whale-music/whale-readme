@@ -19,10 +19,7 @@ import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.AliasUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "AlbumApi")
@@ -114,12 +111,14 @@ public class AlbumApi {
             SongsItem e = new SongsItem();
             e.setId(musicPojo.getId());
             e.setName(musicPojo.getMusicName());
-            Al al = new Al();
-            al.setId(tbAlbumPojo.getId());
-            al.setPicUrl(musicPojo.getPicUrl());
-            al.setName(tbAlbumPojo.getAlbumName());
-            e.setAl(al);
-        
+            if (Objects.nonNull(tbAlbumPojo)) {
+                Al al = new Al();
+                al.setId(tbAlbumPojo.getId());
+                al.setPicUrl(musicPojo.getPicUrl());
+                al.setName(tbAlbumPojo.getAlbumName());
+                e.setAl(al);
+            }
+            
             ArrayList<ArItem> ar = new ArrayList<>();
             List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(musicPojo.getId());
             for (ArtistConvert tbArtistPojo : singerByMusicId) {

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "RecommendApi")
@@ -187,27 +188,34 @@ public class RecommendApi {
             }
             dailySongsItem.setAr(ar);
             dailySongsItem.setArtists(artists);
-    
-    
-            AlbumConvert albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
-            Al al = new Al();
-            al.setPicStr(albumByAlbumId.getPicUrl());
-            al.setId(albumByAlbumId.getId());
-            al.setName(albumByAlbumId.getAlbumName());
-            dailySongsItem.setAl(al);
-    
+            
+            
             // 兼容web api
             org.api.nmusic.model.vo.recommend.songs.Album album = new org.api.nmusic.model.vo.recommend.songs.Album();
-            album.setPicUrl(albumByAlbumId.getPicUrl());
-            album.setArtist(CollUtil.isEmpty(artists) ? null : artists.get(0));
-            album.setId(albumByAlbumId.getId());
-            album.setName(albumByAlbumId.getAlbumName());
-            album.setCompany(albumByAlbumId.getCompany());
-            album.setArtists(artists);
-            album.setBlurPicUrl(albumByAlbumId.getPicUrl());
-            album.setSubType(albumByAlbumId.getSubType());
-            album.setSize(qukuService.getAlbumMusicCountByAlbumId(albumByAlbumId.getId()));
-            album.setPublishTime((long) albumByAlbumId.getPublishTime().getNano());
+            
+            AlbumConvert albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
+            if (Objects.nonNull(albumByAlbumId)) {
+                Al al = new Al();
+                al.setPicStr(albumByAlbumId.getPicUrl());
+                al.setId(albumByAlbumId.getId());
+                al.setName(albumByAlbumId.getAlbumName());
+                dailySongsItem.setAl(al);
+                
+                album.setId(albumByAlbumId.getId());
+                album.setPicUrl(albumByAlbumId.getPicUrl());
+                album.setName(albumByAlbumId.getAlbumName());
+                album.setCompany(albumByAlbumId.getCompany());
+                album.setBlurPicUrl(albumByAlbumId.getPicUrl());
+                album.setSubType(albumByAlbumId.getSubType());
+                
+                album.setSize(qukuService.getAlbumMusicCountByAlbumId(albumByAlbumId.getId()));
+                album.setPublishTime((long) albumByAlbumId.getPublishTime().getNano());
+            }
+            
+            if (CollUtil.isNotEmpty(artists)) {
+                album.setArtist(artists.getFirst());
+                album.setArtists(artists);
+            }
             dailySongsItem.setAlbum(album);
     
             Privilege privilege = new Privilege();

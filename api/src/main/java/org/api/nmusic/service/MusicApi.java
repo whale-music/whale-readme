@@ -123,16 +123,20 @@ public class MusicApi {
             
             // 专辑
             AlbumConvert albumByAlbumId = musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId());
-            Al al = new Al();
-            al.setName(albumByAlbumId.getAlbumName());
-            al.setPicUrl(albumByAlbumId.getPicUrl());
-            al.setId(albumByAlbumId.getId());
-            e.setAl(al);
+            if (Objects.nonNull(albumByAlbumId)) {
+                Al al = new Al();
+                al.setName(albumByAlbumId.getAlbumName());
+                al.setPicUrl(albumByAlbumId.getPicUrl());
+                al.setId(albumByAlbumId.getId());
+                e.setAl(al);
+            }
             
             songs.add(e);
             
             PrivilegesItem privilegesItem = new PrivilegesItem();
             privilegesItem.setId(tbMusicPojo.getId());
+            privilegesItem.setPl(1);
+            privilegesItem.setFee(0);
             privileges.add(privilegesItem);
         }
         songDetailRes.setSongs(songs);

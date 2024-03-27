@@ -28,10 +28,7 @@ import org.core.service.RemoteStorePicService;
 import org.core.utils.AliasUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service(NeteaseCloudConfig.NETEASECLOUD + "ArtistApi")
@@ -165,11 +162,13 @@ public class ArtistApi {
             hotSongsItem.setId(tbMusicPojo.getId());
             
             AlbumConvert albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
-            Al al = new Al();
-            al.setId(albumByMusicId.getId());
-            al.setName(albumByMusicId.getAlbumName());
-            al.setPicUrl(albumByMusicId.getPicUrl());
-            hotSongsItem.setAl(al);
+            if (Objects.nonNull(albumByMusicId)) {
+                Al al = new Al();
+                al.setId(albumByMusicId.getId());
+                al.setName(albumByMusicId.getAlbumName());
+                al.setPicUrl(albumByMusicId.getPicUrl());
+                hotSongsItem.setAl(al);
+            }
             hotSongs.add(hotSongsItem);
             
             ArrayList<ArItem> ar = new ArrayList<>();

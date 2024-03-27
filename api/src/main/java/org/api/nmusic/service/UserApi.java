@@ -299,6 +299,12 @@ public class UserApi {
             musicPojoList = musicService.listByIds(musicIds);
         }
         
+        Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicPojoList.parallelStream()
+                                                                                                               .map(TbMusicPojo::getId)
+                                                                                                               .toList());
+        Map<Long, AlbumConvert> musicAlbumByAlbumIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(musicPojoList.parallelStream()
+                                                                                                                .map(TbMusicPojo::getAlbumId)
+                                                                                                                .toList());
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             UserRecordRes userRecordRes = new UserRecordRes();
             int count = rankPojoMap.get(tbMusicPojo.getId()) == null ? 0 : rankPojoMap.get(tbMusicPojo.getId()).getCount();
@@ -308,7 +314,7 @@ public class UserApi {
             song.setId(tbMusicPojo.getId());
             song.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             
-            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
+            List<ArtistConvert> singerByMusicId = artistByMusicIdToMap.get(tbMusicPojo.getId());
             ArrayList<ArItem> ar = new ArrayList<>();
             for (ArtistConvert tbArtistPojo : singerByMusicId) {
                 ArItem e = new ArItem();
@@ -318,13 +324,15 @@ public class UserApi {
                 ar.add(e);
             }
             song.setAr(ar);
-    
-            AlbumConvert albumByMusicId = qukuService.getAlbumByMusicId(tbMusicPojo.getId());
-            Al al = new Al();
-            al.setId(albumByMusicId.getId());
-            al.setPicUrl(albumByMusicId.getPicUrl());
-            al.setName(albumByMusicId.getAlbumName());
-            song.setAl(al);
+            
+            AlbumConvert albumByMusicId = musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId());
+            if (Objects.nonNull(albumByMusicId)) {
+                Al al = new Al();
+                al.setId(albumByMusicId.getId());
+                al.setPicUrl(albumByMusicId.getPicUrl());
+                al.setName(albumByMusicId.getAlbumName());
+                song.setAl(al);
+            }
             userRecordRes.setSong(song);
     
             res.add(userRecordRes);

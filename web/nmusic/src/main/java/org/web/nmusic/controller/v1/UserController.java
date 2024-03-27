@@ -145,6 +145,7 @@ public class UserController extends BaseController {
         return r.success();
     }
     
+    @AnonymousAccess
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/user/detail", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userDetail(@RequestParam("uid") Long uid) {

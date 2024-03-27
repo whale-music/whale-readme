@@ -1,5 +1,6 @@
 package org.api.nmusic.service;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -373,27 +374,34 @@ public class CollectApi {
         
         ArrayList<TracksItem> tracks = new ArrayList<>();
         ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
+        // 获取歌曲map
+        List<Long> musicIds = playListAllMusic.parallelStream().map(TbMusicPojo::getId).toList();
+        Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
+        // 获取专辑map
+        List<Long> albumIds = playListAllMusic.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+        Map<Long, AlbumConvert> musicAlbumByAlbumIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         for (TbMusicPojo tbMusicPojo : playListAllMusic) {
             TracksItem e = new TracksItem();
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
             e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
             e.setPublishTime((long) tbMusicPojo.getCreateTime().getNano());
-            ArrayList<ArItem> ar = new ArrayList<>();
-    
             // 艺术家数据
-            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
-            for (ArtistConvert tbArtistPojo : singerByMusicId) {
-                ArItem e1 = new ArItem();
-                e1.setId(tbArtistPojo.getId());
-                e1.setName(tbArtistPojo.getArtistName());
-                e1.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-                ar.add(e1);
+            List<ArtistConvert> singerByMusicId = artistByMusicIdToMap.get(tbMusicPojo.getId());
+            if (CollUtil.isNotEmpty(singerByMusicId)) {
+                ArrayList<ArItem> ar = new ArrayList<>();
+                for (ArtistConvert tbArtistPojo : singerByMusicId) {
+                    ArItem e1 = new ArItem();
+                    e1.setId(tbArtistPojo.getId());
+                    e1.setName(tbArtistPojo.getArtistName());
+                    e1.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
+                    ar.add(e1);
+                }
+                e.setAr(ar);
             }
-            e.setAr(ar);
-    
+            
             // 专辑数据
-            AlbumConvert albumByAlbumId = Optional.ofNullable(qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId())).orElse(new AlbumConvert());
+            AlbumConvert albumByAlbumId = Optional.ofNullable(musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId())).orElse(new AlbumConvert());
             Al al = new Al();
             al.setId(albumByAlbumId.getId());
             al.setName(albumByAlbumId.getAlbumName());

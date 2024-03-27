@@ -97,27 +97,32 @@ public class MusicApi {
         ArrayList<SongsItem> songs = new ArrayList<>();
         
         ArrayList<PrivilegesItem> privileges = new ArrayList<>();
+        
+        Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(ids);
+        List<Long> albumIds = musicPojoList.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+        Map<Long, AlbumConvert> musicAlbumByAlbumIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             SongsItem e = new SongsItem();
             e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
             e.setPublishTime(tbMusicPojo.getCreateTime().getNano());
             e.setDt(tbMusicPojo.getTimeLength());
-            ArrayList<ArItem> ar = new ArrayList<>();
-            List<ArtistConvert> singerByMusicId = qukuService.getArtistByMusicIds(tbMusicPojo.getId());
-            
-            // 歌手
-            for (ArtistConvert tbArtistPojo : singerByMusicId) {
-                ArItem e1 = new ArItem();
-                e1.setName(tbArtistPojo.getArtistName());
-                e1.setId(tbArtistPojo.getId());
-                e1.setAlias(Arrays.asList(Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("").split(",")));
-                ar.add(e1);
+            List<ArtistConvert> singerByMusicId = artistByMusicIdToMap.get(tbMusicPojo.getId());
+            if (CollUtil.isNotEmpty(singerByMusicId)) {
+                ArrayList<ArItem> ar = new ArrayList<>();
+                // 歌手
+                for (ArtistConvert tbArtistPojo : singerByMusicId) {
+                    ArItem e1 = new ArItem();
+                    e1.setName(tbArtistPojo.getArtistName());
+                    e1.setId(tbArtistPojo.getId());
+                    e1.setAlias(Arrays.asList(Optional.ofNullable(tbArtistPojo.getAliasName()).orElse("").split(",")));
+                    ar.add(e1);
+                }
+                e.setAr(ar);
             }
-            e.setAr(ar);
             
             // 专辑
-            AlbumConvert albumByAlbumId = qukuService.getAlbumByAlbumId(tbMusicPojo.getAlbumId());
+            AlbumConvert albumByAlbumId = musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId());
             Al al = new Al();
             al.setName(albumByAlbumId.getAlbumName());
             al.setPicUrl(albumByAlbumId.getPicUrl());

@@ -67,7 +67,7 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
-    public NeteaseResult loginMail(HttpServletResponse response, @RequestParam Map<String, String> req) {
+    public NeteaseResult loginMail(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, String> req) {
         if (CollUtil.isEmpty(req)) {
             return new NeteaseResult().success();
         }
@@ -77,7 +77,7 @@ public class LoginController extends BaseController {
         UserConvert userPojo = user.login(email, password, md5Password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
+        NeteaseResult r = getNeteaseResult(request, response, tokenUtil, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
     }
@@ -90,7 +90,7 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @AnonymousAccess
     @RequestMapping(value = "/login/cellphone", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult loginPhone(HttpServletResponse response,
+    public NeteaseResult loginPhone(HttpServletRequest request, HttpServletResponse response,
                                     @RequestParam(value = "phone", required = false) String phone,
                                     @RequestParam(value = "password", required = false) String password,
                                     @RequestParam(value = "md5_password", required = false) String md5Password
@@ -98,7 +98,7 @@ public class LoginController extends BaseController {
         UserConvert userPojo = user.login(phone, password, md5Password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
-        NeteaseResult r = getNeteaseResult(response, tokenUtil, userPojo);
+        NeteaseResult r = getNeteaseResult(request, response, tokenUtil, userPojo);
         r.putAll(BeanUtil.beanToMap(userVo));
         return r.success();
     }
@@ -257,13 +257,13 @@ public class LoginController extends BaseController {
      */
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login/refresh", method = {RequestMethod.GET, RequestMethod.POST})
-    public NeteaseResult refresh(HttpServletResponse response) {
+    public NeteaseResult refresh(HttpServletRequest request, HttpServletResponse response) {
         SysUserPojo userPojo = UserUtil.getUser();
         if (userPojo == null) {
             log.warn(ResultCode.USER_NOT_EXIST.getResultMsg());
             throw new BaseException(ResultCode.USER_NOT_EXIST);
         }
-        return getNeteaseResult(response, tokenUtil, userPojo);
+        return getNeteaseResult(request, response, tokenUtil, userPojo);
     }
     
     

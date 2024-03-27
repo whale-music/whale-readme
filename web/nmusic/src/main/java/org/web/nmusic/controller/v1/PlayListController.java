@@ -303,9 +303,9 @@ public class PlayListController {
      *
      * @return ID
      */
+    @AnonymousAccess
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/playlist/detail", method = {RequestMethod.GET, RequestMethod.POST})
-    @AnonymousAccess
     public NeteaseResult playlistDetail(@RequestParam("id") Long id) {
         PlayListDetailRes res = collect.playlistDetail(id);
         NeteaseResult r = new NeteaseResult();

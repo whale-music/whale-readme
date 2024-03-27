@@ -84,6 +84,7 @@ public class UserController extends BaseController {
      * @param uid 用户ID
      * @return 返回用户歌单
      */
+    @AnonymousAccess
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/user/playlist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult userPlayList(@RequestParam(value = "uid", required = false) Long uid, @RequestParam(value = "pageIndex", required = false, defaultValue = "0") Long pageIndex, @RequestParam(value = "pageSize", required = false, defaultValue = "30") Long pageSize) {

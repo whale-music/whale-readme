@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 @Setter
 @Getter
 @Configuration
+// todo rename
 public class NeteaseCloudMusicPermitAllUrlProperties  {
     private final static String asterisk = "*";
     private final static Pattern pattern = Pattern.compile("\\{(.*?)}");

@@ -25,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.web.nmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
 
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +45,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         this.permitAllUrlProperties = permitAllUrlProperties;
         this.tokenUtil = tokenUtil;
     }
-    
     
     /**
      * 从cookie header parameter body 中获取token
@@ -67,17 +67,28 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         } else {
             try {
                 // get parameters
-                String cookie = request.getParameterMap().get("cookie")[0];
-                if (StringUtils.isBlank(cookie)) {
+                String cookies = request.getParameterMap().get("cookie")[0];
+                HttpCookie.parse(cookies);
+                if (StringUtils.isBlank(cookies)) {
                     // post body
-                    cookie = IOUtils.toString(request.getReader());
+                    cookies = IOUtils.toString(request.getReader());
                 }
-                token = cookie.split("=")[1];
+                token = parserCookie(cookies);
             } catch (Exception e) {
                 log.error("Failed to parse cookie, origin msgs: {}", e.getMessage());
             }
         }
         return token;
+    }
+    
+    private static String parserCookie(String cookies) {
+        for (String cookie : StringUtils.split(cookies, ";")) {
+            String[] split = StringUtils.split(cookie, "=");
+            if (split.length == 2 && StringUtils.equals(split[0], CookieConstant.COOKIE_NAME_MUSIC_U)) {
+                return split[1];
+            }
+        }
+        return null;
     }
     
     @Override

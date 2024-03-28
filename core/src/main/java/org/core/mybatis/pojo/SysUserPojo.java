@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -84,6 +86,13 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
     
     public boolean getIsAdmin() {
         return Optional.ofNullable(getAccountType()).orElse(-1) == 0;
+    }
+    
+    public Long getCreateTimeToTime() {
+        if (Objects.isNull(this.createTime)) {
+            return null;
+        }
+        return DateUtil.date(createTime).getTime();
     }
 }
 

@@ -203,7 +203,7 @@ public class UserDetailRes {
 		private boolean inBlacklist;
 		
 		@JsonProperty("backgroundImgId")
-		private long backgroundImgId;
+		private Long backgroundImgId;
 		
 		@JsonProperty("userType")
 		private int userType;

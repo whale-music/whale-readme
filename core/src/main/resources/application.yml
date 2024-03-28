@@ -219,6 +219,10 @@ application:
     subsonic-spring-boot-application: false
     web-dav-spring-boot-application: false
 
+# 保存缓存路径
+cache:
+  path: ./data/cache/record
+
 # subsonic 资源多个资源返回策略:
 # first:第一个 last: 最后一个
 # bitRateMax:最大比特率 bitRateMin:最小比特率

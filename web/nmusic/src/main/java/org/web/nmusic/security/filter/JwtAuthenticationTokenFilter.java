@@ -1,5 +1,6 @@
 package org.web.nmusic.security.filter;
 
+import cn.hutool.json.JSONUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -25,7 +26,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.web.nmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
 
 import java.io.IOException;
-import java.net.HttpCookie;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,16 +46,50 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         this.tokenUtil = tokenUtil;
     }
     
+    private HttpServletRequest requestWrapper;
+    
+    private static String getCookiesByParam(@NotNull HttpServletRequest request) {
+        try {
+            return request.getParameterMap().get("cookie")[0];
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+    
+    @Override
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
+        // 如果要从post body中获取token, 则使用自定义 RepeatedlyRequestWrapper, 缓存request body中的数据
+        requestWrapper = request;
+        // 放行运行匿名访问的地址
+        String token = getToken();
+        if (mathUri(requestWrapper)) {
+            // 如果是匿名接口，校验失败不抛出异常
+            if (validate(token)) {
+                setSecurityUser(requestWrapper, token);
+            }
+            filterChain.doFilter(requestWrapper, response);
+        } else {
+            try {
+                if (StringUtils.isNotBlank(token)) {
+                    tokenUtil.checkSign(token);
+                    setSecurityUser(requestWrapper, token);
+                }
+                filterChain.doFilter(requestWrapper, response);
+            } finally {
+                UserUtil.removeUser();
+            }
+        }
+    }
+    
     /**
      * 从cookie header parameter body 中获取token
      *
-     * @param request 请求
      * @return token
      */
     @Nullable
-    private static String getToken(@NotNull HttpServletRequest request) {
+    private String getToken() {
         // 获取cookie
-        Optional<String> first = Arrays.stream(request.getCookies() == null ? new Cookie[]{} : request.getCookies())
+        Optional<String> first = Arrays.stream(requestWrapper.getCookies() == null ? new Cookie[]{} : requestWrapper.getCookies())
                                        .filter(cookie -> StringUtils.equalsIgnoreCase(CookieConstant.COOKIE_NAME_MUSIC_U, cookie.getName()))
                                        .map(Cookie::getValue)
                                        .filter(StringUtils::isNotBlank)
@@ -67,11 +101,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         } else {
             try {
                 // get parameters
-                String cookies = request.getParameterMap().get("cookie")[0];
-                HttpCookie.parse(cookies);
+                String cookies = getCookiesByParam(requestWrapper);
                 if (StringUtils.isBlank(cookies)) {
+                    // 如果需要从post body中取数据，则使用缓存。否则后续读取post body会报错。因为流只能读取一次
+                    this.requestWrapper = new RepeatedlyRequestWrapper(requestWrapper);
                     // post body
-                    cookies = IOUtils.toString(request.getReader());
+                    String jsonBody = IOUtils.toString(requestWrapper.getReader());
+                    cookies = JSONUtil.parseObj(jsonBody).get(CookieConstant.COOKIE_NAME_COOKIE, String.class);
                 }
                 token = parserCookie(cookies);
             } catch (Exception e) {
@@ -89,29 +125,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             }
         }
         return null;
-    }
-    
-    @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
-        // 放行运行匿名访问的地址
-        String token = getToken(request);
-        if (mathUri(request)) {
-            // 如果是匿名接口，校验则不抛出异常
-            if (validate(token)) {
-                setSecurityUser(request, token);
-            }
-            filterChain.doFilter(request, response);
-        } else {
-            try {
-                if (StringUtils.isNotBlank(token)) {
-                    tokenUtil.checkSign(token);
-                    setSecurityUser(request, token);
-                }
-                filterChain.doFilter(request, response);
-            } finally {
-                UserUtil.removeUser();
-            }
-        }
     }
     
     private void setSecurityUser(@NotNull HttpServletRequest request, String token) {

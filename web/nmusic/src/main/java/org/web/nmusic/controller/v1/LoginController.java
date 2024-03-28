@@ -4,13 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
-import cn.hutool.http.Header;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.login.status.LoginStatusRes;
 import org.api.nmusic.model.vo.user.UserVo;
@@ -93,8 +92,12 @@ public class LoginController extends BaseController {
     public NeteaseResult loginPhone(HttpServletRequest request, HttpServletResponse response,
                                     @RequestParam(value = "phone", required = false) String phone,
                                     @RequestParam(value = "password", required = false) String password,
-                                    @RequestParam(value = "md5_password", required = false) String md5Password
+                                    @RequestParam(value = "md5_password", required = false) String md5Password,
+                                    @RequestParam(value = "captcha", required = false) String captcha
     ) {
+        if (StringUtils.isNotBlank(captcha)) {
+            password = captcha;
+        }
         UserConvert userPojo = user.login(phone, password, md5Password);
         UserVo userVo = getUserVo(userPojo);
         // 生成sign
@@ -192,7 +195,7 @@ public class LoginController extends BaseController {
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/login/qr/check", method = {RequestMethod.GET, RequestMethod.POST})
     @AnonymousAccess
-    public NeteaseResult qrCreate(HttpServletResponse response, @RequestParam("key") String key) {
+    public NeteaseResult qrCreate(HttpServletRequest request, HttpServletResponse response, @RequestParam("key") String key) {
         String data = GlobeDataUtil.getData(key);
         if (data == null) {
             NeteaseResult r = new NeteaseResult();
@@ -205,16 +208,10 @@ public class LoginController extends BaseController {
             return r.error("801", "等待扫码");
         }
         SysUserPojo userPojo = JSONUtil.toBean(data, SysUserPojo.class);
-        String sign = tokenUtil.neteasecloudmusicSignToken(userPojo.getUsername(), userPojo);
         GlobeDataUtil.remove(key);
-        
-        Cookie cookie = new Cookie(Header.COOKIE.getValue(), sign);
-        response.addCookie(cookie);
-        
-        NeteaseResult r = new NeteaseResult();
+        NeteaseResult r = getNeteaseResult(request, response, tokenUtil, userPojo);
         r.put("code", 803);
         r.put("message", "授权登陆成功");
-        r.put(CookieConstant.COOKIE_NAME_COOKIE, CookieConstant.COOKIE_NAME_MUSIC_U + "=" + sign);
         
         return r;
     }

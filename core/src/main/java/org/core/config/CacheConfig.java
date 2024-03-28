@@ -14,6 +14,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class CacheConfig {
     
+    /**
+     * 图片缓存
+     * key long
+     * value pic
+     */
     @Bean
     public Cache<Long, TbPicPojo> caffeineCache() {
         return Caffeine.newBuilder()
@@ -25,6 +30,11 @@ public class CacheConfig {
                        .maximumSize(1000_0).build();
     }
     
+    /**
+     * 图片关联数据, 例如: key: 音乐ID, 音乐类型
+     * key: middle type
+     * value: pic id
+     */
     @Bean
     public Cache<PicMiddleTypeModel, Long> picMiddleCaffeineCache() {
         return Caffeine.newBuilder()

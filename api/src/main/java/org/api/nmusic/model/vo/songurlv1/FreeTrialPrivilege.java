@@ -7,6 +7,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FreeTrialPrivilege {
+    public FreeTrialPrivilege() {
+    }
+    
+    public FreeTrialPrivilege(Boolean userConsumable, Boolean resConsumable, Integer cannotListenReason, Object playReason, Integer listenType) {
+        this.userConsumable = userConsumable;
+        this.resConsumable = resConsumable;
+        this.cannotListenReason = cannotListenReason;
+        this.playReason = playReason;
+        this.listenType = listenType;
+    }
     
     @JsonProperty("userConsumable")
     private Boolean userConsumable;

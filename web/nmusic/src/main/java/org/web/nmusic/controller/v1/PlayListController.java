@@ -178,6 +178,8 @@ public class PlayListController {
                                                                    .collect(Collectors.toMap(TbResourcePojo::getRate,
                                                                            tbMusicUrlPojo -> tbMusicUrlPojo, (v1, v2) -> v2));
             SongsItem e = new SongsItem();
+            // 设置时长
+            e.setDt(musicPojo.getTimeLength());
             // Sq 无损
             Optional<TbResourcePojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
             musicInfoMaps.remove(320000);

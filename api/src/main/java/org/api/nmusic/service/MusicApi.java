@@ -16,6 +16,7 @@ import org.api.nmusic.model.vo.song.lyric.Tlyric;
 import org.api.nmusic.model.vo.songdetail.*;
 import org.api.nmusic.model.vo.songurl.DataItem;
 import org.api.nmusic.model.vo.songurl.SongUrlRes;
+import org.api.nmusic.model.vo.songurlv1.FreeTimeTrialPrivilege;
 import org.api.nmusic.model.vo.songurlv1.SongUrlV1;
 import org.core.common.constant.HistoryConstant;
 import org.core.common.constant.LyricConstant;
@@ -374,6 +375,11 @@ public class MusicApi {
         ArrayList<org.api.nmusic.model.vo.songurlv1.DataItem> data = new ArrayList<>();
         for (TbResourcePojo tbMusicUrlPojo : musicUrlByMusicId) {
             org.api.nmusic.model.vo.songurlv1.DataItem e = new org.api.nmusic.model.vo.songurlv1.DataItem();
+            e.setGain(0);
+            e.setPeak(0);
+            e.setCanExtend(false);
+            e.setFreeTrialPrivilege(new org.api.nmusic.model.vo.songurlv1.FreeTrialPrivilege(false, false, null, null, null));
+            e.setFreeTimeTrialPrivilege(new FreeTimeTrialPrivilege(false, false, 0, 0));
             e.setId(tbMusicUrlPojo.getId());
             e.setUrl(tbMusicUrlPojo.getPath());
             e.setExpi(60 * 60 * 1000);
@@ -388,6 +394,8 @@ public class MusicApi {
             e.setUrlSource(0);
             e.setRightSource(0);
             e.setTime(Optional.ofNullable(musicPojoMap.get(tbMusicUrlPojo.getMusicId())).orElse(new TbMusicPojo()).getTimeLength());
+            e.setMessage(null);
+            
             data.add(e);
             if (StringUtils.equals(tbMusicUrlPojo.getLevel(), level)) {
                 break;

@@ -269,8 +269,8 @@ public class CollectApi {
         }
         List<Long> musicIds = page.getRecords().stream().map(TbCollectMusicPojo::getMusicId).toList();
         List<TbMusicPojo> tbMusicPojoList = musicService.listByIds(musicIds);
-    
-        List<MusicConvert> collect = tbMusicPojoList.parallelStream().map(tbMusicPojo -> {
+        
+        List<MusicConvert> collect = tbMusicPojoList.stream().map(tbMusicPojo -> {
             MusicConvert convert = new MusicConvert();
             BeanUtils.copyProperties(tbMusicPojo, convert);
             convert.setPicUrl(remoteStorePicService.getMusicPicUrl(tbMusicPojo.getId()));

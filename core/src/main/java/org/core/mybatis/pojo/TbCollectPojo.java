@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 歌单列表(TbCollect)表实体类
@@ -57,6 +59,18 @@ public class TbCollectPojo extends Model<TbCollectPojo> implements Serializable 
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
+    public Long getCreateTimeToTime() {
+        if (Objects.isNull(this.createTime)) {
+            return null;
+        }
+        return DateUtil.date(createTime).getTime();
+    }
     
+    public Long getUpdateTimeToTime() {
+        if (Objects.isNull(this.updateTime)) {
+            return null;
+        }
+        return DateUtil.date(updateTime).getTime();
+    }
 }
 

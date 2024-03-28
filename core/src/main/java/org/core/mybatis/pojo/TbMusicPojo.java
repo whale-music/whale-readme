@@ -1,6 +1,7 @@
 package org.core.mybatis.pojo;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 所有音乐列表(TbMusic)表实体类
@@ -69,6 +71,13 @@ public class TbMusicPojo extends Model<TbMusicPojo> implements Serializable {
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     
+    
+    public Long getPublishTimeToTime() {
+        if (Objects.isNull(publishTime)) {
+            return null;
+        }
+        return DateUtil.date(publishTime).getTime();
+    }
     
 }
 

@@ -1422,6 +1422,9 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public Map<Long, AlbumConvert> getMusicAlbumByAlbumIdToMap(Collection<Long> albumIds) {
+        if (CollUtil.isEmpty(albumIds)) {
+            return Collections.emptyMap();
+        }
         List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
         return tbAlbumPojos.stream().collect(Collectors.toMap(TbAlbumPojo::getId, tbAlbumPojo -> {
             AlbumConvert albumConvert = new AlbumConvert();

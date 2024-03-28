@@ -1,10 +1,12 @@
 package org.api.nmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.song.lyric.Klyric;
@@ -101,12 +103,114 @@ public class MusicApi {
         Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(ids);
         List<Long> albumIds = musicPojoList.parallelStream().map(TbMusicPojo::getAlbumId).toList();
         Map<Long, AlbumConvert> musicAlbumByAlbumIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
+        
+        PrivilegesItem privilegesItem = new PrivilegesItem();
+        privilegesItem.setId(30569280L);
+        privilegesItem.setFee(0);
+        privilegesItem.setPayed(0);
+        privilegesItem.setSt(0);
+        privilegesItem.setPl(320000);
+        privilegesItem.setDl(320000);
+        privilegesItem.setSp(7);
+        privilegesItem.setCp(1);
+        privilegesItem.setSubp(1);
+        privilegesItem.setCs(false);
+        privilegesItem.setMaxbr(320000);
+        privilegesItem.setFl(320000);
+        privilegesItem.setToast(false);
+        privilegesItem.setFlag(128);
+        privilegesItem.setPreSell(false);
+        privilegesItem.setPlayMaxbr(320000);
+        privilegesItem.setDownloadMaxbr(320000);
+        privilegesItem.setMaxBrLevel("exhigh");
+        privilegesItem.setPlayMaxBrLevel("exhigh");
+        privilegesItem.setDownloadMaxBrLevel("exhigh");
+        privilegesItem.setPlLevel("exhigh");
+        privilegesItem.setDlLevel("exhigh");
+        privilegesItem.setFlLevel("exhigh");
+        privilegesItem.setRscl(null);
+        
+        // 设置 freeTrialPrivilege 对象
+        FreeTrialPrivilege freeTrialPrivilege = new FreeTrialPrivilege();
+        freeTrialPrivilege.setResConsumable(false);
+        freeTrialPrivilege.setUserConsumable(false);
+        freeTrialPrivilege.setListenType(0);
+        freeTrialPrivilege.setCannotListenReason(1);
+        freeTrialPrivilege.setPlayReason(null);
+        privilegesItem.setFreeTrialPrivilege(freeTrialPrivilege);
+        
+        privilegesItem.setRightSource(0);
+        
+        // 设置 chargeInfoList 对象
+        List<ChargeInfoListItem> chargeInfoList = new ArrayList<>();
+        ChargeInfoListItem chargeInfo1 = new ChargeInfoListItem();
+        chargeInfo1.setRate(128000);
+        chargeInfo1.setChargeUrl(null);
+        chargeInfo1.setChargeMessage(null);
+        chargeInfo1.setChargeType(0);
+        chargeInfoList.add(chargeInfo1);
+        
+        ChargeInfoListItem chargeInfo2 = new ChargeInfoListItem();
+        chargeInfo2.setRate(192000);
+        chargeInfo2.setChargeUrl(null);
+        chargeInfo2.setChargeMessage(null);
+        chargeInfo2.setChargeType(0);
+        chargeInfoList.add(chargeInfo2);
+        
+        ChargeInfoListItem chargeInfo3 = new ChargeInfoListItem();
+        chargeInfo3.setRate(320000);
+        chargeInfo3.setChargeUrl(null);
+        chargeInfo3.setChargeMessage(null);
+        chargeInfo3.setChargeType(0);
+        chargeInfoList.add(chargeInfo3);
+        
+        ChargeInfoListItem chargeInfo4 = new ChargeInfoListItem();
+        chargeInfo4.setRate(999000);
+        chargeInfo4.setChargeUrl(null);
+        chargeInfo4.setChargeMessage(null);
+        chargeInfo4.setChargeType(1);
+        chargeInfoList.add(chargeInfo4);
+        
+        privilegesItem.setChargeInfoList(chargeInfoList);
+        
+        
         for (TbMusicPojo tbMusicPojo : musicPojoList) {
             SongsItem e = new SongsItem();
-            e.setId(tbMusicPojo.getId());
             e.setName(tbMusicPojo.getMusicName());
-            e.setPublishTime(tbMusicPojo.getCreateTime().getNano());
+            e.setId(tbMusicPojo.getId());
+            e.setPst(0);
+            e.setT(0);
             e.setDt(tbMusicPojo.getTimeLength());
+            e.setAlia(ListUtil.toList(StringUtils.split(tbMusicPojo.getAliasName(), ",")));
+            e.setSq(null);
+            e.setHr(null);
+            e.setA(null);
+            e.setCd("01");
+            e.setNo(1);
+            e.setRtUrl(null);
+            e.setFtype(0);
+            e.setRtUrls(new ArrayList<>());
+            e.setDjId(0);
+            e.setCopyright(2);
+            e.setSId(0);
+            e.setMark(0);
+            e.setOriginCoverType(1);
+            e.setOriginSongSimpleData(null);
+            e.setTagPicList(null);
+            e.setResourceState(true);
+            e.setVersion(668);
+            e.setSongJumpInfo(null);
+            e.setEntertainmentTags(null);
+            e.setAwardTags(null);
+            e.setSingle(0);
+            e.setNoCopyrightRcmd(null);
+            e.setMv(0);
+            e.setRtype(0);
+            e.setRurl(null);
+            e.setMst(9);
+            e.setCp(0);
+            e.setPublishTime(DateUtil.date(tbMusicPojo.getCreateTime()).getTime());
+            
             List<ArtistConvert> singerByMusicId = artistByMusicIdToMap.get(tbMusicPojo.getId());
             if (CollUtil.isNotEmpty(singerByMusicId)) {
                 ArrayList<ArItem> ar = new ArrayList<>();
@@ -133,9 +237,11 @@ public class MusicApi {
             
             songs.add(e);
             
-            PrivilegesItem privilegesItem = new PrivilegesItem();
+            // PrivilegesItem privilegesItem = new PrivilegesItem();
             privilegesItem.setId(tbMusicPojo.getId());
+            // 0 为无效歌曲，就是网易云没版权
             privilegesItem.setPl(1);
+            // 0: 免费或无版权
             privilegesItem.setFee(0);
             privileges.add(privilegesItem);
         }

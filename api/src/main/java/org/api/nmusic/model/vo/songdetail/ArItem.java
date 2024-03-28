@@ -1,13 +1,24 @@
 package org.api.nmusic.model.vo.songdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Setter
+@Getter
 public class ArItem {
-    private String name;
-    private List<Object> tns;
-    private List<String> alias;
-    private Long id;
+	
+	@JsonProperty("name")
+	private String name;
+	
+	@JsonProperty("tns")
+	private List<Object> tns;
+	
+	@JsonProperty("alias")
+	private List<String> alias;
+	
+	@JsonProperty("id")
+	private Long id;
 }

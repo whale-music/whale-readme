@@ -96,9 +96,10 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
      */
     @Override
     public Map<Long, String> getPicPath(Collection<Long> middleIds, Byte type) {
-        if (CollUtil.isEmpty(middleIds)) {
+        if (CollUtil.isEmpty(middleIds) || CollUtil.isEmpty(middleIds.stream().filter(Objects::nonNull).toList())) {
             return Collections.emptyMap();
         }
+        // todo 需要优化, 图片type
         final Byte finalQueryType;
         // 通过关联ID获取封面ID, 没有则全部查询
         List<PicMiddleTypeModel> middleTypeModels = new ArrayList<>();

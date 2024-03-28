@@ -1,6 +1,7 @@
 package org.api.admin.model.res;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +14,17 @@ import java.util.List;
 @Setter
 @Getter
 public class ActivityDeviceRes {
+    
+    @JsonProperty("adminDevices")
     List<Devices> adminDevices = new ArrayList<>();
+    
+    @JsonProperty("nMusicDevices")
     List<Devices> nMusicDevices = new ArrayList<>();
+    
+    @JsonProperty("subsonicDevices")
     List<Devices> subsonicDevices = new ArrayList<>();
+    
+    @JsonProperty("webdavDevices")
     List<Devices> webdavDevices = new ArrayList<>();
     
     @Setter

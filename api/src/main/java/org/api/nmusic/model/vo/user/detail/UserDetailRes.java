@@ -14,16 +14,16 @@ public class UserDetailRes {
 	private UserPoint userPoint;
 	
 	@JsonProperty("code")
-	private int code;
+	private Integer code;
 	
 	@JsonProperty("level")
-	private int level;
+	private Integer level;
 	
 	@JsonProperty("listenSongs")
-	private int listenSongs;
+	private Integer listenSongs;
 	
 	@JsonProperty("createDays")
-	private int createDays;
+	private Integer createDays;
 	
 	@JsonProperty("profile")
 	private Profile profile;
@@ -32,50 +32,50 @@ public class UserDetailRes {
 	private List<BindingsItem> bindings;
 	
 	@JsonProperty("pcSign")
-	private boolean pcSign;
+	private Boolean pcSign;
 	
 	@JsonProperty("mobileSign")
-	private boolean mobileSign;
+	private Boolean mobileSign;
 	
 	@JsonProperty("profileVillageInfo")
 	private ProfileVillageInfo profileVillageInfo;
 	
 	@JsonProperty("adValid")
-	private boolean adValid;
+	private Boolean adValid;
 	
 	@JsonProperty("createTime")
-	private long createTime;
+	private Long createTime;
 	
 	@JsonProperty("recallUser")
-	private boolean recallUser;
+	private Boolean recallUser;
 	
 	@JsonProperty("newUser")
-	private boolean newUser;
+	private Boolean newUser;
 	
 	@JsonProperty("peopleCanSeeMyPlayRecord")
-	private boolean peopleCanSeeMyPlayRecord;
+	private Boolean peopleCanSeeMyPlayRecord;
 	
 	@Getter
 	@Setter
 	public static class UserPoint {
 		
 		@JsonProperty("balance")
-		private int balance;
+		private Integer balance;
 		
 		@JsonProperty("blockBalance")
-		private int blockBalance;
+		private Integer blockBalance;
 		
 		@JsonProperty("updateTime")
-		private long updateTime;
+		private Long updateTime;
 		
 		@JsonProperty("userId")
-		private long userId;
+		private Long userId;
 		
 		@JsonProperty("version")
-		private int version;
+		private Integer version;
 		
 		@JsonProperty("status")
-		private int status;
+		private Integer status;
 	}
 	
 	@Getter
@@ -86,7 +86,7 @@ public class UserDetailRes {
 		private String backgroundUrl;
 		
 		@JsonProperty("birthday")
-		private long birthday;
+		private Long birthday;
 		
 		@JsonProperty("detailDescription")
 		private String detailDescription;
@@ -95,16 +95,16 @@ public class UserDetailRes {
 		private PrivacyItemUnlimit privacyItemUnlimit;
 		
 		@JsonProperty("gender")
-		private int gender;
+		private Integer gender;
 		
 		@JsonProperty("city")
-		private int city;
+		private Integer city;
 		
 		@JsonProperty("signature")
 		private String signature;
 		
 		@JsonProperty("followeds")
-		private int followeds;
+		private Integer followeds;
 		
 		@JsonProperty("description")
 		private String description;
@@ -113,22 +113,22 @@ public class UserDetailRes {
 		private Object remarkName;
 		
 		@JsonProperty("eventCount")
-		private int eventCount;
+		private Integer eventCount;
 		
 		@JsonProperty("allSubscribedCount")
-		private int allSubscribedCount;
+		private Integer allSubscribedCount;
 		
 		@JsonProperty("playlistBeSubscribedCount")
-		private int playlistBeSubscribedCount;
+		private Integer playlistBeSubscribedCount;
 		
 		@JsonProperty("accountStatus")
-		private int accountStatus;
+		private Integer accountStatus;
 		
 		@JsonProperty("avatarImgId")
-		private long avatarImgId;
+		private Long avatarImgId;
 		
 		@JsonProperty("defaultAvatar")
-		private boolean defaultAvatar;
+		private Boolean defaultAvatar;
 		
 		@JsonProperty("avatarImgIdStr")
 		private String avatarImgIdStr;
@@ -137,10 +137,10 @@ public class UserDetailRes {
 		private String backgroundImgIdStr;
 		
 		@JsonProperty("province")
-		private int province;
+		private Integer province;
 		
 		@JsonProperty("followMe")
-		private boolean followMe;
+		private Boolean followMe;
 		
 		@JsonProperty("artistIdentity")
 		private List<Object> artistIdentity;
@@ -152,37 +152,37 @@ public class UserDetailRes {
 		private Object expertTags;
 		
 		@JsonProperty("sDJPCount")
-		private int sDJPCount;
+		private Integer sDJPCount;
 		
 		@JsonProperty("newFollows")
-		private int newFollows;
+		private Integer newFollows;
 		
 		@JsonProperty("djStatus")
-		private int djStatus;
+		private Integer djStatus;
 		
 		@JsonProperty("avatarUrl")
 		private String avatarUrl;
 		
 		@JsonProperty("authStatus")
-		private int authStatus;
+		private Integer authStatus;
 		
 		@JsonProperty("follows")
-		private int follows;
+		private Integer follows;
 		
 		@JsonProperty("vipType")
-		private int vipType;
+		private Integer vipType;
 		
 		@JsonProperty("blacklist")
-		private boolean blacklist;
+		private Boolean blacklist;
 		
 		@JsonProperty("followed")
-		private boolean followed;
+		private Boolean followed;
 		
 		@JsonProperty("userId")
-		private long userId;
+		private Long userId;
 		
 		@JsonProperty("mutual")
-		private boolean mutual;
+		private Boolean mutual;
 		
 		@JsonProperty("avatarImgId_str")
 		private String avatarImgId_Str;
@@ -191,22 +191,22 @@ public class UserDetailRes {
 		private Object followTime;
 		
 		@JsonProperty("createTime")
-		private long createTime;
+		private Long createTime;
 		
 		@JsonProperty("authority")
-		private int authority;
+		private Integer authority;
 		
 		@JsonProperty("cCount")
-		private int cCount;
+		private Integer cCount;
 		
 		@JsonProperty("inBlacklist")
-		private boolean inBlacklist;
+		private Boolean inBlacklist;
 		
 		@JsonProperty("backgroundImgId")
 		private Long backgroundImgId;
 		
 		@JsonProperty("userType")
-		private int userType;
+		private Integer userType;
 		
 		@JsonProperty("avatarDetail")
 		private Object avatarDetail;
@@ -215,29 +215,29 @@ public class UserDetailRes {
 		private Experts experts;
 		
 		@JsonProperty("playlistCount")
-		private int playlistCount;
+		private Integer playlistCount;
 		
 		@JsonProperty("sCount")
-		private int sCount;
+		private Integer sCount;
 		
 		@Getter
 		@Setter
 		public static class PrivacyItemUnlimit {
 			
 			@JsonProperty("area")
-			private boolean area;
+			private Boolean area;
 			
 			@JsonProperty("college")
-			private boolean college;
+			private Boolean college;
 			
 			@JsonProperty("gender")
-			private boolean gender;
+			private Boolean gender;
 			
 			@JsonProperty("age")
-			private boolean age;
+			private Boolean age;
 			
 			@JsonProperty("villageAge")
-			private boolean villageAge;
+			private Boolean villageAge;
 		}
 		
 		@Getter
@@ -268,28 +268,28 @@ public class UserDetailRes {
 	public static class BindingsItem {
 		
 		@JsonProperty("expiresIn")
-		private int expiresIn;
+		private Integer expiresIn;
 		
 		@JsonProperty("expired")
-		private boolean expired;
+		private Boolean expired;
 		
 		@JsonProperty("tokenJsonStr")
 		private Object tokenJsonStr;
 		
 		@JsonProperty("refreshTime")
-		private int refreshTime;
+		private Integer refreshTime;
 		
 		@JsonProperty("id")
-		private int id;
+		private Integer id;
 		
 		@JsonProperty("type")
-		private int type;
+		private Integer type;
 		
 		@JsonProperty("bindingTime")
-		private long bindingTime;
+		private Long bindingTime;
 		
 		@JsonProperty("userId")
-		private int userId;
+		private Integer userId;
 		
 		@JsonProperty("url")
 		private String url;

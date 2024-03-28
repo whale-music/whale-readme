@@ -292,10 +292,10 @@ public class PlayListController {
         return r.success();
     }
     
+    @AnonymousAccess
     @WebLog(LogNameConstant.N_MUSIC)
     @RequestMapping(value = "/likelist", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult likelist(@RequestParam(value = "uid", required = false) Long uid) {
-        uid = Optional.ofNullable(uid).orElse(UserUtil.getUser().getId());
         List<Long> ids = collect.likelist(uid);
         NeteaseResult r = new NeteaseResult();
         r.put("ids", ids);

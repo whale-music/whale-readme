@@ -1,11 +1,22 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ChargeInfoListItem {
-    private Integer rate;
-    private Object chargeMessage;
-    private Integer chargeType;
-    private Object chargeUrl;
+	
+	@JsonProperty("rate")
+	private Integer rate;
+	
+	@JsonProperty("chargeMessage")
+	private Object chargeMessage;
+	
+	@JsonProperty("chargeType")
+	private Integer chargeType;
+	
+	@JsonProperty("chargeUrl")
+	private Object chargeUrl;
 }

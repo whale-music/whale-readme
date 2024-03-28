@@ -1,17 +1,40 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class TrackIdsItem {
-    private Object sc;
-    private Integer uid;
-    private Long at;
-    private Integer t;
-    private Integer v;
-    private Object f;
-    private String rcmdReason;
-    private Long id;
-    private Object alg;
-    private Object sr;
+	
+	@JsonProperty("sc")
+	private Object sc;
+	
+	@JsonProperty("uid")
+	private Integer uid;
+	
+	@JsonProperty("at")
+	private Long at;
+	
+	@JsonProperty("t")
+	private Integer t;
+	
+	@JsonProperty("v")
+	private Integer v;
+	
+	@JsonProperty("f")
+	private Object f;
+	
+	@JsonProperty("rcmdReason")
+	private String rcmdReason;
+	
+	@JsonProperty("id")
+	private Long id;
+	
+	@JsonProperty("alg")
+	private Object alg;
+	
+	@JsonProperty("sr")
+	private Object sr;
 }

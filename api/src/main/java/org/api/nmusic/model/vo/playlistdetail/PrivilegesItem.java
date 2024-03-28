@@ -1,38 +1,102 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class PrivilegesItem {
-    private Integer flag;
-    private String dlLevel;
-    private Integer subp;
-    private Integer fl;
-    private Integer fee;
-    private Integer dl;
-    private String plLevel;
-    private boolean paidBigBang;
-    private String maxBrLevel;
-    private Integer maxbr;
-    private Integer id;
-    private Integer sp;
-    private Integer payed;
-    private Object rscl;
-    private Integer st;
-    private Integer realPayed;
-    private List<ChargeInfoListItem> chargeInfoList;
-    private FreeTrialPrivilege freeTrialPrivilege;
-    private Integer downloadMaxbr;
-    private String downloadMaxBrLevel;
-    private Integer cp;
-    private boolean preSell;
-    private String playMaxBrLevel;
-    private boolean cs;
-    private boolean toast;
-    private Integer playMaxbr;
-    private Object pc;
-    private String flLevel;
-    private Integer pl;
+	
+	@JsonProperty("flag")
+	private Integer flag;
+	
+	@JsonProperty("dlLevel")
+	private String dlLevel;
+	
+	@JsonProperty("subp")
+	private Integer subp;
+	
+	@JsonProperty("fl")
+	private Integer fl;
+	
+	@JsonProperty("fee")
+	private Integer fee;
+	
+	@JsonProperty("dl")
+	private Integer dl;
+	
+	@JsonProperty("plLevel")
+	private String plLevel;
+	
+	@JsonProperty("paidBigBang")
+	private Boolean paidBigBang;
+	
+	@JsonProperty("maxBrLevel")
+	private String maxBrLevel;
+	
+	@JsonProperty("rightSource")
+	private Integer rightSource;
+	
+	@JsonProperty("maxbr")
+	private Integer maxbr;
+	
+	@JsonProperty("id")
+	private Integer id;
+	
+	@JsonProperty("sp")
+	private Integer sp;
+	
+	@JsonProperty("payed")
+	private Integer payed;
+	
+	@JsonProperty("rscl")
+	private Object rscl;
+	
+	@JsonProperty("st")
+	private Integer st;
+	
+	@JsonProperty("realPayed")
+	private Integer realPayed;
+	
+	@JsonProperty("chargeInfoList")
+	private List<ChargeInfoListItem> chargeInfoList;
+	
+	@JsonProperty("freeTrialPrivilege")
+	private FreeTrialPrivilege freeTrialPrivilege;
+	
+	@JsonProperty("downloadMaxbr")
+	private Integer downloadMaxbr;
+	
+	@JsonProperty("downloadMaxBrLevel")
+	private String downloadMaxBrLevel;
+	
+	@JsonProperty("cp")
+	private Integer cp;
+	
+	@JsonProperty("preSell")
+	private Boolean preSell;
+	
+	@JsonProperty("playMaxBrLevel")
+	private String playMaxBrLevel;
+	
+	@JsonProperty("cs")
+	private Boolean cs;
+	
+	@JsonProperty("toast")
+	private Boolean toast;
+	
+	@JsonProperty("playMaxbr")
+	private Integer playMaxbr;
+	
+	@JsonProperty("pc")
+	private Object pc;
+	
+	@JsonProperty("flLevel")
+	private String flLevel;
+	
+	@JsonProperty("pl")
+	private Integer pl;
 }

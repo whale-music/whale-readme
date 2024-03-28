@@ -1,10 +1,25 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class FreeTrialPrivilege {
-    private boolean userConsumable;
-    private boolean resConsumable;
-    private Object listenType;
+	
+	@JsonProperty("userConsumable")
+	private Boolean userConsumable;
+	
+	@JsonProperty("resConsumable")
+	private Boolean resConsumable;
+	
+	@JsonProperty("cannotListenReason")
+	private Integer cannotListenReason;
+	
+	@JsonProperty("playReason")
+	private Object playReason;
+	
+	@JsonProperty("listenType")
+	private Integer listenType;
 }

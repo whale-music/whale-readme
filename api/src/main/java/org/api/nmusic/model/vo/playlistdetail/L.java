@@ -1,11 +1,25 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class L {
-    private Integer br;
-    private Integer fid;
-    private Integer size;
-    private Integer vd;
+	
+	@JsonProperty("br")
+	private Integer br;
+	
+	@JsonProperty("fid")
+	private Integer fid;
+	
+	@JsonProperty("size")
+	private Integer size;
+	
+	@JsonProperty("vd")
+	private Integer vd;
+	
+	@JsonProperty("sr")
+	private Integer sr;
 }

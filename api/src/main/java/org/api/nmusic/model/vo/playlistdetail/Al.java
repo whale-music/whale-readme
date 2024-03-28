@@ -1,15 +1,30 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class Al {
-    private String picUrl;
-    private String name;
-    private List<Object> tns;
-    private String picStr;
-    private Long id;
-    private Long pic;
+	
+	@JsonProperty("picUrl")
+	private String picUrl;
+	
+	@JsonProperty("name")
+	private String name;
+	
+	@JsonProperty("tns")
+	private List<Object> tns;
+	
+	@JsonProperty("pic_str")
+	private String picStr;
+	
+	@JsonProperty("id")
+	private Long id;
+	
+	@JsonProperty("pic")
+	private Long pic;
 }

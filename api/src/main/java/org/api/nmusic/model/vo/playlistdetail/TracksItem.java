@@ -1,55 +1,153 @@
 package org.api.nmusic.model.vo.playlistdetail;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class TracksItem {
-    private Integer no;
-    private String rt;
-    private Integer copyright;
-    private Integer fee;
-    private Object rurl;
-    private Object hr;
-    private Object tagPicList;
-    private Integer mst;
-    private Integer pst;
-    private Integer pop;
-    private Integer dt;
-    private Integer rtype;
-    private Integer sId;
-    private List<Object> rtUrls;
-    private boolean resourceState;
-    private Object songJumpInfo;
-    private Long id;
-    private Object entertainmentTags;
-    private Sq sq;
-    private Integer st;
-    private Object a;
-    private String cd;
-    private Long publishTime;
-    private String cf;
-    private Integer originCoverType;
-    private H h;
-    private Integer mv;
-    private Al al;
-    private Object originSongSimpleData;
-    private L l;
-    private M m;
-    private Integer version;
-    private Integer cp;
-    private List<String> alia;
-    private Integer djId;
-    private Object noCopyrightRcmd;
-    private Object crbt;
-    private Integer single;
-    private List<ArItem> ar;
-    private Object rtUrl;
-    private Integer ftype;
-    private Integer t;
-    private Integer v;
-    private String name;
-    private Integer mark;
-    private List<String> tns;
+	
+	@JsonProperty("no")
+	private Integer no;
+	
+	@JsonProperty("rt")
+	private String rt;
+	
+	@JsonProperty("copyright")
+	private Integer copyright;
+	
+	@JsonProperty("fee")
+	private Integer fee;
+	
+	@JsonProperty("rurl")
+	private Object rurl;
+	
+	@JsonProperty("hr")
+	private Object hr;
+	
+	@JsonProperty("tagPicList")
+	private Object tagPicList;
+	
+	@JsonProperty("mst")
+	private Integer mst;
+	
+	@JsonProperty("pst")
+	private Integer pst;
+	
+	@JsonProperty("pop")
+	private Integer pop;
+	
+	@JsonProperty("dt")
+	private Integer dt;
+	
+	@JsonProperty("awardTags")
+	private Object awardTags;
+	
+	@JsonProperty("rtype")
+	private Integer rtype;
+	
+	@JsonProperty("s_id")
+	private Integer sId;
+	
+	@JsonProperty("rtUrls")
+	private List<Object> rtUrls;
+	
+	@JsonProperty("resourceState")
+	private Boolean resourceState;
+	
+	@JsonProperty("songJumpInfo")
+	private Object songJumpInfo;
+	
+	@JsonProperty("id")
+	private Long id;
+	
+	@JsonProperty("entertainmentTags")
+	private Object entertainmentTags;
+	
+	@JsonProperty("sq")
+	private Sq sq;
+	
+	@JsonProperty("st")
+	private Integer st;
+	
+	@JsonProperty("a")
+	private Object a;
+	
+	@JsonProperty("cd")
+	private String cd;
+	
+	@JsonProperty("publishTime")
+	private Long publishTime;
+	
+	@JsonProperty("cf")
+	private String cf;
+	
+	@JsonProperty("originCoverType")
+	private Integer originCoverType;
+	
+	@JsonProperty("h")
+	private H h;
+	
+	@JsonProperty("mv")
+	private Integer mv;
+	
+	@JsonProperty("al")
+	private Al al;
+	
+	@JsonProperty("originSongSimpleData")
+	private OriginSongSimpleData originSongSimpleData;
+	
+	@JsonProperty("l")
+	private L l;
+	
+	@JsonProperty("m")
+	private M m;
+	
+	@JsonProperty("version")
+	private Integer version;
+	
+	@JsonProperty("cp")
+	private Integer cp;
+	
+	@JsonProperty("alia")
+	private List<String> alia;
+	
+	@JsonProperty("djId")
+	private Integer djId;
+	
+	@JsonProperty("noCopyrightRcmd")
+	private Object noCopyrightRcmd;
+	
+	@JsonProperty("crbt")
+	private Object crbt;
+	
+	@JsonProperty("single")
+	private Integer single;
+	
+	@JsonProperty("ar")
+	private List<ArItem> ar;
+	
+	@JsonProperty("rtUrl")
+	private Object rtUrl;
+	
+	@JsonProperty("ftype")
+	private Integer ftype;
+	
+	@JsonProperty("t")
+	private Integer t;
+	
+	@JsonProperty("v")
+	private Integer v;
+	
+	@JsonProperty("name")
+	private String name;
+	
+	@JsonProperty("tns")
+	private List<String> tns;
+	
+	@JsonProperty("mark")
+	private Integer mark;
 }

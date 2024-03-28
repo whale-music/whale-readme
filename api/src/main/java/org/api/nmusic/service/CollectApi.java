@@ -1,6 +1,7 @@
 package org.api.nmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -358,7 +359,7 @@ public class CollectApi {
         playlist.setId(byId.getId());
         playlist.setName(byId.getPlayListName());
         playlist.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(byId.getId()));
-        playlist.setUpdateTime((long) byId.getUpdateTime().getNano());
+        playlist.setUpdateTime(DateUtil.date(byId.getUpdateTime()).getTime());
         playlist.setDescription(byId.getDescription());
         
         // 歌单创建者

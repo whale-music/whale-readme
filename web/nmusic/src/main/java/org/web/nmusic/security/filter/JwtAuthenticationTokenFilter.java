@@ -99,6 +99,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (first.isPresent()) {
             token = first.get();
         } else {
+            String requestURI = requestWrapper.getRequestURI();
             try {
                 // get parameters
                 String cookies = getCookiesByParam(requestWrapper);
@@ -107,12 +108,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                     this.requestWrapper = new RepeatedlyRequestWrapper(requestWrapper);
                     // post body
                     String jsonBody = IOUtils.toString(requestWrapper.getReader());
-                    cookies = JSONUtil.parseObj(jsonBody).get(CookieConstant.COOKIE_NAME_COOKIE, String.class);
+                    if (JSONUtil.isTypeJSON(jsonBody)) {
+                        cookies = JSONUtil.parseObj(jsonBody).get(CookieConstant.COOKIE_NAME_COOKIE, String.class);
+                    }
                 }
                 token = parserCookie(cookies);
             } catch (Exception e) {
                 log.error("Failed to parse cookie, origin msgs: {}", e.getMessage());
-                log.error("error path: {}", requestWrapper.getRequestURI());
+                log.error("error path: {}", requestURI);
             }
         }
         return token;

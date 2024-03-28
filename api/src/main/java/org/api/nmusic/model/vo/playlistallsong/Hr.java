@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class Hr {
-    private int br;
-    private long fid;
-    private int size;
-    private int vd;
-    private int sr;
+    private Integer br;
+    private Long fid;
+    private Integer size;
+    private Integer vd;
+    private Integer sr;
 }

@@ -6,30 +6,30 @@ import java.util.List;
 
 @Data
 public class PrivilegesItem {
-    private int flag;
+    private Integer flag;
     private String dlLevel;
-    private int subp;
-    private int fl;
-    private int fee;
-    private int dl;
+    private Integer subp;
+    private Integer fl;
+    private Integer fee;
+    private Integer dl;
     private String plLevel;
     private String maxBrLevel;
-    private int maxbr;
-    private int id;
-    private int sp;
-    private int payed;
+    private Integer maxbr;
+    private Integer id;
+    private Integer sp;
+    private Integer payed;
     private Object rscl;
-    private int st;
+    private Integer st;
     private List<ChargeInfoListItem> chargeInfoList;
     private FreeTrialPrivilege freeTrialPrivilege;
-    private int downloadMaxbr;
+    private Integer downloadMaxbr;
     private String downloadMaxBrLevel;
-    private int cp;
-    private boolean preSell;
+    private Integer cp;
+    private Boolean preSell;
     private String playMaxBrLevel;
-    private boolean cs;
-    private boolean toast;
-    private int playMaxbr;
+    private Boolean cs;
+    private Boolean toast;
+    private Integer playMaxbr;
     private String flLevel;
-    private int pl;
+    private Integer pl;
 }

@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class ChargeInfoListItem {
-    private int rate;
+    private Integer rate;
     private Object chargeMessage;
-    private int chargeType;
+    private Integer chargeType;
     private Object chargeUrl;
 }

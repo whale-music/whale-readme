@@ -10,6 +10,6 @@ public class Al {
     private String name;
     private List<Object> tns;
     private String picStr;
-    private int id;
-    private long pic;
+    private Integer id;
+    private Long pic;
 }

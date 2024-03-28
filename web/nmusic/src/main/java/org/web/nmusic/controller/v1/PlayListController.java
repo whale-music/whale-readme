@@ -3,6 +3,7 @@ package org.web.nmusic.controller.v1;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.createplatlist.CreatePlaylistVo;
 import org.api.nmusic.model.vo.createplatlist.Playlist;
@@ -175,7 +176,7 @@ public class PlayListController {
         for (MusicConvert musicPojo : playListAllSong.getRecords()) {
             Map<Integer, TbResourcePojo> musicInfoMaps = musicInfos.stream()
                                                                    .collect(Collectors.toMap(TbResourcePojo::getRate,
-                                                                           tbMusicUrlPojo -> tbMusicUrlPojo));
+                                                                           tbMusicUrlPojo -> tbMusicUrlPojo, (v1, v2) -> v2));
             SongsItem e = new SongsItem();
             // Sq 无损
             Optional<TbResourcePojo> sq = Optional.ofNullable(musicInfoMaps.get(320000));
@@ -228,7 +229,9 @@ public class PlayListController {
             
             e.setName(musicPojo.getMusicName());
             e.setId(musicPojo.getId());
-            e.setAlia(Arrays.asList(musicPojo.getAliasName().split(",")));
+            if (StringUtils.isNotBlank(musicPojo.getAliasName())) {
+                e.setAlia(Arrays.asList(musicPojo.getAliasName().split(",")));
+            }
             Al al = new Al();
             al.setName(musicPojo.getMusicName());
             al.setPicUrl(musicPojo.getPicUrl());

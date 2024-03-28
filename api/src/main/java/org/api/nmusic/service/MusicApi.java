@@ -16,6 +16,7 @@ import org.api.nmusic.model.vo.song.lyric.Tlyric;
 import org.api.nmusic.model.vo.songdetail.*;
 import org.api.nmusic.model.vo.songurl.DataItem;
 import org.api.nmusic.model.vo.songurl.SongUrlRes;
+import org.api.nmusic.model.vo.songurlv1.SongUrlV1;
 import org.core.common.constant.HistoryConstant;
 import org.core.common.constant.LyricConstant;
 import org.core.mybatis.iservice.*;
@@ -363,5 +364,36 @@ public class MusicApi {
         if (CollUtil.isNotEmpty(entityList)) {
             historyService.saveBatch(entityList);
         }
+    }
+    
+    public SongUrlV1 songUrlV1(List<Long> id, String level) {
+        List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(new HashSet<>(id), false);
+        List<TbMusicPojo> musicPojos = musicService.listByIds(id);
+        Map<Long, TbMusicPojo> musicPojoMap = musicPojos.stream().collect(Collectors.toMap(TbMusicPojo::getId, tbMusicPojo -> tbMusicPojo));
+        SongUrlV1 songUrlRes = new SongUrlV1();
+        ArrayList<org.api.nmusic.model.vo.songurlv1.DataItem> data = new ArrayList<>();
+        for (TbResourcePojo tbMusicUrlPojo : musicUrlByMusicId) {
+            org.api.nmusic.model.vo.songurlv1.DataItem e = new org.api.nmusic.model.vo.songurlv1.DataItem();
+            e.setId(tbMusicUrlPojo.getId());
+            e.setUrl(tbMusicUrlPojo.getPath());
+            e.setExpi(60 * 60 * 1000);
+            e.setBr(tbMusicUrlPojo.getRate());
+            e.setFee(1);
+            e.setSize(tbMusicUrlPojo.getSize());
+            e.setCode(200);
+            e.setType(tbMusicUrlPojo.getEncodeType());
+            e.setEncodeType(tbMusicUrlPojo.getEncodeType());
+            e.setLevel(tbMusicUrlPojo.getLevel());
+            e.setMd5(tbMusicUrlPojo.getMd5());
+            e.setUrlSource(0);
+            e.setRightSource(0);
+            e.setTime(Optional.ofNullable(musicPojoMap.get(tbMusicUrlPojo.getMusicId())).orElse(new TbMusicPojo()).getTimeLength());
+            data.add(e);
+            if (StringUtils.equals(tbMusicUrlPojo.getLevel(), level)) {
+                break;
+            }
+        }
+        songUrlRes.setData(data);
+        return songUrlRes;
     }
 }

@@ -6,6 +6,7 @@ import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.song.lyric.SongLyricRes;
 import org.api.nmusic.model.vo.songdetail.SongDetailRes;
 import org.api.nmusic.model.vo.songurl.SongUrlRes;
+import org.api.nmusic.model.vo.songurlv1.SongUrlV1;
 import org.api.nmusic.service.MusicApi;
 import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.NeteaseResult;
@@ -58,6 +59,19 @@ public class SongController {
     @RequestMapping(value = "/song/url", method = {RequestMethod.GET, RequestMethod.POST})
     public NeteaseResult songUrl(@RequestParam("id") List<Long> id, @RequestParam(value = "br", required = false, defaultValue = "999000") Integer br) {
         SongUrlRes songUrlRes = musicApi.songUrl(id, br);
+        NeteaseResult r = new NeteaseResult();
+        r.putAll(BeanUtil.beanToMap(songUrlRes));
+        return r.success();
+    }
+    
+    /**
+     * 获取音乐 url - 新版
+     */
+    @AnonymousAccess
+    @WebLog(LogNameConstant.N_MUSIC)
+    @RequestMapping(value = "/song/url/v1", method = {RequestMethod.GET, RequestMethod.POST})
+    public NeteaseResult songUrlV1(@RequestParam("id") List<Long> id, @RequestParam(value = "level", required = false, defaultValue = "standard") String level) {
+        SongUrlV1 songUrlRes = musicApi.songUrlV1(id, level);
         NeteaseResult r = new NeteaseResult();
         r.putAll(BeanUtil.beanToMap(songUrlRes));
         return r.success();

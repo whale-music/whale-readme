@@ -57,21 +57,20 @@ public class BaseController {
     @NotNull
     protected NeteaseResult getNeteaseResult(HttpServletRequest request, HttpServletResponse response, TokenUtil tokenUtil, SysUserPojo userPojo) {
         String sign = tokenUtil.neteasecloudmusicSignToken(userPojo.getUsername(), userPojo);
-        // 写入用户信息到cookie
-        Cookie cookie = new Cookie(CookieConstant.COOKIE_NAME_MUSIC_U, sign);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        
         Cookie[] cookies = {
                 CookieUtil.createCookieString("MUSIC_R_T", "1465815410743", 2147483647, "Mon, 29 Oct 2091 15:36:04 GMT", "/weapi/feedback"),
                 CookieUtil.createCookieString("MUSIC_A_T", "1465815403512", 2147483647, "Mon, 29 Oct 2091 15:36:04 GMT", "/eapi/feedback"),
                 CookieUtil.createCookieString("MUSIC_SNS", "", 0, "Wed, 11 Oct 2099 12:21:57 GMT", "/"),
-                CookieUtil.createCookieString("MUSIC_U", sign, 2147483647, "Mon, 08 Apr 2099 12:21:57 GMT", "/")
+                CookieUtil.createCookieString(CookieConstant.COOKIE_NAME_MUSIC_U, sign, 2147483647, "Mon, 08 Apr 2099 12:21:57 GMT", "/")
         };
+        // 写入用户信息到cookie
+        for (Cookie cookie : cookies) {
+            response.addCookie(cookie);
+        }
         String s = CookieUtil.cookieToString(cookies, request);
         NeteaseResult r = new NeteaseResult();
         r.put("token", sign);
-        r.put("cookie", s);
+        r.put(CookieConstant.COOKIE_NAME_MUSIC_U, s);
         return r;
     }
 }

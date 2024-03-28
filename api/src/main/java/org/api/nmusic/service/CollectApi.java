@@ -1,7 +1,6 @@
 package org.api.nmusic.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
 import org.api.nmusic.config.NeteaseCloudConfig;
-import org.api.nmusic.model.vo.playlistdetail.*;
+import org.api.nmusic.model.vo.playlistdetail.PlayListDetailRes;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.exception.BaseException;
 import org.core.common.result.NeteaseResult;
@@ -157,30 +156,30 @@ public class CollectApi {
         collectPojo.setId(collectId);
         collectPojo.setUserId(userId);
         QukuServiceImpl.checkUserAuth(userId, collectPojo);
-    
-    
+        
+        
         // 如果为0则直接不需要保存操作
         if (split.length == 0) {
             return;
         }
-    
+        
         // 先删除歌单的关联tag然后在重新添加
         LambdaQueryWrapper<TbMiddleTagPojo> collectLambdaQueryWrapper = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                                                 .eq(TbMiddleTagPojo::getId, collectId);
         collectMusicTagService.remove(collectLambdaQueryWrapper);
-    
+        
         // tag为空字符串跳过
         if (split.length == 1 && StringUtils.isBlank(split[0])) {
             return;
         }
-    
+        
         List<String> splitList = Arrays.asList(split);
-    
+        
         // 需要存入的tag list
         List<TbMiddleTagPojo> saveCollectTagPojoList = new ArrayList<>(split.length);
         // 用来批量存放tb tag
         List<TbTagPojo> saveTbTagList = new ArrayList<>();
-    
+        
         LambdaQueryWrapper<TbTagPojo> tagPojoLambdaQueryWrapper = Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, splitList);
         // 获取tag表中已经记录的tag id
         List<TbTagPojo> tbTagPojos = tagService.list(tagPojoLambdaQueryWrapper);
@@ -354,27 +353,16 @@ public class CollectApi {
             return new PlayListDetailRes();
         }
         List<TbMusicPojo> playListAllMusic = playListService.getPlayListAllMusic(id);
-        PlayListDetailRes playListRes = new PlayListDetailRes();
-        Playlist playlist = new Playlist();
-        playlist.setId(byId.getId());
-        playlist.setName(byId.getPlayListName());
-        playlist.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(byId.getId()));
-        playlist.setUpdateTime(DateUtil.date(byId.getUpdateTime()).getTime());
-        playlist.setDescription(byId.getDescription());
+        SysUserPojo userPojo = Optional.ofNullable(accountService.getById(byId.getUserId())).orElse(new SysUserPojo());
         
+        PlayListDetailRes.Playlist playlist = fillPlayUser(byId, playListAllMusic.size());
         // 歌单创建者
-        Creator creator = new Creator();
-        SysUserPojo userPojo = accountService.getById(byId.getUserId());
-        userPojo = Optional.ofNullable(userPojo).orElse(new SysUserPojo());
-        creator.setNickname(userPojo.getNickname());
-        creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(userPojo.getId()));
-        creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
-        creator.setUserId(userPojo.getId());
+        PlayListDetailRes.Playlist.Creator creator = fillCreatorUser(userPojo);
         playlist.setCreator(creator);
-        playlist.setUserId(userPojo.getId());
         
-        ArrayList<TracksItem> tracks = new ArrayList<>();
-        ArrayList<TrackIdsItem> trackIds = new ArrayList<>();
+        ArrayList<PlayListDetailRes.PrivilegesItem> privileges = new ArrayList<>();
+        ArrayList<PlayListDetailRes.Playlist.TracksItem> tracks = new ArrayList<>();
+        ArrayList<PlayListDetailRes.Playlist.TrackIdsItem> trackIds = new ArrayList<>();
         // 获取歌曲map
         List<Long> musicIds = playListAllMusic.parallelStream().map(TbMusicPojo::getId).toList();
         Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
@@ -382,46 +370,253 @@ public class CollectApi {
         List<Long> albumIds = playListAllMusic.parallelStream().map(TbMusicPojo::getAlbumId).toList();
         Map<Long, AlbumConvert> musicAlbumByAlbumIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         for (TbMusicPojo tbMusicPojo : playListAllMusic) {
-            TracksItem e = new TracksItem();
-            e.setId(tbMusicPojo.getId());
-            e.setName(tbMusicPojo.getMusicName());
-            e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-            e.setPublishTime((long) tbMusicPojo.getCreateTime().getNano());
             // 艺术家数据
-            List<ArtistConvert> singerByMusicId = artistByMusicIdToMap.get(tbMusicPojo.getId());
-            if (CollUtil.isNotEmpty(singerByMusicId)) {
-                ArrayList<ArItem> ar = new ArrayList<>();
-                for (ArtistConvert tbArtistPojo : singerByMusicId) {
-                    ArItem e1 = new ArItem();
-                    e1.setId(tbArtistPojo.getId());
-                    e1.setName(tbArtistPojo.getArtistName());
-                    e1.setAlias(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
-                    ar.add(e1);
-                }
-                e.setAr(ar);
-            }
-            
+            List<ArtistConvert> singerByMusicId = Optional.ofNullable(artistByMusicIdToMap.get(tbMusicPojo.getId())).orElse(new ArrayList<>());
             // 专辑数据
-            AlbumConvert albumByAlbumId = musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId());
-            if (Objects.nonNull(albumByAlbumId)) {
-                Al al = new Al();
-                al.setId(albumByAlbumId.getId());
-                al.setName(albumByAlbumId.getAlbumName());
-                al.setPicUrl(albumByAlbumId.getPicUrl());
-                e.setAl(al);
-            }
+            AlbumConvert albumByAlbumId = Optional.ofNullable(musicAlbumByAlbumIdToMap.get(tbMusicPojo.getAlbumId())).orElse(new AlbumConvert());
             
-            tracks.add(e);
-    
-    
-            TrackIdsItem trackIdsItem = new TrackIdsItem();
-            trackIdsItem.setId(tbMusicPojo.getId());
-            trackIds.add(trackIdsItem);
+            // tracks 歌单内音乐
+            tracks.add(fillTracks(tbMusicPojo, albumByAlbumId, singerByMusicId));
+            // 歌单音乐ID
+            trackIds.add(fillTrackIds(tbMusicPojo, userPojo));
+            // 歌单中歌曲简略信息
+            privileges.add(fillPrivileges(tbMusicPojo));
         }
+        
         playlist.setTracks(tracks);
         playlist.setTrackIds(trackIds);
         playlist.setTrackCount(playListAllMusic.size());
+        
+        PlayListDetailRes playListRes = new PlayListDetailRes();
+        playListRes.setPrivileges(privileges);
         playListRes.setPlaylist(playlist);
         return playListRes;
+    }
+    
+    private PlayListDetailRes.Playlist fillPlayUser(TbCollectPojo byId, int size) {
+        PlayListDetailRes.Playlist playlist = new PlayListDetailRes.Playlist();
+        playlist.setId(byId.getId());
+        playlist.setName(byId.getPlayListName());
+        // playlist.setCoverImgId(109951165443127620);
+        playlist.setCoverImgUrl(remoteStorePicService.getCollectPicUrl(byId.getId()));
+        // playlist.setCoverImgIdStr("109951165443127612");
+        playlist.setAdType(0);
+        playlist.setUserId(byId.getUserId());
+        playlist.setCreateTime(byId.getCreateTimeToTime());
+        playlist.setStatus(0);
+        playlist.setOpRecommend(false);
+        playlist.setHighQuality(false);
+        playlist.setNewImported(false);
+        playlist.setUpdateTime(byId.getUpdateTimeToTime());
+        playlist.setTrackCount(1713);
+        playlist.setSpecialType(5);
+        playlist.setPrivacy(0);
+        playlist.setTrackUpdateTime(byId.getUpdateTimeToTime());
+        playlist.setCommentThreadId("A_PL_0_000000");
+        playlist.setPlayCount(size);
+        playlist.setTrackNumberUpdateTime(byId.getUpdateTimeToTime());
+        playlist.setSubscribedCount(0);
+        playlist.setCloudTrackCount(0);
+        playlist.setOrdered(true);
+        playlist.setDescription(playlist.getDescription());
+        playlist.setTags(new ArrayList<>());
+        playlist.setUpdateFrequency(null);
+        playlist.setBackgroundCoverId(0);
+        playlist.setBackgroundCoverUrl(null);
+        playlist.setTitleImage(0);
+        playlist.setTitleImageUrl(null);
+        playlist.setEnglishTitle(null);
+        playlist.setOfficialPlaylistType(null);
+        playlist.setCopied(false);
+        playlist.setRelateResType(null);
+        return playlist;
+    }
+    
+    private PlayListDetailRes.PrivilegesItem fillPrivileges(TbMusicPojo tbMusicPojo) {
+        PlayListDetailRes.PrivilegesItem songDetail = new PlayListDetailRes.PrivilegesItem();
+        songDetail.setId(tbMusicPojo.getId());
+        songDetail.setFee(0);
+        songDetail.setPayed(0);
+        songDetail.setRealPayed(0);
+        songDetail.setSt(0);
+        songDetail.setPl(320000);
+        songDetail.setDl(999000);
+        songDetail.setSp(7);
+        songDetail.setCp(1);
+        songDetail.setSubp(1);
+        songDetail.setCs(false);
+        songDetail.setMaxbr(999000);
+        songDetail.setFl(320000);
+        songDetail.setPc(null);
+        songDetail.setToast(false);
+        songDetail.setFlag(256);
+        songDetail.setPaidBigBang(false);
+        songDetail.setPreSell(false);
+        songDetail.setPlayMaxbr(999000);
+        songDetail.setDownloadMaxbr(999000);
+        songDetail.setMaxBrLevel("lossless");
+        songDetail.setPlayMaxBrLevel("lossless");
+        songDetail.setDownloadMaxBrLevel("lossless");
+        songDetail.setPlLevel("exhigh");
+        songDetail.setDlLevel("lossless");
+        songDetail.setFlLevel("exhigh");
+        songDetail.setRscl(null);
+        
+        List<PlayListDetailRes.PrivilegesItem.ChargeInfoListItem> chargeInfoList = new ArrayList<>();
+        chargeInfoList.add(new PlayListDetailRes.PrivilegesItem.ChargeInfoListItem(128000, null, null, 0));
+        chargeInfoList.add(new PlayListDetailRes.PrivilegesItem.ChargeInfoListItem(192000, null, null, 0));
+        chargeInfoList.add(new PlayListDetailRes.PrivilegesItem.ChargeInfoListItem(320000, null, null, 0));
+        chargeInfoList.add(new PlayListDetailRes.PrivilegesItem.ChargeInfoListItem(999000, null, null, 0));
+        songDetail.setChargeInfoList(chargeInfoList);
+        
+        PlayListDetailRes.PrivilegesItem.FreeTrialPrivilege freeTrialPrivilege = new PlayListDetailRes.PrivilegesItem.FreeTrialPrivilege();
+        freeTrialPrivilege.setResConsumable(false);
+        freeTrialPrivilege.setUserConsumable(false);
+        freeTrialPrivilege.setListenType(0);
+        freeTrialPrivilege.setCannotListenReason(1);
+        freeTrialPrivilege.setPlayReason(null);
+        songDetail.setFreeTrialPrivilege(freeTrialPrivilege);
+        return songDetail;
+    }
+    
+    private PlayListDetailRes.Playlist.Creator fillCreatorUser(SysUserPojo userPojo) {
+        PlayListDetailRes.Playlist.Creator creator = new PlayListDetailRes.Playlist.Creator();
+        creator.setDefaultAvatar(false);
+        creator.setProvince(420000);
+        creator.setAuthStatus(0);
+        creator.setFollowed(false);
+        creator.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(userPojo.getId()));
+        creator.setAccountStatus(0);
+        creator.setGender(1);
+        creator.setCity(1010000);
+        creator.setBirthday(0);
+        creator.setUserId(userPojo.getId());
+        creator.setUserType(0);
+        creator.setNickname(userPojo.getNickname());
+        creator.setSignature(userPojo.getSignature());
+        creator.setDescription("");
+        creator.setDetailDescription("");
+        // creator.setAvatarImgId(0L);
+        // creator.setBackgroundImgId(0L);
+        creator.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(userPojo.getId()));
+        creator.setAuthority(0);
+        creator.setMutual(false);
+        creator.setDjStatus(0);
+        creator.setVipType(2);
+        creator.setAuthenticationTypes(0);
+        // creator.setAvatarImgIdStr("");
+        // creator.setBackgroundImgIdStr("");
+        creator.setAnchor(false);
+        return creator;
+    }
+    
+    private PlayListDetailRes.Playlist.TrackIdsItem fillTrackIds(TbMusicPojo tbMusicPojo, SysUserPojo userPojo) {
+        PlayListDetailRes.Playlist.TrackIdsItem song = new PlayListDetailRes.Playlist.TrackIdsItem();
+        song.setId(tbMusicPojo.getId());
+        song.setV(0);
+        song.setT(0);
+        song.setAt(1711525625685L);
+        song.setUid(userPojo.getId());
+        song.setRcmdReason("");
+        return song;
+    }
+    
+    private PlayListDetailRes.Playlist.TracksItem fillTracks(TbMusicPojo tbMusicPojo, AlbumConvert albumByAlbumId, List<ArtistConvert> artistConverts) {
+        PlayListDetailRes.Playlist.TracksItem e = new PlayListDetailRes.Playlist.TracksItem();
+        e.setName(tbMusicPojo.getMusicName());
+        e.setId(tbMusicPojo.getId());
+        e.setPst(0);
+        e.setT(0);
+        
+        List<PlayListDetailRes.Playlist.TracksItem.ArItem> artists = new ArrayList<>();
+        if (CollUtil.isNotEmpty(artistConverts)) {
+            for (ArtistConvert artistConvert : artistConverts) {
+                PlayListDetailRes.Playlist.TracksItem.ArItem artist = new PlayListDetailRes.Playlist.TracksItem.ArItem();
+                artist.setId(artistConvert.getId());
+                artist.setName(artistConvert.getArtistName());
+                artist.setAlias(AliasUtil.getAliasList(artistConvert.getAliasName()));
+                artists.add(artist);
+            }
+        }
+        e.setAr(artists);
+        e.setAlia(AliasUtil.getAliasList(tbMusicPojo.getAliasName()));
+        // e.setPop(100);
+        e.setSt(0);
+        e.setRt("");
+        e.setFee(0);
+        e.setV(3);
+        e.setCrbt(null);
+        e.setCf("");
+        
+        PlayListDetailRes.Playlist.TracksItem.Al album = new PlayListDetailRes.Playlist.TracksItem.Al();
+        album.setId(albumByAlbumId.getId());
+        album.setName(albumByAlbumId.getAlbumName());
+        album.setPicUrl(remoteStorePicService.getAlbumPicUrl(albumByAlbumId.getId()));
+        album.setTns(new ArrayList<>());
+        // album.setPicStr("");
+        // album.setPic(0L);
+        e.setAl(album);
+        e.setDt(tbMusicPojo.getTimeLength());
+        PlayListDetailRes.Playlist.TracksItem.H h = new PlayListDetailRes.Playlist.TracksItem.H();
+        h.setBr(320001);
+        h.setFid(0);
+        h.setSize(10202427);
+        h.setVd(-40588);
+        h.setSr(44100);
+        e.setH(h);
+        
+        PlayListDetailRes.Playlist.TracksItem.M m = new PlayListDetailRes.Playlist.TracksItem.M();
+        m.setBr(192001);
+        m.setFid(0);
+        m.setSize(6121474);
+        m.setVd(-38058);
+        m.setSr(44100);
+        e.setM(m);
+        
+        
+        PlayListDetailRes.Playlist.TracksItem.L l = new PlayListDetailRes.Playlist.TracksItem.L();
+        l.setBr(128001);
+        l.setFid(0);
+        l.setSize(4080997);
+        l.setVd(-36535);
+        l.setSr(44100);
+        e.setL(l);
+        
+        PlayListDetailRes.Playlist.TracksItem.Sq sq = new PlayListDetailRes.Playlist.TracksItem.Sq();
+        sq.setBr(1652269);
+        sq.setFid(0);
+        sq.setSize(52666081);
+        sq.setVd(-40625);
+        sq.setSr(44100);
+        e.setSq(sq);
+        
+        e.setHr(null);
+        e.setA(null);
+        e.setCd("01");
+        e.setNo(1);
+        e.setRtUrl(null);
+        e.setFtype(0);
+        e.setRtUrls(new ArrayList<>());
+        e.setDjId(0);
+        e.setCopyright(0);
+        e.setSId(0);
+        e.setMark(128);
+        e.setOriginCoverType(1);
+        e.setOriginSongSimpleData(null);
+        e.setTagPicList(null);
+        e.setResourceState(true);
+        e.setVersion(3);
+        e.setSongJumpInfo(null);
+        e.setEntertainmentTags(null);
+        e.setAwardTags(null);
+        e.setSingle(0);
+        e.setNoCopyrightRcmd(null);
+        e.setRtype(0);
+        e.setRurl(null);
+        e.setMst(9);
+        e.setCp(0);
+        e.setMv(0);
+        e.setPublishTime(tbMusicPojo.getPublishTimeToTime());
+        return e;
     }
 }

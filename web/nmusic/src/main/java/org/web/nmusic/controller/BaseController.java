@@ -70,7 +70,7 @@ public class BaseController {
         String s = CookieUtil.cookieToString(cookies, request);
         NeteaseResult r = new NeteaseResult();
         r.put("token", sign);
-        r.put(CookieConstant.COOKIE_NAME_MUSIC_U, s);
+        r.put(CookieConstant.COOKIE_NAME_COOKIE, s);
         return r;
     }
 }

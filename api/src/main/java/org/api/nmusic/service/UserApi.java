@@ -10,10 +10,7 @@ import org.api.nmusic.config.NeteaseCloudConfig;
 import org.api.nmusic.model.vo.playlist.Creator;
 import org.api.nmusic.model.vo.playlist.PlayListVo;
 import org.api.nmusic.model.vo.playlist.PlaylistItem;
-import org.api.nmusic.model.vo.user.detail.Profile;
-import org.api.nmusic.model.vo.user.detail.ProfileVillageInfo;
 import org.api.nmusic.model.vo.user.detail.UserDetailRes;
-import org.api.nmusic.model.vo.user.detail.UserPoint;
 import org.api.nmusic.model.vo.user.record.Al;
 import org.api.nmusic.model.vo.user.record.ArItem;
 import org.api.nmusic.model.vo.user.record.Song;
@@ -370,14 +367,14 @@ public class UserApi {
         SysUserPojo accUserPojo = accountService.getById(uid);
         res.setLevel(23333);
         res.setListenSongs(23333);
-        UserPoint userPoint = new UserPoint();
+        UserDetailRes.UserPoint userPoint = new UserDetailRes.UserPoint();
         userPoint.setUserId(accUserPojo.getId());
         userPoint.setUpdateTime(accUserPojo.getUpdateTime().getNano());
         userPoint.setStatus(1);
         res.setUserPoint(userPoint);
         
         
-        Profile profile = new Profile();
+        UserDetailRes.Profile profile = new UserDetailRes.Profile();
         profile.setUserId(accUserPojo.getId());
         profile.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(accUserPojo.getId()));
         profile.setBackgroundUrl(remoteStorePicService.getUserBackgroundPicUrl(accUserPojo.getId()));
@@ -386,7 +383,7 @@ public class UserApi {
         profile.setFolloweds(23333);
         res.setProfile(profile);
         
-        ProfileVillageInfo profileVillageInfo = new ProfileVillageInfo();
+        UserDetailRes.ProfileVillageInfo profileVillageInfo = new UserDetailRes.ProfileVillageInfo();
         profileVillageInfo.setTitle("crown");
         profileVillageInfo.setImageUrl(remoteStorePicService.getUserAvatarPicUrl(accUserPojo.getId()));
         profileVillageInfo.setTargetUrl(remoteStorePicService.getUserBackgroundPicUrl(accUserPojo.getId()));

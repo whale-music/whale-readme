@@ -112,6 +112,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 token = parserCookie(cookies);
             } catch (Exception e) {
                 log.error("Failed to parse cookie, origin msgs: {}", e.getMessage());
+                log.error("error path: {}", requestWrapper.getRequestURI());
             }
         }
         return token;

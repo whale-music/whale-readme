@@ -4,6 +4,8 @@ import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
 
+import java.util.Objects;
+
 public class UserUtil {
     
     private static final ThreadLocal<SysUserPojo> USER = new ThreadLocal<>();
@@ -19,6 +21,9 @@ public class UserUtil {
     }
     
     public static void setUser(SysUserPojo userPojo) {
+        if (Objects.isNull(userPojo)) {
+            return;
+        }
         USER.set(userPojo);
     }
     

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.benmanes.caffeine.cache.Cache;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,7 +69,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
      * @return 封面地址
      */
     @Override
-    public Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type) {
+    public Map<Long, String> getPicUrl(Collection<Long> middleIds, @NotNull Byte type) {
         Map<Long, String> picUrl = this.getPicPath(middleIds, type);
         return getPicUrlList(picUrl, false);
     }
@@ -99,21 +100,13 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         if (CollUtil.isEmpty(middleIds) || CollUtil.isEmpty(middleIds.stream().filter(Objects::nonNull).toList())) {
             return Collections.emptyMap();
         }
-        // todo 需要优化, 图片type
-        final Byte finalQueryType;
+        //
         // 通过关联ID获取封面ID, 没有则全部查询
-        List<PicMiddleTypeModel> middleTypeModels = new ArrayList<>();
+        List<PicMiddleTypeModel> middleTypeModels;
         if (Objects.isNull(type)) {
-            List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery().in(TbMiddlePicPojo::getMiddleId, middleIds));
-            if (CollUtil.isNotEmpty(list)) {
-                finalQueryType = Optional.ofNullable(list.get(0)).orElse(new TbMiddlePicPojo()).getType();
-                middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, finalQueryType)).toList());
-            } else {
-                finalQueryType = null;
-            }
+            throw new BaseException(ResultCode.PARAM_IS_BLANK);
         } else {
-            middleTypeModels.addAll(middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList());
-            finalQueryType = type;
+            middleTypeModels = new ArrayList<>(middleIds.parallelStream().map(aLong -> new PicMiddleTypeModel(aLong, type)).toList());
         }
         Map<PicMiddleTypeModel, Long> picMiddle = picMiddleCache.getAll(middleTypeModels, aLong -> {
             List<TbMiddlePicPojo> list = middlePicService.list();
@@ -121,7 +114,7 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
         });
         // 没有查询到，直接返回默认地址
         if (CollUtil.isEmpty(picMiddle)) {
-            return middleIds.stream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(finalQueryType), (s, s2) -> s2));
+            return middleIds.stream().collect(Collectors.toMap(Long::longValue, aLong -> getDefaultPicUrl(type), (s, s2) -> s2));
         }
         // 获取缓存中地址
         Collection<Long> picIds = picMiddle.values();
@@ -129,20 +122,20 @@ public class RemoteStorePicServiceImpl implements RemoteStorePicService {
             List<TbMiddlePicPojo> list = middlePicService.list(Wrappers.<TbMiddlePicPojo>lambdaQuery()
                                                                        .in(TbMiddlePicPojo::getMiddleId, middleIds)
                                                                        .in(TbMiddlePicPojo::getPicId, picId)
-                                                                       .eq(TbMiddlePicPojo::getType, finalQueryType));
+                                                                       .eq(TbMiddlePicPojo::getType, type));
             List<TbPicPojo> tbPicPojoList = tbPicService.listByIds(list.parallelStream().map(TbMiddlePicPojo::getPicId).collect(Collectors.toSet()));
             return tbPicPojoList.parallelStream().map(tbPicPojo -> {
                 tbPicPojo = tbPicPojo == null ? new TbPicPojo() : tbPicPojo;
                 if (StringUtils.isEmpty(tbPicPojo.getPath())) {
-                    tbPicPojo.setPath(getDefaultPicUrl(finalQueryType));
+                    tbPicPojo.setPath(getDefaultPicUrl(type));
                 }
                 return tbPicPojo;
             }).collect(Collectors.toMap(TbPicPojo::getId, tbPicPojo -> tbPicPojo));
         });
         // 遍历ID，如果没有查找到，则返回默认数据
         return middleIds.stream().collect(Collectors.toMap(o -> o, aLong -> {
-            Long picId = picMiddle.get(new PicMiddleTypeModel(aLong, finalQueryType));
-            return picId == null ? getDefaultPicUrl(finalQueryType) : map.get(picId).getPath();
+            Long picId = picMiddle.get(new PicMiddleTypeModel(aLong, type));
+            return picId == null ? getDefaultPicUrl(type) : map.get(picId).getPath();
         }, (s, s2) -> s2));
     }
     

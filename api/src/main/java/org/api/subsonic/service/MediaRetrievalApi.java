@@ -1,6 +1,7 @@
 package org.api.subsonic.service;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.common.service.QukuAPI;
@@ -9,6 +10,9 @@ import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.properties.DebugConfig;
+import org.core.mybatis.iservice.TbMiddlePicService;
+import org.core.mybatis.iservice.TbPicService;
+import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.RemoteStorePicService;
 import org.springframework.stereotype.Service;
@@ -28,11 +32,14 @@ public class MediaRetrievalApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public MediaRetrievalApi(QukuAPI qukuService, DefaultInfo defaultInfo, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService) {
+    private final TbMiddlePicService tbMiddlePicService;
+    
+    public MediaRetrievalApi(QukuAPI qukuService, DefaultInfo defaultInfo, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService, TbPicService tbPicService, TbMiddlePicService tbMiddlePicService) {
         this.qukuService = qukuService;
         this.defaultInfo = defaultInfo;
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
         this.remoteStorePicService = remoteStorePicService;
+        this.tbMiddlePicService = tbMiddlePicService;
     }
     
     public String getCoverArt(SubsonicCommonReq req, String id, Long size) {
@@ -60,7 +67,9 @@ public class MediaRetrievalApi {
                 return defaultInfo.getPic().getDefaultPic();
             }
         }
-        String picUrl = remoteStorePicService.getPicUrl(middlePic, null);
+        // 查询数据库中的图片, 后续优化。使用字符串类型，同时包括数据封面ID和封面类型
+        TbMiddlePicPojo one = tbMiddlePicService.getOne(Wrappers.<TbMiddlePicPojo>lambdaQuery().eq(TbMiddlePicPojo::getMiddleId, middlePic), false);
+        String picUrl = remoteStorePicService.getPicUrl(one.getMiddleId(), one.getType());
         if (StringUtils.isNotBlank(picUrl)) {
             return picUrl;
         }

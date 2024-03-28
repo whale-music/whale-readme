@@ -1,6 +1,7 @@
 package org.core.service;
 
 import cn.hutool.core.map.MapUtil;
+import jakarta.validation.constraints.NotNull;
 import org.core.common.constant.PicTypeConstant;
 import org.core.model.PicMiddleTypeModel;
 import org.core.mybatis.pojo.TbPicPojo;
@@ -18,7 +19,7 @@ public interface RemoteStorePicService {
     
     Map<Long, String> getPicUrl(Collection<Long> middleIds, Byte type);
     
-    default String getPicUrl(Long id, Byte type) {
+    default String getPicUrl(Long id, @NotNull Byte type) {
         return this.getPicUrl(Collections.singletonList(id), type).get(id);
     }
     
@@ -29,7 +30,7 @@ public interface RemoteStorePicService {
      * @param type 关联ID类型
      * @return 封面地址map long -> 关联ID, String -> 封面地址
      */
-    Map<Long, String> getPicPath(Collection<Long> ids, Byte type);
+    Map<Long, String> getPicPath(Collection<Long> ids, @NotNull Byte type);
     
     /**
      * 查询封面地址
@@ -38,7 +39,7 @@ public interface RemoteStorePicService {
      * @param type 关联ID类型
      * @return 封面地址
      */
-    default String getPicPath(Long id, Byte type) {
+    default String getPicPath(Long id, @NotNull Byte type) {
         Map<Long, String> picUrl = getPicPath(Collections.singletonList(id), type);
         return MapUtil.get(picUrl, id, String.class);
     }

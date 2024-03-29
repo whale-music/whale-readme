@@ -15,7 +15,6 @@ public class WebdavCacheApi {
     @CacheEvict(value = {
             WebdavCacheConstant.WEBDAV_COLLECT_TYPE_LIST,
             WebdavCacheConstant.WEBDAV_PLAY_LIST,
-            WebdavCacheConstant.WEBDAV_USER_POJO,
             WebdavCacheConstant.WEBDAV_RESOURCE
     }, allEntries = true)
     public void refreshAllCache() {

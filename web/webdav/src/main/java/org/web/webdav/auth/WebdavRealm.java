@@ -1,5 +1,6 @@
 package org.web.webdav.auth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -9,7 +10,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.api.webdav.service.WebdavApi;
 import org.api.webdav.utils.WebdavAccountUtil;
 import org.core.common.exception.BaseException;
-import org.core.common.result.ResultCode;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
 import org.springframework.stereotype.Component;
@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 public class WebdavRealm extends RealmBase {
     
@@ -102,14 +103,12 @@ public class WebdavRealm extends RealmBase {
     @Override
     public Principal authenticate(String username, String password) {
         try {
-            SysUserPojo account = webdavApi.getUserByName(username);
+            SysUserPojo account = webdavApi.userCheck(username, password, null);
             WebdavAccountUtil.setAccount(account);
             return getPrincipal(account.getUsername());
         } catch (BaseException e) {
-            if (ResultCode.USER_NOT_EXIST.getCode().equals(e.getCode())) {
-                return null;
-            }
-            throw e;
+            log.error("webdav login error: {}", e.getMessage());
+            return null;
         }
     }
     

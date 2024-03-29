@@ -8,6 +8,7 @@ import org.api.webdav.model.CollectTypeList;
 import org.api.webdav.model.PlayListRes;
 import org.api.webdav.utils.spring.WebdavResourceReturnStrategyUtil;
 import org.core.common.constant.PlayListTypeConstant;
+import org.core.common.constant.UserCacheKeyFieldConstant;
 import org.core.mybatis.iservice.TbCollectService;
 import org.core.mybatis.iservice.TbResourceService;
 import org.core.mybatis.model.convert.ArtistConvert;
@@ -104,8 +105,16 @@ public class WebdavApi {
         return res;
     }
     
-    @Cacheable(value = WebdavCacheConstant.WEBDAV_USER_POJO, key = "#userName")
-    public SysUserPojo getUserByName(String userName) {
-        return accountService.getUserOrSubAccount(userName);
+    /**
+     * 检查用户信息，检查用户和用户子账户
+     *
+     * @param username    用户或子用户名
+     * @param password    用户密码
+     * @param md5Password md5密码与用户密码互斥
+     * @return 成功返回用户信息
+     */
+    @Cacheable(value = UserCacheKeyFieldConstant.WEBDAV_USER_POJO, key = "#username + '-' + #password + '-' + #md5Password")
+    public SysUserPojo userCheck(String username, String password, String md5Password) {
+        return accountService.loginUserOrSubAccount(username, password, null);
     }
 }

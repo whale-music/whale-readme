@@ -13,6 +13,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -33,15 +34,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-@EnableSpringUtil
-@EntityScan(basePackages = "org.core.jpa.entity")
-@EnableJpaRepositories(basePackages = "org.core.jpa.repository")
-@SpringBootApplication(scanBasePackages = "org.core")
+@Slf4j
+// 开启缓存注解
+@EnableCaching
 // 开启异步注解
 @EnableAsync
 // 开启定时任务
 @EnableScheduling
-@Slf4j
+// Spring 工具类
+@EnableSpringUtil
+@EntityScan(basePackages = "org.core.jpa.entity")
+@EnableJpaRepositories(basePackages = "org.core.jpa.repository")
+@SpringBootApplication(scanBasePackages = "org.core")
 public class StartSpringBoot {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {
         StopWatch sw = new StopWatch("priming step");

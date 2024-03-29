@@ -6,7 +6,6 @@ import org.api.config.ApplicationStartup;
 import org.api.config.EnableApiServer;
 import org.core.factory.YamlPropertySourceFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 
 
@@ -21,6 +20,5 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @PropertySource(value = "classpath:application-subsonic.yml", factory = YamlPropertySourceFactory.class)
 @PropertySource("classpath:application-subsonic.properties")
-@EnableCaching
 public class SubsonicSpringBootApplication implements ApplicationStartup {
 }

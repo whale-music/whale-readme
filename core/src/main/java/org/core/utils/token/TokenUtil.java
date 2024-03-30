@@ -46,7 +46,7 @@ public class TokenUtil {
         return sign(UserCacheTypeConstant.SUBSONIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
     }
     
-    public String neteasecloudmusicSignToken(String userId, SysUserPojo user) {
+    public String nMusicSignToken(String userId, SysUserPojo user) {
         return sign(UserCacheTypeConstant.NMUSIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
     }
     
@@ -64,7 +64,7 @@ public class TokenUtil {
         return sign(UserCacheTypeConstant.SUBSONIC, expires, userId, user, USER_INFO);
     }
     
-    public String neteasecloudmusicSignToken(Date expires, String userId, SysUserPojo user) {
+    public String nMusicSignToken(Date expires, String userId, SysUserPojo user) {
         return sign(UserCacheTypeConstant.NMUSIC, expires, userId, user, USER_INFO);
     }
     
@@ -81,7 +81,7 @@ public class TokenUtil {
         return sign(UserCacheTypeConstant.SUBSONIC_REFRESH, expires, userId, user, REFRESH);
     }
     
-    public String neteasecloudmusicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
+    public String nMusicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
         return sign(UserCacheTypeConstant.NMUSIC_REFRESH, expires, userId, user, REFRESH);
     }
     

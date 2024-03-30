@@ -56,7 +56,7 @@ public class BaseController {
     
     @NotNull
     protected NeteaseResult getNeteaseResult(HttpServletRequest request, HttpServletResponse response, TokenUtil tokenUtil, SysUserPojo userPojo) {
-        String sign = tokenUtil.neteasecloudmusicSignToken(userPojo.getUsername(), userPojo);
+        String sign = tokenUtil.nMusicSignToken(userPojo.getUsername(), userPojo);
         Cookie[] cookies = {
                 CookieUtil.createCookieString("MUSIC_R_T", "1465815410743", 2147483647, "Mon, 29 Oct 2091 15:36:04 GMT", "/weapi/feedback"),
                 CookieUtil.createCookieString("MUSIC_A_T", "1465815403512", 2147483647, "Mon, 29 Oct 2091 15:36:04 GMT", "/eapi/feedback"),

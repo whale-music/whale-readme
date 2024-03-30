@@ -214,10 +214,10 @@ application:
     plugin: false
     log: false
   enable:
-    admin-spring-boot-application: true
-    n-music-spring-boot-application: false
-    subsonic-spring-boot-application: false
-    web-dav-spring-boot-application: false
+    admin-application: true
+    n-music-application: false
+    subsonic-application: false
+    webdav-application: false
 
 # 保存缓存路径
 cache:

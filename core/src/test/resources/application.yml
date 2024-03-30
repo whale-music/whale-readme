@@ -201,10 +201,10 @@ application:
     plugin: false
     log: false
   enable:
-    admin-spring-boot-application: true
-    n-music-spring-boot-application: false
-    subsonic-spring-boot-application: false
-    web-dav-spring-boot-application: false
+    admin-application: true
+    n-music-application: false
+    subsonic-application: false
+    webdav-application: false
 
 # subsonic 资源多个资源返回策略:
 # first:第一个 last: 最后一个

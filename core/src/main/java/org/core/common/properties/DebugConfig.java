@@ -19,16 +19,16 @@ public class DebugConfig {
     @Value("${application.config.log}")
     private Boolean logEnable;
     
-    @Value("${application.enable.admin-spring-boot-application}")
+    @Value("${application.enable.admin-application}")
     private Boolean enableAdminSpringBootApplication;
     
-    @Value("${application.enable.n-music-spring-boot-application}")
+    @Value("${application.enable.n-music-application}")
     private Boolean enableNMusicSpringBootApplication;
     
-    @Value("${application.enable.subsonic-spring-boot-application}")
+    @Value("${application.enable.subsonic-application}")
     private Boolean enableSubsonicSpringBootApplication;
     
-    @Value("${application.enable.web-dav-spring-boot-application}")
+    @Value("${application.enable.webdav-application}")
     private Boolean webDavSpringBootApplication;
     
     public static Boolean getDebug() {

@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.web.nmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
+import org.web.nmusic.security.config.NMusicPermitAllUrlProperties;
 import org.web.nmusic.security.filter.JwtAuthenticationTokenFilter;
 import org.web.nmusic.security.handle.AnonymousAuthenticationEntryPoint;
 
@@ -37,7 +37,7 @@ public class SecurityConfig {
      * 获取匿名访问的url
      */
     @Autowired
-    private NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties;
+    private NMusicPermitAllUrlProperties permitAllUrlProperties;
     
     
     /**

@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.web.nmusic.security.config.NeteaseCloudMusicPermitAllUrlProperties;
+import org.web.nmusic.security.config.NMusicPermitAllUrlProperties;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,11 +37,11 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
-    private final NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties;
+    private final NMusicPermitAllUrlProperties permitAllUrlProperties;
     
     private final TokenUtil tokenUtil;
     
-    public JwtAuthenticationTokenFilter(NeteaseCloudMusicPermitAllUrlProperties permitAllUrlProperties, TokenUtil tokenUtil) {
+    public JwtAuthenticationTokenFilter(NMusicPermitAllUrlProperties permitAllUrlProperties, TokenUtil tokenUtil) {
         this.permitAllUrlProperties = permitAllUrlProperties;
         this.tokenUtil = tokenUtil;
     }

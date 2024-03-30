@@ -20,10 +20,9 @@ import java.util.regex.Pattern;
 @Setter
 @Getter
 @Configuration
-// todo rename
-public class NeteaseCloudMusicPermitAllUrlProperties  {
-    private final static String asterisk = "*";
-    private final static Pattern pattern = Pattern.compile("\\{(.*?)}");
+public class NMusicPermitAllUrlProperties {
+    private static final String STRING = "*";
+    private static final Pattern PATTERN = Pattern.compile("\\{(.*?)}");
     
     private Set<String> urls = new HashSet<>(WebConfig.getPublicList());
     
@@ -36,13 +35,13 @@ public class NeteaseCloudMusicPermitAllUrlProperties  {
             // 获取方法上边的注解 替代path variable 为 *
             AnonymousAccess method = AnnotationUtils.findAnnotation(handlerMethod.getMethod(), AnonymousAccess.class);
             Optional.ofNullable(method)
-                    .ifPresent(anonymous -> info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, pattern, asterisk))));
+                    .ifPresent(anonymous -> info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, STRING))));
             
             // 获取类上边的注解, 替代path variable 为 *
             AnonymousAccess controller = AnnotationUtils.findAnnotation(handlerMethod.getBeanType(), AnonymousAccess.class);
             Optional.ofNullable(controller).ifPresent(anonymous -> {
                 if (Objects.nonNull(info.getPatternsCondition())) {
-                    info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, pattern, asterisk)));
+                    info.getPatternValues().forEach(url -> urls.add(RegExUtils.replaceAll(url, PATTERN, STRING)));
                 }
             });
         });

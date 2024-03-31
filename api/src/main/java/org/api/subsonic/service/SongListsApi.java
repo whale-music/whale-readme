@@ -399,13 +399,8 @@ public class SongListsApi {
                 e.setTranscodedSuffix(tbResourcePojo.getEncodeType());
                 e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
                 e.setPath(tbResourcePojo.getPath());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    e.setContentType("audio/mpeg");
-                    e.setTranscodedContentType("audio/mpeg");
-                } else {
-                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                    e.setTranscodedContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
+                e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+                e.setTranscodedContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
             e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
             e.setPlayCount(0);
@@ -480,11 +475,7 @@ public class SongListsApi {
                 e.setSuffix(tbResourcePojo.getEncodeType());
                 e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
                 e.setPath(tbResourcePojo.getPath());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    e.setContentType("audio/mpeg");
-                } else {
-                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
+                e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
             e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
             e.setPlayCount(0);
@@ -552,11 +543,7 @@ public class SongListsApi {
                 e.setSuffix(tbResourcePojo.getEncodeType());
                 e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
                 e.setPath(tbResourcePojo.getPath());
-                if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                    e.setContentType("audio/mpeg");
-                } else {
-                    e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                }
+                e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
             entries.add(e);
         }
@@ -682,11 +669,7 @@ public class SongListsApi {
                     e.setSuffix(tbResourcePojo.getEncodeType());
                     e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
                     e.setPath(tbResourcePojo.getPath());
-                    if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                        e.setContentType("audio/mpeg");
-                    } else {
-                        e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                    }
+                    e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 }
                 e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
                 e.setPlayCount(0);
@@ -823,11 +806,7 @@ public class SongListsApi {
                     e.setSuffix(tbResourcePojo.getEncodeType());
                     e.setBitRate(tbResourcePojo.getRate());
                     e.setPath(tbResourcePojo.getPath());
-                    if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                        e.setContentType("audio/mpeg");
-                    } else {
-                        e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                    }
+                    e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 }
                 e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
                 e.setPlayCount(0);

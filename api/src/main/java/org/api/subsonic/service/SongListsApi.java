@@ -34,6 +34,7 @@ import org.core.service.AccountService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.net.URLConnection;
@@ -125,7 +126,6 @@ public class SongListsApi {
             e.setId(StringUtil.defaultNullString(albumPojo.getId()));
             e.setBpm(0);
             e.setComment("");
-            e.setCoverArt(remoteStorePicService.getAlbumPicUrl(albumPojo.getId()));
             e.setCreated(StringUtil.defaultNullString(albumPojo.getCreateTime()));
             
             e.setDuration(albumDurationCount.get(albumPojo.getId()));
@@ -736,6 +736,8 @@ public class SongListsApi {
         return res;
     }
     
+    // todo: 如果专辑，歌手，歌单变动,需要释放对应的缓存
+    @Cacheable(value = "getStarred2", key = "#req.u + '-' + #req.v + '-' + #req.f + '-' + #musicFolderId")
     public Starred2Res getStarred2(SubsonicCommonReq req, Long musicFolderId) {
         Starred2Res starred2Res = new Starred2Res();
         Starred2Res.Starred2 starred2 = new Starred2Res.Starred2();

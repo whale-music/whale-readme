@@ -118,13 +118,13 @@ public class AlbumAndSongListsController {
                                                     @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
                                                 
                                                 @Parameter(description = "范围内的第一年。如果 fromYear > toYear ，则返回一个倒序列表")
-                                                    @RequestParam(value = "fromYear", defaultValue = "20", required = false) Long fromYear,
+                                                    @RequestParam(value = "fromYear", required = false) Long fromYear,
                                                 
                                                 @Parameter(description = "最后一年在范围内。")
-                                                    @RequestParam(value = "toYear", defaultValue = "20", required = false) Long toYear,
+                                                    @RequestParam(value = "toYear", required = false) Long toYear,
                                                 
                                                 @Parameter(description = "流派的名称，例如，“摇滚”", deprecated = true)
-                                                    @RequestParam(value = "genre", defaultValue = "20", required = false) Long genre,
+                                                    @RequestParam(value = "genre", required = false) Long genre,
                                                 
                                                 @Parameter(description = "（自1.11.0起）仅返回音乐文件夹中具有给定ID的专辑。参见 getMusicFolders ", deprecated = true)
                                                     @RequestParam(value = "musicFolderId", defaultValue = "20", required = false) Long musicFolderId

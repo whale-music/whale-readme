@@ -26,7 +26,7 @@ public class MediaLibraryScanningApi {
         res.setScanStatus(new ScanStatusRes.ScanStatus(format,false, count, 1));
         return res;
     }
-    
+    @Cacheable(value = "ScanStatus", key = "#root.methodName")
     public StartScanRes startScan(SubsonicCommonReq req) {
         StartScanRes res = new StartScanRes();
         long count = tbMusicService.count();

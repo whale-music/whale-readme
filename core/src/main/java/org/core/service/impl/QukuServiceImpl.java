@@ -1454,7 +1454,7 @@ public class QukuServiceImpl implements QukuService {
         HashMap<Long, Integer> resMap = new HashMap<>();
         Map<Long, List<MusicConvert>> musicMapByAlbumId = getMusicMapByAlbumId(albumIds);
         for (Map.Entry<Long, List<MusicConvert>> longListEntry : musicMapByAlbumId.entrySet()) {
-            Integer durationCount = longListEntry.getValue().parallelStream().map(TbMusicPojo::getTimeLength).reduce(0, Integer::sum);
+            Integer durationCount = longListEntry.getValue().parallelStream().map(TbMusicPojo::getTimeLength).map(integer -> Optional.ofNullable(integer).orElse(0)).reduce(0, Integer::sum);
             resMap.put(longListEntry.getKey(), durationCount);
         }
         return resMap;

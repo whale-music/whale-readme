@@ -56,7 +56,7 @@ public class PlaylistApi {
     
     public PlaylistsRes getPlaylists(SubsonicCommonReq req, String username) {
         username = StringUtils.isBlank(username) ? req.getU() : username;
-        SysUserPojo user = accountService.getUser(username);
+        SysUserPojo user = accountService.getUserOrSubAccount(username);
         List<CollectConvert> userPlayList = qukuApi.getUserPlayList(user.getId(),
                 Arrays.asList(PlayListTypeConstant.ORDINARY, PlayListTypeConstant.ORDINARY));
         if (CollUtil.isEmpty(userPlayList)) {

@@ -118,11 +118,11 @@ public class SongListsApi {
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumList2Res.AlbumList2.AlbumItem e = new AlbumList2Res.AlbumList2.AlbumItem();
-            e.setId(String.valueOf(albumPojo.getId()));
+            e.setId(StringUtil.defaultNullString(albumPojo.getId()));
             e.setBpm(0);
             e.setComment("");
             e.setCoverArt(remoteStorePicService.getAlbumPicUrl(albumPojo.getId()));
-            e.setCreated(String.valueOf(albumPojo.getCreateTime()));
+            e.setCreated(StringUtil.defaultNullString(albumPojo.getCreateTime()));
             
             e.setDuration(0);
             e.setGenres(new ArrayList<>());
@@ -148,7 +148,7 @@ public class SongListsApi {
             String idStr = StringUtil.defaultNullString(pojo.getId());
             e.setParent(idStr);
             e.setArtistId(idStr);
-            e.setCoverArt(String.valueOf(albumPojo.getId()));
+            e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
             albumArrayList.add(e);
         }
         // 歌手排序
@@ -344,7 +344,7 @@ public class SongListsApi {
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumListRes.Album e = new AlbumListRes.Album();
-            e.setId(String.valueOf(albumPojo.getId()));
+            e.setId(StringUtil.defaultNullString(albumPojo.getId()));
             e.setAlbum(albumPojo.getAlbumName());
             e.setTitle(albumPojo.getAlbumName());
             e.setName(albumPojo.getAlbumName());
@@ -353,8 +353,8 @@ public class SongListsApi {
             List<ArtistConvert> artistListByAlbumIds = artistMapByAlbumIds.get(albumPojo.getId());
             TbArtistPojo pojo = CollUtil.isNotEmpty(artistListByAlbumIds) ? artistListByAlbumIds.get(0) : new TbArtistPojo();
             e.setArtist(pojo.getArtistName());
-            e.setArtistId(String.valueOf(pojo.getId()));
-            e.setCoverArt(String.valueOf(albumPojo.getId()));
+            e.setArtistId(StringUtil.defaultNullString(pojo.getId()));
+            e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
             albumArrayList.add(e);
         }
         // 歌手排序
@@ -386,8 +386,8 @@ public class SongListsApi {
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             RandomSongsRes.Song e = new RandomSongsRes.Song();
             // 设置每个字段的值
-            e.setId(String.valueOf(musicPojo.getId()));
-            e.setParent(String.valueOf(musicPojo.getAlbumId()));
+            e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
             if (Objects.nonNull(musicPojo.getPublishTime())) {
@@ -401,15 +401,15 @@ public class SongListsApi {
             AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getAlbumId());
             if (Objects.nonNull(albumConvert)) {
                 e.setAlbum(albumConvert.getAlbumName());
-                e.setAlbumId(String.valueOf(albumConvert.getId()));
+                e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
             }
             List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
             if (CollUtil.isNotEmpty(artistConverts)) {
                 ArtistConvert artistConvert = artistConverts.get(0);
                 e.setArtist(artistConvert.getArtistName());
-                e.setArtistId(String.valueOf(artistConvert.getId()));
+                e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
             }
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
+            e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
             e.setTrack(0);
             List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrl);
@@ -426,7 +426,7 @@ public class SongListsApi {
             }
             e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setPlayCount(0);
-            e.setPlayed(String.valueOf(new Date()));
+            e.setPlayed(StringUtil.defaultNullString(new Date()));
             e.setType("music");
             e.setIsVideo(false);
             e.setBpm(0);
@@ -477,8 +477,8 @@ public class SongListsApi {
         ArrayList<SongsByGenreRes.Song> song = new ArrayList<>();
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             SongsByGenreRes.Song e = new SongsByGenreRes.Song();
-            e.setId(String.valueOf(musicPojo.getId()));
-            e.setParent(String.valueOf(musicPojo.getAlbumId()));
+            e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
             List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
@@ -488,27 +488,27 @@ public class SongListsApi {
             AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
             if (Objects.nonNull(albumConvert)) {
                 e.setAlbum(albumConvert.getAlbumName());
-                e.setAlbumId(String.valueOf(albumConvert.getId()));
-                e.setYear(String.valueOf(albumConvert.getPublishTime().getYear()));
+                e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
+                e.setYear(StringUtil.defaultNullString(albumConvert.getPublishTime().getYear()));
             }
             List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
             if (CollUtil.isNotEmpty(artistConverts)) {
                 ArtistConvert artistConvert = artistConverts.get(0);
                 e.setArtist(artistConvert.getArtistName());
-                e.setArtistId(String.valueOf(artistConvert.getId()));
+                e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
             }
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
-            e.setTrack(String.valueOf(0));
+            e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setTrack(StringUtil.defaultNullString(0));
             List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrl);
             if (Objects.nonNull(tbResourcePojo)) {
-                e.setSize(String.valueOf(tbResourcePojo.getSize()));
+                e.setSize(StringUtil.defaultNullString(tbResourcePojo.getSize()));
                 e.setSuffix(tbResourcePojo.getEncodeType());
-                e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
+                e.setBitRate(StringUtil.defaultNullString(tbResourcePojo.getRate()));
                 e.setPath(tbResourcePojo.getPath());
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
-            e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
+            e.setDuration(StringUtil.defaultNullString(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
             e.setPlayCount(0);
             e.setPlayed(new Date());
             e.setType("music");
@@ -546,8 +546,8 @@ public class SongListsApi {
         Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             NowPlayingRes.Entry e = new NowPlayingRes.Entry();
-            e.setId(String.valueOf(musicPojo.getId()));
-            e.setParent(String.valueOf(musicPojo.getAlbumId()));
+            e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
             e.setUsername(userByName.getUsername());
@@ -558,21 +558,21 @@ public class SongListsApi {
             AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
             if (Objects.nonNull(albumConvert)) {
                 e.setAlbum(albumConvert.getAlbumName());
-                e.setYear(String.valueOf(albumConvert.getPublishTime().getYear()));
+                e.setYear(StringUtil.defaultNullString(albumConvert.getPublishTime().getYear()));
             }
             List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
             if (CollUtil.isNotEmpty(artistConverts)) {
                 ArtistConvert artistConvert = artistConverts.get(0);
                 e.setArtist(artistConvert.getArtistName());
             }
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
-            e.setTrack(String.valueOf(0));
+            e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setTrack(StringUtil.defaultNullString(0));
             List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrl);
             if (Objects.nonNull(tbResourcePojo)) {
-                e.setSize(String.valueOf(tbResourcePojo.getSize()));
+                e.setSize(StringUtil.defaultNullString(tbResourcePojo.getSize()));
                 e.setSuffix(tbResourcePojo.getEncodeType());
-                e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
+                e.setBitRate(StringUtil.defaultNullString(tbResourcePojo.getRate()));
                 e.setPath(tbResourcePojo.getPath());
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
@@ -604,21 +604,21 @@ public class SongListsApi {
             List<StarredRes.Album> albums = new ArrayList<>();
             for (TbAlbumPojo tbAlbumPojo : tbAlbumPojos) {
                 StarredRes.Album e = new StarredRes.Album();
-                e.setId(String.valueOf(tbAlbumPojo.getId()));
+                e.setId(StringUtil.defaultNullString(tbAlbumPojo.getId()));
                 e.setAlbum(tbAlbumPojo.getAlbumName());
                 e.setTitle(tbAlbumPojo.getAlbumName());
                 e.setName(tbAlbumPojo.getAlbumName());
-                e.setCoverArt(String.valueOf(tbAlbumPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(tbAlbumPojo.getId()));
                 e.setAlbumTitle(tbAlbumPojo.getAlbumName());
                 
                 List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(tbAlbumPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {
                     ArtistConvert artistConvert = artistConverts.get(0);
                     e.setArtist(artistConvert.getArtistName());
-                    e.setArtistId(String.valueOf(artistConvert.getId()));
-                    e.setParent(String.valueOf(artistConvert.getId()));
+                    e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
+                    e.setParent(StringUtil.defaultNullString(artistConvert.getId()));
                 }
-                e.setCoverArt(String.valueOf(tbAlbumPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(tbAlbumPojo.getId()));
                 e.setCreated(Date.from(tbAlbumPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
                 e.setDuration(albumDurationCount.get(tbAlbumPojo.getId()));
                 e.setIsDir(true);

@@ -22,6 +22,7 @@ import org.core.mybatis.model.convert.AlbumConvert;
 import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.StringUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -105,11 +106,11 @@ public class SearchingApi {
                                                                                                    .toList());
             for (TbArtistPojo artistPojo : artistPage.getRecords()) {
                 Search2Res.Artist e = new Search2Res.Artist();
-                e.setId(String.valueOf(artistPojo.getId()));
+                e.setId(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setName(artistPojo.getArtistName());
                 e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
-                e.setCoverArt(String.valueOf(artistPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
                 e.setUserRating(0);
                 
@@ -131,7 +132,7 @@ public class SearchingApi {
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
                 Search2Res.Album e = new Search2Res.Album();
-                e.setId(String.valueOf(albumPojo.getId()));
+                e.setId(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setIsDir(true);
                 e.setTitle(albumPojo.getAlbumName());
                 e.setName(albumPojo.getAlbumName());
@@ -146,12 +147,12 @@ public class SearchingApi {
                 List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(albumPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {
                     ArtistConvert artistConvert = artistConverts.get(0);
-                    String artistId = String.valueOf(artistConvert.getId());
+                    String artistId = StringUtil.defaultNullString(artistConvert.getId());
                     e.setParent(artistId);
                     e.setArtistId(artistId);
                     e.setArtist(artistConvert.getArtistName());
                 }
-                e.setCoverArt(String.valueOf(albumPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setDuration(albumDurationCount.get(albumPojo.getId()));
                 e.setPlayCount(0);
                 e.setPlayed(new Date());
@@ -180,14 +181,14 @@ public class SearchingApi {
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {
                 Search2Res.Song e = new Search2Res.Song();
-                e.setId(String.valueOf(musicPojo.getId()));
-                e.setParent(String.valueOf(musicPojo.getAlbumId()));
+                e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+                e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
                 e.setIsDir(true);
                 e.setTitle(musicPojo.getMusicName());
                 
                 AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(musicPojo.getId());
                 if (Objects.nonNull(albumConvert)) {
-                    e.setAlbumId(String.valueOf(albumConvert.getId()));
+                    e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
                     e.setAlbum(albumConvert.getAlbumName());
                     e.setYear(albumConvert.getPublishTime().getYear());
                 }
@@ -200,12 +201,12 @@ public class SearchingApi {
                 List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {
                     ArtistConvert artistConvert = artistConverts.get(0);
-                    String artistId = String.valueOf(artistConvert.getId());
+                    String artistId = StringUtil.defaultNullString(artistConvert.getId());
                     e.setParent(artistId);
                     e.setArtistId(artistId);
                     e.setArtist(artistConvert.getArtistName());
                 }
-                e.setCoverArt(String.valueOf(musicPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
                 
                 e.setDuration(musicPojo.getTimeLength());
                 List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicPojo.getId());
@@ -256,11 +257,11 @@ public class SearchingApi {
                                                                                                    .toList());
             for (TbArtistPojo artistPojo : artistPage.getRecords()) {
                 Search3Res.Artist e = new Search3Res.Artist();
-                e.setId(String.valueOf(artistPojo.getId()));
+                e.setId(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setName(artistPojo.getArtistName());
                 e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
-                e.setCoverArt(String.valueOf(artistPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
                 e.setUserRating(0);
                 
@@ -282,7 +283,7 @@ public class SearchingApi {
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
                 Search3Res.Album e = new Search3Res.Album();
-                e.setId(String.valueOf(albumPojo.getId()));
+                e.setId(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setIsDir(true);
                 e.setTitle(albumPojo.getAlbumName());
                 e.setName(albumPojo.getAlbumName());
@@ -297,12 +298,12 @@ public class SearchingApi {
                 List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(albumPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {
                     ArtistConvert artistConvert = artistConverts.get(0);
-                    String artistId = String.valueOf(artistConvert.getId());
+                    String artistId = StringUtil.defaultNullString(artistConvert.getId());
                     e.setParent(artistId);
                     e.setArtistId(artistId);
                     e.setArtist(artistConvert.getArtistName());
                 }
-                e.setCoverArt(String.valueOf(albumPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setDuration(albumDurationCount.get(albumPojo.getId()));
                 e.setPlayCount(0);
                 e.setPlayed(new Date());
@@ -331,14 +332,14 @@ public class SearchingApi {
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {
                 Search3Res.Song e = new Search3Res.Song();
-                e.setId(String.valueOf(musicPojo.getId()));
-                e.setParent(String.valueOf(musicPojo.getAlbumId()));
+                e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+                e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
                 e.setIsDir(true);
                 e.setTitle(musicPojo.getMusicName());
                 
                 AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(musicPojo.getId());
                 if (Objects.nonNull(albumConvert)) {
-                    e.setAlbumId(String.valueOf(albumConvert.getId()));
+                    e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
                     e.setAlbum(albumConvert.getAlbumName());
                     e.setYear(albumConvert.getPublishTime().getYear());
                 }
@@ -351,12 +352,12 @@ public class SearchingApi {
                 List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {
                     ArtistConvert artistConvert = artistConverts.get(0);
-                    String artistId = String.valueOf(artistConvert.getId());
+                    String artistId = StringUtil.defaultNullString(artistConvert.getId());
                     e.setParent(artistId);
                     e.setArtistId(artistId);
                     e.setArtist(artistConvert.getArtistName());
                 }
-                e.setCoverArt(String.valueOf(musicPojo.getId()));
+                e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
                 
                 e.setDuration(musicPojo.getTimeLength());
                 List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicPojo.getId());

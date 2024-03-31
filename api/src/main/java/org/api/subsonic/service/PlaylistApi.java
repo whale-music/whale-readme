@@ -25,6 +25,7 @@ import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -66,12 +67,12 @@ public class PlaylistApi {
         List<PlaylistItem> playlist = new ArrayList<>();
         for (TbCollectPojo collectPojo : userPlayList) {
             PlaylistItem e = new PlaylistItem();
-            e.setId(String.valueOf(collectPojo.getId()));
+            e.setId(StringUtil.defaultNullString(collectPojo.getId()));
             e.setName(collectPojo.getPlayListName());
             e.setChanged(LocalDateTimeUtil.format(collectPojo.getUpdateTime(), DatePattern.createFormatter(DatePattern.UTC_SIMPLE_PATTERN)));
             e.setSongCount(qukuApi.getCollectMusicCount(collectPojo.getId()));
             e.setCreated(LocalDateTimeUtil.format(collectPojo.getCreateTime(), DatePattern.createFormatter(DatePattern.UTC_SIMPLE_PATTERN)));
-            e.setCoverArt(String.valueOf(collectPojo.getId()));
+            e.setCoverArt(StringUtil.defaultNullString(collectPojo.getId()));
             e.setOwner(user.getUsername());
             e.setDuration(collectDurationCount.get(collectPojo.getId()));
             e.setJsonMemberPublic(true);
@@ -98,18 +99,18 @@ public class PlaylistApi {
         for (TbMusicPojo musicPojo : playListAllMusic) {
             EntryItem e = new EntryItem();
             List<TbResourcePojo> musicUrl = qukuApi.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
-            e.setId(String.valueOf(musicPojo.getId()));
+            e.setId(StringUtil.defaultNullString(musicPojo.getId()));
             e.setTitle(musicPojo.getMusicName());
             TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
             e.setBitRate(tbMusicUrlPojo.getRate() == null ? 0 : tbMusicUrlPojo.getRate());
             e.setIsDir(false);
-            e.setCoverArt(String.valueOf(musicPojo.getId()));
+            e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
             e.setPlayed(musicPojo.getCreateTime().toString());
             
             TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuApi.getAlbumByAlbumId(musicPojo.getAlbumId())).orElse(new AlbumConvert());
             e.setAlbum(albumByAlbumId.getAlbumName());
-            e.setAlbumId(String.valueOf(albumByAlbumId.getId()));
-            e.setParent(String.valueOf(albumByAlbumId.getId()));
+            e.setAlbumId(StringUtil.defaultNullString(albumByAlbumId.getId()));
+            e.setParent(StringUtil.defaultNullString(albumByAlbumId.getId()));
             
             // 流派
             e.setGenre("");
@@ -132,7 +133,7 @@ public class PlaylistApi {
             List<ArtistConvert> artistByMusicId = qukuApi.getArtistByMusicIds(musicPojo.getId());
             TbArtistPojo artistPojo = CollUtil.isEmpty(artistByMusicId) ? new TbArtistPojo() : artistByMusicId.get(0);
             e.setArtist(artistPojo.getArtistName());
-            e.setArtistId(String.valueOf(artistPojo.getId()));
+            e.setArtistId(StringUtil.defaultNullString(artistPojo.getId()));
             
             e.setVideo(false);
             entry.add(e);
@@ -141,7 +142,7 @@ public class PlaylistApi {
     
         TbCollectPojo byId = collectService.getById(id);
         PlayList playlistRes = new PlayList();
-        playlistRes.setId(String.valueOf(byId.getId()));
+        playlistRes.setId(StringUtil.defaultNullString(byId.getId()));
         playlistRes.setName(byId.getPlayListName());
         playlistRes.setSongCount(qukuApi.getCollectMusicCount(byId.getId()));
         playlistRes.setDuration(duration / 1000);
@@ -150,7 +151,7 @@ public class PlaylistApi {
         playlistRes.setOwner(Optional.ofNullable(byId1).orElse(new SysUserPojo()).getUsername());
         playlistRes.setCreated(byId.getCreateTime().toString());
         playlistRes.setChanged(byId.getUpdateTime().toString());
-        playlistRes.setCoverArt(String.valueOf(byId.getId()));
+        playlistRes.setCoverArt(StringUtil.defaultNullString(byId.getId()));
         
         playlistRes.setEntry(entry);
         PlaylistRes playlistRes1 = new PlaylistRes();
@@ -183,12 +184,12 @@ public class PlaylistApi {
         }
         CreatePlaylistRes.Playlist playlist = new CreatePlaylistRes.Playlist();
         playlist.setPublicFlag(false);
-        playlist.setId(String.valueOf(playList.getId()));
+        playlist.setId(StringUtil.defaultNullString(playList.getId()));
         playlist.setCreated(Date.from(playList.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
         playlist.setName(playList.getPlayListName());
         playlist.setChanged(Date.from(playList.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
         playlist.setSongCount(0);
-        playlist.setCoverArt(String.valueOf(playList.getId()));
+        playlist.setCoverArt(StringUtil.defaultNullString(playList.getId()));
         playlist.setDuration(0);
         
         res.setPlaylist(playlist);

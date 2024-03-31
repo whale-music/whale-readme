@@ -40,6 +40,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -141,16 +142,16 @@ public class BrowsingApi {
         List<TbResourcePojo> musicUrl = qukuService.getMusicPaths(CollUtil.newHashSet(musicPojo.getId()));
         ArtistConvert tbArtistPojo = CollUtil.isEmpty(artistByMusicId) ? new ArtistConvert() : artistByMusicId.get(0);
         Song song = new Song();
-        song.setId(String.valueOf(musicPojo.getId()));
+        song.setId(StringUtil.defaultNullString(musicPojo.getId()));
         song.setIsDir(false);
         song.setTitle(musicPojo.getMusicName());
         song.setAlbum(albumByAlbumId.getAlbumName());
-        song.setAlbumId(String.valueOf(albumByAlbumId.getId()));
+        song.setAlbumId(StringUtil.defaultNullString(albumByAlbumId.getId()));
         song.setArtist(tbArtistPojo.getArtistName());
-        song.setArtistId(String.valueOf(tbArtistPojo.getId()));
+        song.setArtistId(StringUtil.defaultNullString(tbArtistPojo.getId()));
         song.setTrack(0);
         song.setYear(albumByAlbumId.getPublishTime().getYear());
-        song.setCoverArt(String.valueOf(musicPojo.getId()));
+        song.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
         TbResourcePojo tbMusicUrlPojo = CollUtil.isEmpty(musicUrl) ? new TbResourcePojo() : musicUrl.get(0);
         if (Objects.isNull(tbMusicUrlPojo)) {
             throw new BaseException(ResultCode.RESOURCE_DATA_NOT_EXISTED);
@@ -163,8 +164,8 @@ public class BrowsingApi {
         
         song.setStarred(musicPojo.getUpdateTime().toString());
         song.setDuration(musicPojo.getTimeLength() / 1000);
-        song.setParent(String.valueOf(albumByAlbumId.getId()));
-        song.setDiscNumber(String.valueOf(0));
+        song.setParent(StringUtil.defaultNullString(albumByAlbumId.getId()));
+        song.setDiscNumber(StringUtil.defaultNullString(0));
         song.setPlayCount(0);
         song.setPlayed(musicPojo.getUpdateTime().toString());
         song.setCreated(LocalDateTimeUtil.format(musicPojo.getCreateTime(), DatePattern.UTC_MS_PATTERN));
@@ -215,10 +216,10 @@ public class BrowsingApi {
                                                                                                         .toList());
             for (TbArtistPojo tbArtistPojo : entryKey.getValue()) {
                 IndexesRes.Artist e1 = new IndexesRes.Artist();
-                e1.setId(String.valueOf(tbArtistPojo.getId()));
+                e1.setId(StringUtil.defaultNullString(tbArtistPojo.getId()));
                 e1.setName(tbArtistPojo.getArtistName());
                 e1.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
-                e1.setCoverArt(String.valueOf(tbArtistPojo.getId()));
+                e1.setCoverArt(StringUtil.defaultNullString(tbArtistPojo.getId()));
                 e1.setUserRating(0);
                 e1.setAlbumCount(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(tbArtistPojo.getId()));
                 artist.add(e1);
@@ -338,11 +339,11 @@ public class BrowsingApi {
             long albumCount = tbMiddleTagPojos.parallelStream()
                                               .filter(tbMiddleTagPojo1 -> Objects.equals(tbMiddleTagPojo1.getType(), PicTypeConstant.ALBUM))
                                               .count();
-            e.setAlbumCount(String.valueOf(albumCount));
+            e.setAlbumCount(StringUtil.defaultNullString(albumCount));
             long songCount = tbMiddleTagPojos.parallelStream()
                                              .filter(tbMiddleTagPojo1 -> Objects.equals(tbMiddleTagPojo1.getType(), PicTypeConstant.MUSIC))
                                              .count();
-            e.setSongCount(String.valueOf(songCount));
+            e.setSongCount(StringUtil.defaultNullString(songCount));
             TbTagPojo tbTagPojo = tagMap.get(tbMiddleTagPojo.getTagId());
             e.setGenre(tbTagPojo.getTagName());
             genres.add(e);
@@ -376,12 +377,13 @@ public class BrowsingApi {
                                                                                                         .toList());
             for (TbArtistPojo tbArtistPojo : entryKey.getValue()) {
                 ArtistsRes.Artist e1 = new ArtistsRes.Artist();
-                e1.setId(String.valueOf(tbArtistPojo.getId()));
+                e1.setId(StringUtil.defaultNullString(tbArtistPojo.getId()));
                 e1.setName(tbArtistPojo.getArtistName());
                 e1.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
-                e1.setCoverArt(String.valueOf(tbArtistPojo.getId()));
-                e1.setUserRating(String.valueOf(0));
-                e1.setAlbumCount(String.valueOf(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(tbArtistPojo.getId())));
+                e1.setCoverArt(StringUtil.defaultNullString(tbArtistPojo.getId()));
+                e1.setUserRating(StringUtil.defaultNullString(0));
+                e1.setAlbumCount(StringUtil.defaultNullString(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(
+                        tbArtistPojo.getId())));
                 artist.add(e1);
             }
             e.setArtist(artist);
@@ -398,9 +400,9 @@ public class BrowsingApi {
         
         ArtistRes.Artist artistRes = new ArtistRes.Artist();
         artistRes.setName(artist.getArtistName());
-        artistRes.setId(String.valueOf(artist.getId()));
-        artistRes.setCoverArt(String.valueOf(artist.getId()));
-        artistRes.setAlbumCount(String.valueOf(qukuService.getArtistAlbumCountByArtistId(artist.getId())));
+        artistRes.setId(StringUtil.defaultNullString(artist.getId()));
+        artistRes.setCoverArt(StringUtil.defaultNullString(artist.getId()));
+        artistRes.setAlbumCount(StringUtil.defaultNullString(qukuService.getArtistAlbumCountByArtistId(artist.getId())));
         
         List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumByArtistIds(Collections.singletonList(artist.getId()));
         List<Long> albumIds = albumListByArtistIds.parallelStream()
@@ -411,29 +413,29 @@ public class BrowsingApi {
         Map<Long, Integer> albumMusicCountMap = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (AlbumConvert albumListByArtistId : albumListByArtistIds) {
             ArtistRes.Album e = new ArtistRes.Album();
-            e.setId(String.valueOf(albumListByArtistId.getId()));
+            e.setId(StringUtil.defaultNullString(albumListByArtistId.getId()));
             e.setName(albumListByArtistId.getAlbumName());
             e.setCoverArt(albumListByArtistId.getPicUrl());
-            e.setParent(String.valueOf(artist.getId()));
-            e.setIsDir(String.valueOf(true));
+            e.setParent(StringUtil.defaultNullString(artist.getId()));
+            e.setIsDir(StringUtil.defaultNullString(true));
             e.setTitle(albumListByArtistId.getAlbumName());
             e.setAlbum(albumListByArtistId.getAlbumName());
             e.setArtist(artist.getArtistName());
-            e.setYear(String.valueOf(albumListByArtistId.getPublishTime().getYear()));
+            e.setYear(StringUtil.defaultNullString(albumListByArtistId.getPublishTime().getYear()));
             List<TbTagPojo> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumListByArtistId.getId());
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 e.setGenre(Optional.ofNullable(labelAlbumGenre.get(0)).orElse(new TbTagPojo()).getTagName());
             }
-            e.setCoverArt(String.valueOf(albumListByArtistId.getId()));
-            e.setDuration(String.valueOf(albumDurationCountMap.get(albumListByArtistId.getId())));
+            e.setCoverArt(StringUtil.defaultNullString(albumListByArtistId.getId()));
+            e.setDuration(StringUtil.defaultNullString(albumDurationCountMap.get(albumListByArtistId.getId())));
             // 播放数量
-            e.setPlayCount(String.valueOf(0));
+            e.setPlayCount(StringUtil.defaultNullString(0));
             e.setPlayed(new Date().toString());
             e.setCreated(LocalDateTimeUtil.format(albumListByArtistId.getPublishTime(), DatePattern.UTC_MS_PATTERN));
-            e.setArtistId(String.valueOf(artist.getId()));
-            e.setUserRating(String.valueOf(0));
-            e.setSongCount(String.valueOf(albumMusicCountMap.get(albumListByArtistId.getId())));
-            e.setIsVideo(String.valueOf(false));
+            e.setArtistId(StringUtil.defaultNullString(artist.getId()));
+            e.setUserRating(StringUtil.defaultNullString(0));
+            e.setSongCount(StringUtil.defaultNullString(albumMusicCountMap.get(albumListByArtistId.getId())));
+            e.setIsVideo(StringUtil.defaultNullString(false));
             
             album.add(e);
         }
@@ -542,13 +544,13 @@ public class BrowsingApi {
     public AlbumRes getAlbum(Long id) {
         TbAlbumPojo albumPojo = albumService.getById(id);
         Album album = new Album();
-        album.setId(String.valueOf(albumPojo.getId()));
+        album.setId(StringUtil.defaultNullString(albumPojo.getId()));
         album.setName(albumPojo.getAlbumName());
         List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumPojo.getId());
         ArtistConvert artistPojo = CollUtil.isEmpty(artistListByAlbumIds) ? new ArtistConvert() : artistListByAlbumIds.get(0);
         album.setArtist(artistPojo.getArtistName());
-        album.setArtistId(String.valueOf(artistPojo.getId()));
-        album.setCoverArt(String.valueOf(albumPojo.getId()));
+        album.setArtistId(StringUtil.defaultNullString(artistPojo.getId()));
+        album.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
         album.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
         album.setPlayCount(0);
         album.setPlayed(albumPojo.getUpdateTime().toString());
@@ -566,14 +568,14 @@ public class BrowsingApi {
         int duration = 0;
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             SongItem e = new SongItem();
-            e.setId(String.valueOf(musicPojo.getId()));
-            e.setParent(String.valueOf(albumPojo.getId()));
+            e.setId(StringUtil.defaultNullString(musicPojo.getId()));
+            e.setParent(StringUtil.defaultNullString(albumPojo.getId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
             e.setAlbum(albumPojo.getAlbumName());
-            e.setAlbumId(String.valueOf(albumPojo.getId()));
+            e.setAlbumId(StringUtil.defaultNullString(albumPojo.getId()));
             e.setArtist(tbArtistPojo.getArtistName());
-            e.setArtistId(String.valueOf(tbArtistPojo.getId()));
+            e.setArtistId(StringUtil.defaultNullString(tbArtistPojo.getId()));
             e.setTrack(1);
             e.setYear(albumPojo.getPublishTime().getYear());
             e.setCoverArt(String.valueOf(musicPojo.getId()));

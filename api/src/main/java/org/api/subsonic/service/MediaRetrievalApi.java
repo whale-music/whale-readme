@@ -12,7 +12,6 @@ import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.properties.DebugConfig;
 import org.core.mybatis.iservice.TbMiddlePicService;
-import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.RemoteStorePicService;
@@ -36,7 +35,7 @@ public class MediaRetrievalApi {
     
     private final TbMiddlePicService tbMiddlePicService;
     
-    public MediaRetrievalApi(QukuAPI qukuService, DefaultInfo defaultInfo, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService, TbPicService tbPicService, TbMiddlePicService tbMiddlePicService) {
+    public MediaRetrievalApi(QukuAPI qukuService, DefaultInfo defaultInfo, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, RemoteStorePicService remoteStorePicService, TbMiddlePicService tbMiddlePicService) {
         this.qukuService = qukuService;
         this.defaultInfo = defaultInfo;
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
@@ -82,6 +81,7 @@ public class MediaRetrievalApi {
         return defaultInfo.getPic().getDefaultPic();
     }
     
+    @Cacheable(value = "stream", key = "#id")
     public String stream(SubsonicCommonReq req, Long id, String maxBitRate, String format, String timeOffset, String size, String estimateContentLength, String converted) {
         List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(id, false);
         TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrlByMusicId);

@@ -353,12 +353,8 @@ public class SongListsApi {
         
         List<MusicConvert> musicListByAlbumId = qukuService.randomMusicList(size.intValue(), genre, fromYear, toYear);
         
-        List<Long> musicIds = musicListByAlbumId.parallelStream()
-                                                .map(TbMusicPojo::getId)
-                                                .toList();
-        List<Long> albumIds = musicListByAlbumId.parallelStream()
-                                                .map(TbMusicPojo::getId)
-                                                .toList();
+        List<Long> musicIds = musicListByAlbumId.parallelStream().map(TbMusicPojo::getId).toList();
+        List<Long> albumIds = musicListByAlbumId.parallelStream().map(TbMusicPojo::getAlbumId).toList();
         Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
@@ -368,19 +364,23 @@ public class SongListsApi {
         ArrayList<RandomSongsRes.Song> song = new ArrayList<>();
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             RandomSongsRes.Song e = new RandomSongsRes.Song();
+            // 设置每个字段的值
             e.setId(String.valueOf(musicPojo.getId()));
             e.setParent(String.valueOf(musicPojo.getAlbumId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
-            List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
-            if (CollUtil.isNotEmpty(tbTagPojos)) {
-                e.setGenre(tbTagPojos.get(0).getTagName());
+            if (Objects.nonNull(musicPojo.getPublishTime())) {
+                e.setYear(musicPojo.getPublishTime().getYear());
             }
-            AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
+            List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
+            if (CollUtil.isNotEmpty(tbTagPojos) && Objects.nonNull(tbTagPojos.get(0))) {
+                e.setGenre(tbTagPojos.getFirst().getTagName());
+                e.setGenres(new RandomSongsRes.Song.Genres(tbTagPojos.getFirst().getTagName()));
+            }
+            AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getAlbumId());
             if (Objects.nonNull(albumConvert)) {
                 e.setAlbum(albumConvert.getAlbumName());
                 e.setAlbumId(String.valueOf(albumConvert.getId()));
-                e.setYear(String.valueOf(albumConvert.getPublishTime().getYear()));
             }
             List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
             if (CollUtil.isNotEmpty(artistConverts)) {
@@ -389,24 +389,35 @@ public class SongListsApi {
                 e.setArtistId(String.valueOf(artistConvert.getId()));
             }
             e.setCoverArt(String.valueOf(musicPojo.getId()));
-            e.setTrack(String.valueOf(0));
+            e.setTrack(0);
             List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrl);
             if (Objects.nonNull(tbResourcePojo)) {
-                e.setSize(String.valueOf(tbResourcePojo.getSize()));
+                e.setSize(tbResourcePojo.getSize());
                 e.setSuffix(tbResourcePojo.getEncodeType());
                 e.setTranscodedSuffix(tbResourcePojo.getEncodeType());
-                e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
+                if (Objects.nonNull(tbResourcePojo.getRate())) {
+                    e.setBitRate(tbResourcePojo.getRate() / 1000);
+                }
                 e.setPath(tbResourcePojo.getPath());
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 e.setTranscodedContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
-            e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
+            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setPlayCount(0);
-            e.setPlayed(new Date());
+            e.setPlayed(String.valueOf(new Date()));
             e.setType("music");
             e.setIsVideo(false);
-            e.setCreated(Date.from(musicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+            e.setBpm(0);
+            e.setPlayed("2010-03-04T17:15:06.567Z");
+            e.setUserRating(0);
+            e.setComment("");
+            e.setSortName("");
+            e.setMediaType("song");
+            e.setMusicBrainzId("");
+            e.setStarred("2010-10-14T12:24:14Z");
+            e.setReplayGain(new RandomSongsRes.Song.ReplayGain(0, 0));
+            e.setCreated(musicPojo.getCreateTime().toString());
             song.add(e);
         }
         RandomSongsRes.RandomSongs randomSongs = new RandomSongsRes.RandomSongs();

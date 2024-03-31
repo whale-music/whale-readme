@@ -9,7 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -90,9 +92,10 @@ public class AlbumList2Res extends SubsonicResult {
             @JacksonXmlProperty(isAttribute = true)
             private Integer userRating;
             
-            // @JsonProperty("replayGain")
-            // @JacksonXmlProperty(isAttribute = true)
-            // private ReplayGain replayGain;
+            @Schema(name = "保留字段, 文档没有对应字段信息")
+            @JsonProperty("replayGain")
+            @JacksonXmlProperty(isAttribute = true)
+            private Map<String, String> replayGain = new HashMap<>();
             
             @JsonProperty("songCount")
             @JacksonXmlProperty(isAttribute = true)
@@ -137,10 +140,6 @@ public class AlbumList2Res extends SubsonicResult {
             @JsonProperty("starred")
             @JacksonXmlProperty(isAttribute = true)
             private String starred;
-            
-            // public static class ReplayGain{
-            //
-            // }
         }
     }
 }

@@ -117,6 +117,9 @@ public class SongListsApi {
         Set<Long> albumIds = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
         Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
+        Map<Long, Integer> albumDurationCount = qukuService.getAlbumDurationCount(albumIds);
+        Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumIds);
+        
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumList2Res.AlbumList2.AlbumItem e = new AlbumList2Res.AlbumList2.AlbumItem();
             e.setId(StringUtil.defaultNullString(albumPojo.getId()));
@@ -125,9 +128,17 @@ public class SongListsApi {
             e.setCoverArt(remoteStorePicService.getAlbumPicUrl(albumPojo.getId()));
             e.setCreated(StringUtil.defaultNullString(albumPojo.getCreateTime()));
             
-            e.setDuration(0);
-            e.setGenres(new ArrayList<>());
-            e.setSongCount(0);
+            e.setDuration(albumDurationCount.get(albumPojo.getId()));
+            List<TbTagPojo> tbTagPojos = labelAlbumGenre.get(albumPojo.getId());
+            if (CollUtil.isNotEmpty(tbTagPojos)) {
+                List<String> list = tbTagPojos.parallelStream()
+                                              .filter(Objects::nonNull)
+                                              .map(TbTagPojo::getTagName)
+                                              .filter(StringUtil::isNotBlank)
+                                              .toList();
+                e.setGenres(list);
+                e.setGenre(CollUtil.get(list, 0));
+            }
             
             e.setIsDir(true);
             e.setIsVideo(false);
@@ -135,6 +146,7 @@ public class SongListsApi {
             e.setMusicBrainzId("");
             e.setPlayCount(0);
             e.setPlayed("2020-03-29T20:54:39.381Z");
+            e.setStarred("2020-03-15T04:45:53.011519335Z");
             e.setSortName("");
             e.setUserRating(0);
             
@@ -144,12 +156,17 @@ public class SongListsApi {
             e.setYear(albumPojo.getPublishTime().getYear());
             e.setSongCount(albumMusicCountByMapAlbumId.get(albumPojo.getId()));
             List<ArtistConvert> artistListByAlbumIds = artistMapByAlbumIds.get(albumPojo.getId());
-            TbArtistPojo pojo = CollUtil.isEmpty(artistListByAlbumIds) || Objects.isNull(artistListByAlbumIds.get(0)) ? new TbArtistPojo() : artistListByAlbumIds.getFirst();
-            e.setArtist(pojo.getArtistName());
-            String idStr = StringUtil.defaultNullString(pojo.getId());
-            e.setParent(idStr);
-            e.setArtistId(idStr);
+            if (CollUtil.isNotEmpty(artistListByAlbumIds) && Objects.nonNull(artistListByAlbumIds.get(0))) {
+                TbArtistPojo pojo = artistListByAlbumIds.getFirst();
+                e.setArtist(pojo.getArtistName());
+                String idStr = StringUtil.defaultNullString(pojo.getId());
+                e.setParent(idStr);
+                e.setArtistId(idStr);
+            } else {
+                continue;
+            }
             e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
+            
             albumArrayList.add(e);
         }
         // 歌手排序

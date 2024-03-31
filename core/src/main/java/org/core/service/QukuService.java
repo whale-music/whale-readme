@@ -757,7 +757,7 @@ public interface QukuService {
      * @param albumIds 专辑ID
      * @return 专辑时长
      */
-    Map<Long, Integer> getAlbumDurationCount(List<Long> albumIds);
+    Map<Long, Integer> getAlbumDurationCount(Collection<Long> albumIds);
     
     /**
      * 获取歌单音乐时长

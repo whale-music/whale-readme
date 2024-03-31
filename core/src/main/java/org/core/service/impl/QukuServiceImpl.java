@@ -240,8 +240,10 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public Map<Long, Integer> getAlbumMusicCountByMapAlbumId(Collection<Long> albumIds) {
-        List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, albumIds));
-        return list.parallelStream().collect(Collectors.toMap(TbMusicPojo::getAlbumId, tbMusicPojo -> 1, Integer::sum));
+        List<Long> list = musicService.listObjs(Wrappers.<TbMusicPojo>lambdaQuery()
+                                                        .select(TbMusicPojo::getAlbumId)
+                                                        .in(TbMusicPojo::getAlbumId, albumIds));
+        return list.parallelStream().collect(Collectors.toMap(Long::longValue, aLong -> 1, Integer::sum));
     }
     
     /**
@@ -251,8 +253,12 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public Integer getAlbumMusicCountByMusicId(Long musicId) {
-        long count = musicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, musicId));
-        return Math.toIntExact(count);
+        TbMusicPojo byId = musicService.getById(musicId);
+        if (Objects.isNull(byId.getAlbumId())) {
+            return 0;
+        } else {
+            return this.getAlbumMusicCountByAlbumId(byId.getAlbumId());
+        }
     }
     
     /**
@@ -1444,7 +1450,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 专辑时长
      */
     @Override
-    public Map<Long, Integer> getAlbumDurationCount(List<Long> albumIds) {
+    public Map<Long, Integer> getAlbumDurationCount(Collection<Long> albumIds) {
         HashMap<Long, Integer> resMap = new HashMap<>();
         Map<Long, List<MusicConvert>> musicMapByAlbumId = getMusicMapByAlbumId(albumIds);
         for (Map.Entry<Long, List<MusicConvert>> longListEntry : musicMapByAlbumId.entrySet()) {

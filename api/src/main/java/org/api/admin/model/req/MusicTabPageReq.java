@@ -30,4 +30,6 @@ public class MusicTabPageReq extends PageReqCommon {
     @Schema(name = "是否只显示无音源")
     private Boolean isShowSource;
     
+    @Schema(name = "用户ID")
+    private Long userId;
 }

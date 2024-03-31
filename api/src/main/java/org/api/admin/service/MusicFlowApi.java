@@ -1335,6 +1335,7 @@ public class MusicFlowApi {
                 return new PageResCommon<>();
             }
             LambdaQueryWrapper<TbMusicPojo> wrapper = WrapperUtil.musicWrapper(StringUtils.isNotBlank(name), StringUtils.isNotBlank(music), name, music)
+                                                                 .eq(Objects.nonNull(req.getUserId()), TbMusicPojo::getUserId, req.getUserId())
                                                                  .in(CollUtil.isNotEmpty(musicIds), TbMusicPojo::getId, musicIds)
                                                                  .orderByDesc(TbMusicPojo::getCreateTime);
             page = musicService.page(req.getPage(), wrapper);

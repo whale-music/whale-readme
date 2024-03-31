@@ -2,13 +2,9 @@ package org.api.subsonic.model.res.randomsongs;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.api.subsonic.common.SubsonicResult;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -51,19 +47,22 @@ public class RandomSongsRes extends SubsonicResult {
         private String artist;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String track;
+        private Integer track;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String year;
+        private Integer year;
         
         @JacksonXmlProperty(isAttribute = true)
         private String genre;
         
         @JacksonXmlProperty(isAttribute = true)
+        private Genres genres;
+        
+        @JacksonXmlProperty(isAttribute = true)
         private String coverArt;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String size;
+        private Long size;
         
         @JacksonXmlProperty(isAttribute = true)
         private String contentType;
@@ -72,10 +71,10 @@ public class RandomSongsRes extends SubsonicResult {
         private String suffix;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String bitRate;
+        private Integer bitRate;
         
         @JacksonXmlProperty(isAttribute = true)
         private String path;
@@ -84,10 +83,10 @@ public class RandomSongsRes extends SubsonicResult {
         private Integer playCount;
         
         @JacksonXmlProperty(isAttribute = true)
-        private Date played;
+        private String played;
         
         @JacksonXmlProperty(isAttribute = true)
-        private Date created;
+        private String created;
         
         @JacksonXmlProperty(isAttribute = true)
         private String albumId;
@@ -106,5 +105,44 @@ public class RandomSongsRes extends SubsonicResult {
         
         @JacksonXmlProperty(isAttribute = true)
         private String transcodedSuffix;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private Integer userRating;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private Integer bpm;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private String comment;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private String sortName;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private String mediaType;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private String starred;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private String musicBrainzId;
+        
+        @JacksonXmlProperty(isAttribute = true)
+        private ReplayGain replayGain;
+        
+        @Setter
+        @Getter
+        @AllArgsConstructor
+        public static class Genres {
+            private String name;
+        }
+        
+        @Setter
+        @Getter
+        @AllArgsConstructor
+        public static class ReplayGain {
+            private Integer trackPeak;
+            private Integer albumPeak;
+        }
     }
 }

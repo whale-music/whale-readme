@@ -146,13 +146,20 @@ public class SongListsApi {
     private List<TbAlbumPojo> handleAlbums(SubsonicCommonReq req, String type, Long offset, Long size, Long fromYear, Long toYear) {
         Page<TbAlbumPojo> page = new Page<>(offset, size);
         String userName = req.getU();
-        boolean yearFlag = Objects.nonNull(fromYear) && Objects.nonNull(toYear);
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        if (Objects.isNull(fromYear)) {
+            fromYear = 0L;
+        }
+        if (Objects.isNull(toYear)) {
+            toYear = 9999L;
+        }
+        LocalDate fromYearLocalDate = LocalDate.of(fromYear.intValue(), 1, 1);
+        LocalDate toYearLocalDate = LocalDate.of(toYear.intValue(), 12, 31);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         switch (type) {
             // 最新添加
             case "newest":
                 LambdaQueryWrapper<TbAlbumPojo> between = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                                  .between(yearFlag, TbAlbumPojo::getPublishTime, new Date(fromYear), new Date(fromYear));
+                                                                  .between(TbAlbumPojo::getPublishTime, fromYearLocalDate, toYearLocalDate);
                 if (fromYear > toYear) {
                     between.orderByDesc(TbAlbumPojo::getCreateTime);
                 } else {
@@ -185,10 +192,7 @@ public class SongListsApi {
                 if (CollUtil.isEmpty(tbCollectMusicPojos)) {
                     return new ArrayList<>();
                 }
-                List<Long> musicIds = tbCollectMusicPojos
-                        .parallelStream()
-                        .map(TbCollectMusicPojo::getMusicId)
-                        .toList();
+                List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
                 if (CollUtil.isEmpty(musicIds)) {
                     return new ArrayList<>();
                 }
@@ -212,10 +216,9 @@ public class SongListsApi {
                 int pageCount = PageUtil.totalPage(Math.toIntExact(count), Math.toIntExact(size));
                 long randomOffset = RandomUtil.randomLong(0, pageCount);
                 LambdaQueryWrapper<TbAlbumPojo> randomQueryWrapper = Wrappers.<TbAlbumPojo>lambdaQuery()
-                                                                             .between(yearFlag,
-                                                                                     TbAlbumPojo::getPublishTime,
-                                                                                     new Date(fromYear),
-                                                                                     new Date(fromYear));
+                                                                             .between(TbAlbumPojo::getPublishTime,
+                                                                                     fromYearLocalDate,
+                                                                                     toYearLocalDate);
                 if (fromYear > toYear) {
                     randomQueryWrapper.orderByDesc(TbAlbumPojo::getPublishTime);
                 } else {

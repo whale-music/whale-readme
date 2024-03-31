@@ -523,22 +523,6 @@ public class QukuServiceImpl implements QukuService {
     }
     
     /**
-     * 通过专辑ID获取歌手
-     *
-     * @param empty      是否执行
-     * @param longStream 专辑ID流
-     */
-    private List<ArtistConvert> getTbSingerPojoList(boolean empty, Stream<Long> longStream) {
-        if (empty) {
-            return Collections.emptyList();
-        }
-        List<Long> artistIds = longStream.toList();
-        List<TbArtistPojo> list = artistService.list(Wrappers.<TbArtistPojo>lambdaQuery().in(TbArtistPojo::getId, artistIds));
-        Map<Long, String> picUrl = remoteStorePicService.getArtistPicUrl(artistIds);
-        return getArtistConvertList(list, picUrl);
-    }
-    
-    /**
      * 获取歌手所有专辑数量
      *
      * @param artistIds 歌手ID

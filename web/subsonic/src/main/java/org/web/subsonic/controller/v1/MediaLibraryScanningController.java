@@ -10,6 +10,7 @@ import org.api.subsonic.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.scanstatus.ScanStatusRes;
+import org.api.subsonic.model.res.startscan.StartScanRes;
 import org.api.subsonic.service.MediaLibraryScanningApi;
 import org.core.common.constant.HttpStatusStrConstant;
 import org.core.common.weblog.annotation.WebLog;
@@ -39,6 +40,15 @@ public class MediaLibraryScanningController {
     @ManualSerialize
     public ResponseEntity<String> getScanStatus(SubsonicCommonReq req) {
         ScanStatusRes res = mediaLibraryScanningApi.getScanStatus(req);
+        return res.success(req);
+    }
+    @Operation(summary = "开始扫描")
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK, content = @Content)
+    @WebLog(LogNameConstant.SUBSONIC)
+    @GetMapping({"/startScan.view", "/startScan"})
+    @ManualSerialize
+    public ResponseEntity<String> startScan(SubsonicCommonReq req) {
+        StartScanRes res = mediaLibraryScanningApi.startScan(req);
         return res.success(req);
     }
 }

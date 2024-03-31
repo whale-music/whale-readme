@@ -610,10 +610,10 @@ public class SongListsApi {
         SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         
         // 专辑
-        List<TbUserAlbumPojo> userAlbumList = tbUserAlbumService.list(Wrappers.<TbUserAlbumPojo>lambdaQuery()
-                                                                              .eq(TbUserAlbumPojo::getUserId, userByName.getId()));
-        if (CollUtil.isNotEmpty(userAlbumList)) {
-            List<Long> albumIds = userAlbumList.parallelStream().map(TbUserAlbumPojo::getAlbumId).toList();
+        List<Long> albumIds = tbUserAlbumService.listObjs(Wrappers.<TbUserAlbumPojo>lambdaQuery()
+                                                                  .select(TbUserAlbumPojo::getAlbumId)
+                                                                  .eq(TbUserAlbumPojo::getUserId, userByName.getId()));
+        if (CollUtil.isNotEmpty(albumIds)) {
             List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
             
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
@@ -630,7 +630,12 @@ public class SongListsApi {
                 e.setAlbumTitle(tbAlbumPojo.getAlbumName());
                 
                 List<ArtistConvert> artistConverts = albumArtistMapByAlbumIds.get(tbAlbumPojo.getId());
-                if (CollUtil.isNotEmpty(artistConverts)) {
+                if (CollUtil.isEmpty(artistConverts)) {
+                    e.setArtist("");
+                    e.setArtistId("");
+                    e.setParent("");
+                    
+                } else {
                     ArtistConvert artistConvert = artistConverts.get(0);
                     e.setArtist(artistConvert.getArtistName());
                     e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
@@ -652,10 +657,10 @@ public class SongListsApi {
             starred.setAlbums(albums);
         }
         // 歌手
-        List<TbUserArtistPojo> userArtistList = tbUserArtistService.list(Wrappers.<TbUserArtistPojo>lambdaQuery()
-                                                                                 .eq(TbUserArtistPojo::getUserId, userByName.getId()));
-        if (CollUtil.isNotEmpty(userArtistList)) {
-            List<Long> artistIds = userArtistList.parallelStream().map(TbUserArtistPojo::getArtistId).toList();
+        List<Long> artistIds = tbUserArtistService.listObjs(Wrappers.<TbUserArtistPojo>lambdaQuery()
+                                                                    .select(TbUserArtistPojo::getArtistId)
+                                                                    .eq(TbUserArtistPojo::getUserId, userByName.getId()));
+        if (CollUtil.isNotEmpty(artistIds)) {
             List<TbArtistPojo> tbArtistPojos = tbArtistService.listByIds(artistIds);
             List<StarredRes.Artist> artists = new ArrayList<>();
             for (TbArtistPojo tbArtistPojo : tbArtistPojos) {
@@ -679,9 +684,10 @@ public class SongListsApi {
             List<TbCollectMusicPojo> tbCollectMusicPojos = tbCollectMusicService.getCollectIds(userPlayList.stream().map(TbCollectPojo::getId).toList());
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
             List<TbMusicPojo> tbMusicPojos = tbMusicService.listByIds(musicIds);
-            List<Long> albumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+            List<Long> musicAlbumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+            
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
-            Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
+            Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(musicAlbumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
             List<StarredRes.Song> songs = new ArrayList<>();
@@ -693,18 +699,26 @@ public class SongListsApi {
                 e.setTitle(musicPojo.getMusicName());
                 e.setUserRating(0);
                 List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
-                if (CollUtil.isNotEmpty(tbTagPojos)) {
+                if (CollUtil.isEmpty(tbTagPojos)) {
+                    e.setGenre("");
+                } else {
                     TbTagPojo tbTagPojo = tbTagPojos.get(0);
                     e.setGenre(tbTagPojo.getTagName());
                 }
                 AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
-                if (Objects.nonNull(albumConvert)) {
+                if (Objects.isNull(albumConvert)) {
+                    e.setAlbum("");
+                    e.setAlbumId("");
+                } else {
                     e.setAlbum(albumConvert.getAlbumName());
                     e.setAlbumId(String.valueOf(albumConvert.getId()));
                     e.setYear(Optional.ofNullable(albumConvert.getPublishTime()).orElse(LocalDateTime.now()).getYear());
                 }
                 List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
-                if (CollUtil.isNotEmpty(artistConverts)) {
+                if (CollUtil.isEmpty(artistConverts)) {
+                    e.setArtist("");
+                    e.setArtistId("");
+                } else {
                     ArtistConvert artistConvert = artistConverts.get(0);
                     e.setArtistId(String.valueOf(artistConvert.getId()));
                     e.setArtist(artistConvert.getArtistName());
@@ -719,6 +733,8 @@ public class SongListsApi {
                     e.setBitRate(String.valueOf(tbResourcePojo.getRate()));
                     e.setPath(tbResourcePojo.getPath());
                     e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+                }else{
+                    continue;
                 }
                 e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
                 e.setPlayCount(0);

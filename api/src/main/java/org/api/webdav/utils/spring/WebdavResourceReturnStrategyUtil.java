@@ -1,5 +1,6 @@
 package org.api.webdav.utils.spring;
 
+import cn.hutool.core.collection.CollUtil;
 import org.api.webdav.config.WebdavResourceReturnStrategyConfig;
 import org.core.jpa.entity.TbResourceEntity;
 import org.core.mybatis.pojo.TbResourcePojo;
@@ -25,6 +26,12 @@ public class WebdavResourceReturnStrategyUtil {
      * @return 文件数据
      */
     public TbResourcePojo handleResource(List<TbResourcePojo> resources) {
+        if (CollUtil.isEmpty(resources)) {
+            return null;
+        }
+        if (resources.size() == 1) {
+            return resources.getFirst();
+        }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
             case FIRST -> {
                 return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
@@ -62,6 +69,12 @@ public class WebdavResourceReturnStrategyUtil {
      * @return 文件数据
      */
     public TbResourceEntity handleResourceEntity(List<TbResourceEntity> resources) {
+        if (CollUtil.isEmpty(resources)) {
+            return null;
+        }
+        if (resources.size() == 1) {
+            return resources.getFirst();
+        }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
             case FIRST -> {
                 return Optional.ofNullable(resources.get(0)).orElse(new TbResourceEntity());

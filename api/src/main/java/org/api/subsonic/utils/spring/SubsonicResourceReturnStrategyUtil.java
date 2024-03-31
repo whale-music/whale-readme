@@ -28,6 +28,9 @@ public class SubsonicResourceReturnStrategyUtil {
         if (CollUtil.isEmpty(resources)) {
             return null;
         }
+        if (resources.size() == 1) {
+            return resources.getFirst();
+        }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
             case FIRST -> {
                 return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());

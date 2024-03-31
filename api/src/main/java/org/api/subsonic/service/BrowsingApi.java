@@ -411,7 +411,7 @@ public class BrowsingApi {
                                                   .toList();
         Map<Long, Integer> albumDurationCountMap = qukuService.getAlbumDurationCount(albumIds);
         ArrayList<ArtistRes.Album> album = new ArrayList<>();
-        Map<Long, Integer> albumMusicCountMap = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
+        Map<Long, Integer> albumMusicCountMap = qukuService.getAlbumMusicCountByAlbumIdToMap(albumIds);
         for (AlbumConvert albumListByArtistId : albumListByArtistIds) {
             ArtistRes.Album e = new ArtistRes.Album();
             e.setId(StringUtil.defaultNullString(albumListByArtistId.getId()));

@@ -89,6 +89,14 @@ public interface QukuService {
     Integer getAlbumMusicCountByAlbumId(Long albumId);
     
     /**
+     * 专辑下所有音乐数量
+     *
+     * @param albumIds 专辑ID
+     * @return 专辑音乐数量
+     */
+    Map<Long, Integer> getAlbumMusicCountByAlbumIdToMap(Collection<Long> albumIds);
+    
+    /**
      * 查询专辑下音乐数量
      */
     Integer getAlbumMusicCountByMusicId(Long musicId);
@@ -766,14 +774,5 @@ public interface QukuService {
      * @return 专辑时长
      */
     Map<Long, Integer> getCollectDurationCount(List<Long> collectIds);
-    
-    
-    /**
-     * 专辑下所有音乐数量
-     *
-     * @param albumIds 专辑ID
-     * @return 专辑音乐数量
-     */
-    Map<Long, Integer> getAlbumMusicCountByMapAlbumId(Collection<Long> albumIds);
     
 }

@@ -239,7 +239,7 @@ public class QukuServiceImpl implements QukuService {
      * @return 专辑音乐数量
      */
     @Override
-    public Map<Long, Integer> getAlbumMusicCountByMapAlbumId(Collection<Long> albumIds) {
+    public Map<Long, Integer> getAlbumMusicCountByAlbumIdToMap(Collection<Long> albumIds) {
         List<Long> list = musicService.listObjs(Wrappers.<TbMusicPojo>lambdaQuery()
                                                         .select(TbMusicPojo::getAlbumId)
                                                         .in(TbMusicPojo::getAlbumId, albumIds));

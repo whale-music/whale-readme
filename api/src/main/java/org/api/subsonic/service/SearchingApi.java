@@ -129,7 +129,7 @@ public class SearchingApi {
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
-            Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);
+            Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByAlbumIdToMap(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
                 Search2Res.Album e = new Search2Res.Album();
                 e.setId(StringUtil.defaultNullString(albumPojo.getId()));
@@ -280,7 +280,7 @@ public class SearchingApi {
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
             Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
-            Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByMapAlbumId(albumIds);
+            Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByAlbumIdToMap(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
                 Search3Res.Album e = new Search3Res.Album();
                 e.setId(StringUtil.defaultNullString(albumPojo.getId()));

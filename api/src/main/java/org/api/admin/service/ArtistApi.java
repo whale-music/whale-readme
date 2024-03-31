@@ -192,28 +192,28 @@ public class ArtistApi {
     public PageResCommon<ArtistPageRes> getArtistPage(ArtistPageReq req) {
         Page<TbArtistPojo> reqPage = req.getPage();
         Page<TbArtistPojo> page = new Page<>(reqPage.getCurrent(), reqPage.getSize());
-        final String name = req.getName();
-        final String albumName = req.getAlbumName();
-        final String musicName = req.getMusicName();
+        final String name = StringUtils.trim(req.getName());
+        final String albumName = StringUtils.trim(req.getAlbumName());
+        final String musicName = StringUtils.trim(req.getMusicName());
         final String artistName = StringUtils.trim(req.getArtistName());
         List<Long> artistIds = new ArrayList<>();
         // 音乐
         boolean nameNotBlank = StringUtils.isNotBlank(name);
         boolean musicNotBlank = StringUtils.isNotBlank(musicName);
         if (nameNotBlank || musicNotBlank) {
-            List<TbMusicPojo> list = tbMusicService.list(WrapperUtil.musicWrapper(nameNotBlank, musicNotBlank, name, musicName));
-            List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(list.parallelStream()
-                                                                                           .map(TbMusicPojo::getId)
-                                                                                           .collect(Collectors.toSet()));
+            LambdaQueryWrapper<TbMusicPojo> wrapper = WrapperUtil.musicWrapper(nameNotBlank, musicNotBlank, name, musicName);
+            wrapper.select(TbMusicPojo::getId);
+            List<Long> musicIds = tbMusicService.listObjs(wrapper);
+            List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(musicIds);
             artistIds.addAll(musicArtistByMusicId.parallelStream().map(TbArtistPojo::getId).collect(Collectors.toSet()));
         }
         // 专辑
         boolean albumNotBlank = StringUtils.isNotBlank(albumName);
         if (nameNotBlank || albumNotBlank) {
-            List<TbAlbumPojo> list = tbAlbumService.list(WrapperUtil.albumWrapper(nameNotBlank, albumNotBlank, name, albumName));
-            List<ArtistConvert> artistConverts = qukuService.getArtistByAlbumIds(list.parallelStream()
-                                                                                     .map(TbAlbumPojo::getId)
-                                                                                     .toList());
+            LambdaQueryWrapper<TbAlbumPojo> wrapper = WrapperUtil.albumWrapper(nameNotBlank, albumNotBlank, name, albumName);
+            wrapper.select(TbAlbumPojo::getId);
+            List<Long> albumIds = tbAlbumService.listObjs(wrapper);
+            List<ArtistConvert> artistConverts = qukuService.getArtistByAlbumIds(albumIds);
             artistIds.addAll(artistConverts.stream().map(TbArtistPojo::getId).toList());
         }
         // 歌手
@@ -224,10 +224,10 @@ public class ArtistApi {
         }
         
         // 如果前端传入搜索参数，并且没有查询到数据则直接返回空数据库。防止搜索结果混乱
-        if (StringUtils.isNotBlank(name)
+        if ((StringUtils.isNotBlank(name)
                 || (StringUtils.isNotBlank(musicName)
                 || StringUtils.isNotBlank(albumName)
-                || StringUtils.isNotBlank(artistName))
+                || StringUtils.isNotBlank(artistName)))
                 && CollUtil.isEmpty(artistIds)) {
             return new PageResCommon<>();
         }

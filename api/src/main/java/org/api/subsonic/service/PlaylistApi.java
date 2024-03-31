@@ -167,7 +167,7 @@ public class PlaylistApi {
                 throw new BaseException(ResultCode.PLAY_LIST_NO_EXIST);
             }
             String userName = req.getU();
-            SysUserPojo userByName = Optional.ofNullable(accountService.getUserByName(userName)).orElse(new SysUserPojo());
+            SysUserPojo userByName = Optional.ofNullable(accountService.getUserOrSubAccount(userName)).orElse(new SysUserPojo());
             playList = qukuApi.createPlayList(userByName.getId(), name, PlayListTypeConstant.ORDINARY);
         } else {
             // 更新
@@ -214,7 +214,7 @@ public class PlaylistApi {
     
     public void deletePlaylist(SubsonicCommonReq req, Long id) {
         String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         qukuApi.removePlayList(userByName.getId(), Collections.singleton(id));
     }
 }

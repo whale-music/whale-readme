@@ -229,7 +229,7 @@ public class SongListsApi {
     
     public void scrobble(SubsonicCommonReq req, Long id, Long timeStamp, Boolean submission) {
         String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         if (updateHistory(tbMusicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, id)),
                 userByName,
                 id,
@@ -503,7 +503,7 @@ public class SongListsApi {
     
     public NowPlayingRes getNowPlaying(SubsonicCommonReq req) {
         String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         if (Objects.isNull(userByName)) {
             return new NowPlayingRes();
         }
@@ -571,7 +571,7 @@ public class SongListsApi {
         StarredRes.Starred starred = new StarredRes.Starred();
         res.setStarred(starred);
         String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         
         // 专辑
         List<TbUserAlbumPojo> userAlbumList = tbUserAlbumService.list(Wrappers.<TbUserAlbumPojo>lambdaQuery()
@@ -709,7 +709,7 @@ public class SongListsApi {
         Starred2Res.Starred2 starred2 = new Starred2Res.Starred2();
         starred2Res.setStarred2(starred2);
         String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserByName(userName);
+        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         
         // 专辑
         List<TbUserAlbumPojo> userAlbumList = tbUserAlbumService.list(Wrappers.<TbUserAlbumPojo>lambdaQuery()

@@ -559,8 +559,11 @@ public class QukuServiceImpl implements QukuService {
         List<Long> musicIds = artistMusicMaps.values().stream().flatMap(Collection::parallelStream).toList();
         List<TbMusicPojo> musicList = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery()
                                                                 .select(TbMusicPojo::getId, TbMusicPojo::getAlbumId)
+                                                                .isNotNull(TbMusicPojo::getAlbumId)
                                                                 .in(TbMusicPojo::getId, musicIds));
-        Map<Long, Long> musicMaps = musicList.parallelStream().collect(Collectors.toMap((TbMusicPojo::getId), TbMusicPojo::getAlbumId));
+        Map<Long, Long> musicMaps = musicList.parallelStream()
+                                             .filter(Objects::nonNull)
+                                             .collect(Collectors.toMap((TbMusicPojo::getId), TbMusicPojo::getAlbumId));
         
         HashMap<Long, Integer> res = new HashMap<>();
         for (Map.Entry<Long, List<Long>> artistMusic : artistMusicMaps.entrySet()) {

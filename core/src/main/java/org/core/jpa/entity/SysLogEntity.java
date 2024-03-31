@@ -113,8 +113,8 @@ public class SysLogEntity {
     @Column(name = "rendering_engine_version", length = 128)
     private String renderingEngineVersion;
     
-    @Size(max = 512)
-    @Column(name = "exception_message", length = 512)
+    @Lob
+    @Column(name = "exception_message")
     private String exceptionMessage;
     
     @Lob

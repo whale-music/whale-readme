@@ -45,6 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.net.URLConnection;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -421,7 +422,7 @@ public class BrowsingApi {
             e.setTitle(albumListByArtistId.getAlbumName());
             e.setAlbum(albumListByArtistId.getAlbumName());
             e.setArtist(artist.getArtistName());
-            e.setYear(StringUtil.defaultNullString(albumListByArtistId.getPublishTime().getYear()));
+            e.setYear(Optional.ofNullable(albumListByArtistId.getPublishTime()).orElse(LocalDateTime.now()).getYear());
             List<TbTagPojo> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumListByArtistId.getId());
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 e.setGenre(Optional.ofNullable(labelAlbumGenre.get(0)).orElse(new TbTagPojo()).getTagName());

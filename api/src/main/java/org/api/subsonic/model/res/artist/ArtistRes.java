@@ -92,7 +92,7 @@ public class ArtistRes extends SubsonicResult {
         
         @JsonProperty("year")
         @JacksonXmlProperty(isAttribute = true)
-        private String year;
+        private Integer year;
         
         @JsonProperty("played")
         @JacksonXmlProperty(isAttribute = true)

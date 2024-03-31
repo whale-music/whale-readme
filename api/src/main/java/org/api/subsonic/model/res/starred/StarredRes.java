@@ -165,7 +165,7 @@ public class StarredRes extends SubsonicResult {
         private String track;
         
         @JacksonXmlProperty(isAttribute = true, localName = "year")
-        private String year;
+        private Integer year;
         
         @JacksonXmlProperty(isAttribute = true, localName = "genre")
         private String genre;

@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLConnection;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -558,7 +559,7 @@ public class SongListsApi {
             AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
             if (Objects.nonNull(albumConvert)) {
                 e.setAlbum(albumConvert.getAlbumName());
-                e.setYear(StringUtil.defaultNullString(albumConvert.getPublishTime().getYear()));
+                e.setYear(Optional.ofNullable(albumConvert.getPublishTime()).orElse(LocalDateTime.now()).getYear());
             }
             List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
             if (CollUtil.isNotEmpty(artistConverts)) {
@@ -683,7 +684,7 @@ public class SongListsApi {
                 if (Objects.nonNull(albumConvert)) {
                     e.setAlbum(albumConvert.getAlbumName());
                     e.setAlbumId(String.valueOf(albumConvert.getId()));
-                    e.setYear(String.valueOf(albumConvert.getPublishTime().getYear()));
+                    e.setYear(Optional.ofNullable(albumConvert.getPublishTime()).orElse(LocalDateTime.now()).getYear());
                 }
                 List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
                 if (CollUtil.isNotEmpty(artistConverts)) {

@@ -14,8 +14,6 @@ import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.albumlist.AlbumListRes;
-import org.api.subsonic.model.res.albumlist2.AlbumItem;
-import org.api.subsonic.model.res.albumlist2.AlbumList2;
 import org.api.subsonic.model.res.albumlist2.AlbumList2Res;
 import org.api.subsonic.model.res.nowplaying.NowPlayingRes;
 import org.api.subsonic.model.res.randomsongs.RandomSongsRes;
@@ -34,9 +32,12 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorePicService;
+import org.core.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.net.URLConnection;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,22 +112,42 @@ public class SongListsApi {
         if (CollUtil.isEmpty(albumList)) {
             return new AlbumList2Res();
         }
-        List<AlbumItem> albumArrayList = new ArrayList<>();
+        List<AlbumList2Res.AlbumList2.AlbumItem> albumArrayList = new ArrayList<>();
         Set<Long> albumIds = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
         Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByMapAlbumId(albumIds);
         for (TbAlbumPojo albumPojo : albumList) {
-            AlbumItem e = new AlbumItem();
+            AlbumList2Res.AlbumList2.AlbumItem e = new AlbumList2Res.AlbumList2.AlbumItem();
             e.setId(String.valueOf(albumPojo.getId()));
+            e.setBpm(0);
+            e.setComment("");
+            e.setCoverArt(remoteStorePicService.getAlbumPicUrl(albumPojo.getId()));
+            e.setCreated(String.valueOf(albumPojo.getCreateTime()));
+            
+            e.setDuration(0);
+            e.setGenres(new ArrayList<>());
+            e.setSongCount(0);
+            
+            e.setIsDir(true);
+            e.setIsVideo(false);
+            e.setMediaType("album");
+            e.setMusicBrainzId("");
+            e.setPlayCount(0);
+            e.setPlayed("2020-03-29T20:54:39.381Z");
+            e.setSortName("");
+            e.setUserRating(0);
+            
             e.setAlbum(albumPojo.getAlbumName());
             e.setTitle(albumPojo.getAlbumName());
             e.setName(albumPojo.getAlbumName());
             e.setYear(albumPojo.getPublishTime().getYear());
             e.setSongCount(albumMusicCountByMapAlbumId.get(albumPojo.getId()));
             List<ArtistConvert> artistListByAlbumIds = artistMapByAlbumIds.get(albumPojo.getId());
-            TbArtistPojo pojo = CollUtil.isNotEmpty(artistListByAlbumIds) ? artistListByAlbumIds.get(0) : new TbArtistPojo();
+            TbArtistPojo pojo = CollUtil.isEmpty(artistListByAlbumIds) || Objects.isNull(artistListByAlbumIds.get(0)) ? new TbArtistPojo() : artistListByAlbumIds.getFirst();
             e.setArtist(pojo.getArtistName());
-            e.setArtistId(String.valueOf(pojo.getId()));
+            String idStr = StringUtil.defaultNullString(pojo.getId());
+            e.setParent(idStr);
+            e.setArtistId(idStr);
             e.setCoverArt(String.valueOf(albumPojo.getId()));
             albumArrayList.add(e);
         }
@@ -136,7 +157,7 @@ public class SongListsApi {
         }
         
         AlbumList2Res albumRes = new AlbumList2Res();
-        AlbumList2 albumList2 = new AlbumList2();
+        AlbumList2Res.AlbumList2 albumList2 = new AlbumList2Res.AlbumList2();
         albumList2.setAlbum(albumArrayList);
         albumRes.setAlbumList2(albumList2);
         return albumRes;

@@ -737,7 +737,7 @@ public class SongListsApi {
     }
     
     // todo: 如果专辑，歌手，歌单变动,需要释放对应的缓存
-    @Cacheable(value = "getStarred2", key = "#req.u + '-' + #req.v + '-' + #req.f + '-' + #musicFolderId")
+    @Cacheable(value = "getStarred2", key = "#req.u + '-' + #req.v + '-' + #req.f", sync = true)
     public Starred2Res getStarred2(SubsonicCommonReq req, Long musicFolderId) {
         Starred2Res starred2Res = new Starred2Res();
         Starred2Res.Starred2 starred2 = new Starred2Res.Starred2();
@@ -746,10 +746,10 @@ public class SongListsApi {
         SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
         
         // 专辑
-        List<TbUserAlbumPojo> userAlbumList = tbUserAlbumService.list(Wrappers.<TbUserAlbumPojo>lambdaQuery()
-                                                                              .eq(TbUserAlbumPojo::getUserId, userByName.getId()));
-        if (CollUtil.isNotEmpty(userAlbumList)) {
-            List<Long> albumIds = userAlbumList.parallelStream().map(TbUserAlbumPojo::getAlbumId).toList();
+        List<Long> albumIds = tbUserAlbumService.listObjs(Wrappers.<TbUserAlbumPojo>lambdaQuery()
+                                                                  .select(TbUserAlbumPojo::getAlbumId)
+                                                                  .eq(TbUserAlbumPojo::getUserId, userByName.getId()));
+        if (CollUtil.isNotEmpty(albumIds)) {
             List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
             
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
@@ -792,10 +792,10 @@ public class SongListsApi {
             starred2.setAlbum(albums);
         }
         // 歌手
-        List<TbUserArtistPojo> userArtistList = tbUserArtistService.list(Wrappers.<TbUserArtistPojo>lambdaQuery()
-                                                                                 .eq(TbUserArtistPojo::getUserId, userByName.getId()));
-        if (CollUtil.isNotEmpty(userArtistList)) {
-            List<Long> artistIds = userArtistList.parallelStream().map(TbUserArtistPojo::getArtistId).toList();
+        List<Long> artistIds = tbUserArtistService.listObjs(Wrappers.<TbUserArtistPojo>lambdaQuery()
+                                                                    .select(TbUserArtistPojo::getArtistId)
+                                                                    .eq(TbUserArtistPojo::getUserId, userByName.getId()));
+        if (CollUtil.isNotEmpty(artistIds)) {
             List<TbArtistPojo> tbArtistPojos = tbArtistService.listByIds(artistIds);
             List<Starred2Res.Artist> artists = new ArrayList<>();
             for (TbArtistPojo tbArtistPojo : tbArtistPojos) {
@@ -818,9 +818,10 @@ public class SongListsApi {
             List<TbCollectMusicPojo> tbCollectMusicPojos = tbCollectMusicService.getCollectIds(userPlayList.stream().map(TbCollectPojo::getId).toList());
             List<Long> musicIds = tbCollectMusicPojos.parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
             List<TbMusicPojo> tbMusicPojos = tbMusicService.listByIds(musicIds);
-            List<Long> albumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+            List<Long> musicAlbumIds = tbMusicPojos.parallelStream().map(TbMusicPojo::getAlbumId).toList();
+            
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
-            Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
+            Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(musicAlbumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
             Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
             List<Starred2Res.Song> songs = new ArrayList<>();
@@ -829,21 +830,34 @@ public class SongListsApi {
                 e.setId(String.valueOf(musicPojo.getId()));
                 e.setParent(String.valueOf(musicPojo.getAlbumId()));
                 e.setIsDir(false);
+                e.setSortName("");
                 e.setTitle(musicPojo.getMusicName());
                 e.setUserRating(0);
+                e.setBpm(0);
+                e.setComment(StringUtil.defaultString(musicPojo.getComment()));
+                e.setYear(Optional.ofNullable(musicPojo.getPublishTime()).orElse(LocalDateTime.now()).getYear());
                 List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
-                if (CollUtil.isNotEmpty(tbTagPojos)) {
+                if (CollUtil.isEmpty(tbTagPojos)) {
+                    e.setGenre("");
+                    e.setGenres(new ArrayList<>());
+                } else {
                     TbTagPojo tbTagPojo = tbTagPojos.get(0);
                     e.setGenre(tbTagPojo.getTagName());
+                    e.setGenres(new ArrayList<>());
                 }
                 AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getId());
-                if (Objects.nonNull(albumConvert)) {
+                if (Objects.isNull(albumConvert)) {
+                    e.setAlbum("");
+                    e.setAlbumId("");
+                } else {
                     e.setAlbum(albumConvert.getAlbumName());
                     e.setAlbumId(String.valueOf(albumConvert.getId()));
-                    e.setYear(albumConvert.getPublishTime().getYear());
                 }
                 List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
-                if (CollUtil.isNotEmpty(artistConverts)) {
+                if (CollUtil.isEmpty(artistConverts)) {
+                    e.setArtist("");
+                    e.setArtistId("");
+                } else {
                     ArtistConvert artistConvert = artistConverts.get(0);
                     e.setArtistId(String.valueOf(artistConvert.getId()));
                     e.setArtist(artistConvert.getArtistName());
@@ -858,11 +872,17 @@ public class SongListsApi {
                     e.setBitRate(tbResourcePojo.getRate());
                     e.setPath(tbResourcePojo.getPath());
                     e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
+                } else {
+                    continue;
                 }
+                e.setReplayGain(new Starred2Res.Song.ReplayGain(1, 1));
+                e.setMediaType("song");
                 e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
                 e.setPlayCount(0);
                 e.setPlayed(new Date());
+                e.setDiscNumber(0);
                 e.setType("music");
+                e.setMusicBrainzId("");
                 e.setIsVideo(false);
                 e.setCreated(Date.from(musicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
                 e.setStarred(Date.from(musicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));

@@ -8,6 +8,7 @@ import org.api.common.service.QukuAPI;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
+import org.core.common.constant.PicTypeConstant;
 import org.core.common.constant.defaultinfo.DefaultInfo;
 import org.core.common.properties.DebugConfig;
 import org.core.mybatis.iservice.TbMiddlePicService;
@@ -15,6 +16,7 @@ import org.core.mybatis.iservice.TbPicService;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
 import org.core.service.RemoteStorePicService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +44,7 @@ public class MediaRetrievalApi {
         this.tbMiddlePicService = tbMiddlePicService;
     }
     
+    @Cacheable(value = "coverArt", key = "#id")
     public String getCoverArt(SubsonicCommonReq req, String id, Long size) {
         Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(o -> log.debug("cover id: {}", id));
         // 与封面关联的id，比如歌单，音乐，专辑，歌手
@@ -52,14 +55,17 @@ public class MediaRetrievalApi {
         // 可能是media file 媒体文件缩写
         String mfPrefix = "mf-";
         if (StringUtils.startsWithIgnoreCase(id, playPrefix)) {
-            String playListPic = StringUtils.replace(id, playPrefix, "");
-            middlePic = Long.parseLong(playListPic);
+            String picMiddleId = StringUtils.replace(id, playPrefix, "");
+            middlePic = Long.parseLong(picMiddleId);
+            return Optional.ofNullable(remoteStorePicService.getPicUrl(middlePic, PicTypeConstant.PLAYLIST)).orElse(defaultInfo.getPic().getPlayListPic());
         } else if (StringUtils.startsWithIgnoreCase(id, albumPrefix)) {
-            String playListPic = StringUtils.replace(id, albumPrefix, "");
-            middlePic = Long.parseLong(playListPic);
+            String picMiddleId = StringUtils.replace(id, albumPrefix, "");
+            middlePic = Long.parseLong(picMiddleId);
+            return Optional.ofNullable(remoteStorePicService.getPicUrl(middlePic, PicTypeConstant.ALBUM)).orElse(defaultInfo.getPic().getAlbumPic());
         } else if (StringUtils.startsWithIgnoreCase(id, mfPrefix)) {
-            String playListPic = StringUtils.replace(id, mfPrefix, "");
-            middlePic = Long.parseLong(playListPic);
+            String picMiddleId = StringUtils.replace(id, mfPrefix, "");
+            middlePic = Long.parseLong(picMiddleId);
+            return Optional.ofNullable(remoteStorePicService.getPicUrl(middlePic, PicTypeConstant.MUSIC)).orElse(defaultInfo.getPic().getMusicPic());
         } else {
             try {
                 middlePic = Long.parseLong(id);

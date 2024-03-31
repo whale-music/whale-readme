@@ -269,11 +269,7 @@ public class SongListsApi {
         }
         
         // MV
-        if (updateHistory(tbMvService.count(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getId, id)),
-                userByName,
-                id,
-                HistoryConstant.MV,
-                timeStamp)) {
+        if (updateHistory(tbMvService.count(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getId, id)), userByName, id, HistoryConstant.MV, timeStamp)) {
             // TODO MV 后续处理
             return;
         }

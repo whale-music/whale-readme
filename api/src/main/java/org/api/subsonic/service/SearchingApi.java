@@ -25,6 +25,7 @@ import org.core.service.RemoteStorePicService;
 import org.core.utils.StringUtil;
 import org.springframework.stereotype.Service;
 
+import java.net.URLConnection;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -367,11 +368,7 @@ public class SearchingApi {
                     e.setPath(tbResourcePojo.getPath());
                     e.setSuffix(tbResourcePojo.getEncodeType());
                     e.setBitRate(tbResourcePojo.getRate());
-                    if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                        e.setContentType("audio/mpeg");
-                    } else {
-                        e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                    }
+                    e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 }
                 e.setTrack(0);
                 e.setPlayCount(0);

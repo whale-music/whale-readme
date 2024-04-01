@@ -31,7 +31,7 @@ public class ManualSerializeAspect {
         this.subsonicUserCache = subsonicUserCache;
     }
     
-    @Pointcut("@annotation(org.api.subsonic.ManualSerialize)")
+    @Pointcut("@annotation(org.api.subsonic.aspect.ManualSerialize)")
     public void pointCut() {
     }
     

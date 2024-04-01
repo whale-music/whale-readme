@@ -1,4 +1,4 @@
-package org.api.subsonic;
+package org.api.subsonic.aspect;
 
 
 import java.lang.annotation.*;

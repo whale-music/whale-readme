@@ -439,7 +439,7 @@ public class PlayListApi {
     
     public CollectInfoRes getPlayListInfo(Long id) {
         TbCollectPojo byId = collectService.getById(id);
-        List<TbTagPojo> labelCollectTag = tagManagerService.getLabelCollectTag(id).get(id);
+        List<TbTagPojo> labelCollectTag = tagManagerService.getCollectTag(id).get(id);
         CollectInfoRes collectInfoRes = new CollectInfoRes();
         BeanUtils.copyProperties(byId, collectInfoRes);
         collectInfoRes.setCollectTag(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList());

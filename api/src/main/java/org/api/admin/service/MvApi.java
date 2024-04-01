@@ -126,7 +126,7 @@ public class MvApi {
         }
         // tag
         if (CollUtil.isNotEmpty(mvIds) && CollUtil.isNotEmpty(tags)) {
-            Map<Long, List<TbTagPojo>> labelMvTag = tagManagerService.getLabelMvTag(tags.iterator());
+            Map<Long, List<TbTagPojo>> labelMvTag = tagManagerService.getMvTag(tags.iterator());
             mvIds.addAll(labelMvTag.keySet());
         }
         Page<TbMvInfoPojo> page = new Page<>(index, size);
@@ -143,7 +143,7 @@ public class MvApi {
         Page<MvPageRes> mvPageResPage = new Page<>();
         LinkedList<MvPageRes> records = new LinkedList<>();
         BeanUtils.copyProperties(page, mvPageResPage);
-        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(mvIds);
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getMvTag(mvIds);
         Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuApi.getMvArtistByMvIdToMap(mvIds);
         for (TbMvInfoPojo mvPojo : page.getRecords()) {
@@ -191,7 +191,7 @@ public class MvApi {
         MvInfoRes e = new MvInfoRes();
         BeanUtils.copyProperties(mvPojo, e);
         String mvPicUrl = remoteStorePicService.getMvPicUrl(mvPojo.getId());
-        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(e.getId());
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getMvTag(e.getId());
         List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
         if (CollUtil.isNotEmpty(tbTagPojos)) {
             e.setTags(tbTagPojos.parallelStream().map(TbTagPojo::getTagName).toList());

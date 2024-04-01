@@ -170,7 +170,7 @@ public class ArtistApi {
         List<TbMvPojo> tbMvPojos = tbMvService.listByIds(list.parallelStream().map(TbMvArtistPojo::getMvId).toList());
         
         List<Long> mvIds = tbMvPojos.parallelStream().map(TbMvPojo::getId).toList();
-        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(mvIds);
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getMvTag(mvIds);
         Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuService.getMvArtistByMvIdToMap(mvIds);
         

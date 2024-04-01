@@ -227,7 +227,7 @@ public class BrowsingApi {
                 c.setArtist(first.getArtistName());
                 c.setArtistId(first.getId());
             }
-            List<TbTagPojo> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(id);
+            List<TbTagPojo> labelAlbumGenre = tagManagerService.getAlbumGenre(id);
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 c.setGenre(CollUtil.join(labelAlbumGenre, ","));
             }
@@ -368,7 +368,7 @@ public class BrowsingApi {
             e.setAlbum(albumListByArtistId.getAlbumName());
             e.setArtist(artist.getArtistName());
             e.setYear(Optional.ofNullable(albumListByArtistId.getPublishTime()).orElse(LocalDateTime.now()).getYear());
-            List<TbTagPojo> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumListByArtistId.getId());
+            List<TbTagPojo> labelAlbumGenre = tagManagerService.getAlbumGenre(albumListByArtistId.getId());
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 e.setGenre(Optional.ofNullable(labelAlbumGenre.get(0)).orElse(new TbTagPojo()).getTagName());
             }

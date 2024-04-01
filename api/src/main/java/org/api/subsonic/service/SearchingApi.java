@@ -134,7 +134,7 @@ public class SearchingApi {
             
             List<Long> albumIds = albumPage.getRecords().parallelStream().map(TbAlbumPojo::getId).toList();
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
-            Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
+            Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByAlbumIdToMap(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
@@ -183,7 +183,7 @@ public class SearchingApi {
                                                                                                             .parallelStream()
                                                                                                             .map(TbMusicPojo::getAlbumId)
                                                                                                             .toList());
-            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
+            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getMusicGenre(musicIds);
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getArtistByMusicIdToMap(musicIds);
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {
@@ -281,7 +281,7 @@ public class SearchingApi {
             
             List<Long> albumIds = albumPage.getRecords().parallelStream().map(TbAlbumPojo::getId).toList();
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuApi.getArtistByAlbumIdsToMap(albumIds);
-            Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
+            Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getAlbumGenre(albumIds);
             Map<Long, Integer> albumDurationCount = qukuApi.getAlbumDurationCount(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuApi.getAlbumMusicCountByAlbumIdToMap(albumIds);
             for (TbAlbumPojo albumPojo : albumPage.getRecords()) {
@@ -330,7 +330,7 @@ public class SearchingApi {
                                                                                                             .parallelStream()
                                                                                                             .map(TbMusicPojo::getAlbumId)
                                                                                                             .toList());
-            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
+            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getMusicGenre(musicIds);
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuApi.getArtistByMusicIdToMap(musicIds);
             Map<Long, List<TbResourcePojo>> resourceMap = tbResourceService.getResourceMap(musicIds);
             for (TbMusicPojo musicPojo : musicPage.getRecords()) {

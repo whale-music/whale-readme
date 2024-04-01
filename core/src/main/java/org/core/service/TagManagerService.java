@@ -31,7 +31,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getMusicTag(Collection<Long> ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_TAG, ids);
     }
     
@@ -41,7 +41,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Set<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getMusicTag(Set<Long> ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_TAG, ids);
     }
     
@@ -51,7 +51,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Long ids) {
+    default Map<Long, List<TbTagPojo>> getMusicTag(Long ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
     }
     
@@ -61,7 +61,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Long ids) {
+    default Map<Long, List<TbTagPojo>> getMusicGenre(Long ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_GENRE, Collections.singletonList(ids));
     }
     
@@ -71,7 +71,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getMusicGenre(Collection<Long> ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
     }
     
@@ -81,7 +81,7 @@ public interface TagManagerService {
      * @param ids 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Set<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getMusicGenre(Set<Long> ids) {
         return getTag(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
     }
     
@@ -91,7 +91,7 @@ public interface TagManagerService {
      * @param ids 专辑ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelAlbumGenre(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getAlbumGenre(Collection<Long> ids) {
         return getTag(TargetTagConstant.TARGET_ALBUM_GENRE, ids);
     }
     
@@ -101,7 +101,7 @@ public interface TagManagerService {
      * @param id 专辑ID
      * @return tag 列表
      */
-    default List<TbTagPojo> getLabelAlbumGenre(Long id) {
+    default List<TbTagPojo> getAlbumGenre(Long id) {
         return getTag(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id)).get(id);
     }
     
@@ -111,7 +111,7 @@ public interface TagManagerService {
      * @param ids 歌单ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Collection<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getCollectTag(Collection<Long> ids) {
         return getTag(TargetTagConstant.TARGET_COLLECT_TAG, ids);
     }
     
@@ -121,7 +121,7 @@ public interface TagManagerService {
      * @param ids 歌单ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Long ids) {
+    default Map<Long, List<TbTagPojo>> getCollectTag(Long ids) {
         return getTag(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(ids));
     }
     
@@ -131,7 +131,7 @@ public interface TagManagerService {
      * @param ids mv ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMvTag(List<Long> ids) {
+    default Map<Long, List<TbTagPojo>> getMvTag(List<Long> ids) {
         return getTag(TargetTagConstant.TARGET_MV_TAG, ids);
     }
     
@@ -141,7 +141,7 @@ public interface TagManagerService {
      * @param id mv ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMvTag(Long id) {
+    default Map<Long, List<TbTagPojo>> getMvTag(Long id) {
         return getTag(TargetTagConstant.TARGET_MV_TAG, Collections.singletonList(id));
     }
     
@@ -151,7 +151,7 @@ public interface TagManagerService {
      * @param tags MV ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getLabelMvTag(Iterator<String> tags) {
+    default Map<Long, List<TbTagPojo>> getMvTag(Iterator<String> tags) {
         return getTag(TargetTagConstant.TARGET_MV_TAG, tags);
     }
     

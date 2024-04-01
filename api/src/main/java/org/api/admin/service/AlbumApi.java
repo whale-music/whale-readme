@@ -179,7 +179,7 @@ public class AlbumApi {
             throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
         }
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
-        List<TbTagPojo> albumGenre = tagManagerService.getLabelAlbumGenre(albumId);
+        List<TbTagPojo> albumGenre = tagManagerService.getAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumId);
         

@@ -95,10 +95,10 @@ public class ExchangeApi {
         
         Set<Long> musicIds = all.parallelStream().map(TbMusicEntity::getId).collect(Collectors.toSet());
         
-        Map<Long, List<TbTagPojo>> labelMusicGenreMap = tagManagerService.getLabelMusicGenre(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicGenreMap = tagManagerService.getMusicGenre(musicIds);
         Map<Long, String> musicPicUrl = remoteStorePicService.getMusicPicPath(musicIds);
         Map<Long, List<TbLyricPojo>> musicLyricMap = qukuApi.getMusicLyric(musicIds);
-        Map<Long, List<TbTagPojo>> labelMusicTagMap = tagManagerService.getLabelMusicTag(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicTagMap = tagManagerService.getMusicTag(musicIds);
         
         all.parallelStream().forEach(tbMusicEntity -> {
             try {
@@ -150,7 +150,7 @@ public class ExchangeApi {
         List<TbAlbumEntity> albumList = tbAlbumEntityRepository.findAll();
         List<Long> albumIds = albumList.parallelStream().map(TbAlbumEntity::getId).toList();
         Map<Long, String> albumPicUrl = remoteStorePicService.getAlbumPicPath(albumIds);
-        Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
+        Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getAlbumGenre(albumIds);
         Collection<ExportExcelRes.AlbumInfo> albumInfos = new ConcurrentLinkedDeque<>();
         
         albumList.parallelStream().forEach(entity -> {

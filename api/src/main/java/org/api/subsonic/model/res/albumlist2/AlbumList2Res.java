@@ -1,5 +1,6 @@
 package org.api.subsonic.model.res.albumlist2;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +28,7 @@ public class AlbumList2Res extends SubsonicResult {
     @NoArgsConstructor
     public static class AlbumList2 {
         
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonProperty("album")
         private List<AlbumItem> album;
         
@@ -36,13 +38,53 @@ public class AlbumList2Res extends SubsonicResult {
         @NoArgsConstructor
         public static class AlbumItem {
             
+            @JsonProperty("id")
+            @JacksonXmlProperty(isAttribute = true)
+            private String id;
+            
             @JsonProperty("parent")
             @JacksonXmlProperty(isAttribute = true)
             private String parent;
             
-            @JsonProperty("sortName")
+            @JsonProperty("album")
             @JacksonXmlProperty(isAttribute = true)
-            private String sortName;
+            private String album;
+            
+            @JsonProperty("title")
+            @JacksonXmlProperty(isAttribute = true)
+            private String title;
+            
+            @JsonProperty("name")
+            @JacksonXmlProperty(isAttribute = true)
+            private String name;
+            
+            @JsonProperty("isDir")
+            @JacksonXmlProperty(isAttribute = true, localName = "isDir")
+            private Boolean isDir;
+            
+            @JsonProperty("coverArt")
+            @JacksonXmlProperty(isAttribute = true)
+            private String coverArt;
+            
+            @JsonProperty("songCount")
+            @JacksonXmlProperty(isAttribute = true)
+            private Integer songCount;
+            
+            @JsonProperty("created")
+            @JacksonXmlProperty(isAttribute = true)
+            private String created;
+            
+            @JsonProperty("duration")
+            @JacksonXmlProperty(isAttribute = true)
+            private Integer duration;
+            
+            @JsonProperty("playCount")
+            @JacksonXmlProperty(isAttribute = true)
+            private Integer playCount;
+            
+            @JsonProperty("artistId")
+            @JacksonXmlProperty(isAttribute = true)
+            private String artistId;
             
             @JsonProperty("artist")
             @JacksonXmlProperty(isAttribute = true)
@@ -52,13 +94,13 @@ public class AlbumList2Res extends SubsonicResult {
             @JacksonXmlProperty(isAttribute = true)
             private Integer year;
             
-            @JsonProperty("album")
+            @JsonProperty("genres")
             @JacksonXmlProperty(isAttribute = true)
-            private String album;
+            private List<String> genres;
             
-            @JsonProperty("created")
+            @JsonProperty("sortName")
             @JacksonXmlProperty(isAttribute = true)
-            private String created;
+            private String sortName;
             
             @JsonProperty("musicBrainzId")
             @JacksonXmlProperty(isAttribute = true)
@@ -68,21 +110,9 @@ public class AlbumList2Res extends SubsonicResult {
             @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
             private Boolean isVideo;
             
-            @JsonProperty("artistId")
-            @JacksonXmlProperty(isAttribute = true)
-            private String artistId;
-            
             @JsonProperty("mediaType")
             @JacksonXmlProperty(isAttribute = true)
             private String mediaType;
-            
-            @JsonProperty("coverArt")
-            @JacksonXmlProperty(isAttribute = true)
-            private String coverArt;
-            
-            @JsonProperty("title")
-            @JacksonXmlProperty(isAttribute = true)
-            private String title;
             
             @JsonProperty("played")
             @JacksonXmlProperty(isAttribute = true)
@@ -97,26 +127,6 @@ public class AlbumList2Res extends SubsonicResult {
             @JacksonXmlProperty(isAttribute = true)
             private Map<String, String> replayGain = new HashMap<>();
             
-            @JsonProperty("songCount")
-            @JacksonXmlProperty(isAttribute = true)
-            private Integer songCount;
-            
-            @JsonProperty("duration")
-            @JacksonXmlProperty(isAttribute = true)
-            private Integer duration;
-            
-            @JsonProperty("playCount")
-            @JacksonXmlProperty(isAttribute = true)
-            private Integer playCount;
-            
-            @JsonProperty("genres")
-            @JacksonXmlProperty(isAttribute = true)
-            private List<String> genres;
-            
-            @JsonProperty("name")
-            @JacksonXmlProperty(isAttribute = true)
-            private String name;
-            
             @JsonProperty("comment")
             @JacksonXmlProperty(isAttribute = true)
             private String comment;
@@ -125,17 +135,9 @@ public class AlbumList2Res extends SubsonicResult {
             @JacksonXmlProperty(isAttribute = true)
             private String genre;
             
-            @JsonProperty("id")
-            @JacksonXmlProperty(isAttribute = true)
-            private String id;
-            
             @JsonProperty("bpm")
             @JacksonXmlProperty(isAttribute = true)
             private Integer bpm;
-            
-            @JsonProperty("isDir")
-            @JacksonXmlProperty(isAttribute = true)
-            private Boolean isDir;
             
             @JsonProperty("starred")
             @JacksonXmlProperty(isAttribute = true)

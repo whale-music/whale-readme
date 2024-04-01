@@ -111,7 +111,7 @@ public class SongListsApi {
     public AlbumList2Res getAlbumList2(SubsonicCommonReq req, String type, Long size, Long offset, Long fromYear, Long toYear, Long genre, Long musicFolderId) {
         List<TbAlbumPojo> albumList = handleAlbums(req, type, offset, size, fromYear, toYear);
         if (CollUtil.isEmpty(albumList)) {
-            return new AlbumList2Res();
+            return new AlbumList2Res(new AlbumList2Res.AlbumList2());
         }
         List<AlbumList2Res.AlbumList2.AlbumItem> albumArrayList = new ArrayList<>();
         Set<Long> albumIds = albumList.stream().map(TbAlbumPojo::getId).collect(Collectors.toSet());
@@ -129,6 +129,7 @@ public class SongListsApi {
             
             e.setDuration(DurationUtil.getDuration(albumDurationCount.get(albumPojo.getId())));
             List<TbTagPojo> tbTagPojos = labelAlbumGenre.get(albumPojo.getId());
+            e.setGenre("");
             if (CollUtil.isNotEmpty(tbTagPojos)) {
                 List<String> list = tbTagPojos.parallelStream()
                                               .filter(Objects::nonNull)
@@ -407,30 +408,12 @@ public class SongListsApi {
             e.setParent(StringUtil.defaultNullString(musicPojo.getAlbumId()));
             e.setIsDir(false);
             e.setTitle(musicPojo.getMusicName());
-            if (Objects.nonNull(musicPojo.getPublishTime())) {
-                e.setYear(musicPojo.getPublishTime().getYear());
-            }
-            List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
-            if (CollUtil.isNotEmpty(tbTagPojos) && Objects.nonNull(tbTagPojos.get(0))) {
-                e.setGenre(tbTagPojos.getFirst().getTagName());
-                e.setGenres(new RandomSongsRes.Song.Genres(tbTagPojos.getFirst().getTagName()));
-            }
-            AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getAlbumId());
-            if (Objects.nonNull(albumConvert)) {
-                e.setAlbum(albumConvert.getAlbumName());
-                e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
-            }
-            List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
-            if (CollUtil.isNotEmpty(artistConverts)) {
-                ArtistConvert artistConvert = artistConverts.get(0);
-                e.setArtist(artistConvert.getArtistName());
-                e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
-            }
-            e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
-            e.setTrack(0);
+            e.setYear(LocalDateUtil.getYear(musicPojo.getPublishTime()));
             List<TbResourcePojo> musicUrl = musicMapUrl.get(musicPojo.getId());
             TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(musicUrl);
-            if (Objects.nonNull(tbResourcePojo)) {
+            if (Objects.isNull(tbResourcePojo)) {
+                continue;
+            } else {
                 e.setSize(tbResourcePojo.getSize());
                 e.setSuffix(tbResourcePojo.getEncodeType());
                 e.setTranscodedSuffix(tbResourcePojo.getEncodeType());
@@ -441,6 +424,33 @@ public class SongListsApi {
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 e.setTranscodedContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
+            
+            List<TbTagPojo> tbTagPojos = labelMusicGenre.get(musicPojo.getId());
+            if (CollUtil.isEmpty(tbTagPojos) || Objects.isNull(tbTagPojos.get(0))) {
+                e.setGenre("");
+            } else {
+                e.setGenre(tbTagPojos.getFirst().getTagName());
+                e.setGenres(new RandomSongsRes.Song.Genres(tbTagPojos.getFirst().getTagName()));
+            }
+            AlbumConvert albumConvert = albumByMusicIdToMap.get(musicPojo.getAlbumId());
+            if (Objects.isNull(albumConvert)) {
+                e.setAlbum("");
+                e.setAlbumId("");
+            } else {
+                e.setAlbum(albumConvert.getAlbumName());
+                e.setAlbumId(StringUtil.defaultNullString(albumConvert.getId()));
+            }
+            List<ArtistConvert> artistConverts = musicArtistByMusicIdToMap.get(musicPojo.getId());
+            if (CollUtil.isEmpty(artistConverts)) {
+                e.setArtist("");
+                e.setArtistId("");
+            } else {
+                ArtistConvert artistConvert = artistConverts.get(0);
+                e.setArtist(artistConvert.getArtistName());
+                e.setArtistId(StringUtil.defaultNullString(artistConvert.getId()));
+            }
+            e.setCoverArt(StringUtil.defaultString(musicPojo.getId()));
+            e.setTrack(0);
             e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setPlayCount(0);
             e.setType("music");

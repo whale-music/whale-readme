@@ -390,6 +390,7 @@ public class BrowsingApi {
             e.setArtist(artist);
             index.add(e);
         }
+        indexes.setIgnoredArticles("The An A Die Das Ein Eine Les Le La");
         indexes.setIndex(index);
         artistsRes.setArtists(indexes);
         return artistsRes;
@@ -654,10 +655,12 @@ public class BrowsingApi {
     public AlbumInfo2Res getAlbumInfo2(SubsonicCommonReq req, Long id) {
         AlbumInfo2Res res = new AlbumInfo2Res();
         AlbumInfo2Res.AlbumInfo albumInfo = new AlbumInfo2Res.AlbumInfo();
+        albumInfo.setNotes("");
         TbAlbumPojo albumPojo = albumService.getById(id);
+        String lastFmUrl = "http://www.last.fm";
         if (Objects.nonNull(albumPojo)) {
             albumInfo.setNotes(albumPojo.getDescription());
-            albumInfo.setLastFmUrl("http://www.last.fm");
+            albumInfo.setLastFmUrl(lastFmUrl);
             String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo.getId());
             albumInfo.setLargeImageUrl(albumPicUrl);
             albumInfo.setSmallImageUrl(albumPicUrl);
@@ -671,7 +674,7 @@ public class BrowsingApi {
             if (Objects.nonNull(albumId)) {
                 TbAlbumPojo albumPojo1 = albumService.getById(albumId);
                 albumInfo.setNotes(albumPojo1.getDescription());
-                albumInfo.setLastFmUrl("http://www.last.fm");
+                albumInfo.setLastFmUrl(lastFmUrl);
                 String albumPicUrl = remoteStorePicService.getAlbumPicUrl(albumPojo1.getId());
                 albumInfo.setLargeImageUrl(albumPicUrl);
                 albumInfo.setSmallImageUrl(albumPicUrl);

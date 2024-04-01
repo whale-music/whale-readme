@@ -65,7 +65,7 @@ public class AlbumList2Res extends SubsonicResult {
             private String musicBrainzId;
             
             @JsonProperty("isVideo")
-            @JacksonXmlProperty(isAttribute = true)
+            @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
             private Boolean isVideo;
             
             @JsonProperty("artistId")

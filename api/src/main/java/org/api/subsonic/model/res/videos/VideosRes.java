@@ -50,7 +50,7 @@ public class VideosRes extends SubsonicResult {
         private String created;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true)
         private String bitRate;
@@ -64,8 +64,8 @@ public class VideosRes extends SubsonicResult {
         @JacksonXmlProperty(isAttribute = true)
         private String contentType;
         
-        @JacksonXmlProperty(isAttribute = true)
-        private String isVideo;
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
+        private Boolean isVideo;
         
         @JacksonXmlProperty(isAttribute = true)
         private String path;

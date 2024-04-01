@@ -134,7 +134,7 @@ public class PlaylistApi {
             e.setArtist(artistPojo.getArtistName());
             e.setArtistId(StringUtil.defaultNullString(artistPojo.getId()));
             
-            e.setVideo(false);
+            e.setIsVideo(false);
             entry.add(e);
             duration += e.getDuration();
         }

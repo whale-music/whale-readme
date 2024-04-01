@@ -97,7 +97,7 @@ public class RandomSongsRes extends SubsonicResult {
         @JacksonXmlProperty(isAttribute = true)
         private String type;
         
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
         
         @JacksonXmlProperty(isAttribute = true)

@@ -71,7 +71,7 @@ public class SongsByGenreRes extends SubsonicResult {
         private String suffix;
         
         @JacksonXmlProperty(isAttribute = true)
-        private String duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true)
         private String bitRate;
@@ -97,7 +97,7 @@ public class SongsByGenreRes extends SubsonicResult {
         @JacksonXmlProperty(isAttribute = true)
         private String type;
         
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
     }
 }

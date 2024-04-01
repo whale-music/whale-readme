@@ -73,7 +73,7 @@ public class AlbumListRes extends SubsonicResult {
         private String created;
         
         @JsonProperty("isVideo")
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
         
         @JsonProperty("artistId")

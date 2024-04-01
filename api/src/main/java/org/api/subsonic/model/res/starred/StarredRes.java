@@ -155,7 +155,7 @@ public class StarredRes extends SubsonicResult {
         private String starred;
         
         @JacksonXmlProperty(isAttribute = true, localName = "duration")
-        private String duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true, localName = "bitRate")
         private String bitRate;

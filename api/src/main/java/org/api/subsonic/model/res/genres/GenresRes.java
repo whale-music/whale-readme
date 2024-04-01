@@ -23,11 +23,11 @@ public class GenresRes extends SubsonicResult {
     public static class Genres {
         @JsonProperty("songCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String songCount;
+        private Integer songCount;
         
         @JsonProperty("albumCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String albumCount;
+        private Integer albumCount;
         
         private String genre;
     }

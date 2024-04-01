@@ -169,7 +169,7 @@ public class MusicDirectoryRes extends SubsonicResult {
         private Byte userRating;
         
         @JsonProperty("isVideo")
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
         
         @JsonProperty("played")

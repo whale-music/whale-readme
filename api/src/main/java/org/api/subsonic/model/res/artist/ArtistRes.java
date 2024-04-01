@@ -36,7 +36,7 @@ public class ArtistRes extends SubsonicResult {
         
         @JsonProperty("albumCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String albumCount;
+        private Integer albumCount;
         
         @JacksonXmlElementWrapper(useWrapping = false)
         private List<Album> album;
@@ -76,7 +76,7 @@ public class ArtistRes extends SubsonicResult {
         
         @JsonProperty("songCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String songCount;
+        private Integer songCount;
         
         @JsonProperty("created")
         @JacksonXmlProperty(isAttribute = true)
@@ -84,11 +84,11 @@ public class ArtistRes extends SubsonicResult {
         
         @JsonProperty("duration")
         @JacksonXmlProperty(isAttribute = true)
-        private String duration;
+        private Integer duration;
         
         @JsonProperty("playCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String playCount;
+        private Integer playCount;
         
         @JsonProperty("year")
         @JacksonXmlProperty(isAttribute = true)
@@ -112,10 +112,10 @@ public class ArtistRes extends SubsonicResult {
         
         @JsonProperty("userRating")
         @JacksonXmlProperty(isAttribute = true)
-        private String userRating;
+        private Integer userRating;
         
         @JsonProperty("isVideo")
-        @JacksonXmlProperty(isAttribute = true)
-        private String isVideo;
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
+        private Boolean isVideo;
     }
 }

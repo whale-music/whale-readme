@@ -339,11 +339,11 @@ public class BrowsingApi {
             long albumCount = tbMiddleTagPojos.parallelStream()
                                               .filter(tbMiddleTagPojo1 -> Objects.equals(tbMiddleTagPojo1.getType(), PicTypeConstant.ALBUM))
                                               .count();
-            e.setAlbumCount(StringUtil.defaultNullString(albumCount));
+            e.setAlbumCount(Math.toIntExact(albumCount));
             long songCount = tbMiddleTagPojos.parallelStream()
                                              .filter(tbMiddleTagPojo1 -> Objects.equals(tbMiddleTagPojo1.getType(), PicTypeConstant.MUSIC))
                                              .count();
-            e.setSongCount(StringUtil.defaultNullString(songCount));
+            e.setSongCount(Math.toIntExact(songCount));
             TbTagPojo tbTagPojo = tagMap.get(tbMiddleTagPojo.getTagId());
             e.setGenre(tbTagPojo.getTagName());
             genres.add(e);
@@ -381,9 +381,8 @@ public class BrowsingApi {
                 e1.setName(tbArtistPojo.getArtistName());
                 e1.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(tbArtistPojo.getId()));
                 e1.setCoverArt(StringUtil.defaultNullString(tbArtistPojo.getId()));
-                e1.setUserRating(StringUtil.defaultNullString(0));
-                e1.setAlbumCount(StringUtil.defaultNullString(artistAlbumCountMap.get(tbArtistPojo.getId()) == null ? 0 : artistAlbumCountMap.get(
-                        tbArtistPojo.getId())));
+                e1.setUserRating(0);
+                e1.setAlbumCount(Optional.ofNullable(artistAlbumCountMap.get(tbArtistPojo.getId())).orElse(0));
                 artist.add(e1);
             }
             e.setArtist(artist);
@@ -403,7 +402,7 @@ public class BrowsingApi {
         artistRes.setName(artist.getArtistName());
         artistRes.setId(StringUtil.defaultNullString(artist.getId()));
         artistRes.setCoverArt(StringUtil.defaultNullString(artist.getId()));
-        artistRes.setAlbumCount(StringUtil.defaultNullString(qukuService.getArtistAlbumCountByArtistId(artist.getId())));
+        artistRes.setAlbumCount(qukuService.getArtistAlbumCountByArtistId(artist.getId()));
         
         List<AlbumConvert> albumListByArtistIds = qukuService.getAlbumByArtistIds(Collections.singletonList(artist.getId()));
         List<Long> albumIds = albumListByArtistIds.parallelStream()
@@ -428,15 +427,15 @@ public class BrowsingApi {
                 e.setGenre(Optional.ofNullable(labelAlbumGenre.get(0)).orElse(new TbTagPojo()).getTagName());
             }
             e.setCoverArt(StringUtil.defaultNullString(albumListByArtistId.getId()));
-            e.setDuration(StringUtil.defaultNullString(albumDurationCountMap.get(albumListByArtistId.getId())));
+            e.setDuration(albumDurationCountMap.get(albumListByArtistId.getId()));
             // 播放数量
-            e.setPlayCount(StringUtil.defaultNullString(0));
+            e.setPlayCount(0);
             e.setPlayed(LocalDateUtil.formatUTCZ(albumListByArtistId.getCreateTime()));
             e.setCreated(LocalDateUtil.formatUTCZ(albumListByArtistId.getPublishTime()));
             e.setArtistId(StringUtil.defaultNullString(artist.getId()));
-            e.setUserRating(StringUtil.defaultNullString(0));
-            e.setSongCount(StringUtil.defaultNullString(albumMusicCountMap.get(albumListByArtistId.getId())));
-            e.setIsVideo(StringUtil.defaultNullString(false));
+            e.setUserRating(0);
+            e.setSongCount(albumMusicCountMap.get(albumListByArtistId.getId()));
+            e.setIsVideo(false);
             
             album.add(e);
         }
@@ -704,7 +703,7 @@ public class BrowsingApi {
             SimilarSongsRes.Song e = new SimilarSongsRes.Song();
             e.setId(Math.toIntExact(musicConvert.getId()));
             e.setTitle(musicConvert.getMusicName());
-            e.setDir(false);
+            e.setIsDir(false);
             e.setTitle(musicConvert.getMusicName());
             Optional<AlbumConvert> albumConvertOpt = Optional.ofNullable(musicAlbumByMusicIdToMap.get(musicConvert.getId()));
             if (albumConvertOpt.isPresent()) {
@@ -736,7 +735,7 @@ public class BrowsingApi {
             e.setDiscNumber(0);
             e.setCreated(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
             e.setType("music");
-            e.setVideo(false);
+            e.setIsVideo(false);
             
             
             songs.add(e);

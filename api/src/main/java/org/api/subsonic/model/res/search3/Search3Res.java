@@ -101,7 +101,7 @@ public class Search3Res extends SubsonicResult {
         @JacksonXmlProperty(isAttribute = true)
         private String type;
         
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
     }
     
@@ -157,7 +157,7 @@ public class Search3Res extends SubsonicResult {
         @JacksonXmlProperty(isAttribute = true)
         private Integer songCount;
         
-        @JacksonXmlProperty(isAttribute = true)
+        @JacksonXmlProperty(isAttribute = true, localName = "isVideo")
         private Boolean isVideo;
     }
     

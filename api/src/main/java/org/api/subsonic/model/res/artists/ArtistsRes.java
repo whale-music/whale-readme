@@ -63,7 +63,7 @@ public class ArtistsRes extends SubsonicResult {
         
         @JsonProperty("albumCount")
         @JacksonXmlProperty(isAttribute = true)
-        private String albumCount;
+        private Integer albumCount;
         
         @JsonProperty("artistImageUrl")
         @JacksonXmlProperty(isAttribute = true)
@@ -71,6 +71,6 @@ public class ArtistsRes extends SubsonicResult {
         
         @JsonProperty("userRating")
         @JacksonXmlProperty(isAttribute = true)
-        private String userRating;
+        private Integer userRating;
     }
 }

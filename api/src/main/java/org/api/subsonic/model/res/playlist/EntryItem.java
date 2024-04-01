@@ -36,7 +36,7 @@ public class EntryItem {
 	private String albumId;
 	
 	@JsonProperty("isVideo")
-	@JacksonXmlProperty(isAttribute = true)
+	@JacksonXmlProperty(isAttribute = true, localName = "isVideo")
 	private Boolean isVideo;
 	
 	@JsonProperty("artistId")

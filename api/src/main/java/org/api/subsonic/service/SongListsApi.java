@@ -523,7 +523,7 @@ public class SongListsApi {
                 e.setPath(tbResourcePojo.getPath());
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
-            e.setDuration(StringUtil.defaultNullString(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
+            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setPlayCount(0);
             e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
             e.setType("music");
@@ -733,7 +733,7 @@ public class SongListsApi {
                 }else{
                     continue;
                 }
-                e.setDuration(String.valueOf(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000));
+                e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
                 e.setPlayCount(0);
                 e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
                 e.setType("music");

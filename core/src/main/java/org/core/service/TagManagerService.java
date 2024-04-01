@@ -1,5 +1,6 @@
 package org.core.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.TargetTagConstant;
 import org.core.model.TagMiddleTypeModel;
 import org.core.mybatis.pojo.TbTagPojo;
@@ -221,7 +222,9 @@ public interface TagManagerService {
     }
     
     default void addAlbumGenreLabel(Long id, String label) {
-        this.addTag(TargetTagConstant.TARGET_ALBUM_GENRE, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
+        if (StringUtils.isNotBlank(label)) {
+            this.addTag(TargetTagConstant.TARGET_ALBUM_GENRE, id, Collections.singletonList(label));
+        }
     }
     
     default void addMusicLabelTag(Long id, Long labelId) {

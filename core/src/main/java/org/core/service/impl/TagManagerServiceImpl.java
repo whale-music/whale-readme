@@ -110,23 +110,29 @@ public class TagManagerServiceImpl implements TagManagerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addTag(Byte target, Long id, List<String> labels) {
+        if (CollectUtil.isEmpty(labels)) {
+            return;
+        }
         // 新增tag
         synchronized (lock) {
-            Set<Long> tagIds = null;
-            if (CollUtil.isNotEmpty(labels)) {
-                List<TbTagPojo> list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, labels));
-                Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
-                for (String label : labels) {
-                    if (StringUtils.isNotBlank(label) && collect.get(label) == null) {
-                        TbTagPojo entity = new TbTagPojo();
-                        entity.setCount(0);
-                        entity.setTagName(label);
-                        list.add(entity);
-                    }
+            List<TbTagPojo> list = tagService.list(Wrappers.<TbTagPojo>lambdaQuery().in(TbTagPojo::getTagName, labels));
+            Map<String, TbTagPojo> collect = list.parallelStream().collect(Collectors.toMap(TbTagPojo::getTagName, tbTagPojo -> tbTagPojo));
+            
+            // 如果数据库中没有则添加到数据库
+            ArrayList<TbTagPojo> saveTagList = new ArrayList<>();
+            for (String label : labels) {
+                if (StringUtils.isNotBlank(label) && Objects.isNull(collect.get(label))) {
+                    TbTagPojo entity = new TbTagPojo();
+                    entity.setCount(0);
+                    entity.setTagName(label);
+                    saveTagList.add(entity);
                 }
-                tagService.saveOrUpdateBatch(list);
-                tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
             }
+            if (CollectUtil.isNotEmpty(saveTagList)) {
+                tagService.saveBatch(saveTagList);
+                list.addAll(saveTagList);
+            }
+            Set<Long> tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
             // 关联到对应ID
             this.addTag(target, id, tagIds);
         }
@@ -135,49 +141,61 @@ public class TagManagerServiceImpl implements TagManagerService {
     /**
      * 批量添加tag
      *
-     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param type 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
      * @param id     歌单或歌曲前ID
      * @param tagIds 标签ID
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addTag(Byte target, Long id, Set<Long> tagIds) {
-        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
-                                                         .eq(TbMiddleTagPojo::getMiddleId, id)
-                                                         .eq(TbMiddleTagPojo::getType, target);
-        // 删除重新添加
-        List<TbMiddleTagPojo> middleTagPojoList = middleTagService.list(eq);
-        if (CollUtil.isNotEmpty(middleTagPojoList)) {
-            List<Long> removeTagIds = new ArrayList<>();
-            List<Long> middleTagIds = middleTagPojoList.parallelStream().map(TbMiddleTagPojo::getId).toList();
-            // 删除关联tag后，tag标签自动减一。并且到零时自动删除
-            for (TbTagPojo tbTagPojo : tagService.listByIds(middleTagIds)) {
-                tbTagPojo.setCount(tbTagPojo.getCount() - 1);
-                if (tbTagPojo.getCount() == 0) {
-                    removeTagIds.add(tbTagPojo.getId());
-                }
-            }
-            if (CollUtil.isNotEmpty(middleTagIds)) {
-                middleTagService.removeBatchByIds(middleTagIds);
-            }
-            if (CollUtil.isNotEmpty(removeTagIds)) {
-                tagService.removeBatchByIds(removeTagIds);
-            }
+    public void addTag(Byte type, Long id, Set<Long> tagIds) {
+        if (CollectUtil.isEmpty(tagIds)) {
+            return;
         }
-        
-        if (CollUtil.isNotEmpty(tagIds)) {
-            // 添加tag关联
-            List<TbMiddleTagPojo> middleTagPojos = tagIds.parallelStream().map(aLong -> new TbMiddleTagPojo(null, id, aLong, target)).toList();
-            middleTagService.saveOrUpdateBatch(middleTagPojos);
+        // 先删除ID关联对应tag数据，然后重新添加
+        LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
+                                                         .select(TbMiddleTagPojo::getId)
+                                                         .eq(TbMiddleTagPojo::getMiddleId, id)
+                                                         .eq(TbMiddleTagPojo::getType, type);
+        synchronized (lock) {
+            List<Long> middleTagIds = middleTagService.listObjs(eq);
+            if (CollUtil.isNotEmpty(middleTagIds)) {
+                List<Long> removeTagIds = new ArrayList<>();
+                // 删除关联tag后，tag标签自动减一。并且到零时自动删除
+                List<TbTagPojo> tagList = tagService.listByIds(middleTagIds);
+                for (int i = 0; i < tagList.size(); i++) {
+                    TbTagPojo tbTagPojo = tagList.get(i);
+                    
+                    tbTagPojo.setCount(tbTagPojo.getCount() - 1);
+                    // 如果Tag关联数等于0，并且不包含在需要添加的tag中，则添加到需要删除的tag列表中
+                    if (tbTagPojo.getCount() == 0 && tagIds.contains(tbTagPojo.getId())) {
+                        removeTagIds.add(tbTagPojo.getId());
+                        tagList.remove(i);
+                        --i;
+                    }
+                }
+                // 删除tag关联中间表
+                if (CollUtil.isNotEmpty(middleTagIds)) {
+                    middleTagService.removeBatchByIds(middleTagIds);
+                }
+                // 如果tag关联数等于0，没有关联的tag，则删除该tag
+                if (CollUtil.isNotEmpty(removeTagIds)) {
+                    tagService.removeBatchByIds(removeTagIds);
+                }
+                tagService.updateBatchById(tagList);
+            }
             
-            // 关联后tag关联数自动加1
+            // 处理tag中间表和tag表
+            // 添加tag关联
+            List<TbMiddleTagPojo> middleTagList = tagIds.parallelStream().map(tagId -> new TbMiddleTagPojo(null, id, tagId, type)).toList();
+            middleTagService.saveBatch(middleTagList);
+            
+            // 关联后tag关联数自动加1, 如果需要关联的tag被删除则重新添加
             List<TbTagPojo> tagPojoList = tagService.listByIds(tagIds);
             for (TbTagPojo tbTagPojo : tagPojoList) {
                 tbTagPojo.setCount(tbTagPojo.getCount() + 1);
             }
             tagService.updateBatchById(tagPojoList);
         }
-        
     }
     
     /**

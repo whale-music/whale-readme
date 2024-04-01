@@ -37,7 +37,7 @@ public class EntryItem {
 	
 	@JsonProperty("isVideo")
 	@JacksonXmlProperty(isAttribute = true)
-	private boolean isVideo;
+	private Boolean isVideo;
 	
 	@JsonProperty("artistId")
 	@JacksonXmlProperty(isAttribute = true)

@@ -36,7 +36,7 @@ public class SimilarSongsRes extends SubsonicResult {
         private String parent;
         
         @JacksonXmlProperty(isAttribute = true)
-        private boolean isDir;
+        private Boolean isDir;
         
         @JacksonXmlProperty(isAttribute = true)
         private String title;
@@ -96,6 +96,6 @@ public class SimilarSongsRes extends SubsonicResult {
         private String type;
         
         @JacksonXmlProperty(isAttribute = true)
-        private boolean isVideo;
+        private Boolean isVideo;
     }
 }

@@ -1069,7 +1069,7 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public void removeLabel(Collection<TagMiddleTypeModel> list) {
         synchronized (removeLabelLock) {
-            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery();
+            LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.lambdaQuery();
             for (TagMiddleTypeModel middleTypeModel : list) {
                 eq.in(TbMiddleTagPojo::getMiddleId, middleTypeModel.getMiddleId()).in(TbMiddleTagPojo::getType, middleTypeModel.getType());
             }

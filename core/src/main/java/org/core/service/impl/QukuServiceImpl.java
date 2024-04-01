@@ -33,6 +33,7 @@ import org.core.service.PlayListService;
 import org.core.service.QukuService;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.CollectSortUtil;
+import org.core.utils.CollectUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -623,6 +624,9 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     public Map<Long, List<MusicConvert>> getMusicMapByAlbumId(Collection<Long> ids) {
+        if (CollectUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
         List<TbMusicPojo> list = musicService.list(Wrappers.<TbMusicPojo>lambdaQuery().in(TbMusicPojo::getAlbumId, ids));
         List<MusicConvert> musicConvertList = getMusicConvertList(list,
                 remoteStorePicService.getMusicPicUrl(list.parallelStream().map(TbMusicPojo::getId).toList()));
@@ -1460,5 +1464,64 @@ public class QukuServiceImpl implements QukuService {
             resMap.put(longListEntry.getKey(), durationCount);
         }
         return resMap;
+    }
+    
+    
+    /**
+     * 用户喜欢专辑
+     *
+     * @param userId   用户ID
+     * @param albumIds 专辑ID
+     */
+    @Override
+    public void likeAlbum(Long userId, Collection<Long> albumIds) {
+        if (CollectUtil.isEmpty(albumIds)) {
+            return;
+        }
+        List<TbUserAlbumPojo> list = albumIds.parallelStream().map(s -> new TbUserAlbumPojo(userId, s)).toList();
+        userAlbumService.saveOrUpdateBatch(list);
+    }
+    
+    /**
+     * 用户取消喜欢专辑
+     *
+     * @param userId   用户ID
+     * @param albumIds 专辑ID
+     */
+    @Override
+    public void unLikeAlbum(Long userId, Collection<Long> albumIds) {
+        if (CollectUtil.isEmpty(albumIds)) {
+            return;
+        }
+        userAlbumService.remove(Wrappers.<TbUserAlbumPojo>lambdaQuery().eq(TbUserAlbumPojo::getUserId, userId).in(TbUserAlbumPojo::getAlbumId, albumIds));
+    }
+    
+    /**
+     * 用户喜欢专辑
+     *
+     * @param userId   用户ID
+     * @param artistId 专辑ID
+     */
+    @Override
+    public void likeArtist(Long userId, Collection<Long> artistId) {
+        if (CollectUtil.isEmpty(artistId)) {
+            return;
+        }
+        List<TbUserArtistPojo> list = artistId.parallelStream().map(s -> new TbUserArtistPojo(userId, s)).toList();
+        userSingerService.saveOrUpdateBatch(list);
+    }
+    
+    /**
+     * 用户取消喜欢专辑
+     *
+     * @param userId   用户ID
+     * @param artistId 专辑ID
+     */
+    @Override
+    public void unLikeArtist(Long userId, Collection<Long> artistId) {
+        if (CollectUtil.isEmpty(artistId)) {
+            return;
+        }
+        userSingerService.remove(Wrappers.<TbUserArtistPojo>lambdaQuery().eq(TbUserArtistPojo::getUserId, userId).in(TbUserArtistPojo::getArtistId, artistId));
     }
 }

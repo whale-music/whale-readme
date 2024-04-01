@@ -775,4 +775,49 @@ public interface QukuService {
      */
     Map<Long, Integer> getCollectDurationCount(List<Long> collectIds);
     
+    
+    /**
+     * 用户喜欢专辑
+     * @param userId 用户ID
+     * @param albumIds 专辑ID
+     */
+    void likeAlbum(Long userId, Collection<Long> albumIds);
+    
+    default void likeAlbum(Long userId, Long albumIds) {
+        this.likeAlbum(userId, Collections.singletonList(albumIds));
+    }
+    
+    /**
+     * 用户取消喜欢专辑
+     * @param userId 用户ID
+     * @param albumIds 专辑ID
+     */
+    void unLikeAlbum(Long userId, Collection<Long> albumIds);
+    
+    default void unLikeAlbum(Long userId, Long albumIds) {
+        this.unLikeAlbum(userId, Collections.singletonList(albumIds));
+    }
+    
+    /**
+     * 用户喜欢专辑
+     * @param userId 用户ID
+     * @param artistId 专辑ID
+     */
+    void likeArtist(Long userId, Collection<Long> artistId);
+    
+    default void likeArtist(Long userId, Long artistId) {
+        this.likeArtist(userId, Collections.singletonList(artistId));
+    }
+    
+    /**
+     * 用户取消喜欢专辑
+     * @param userId 用户ID
+     * @param artistId 专辑ID
+     */
+    void unLikeArtist(Long userId, Collection<Long> artistId);
+    
+    default void unLikeArtist(Long userId, Long artistId) {
+        this.unLikeAlbum(userId, Collections.singletonList(artistId));
+    }
+    
 }

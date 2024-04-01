@@ -57,7 +57,7 @@ public class SimilarSongsRes extends SubsonicResult {
         private String coverArt;
         
         @JacksonXmlProperty(isAttribute = true)
-        private long size;
+        private Long size;
         
         @JacksonXmlProperty(isAttribute = true)
         private String contentType;

@@ -78,7 +78,7 @@ public class SearchRes extends SubsonicResult {
         private Integer coverArt;
         
         @JacksonXmlProperty(isAttribute = true)
-        private long size;
+        private Long size;
         
         @JacksonXmlProperty(isAttribute = true)
         private String contentType;

@@ -157,8 +157,8 @@ public class BrowsingController {
     @ManualSerialize
     public ResponseEntity<String> getAlbum(SubsonicCommonReq req,
                                            @Parameter(description = "专辑ID")
-                                           @RequestParam("id") String id) {
-        AlbumRes res = browsingApi.getAlbum(Long.valueOf(id));
+                                           @RequestParam("id") Long id) {
+        AlbumRes res = browsingApi.getAlbum(id);
         return res.success(req);
     }
     

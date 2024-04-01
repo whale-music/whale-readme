@@ -28,6 +28,7 @@ import org.api.subsonic.model.res.song.SongRes;
 import org.api.subsonic.model.res.topsongs.TopSongsRes;
 import org.api.subsonic.model.res.videoinfo.VideoInfoRes;
 import org.api.subsonic.model.res.videos.VideosRes;
+import org.api.subsonic.utils.CharUtil;
 import org.api.subsonic.utils.DurationUtil;
 import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
@@ -41,7 +42,6 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
 import org.core.utils.StringUtil;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.net.URLConnection;
@@ -64,64 +64,7 @@ public class BrowsingApi {
     private final SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
     private final TbMusicArtistService tbMusicArtistService;
     private final RemoteStorePicService remoteStorePicService;
-    
-    @NotNull
-    private static Character getCharacterFirstLetter(String name) {
-        switch (Optional.ofNullable(name).orElse("").charAt(0)) {
-            case 'A', 'a':
-                return 'A';
-            case 'B', 'b':
-                return 'B';
-            case 'C', 'c':
-                return 'C';
-            case 'D', 'd':
-                return 'D';
-            case 'E', 'e':
-                return 'E';
-            case 'F', 'f':
-                return 'F';
-            case 'G', 'g':
-                return 'G';
-            case 'H', 'h':
-                return 'H';
-            case 'I', 'i':
-                return 'I';
-            case 'J', 'j':
-                return 'J';
-            case 'K', 'k':
-                return 'K';
-            case 'L', 'l':
-                return 'L';
-            case 'M', 'm':
-                return 'M';
-            case 'N', 'n':
-                return 'N';
-            case 'O', 'o':
-                return 'O';
-            case 'P', 'p':
-                return 'P';
-            case 'Q', 'q':
-                return 'Q';
-            case 'R', 'r':
-                return 'R';
-            case 'S', 's':
-                return 'S';
-            case 'T', 't':
-                return 'T';
-            case 'U', 'u':
-                return 'U';
-            case 'W', 'w':
-                return 'W';
-            case 'X', 'x':
-                return 'X';
-            case 'Y', 'y':
-                return 'Y';
-            case 'Z', 'z':
-                return 'Z';
-            default:
-                return '#';
-        }
-    }
+  
     
     public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService, RemoteStorePicService remoteStorePicService) {
         this.qukuService = qukuService;
@@ -195,7 +138,7 @@ public class BrowsingApi {
     public IndexesRes getIndexes(SubsonicCommonReq req, String musicFolderId, String ifModifiedSince) {
         List<TbArtistPojo> list = tbArtistService.list();
         Map<Character, ArrayList<TbArtistPojo>> artistMap = list.parallelStream()
-                                                                .collect(Collectors.toMap(tbArtistPojo -> getCharacterFirstLetter(tbArtistPojo.getArtistName()),
+                                                                .collect(Collectors.toMap(tbArtistPojo -> CharUtil.getCharacterFirstLetter(tbArtistPojo.getArtistName()),
                                                                         ListUtil::toList,
                                                                         (o1, o2) -> {
                                                                             o2.addAll(o1);
@@ -356,7 +299,7 @@ public class BrowsingApi {
     public ArtistsRes getArtists(SubsonicCommonReq req) {
         List<TbArtistPojo> list = tbArtistService.list();
         Map<Character, ArrayList<TbArtistPojo>> artistMap = list.parallelStream()
-                                                                .collect(Collectors.toMap(tbArtistPojo -> getCharacterFirstLetter(tbArtistPojo.getArtistName()),
+                                                                .collect(Collectors.toMap(tbArtistPojo -> CharUtil.getCharacterFirstLetter(tbArtistPojo.getArtistName()),
                                                                         ListUtil::toList,
                                                                         (o1, o2) -> {
                                                                             o2.addAll(o1);

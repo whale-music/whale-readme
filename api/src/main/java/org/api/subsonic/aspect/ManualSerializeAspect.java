@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.subsonic.common.ErrorEnum;
 import org.api.subsonic.common.SubsonicResult;
+import org.api.subsonic.utils.SubsonicUserUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -74,6 +75,8 @@ public class ManualSerializeAspect {
             // 不能使用spring boot 异常拦截器, 因为返回值需要根据请求参数进行转换
             log.error(e.getMessage(), e);
             return new SubsonicResult().error(StringUtils.equalsIgnoreCase(from, "json"), ErrorEnum.A_GENERIC_ERROR);
+        } finally {
+            SubsonicUserUtil.removeUser();
         }
     }
     
@@ -113,7 +116,9 @@ public class ManualSerializeAspect {
             // http://your-server/rest/ping.view?u=joe&t=26719a1196d2a940705a59634eb18eab&s=c19b2d&v=1.12.0&c=myapp
             SysUserPojo pojo = subsonicUserCache.checkUser(user);
             String originToken = SecureUtil.md5(pojo.getPassword() + salt);
-            if (!StringUtils.equals(originToken, token)) {
+            if (StringUtils.equals(originToken, token)) {
+                SubsonicUserUtil.setUser(pojo);
+            } else {
                 throw new BaseException(ResultCode.PASSWORD_ERROR);
             }
         } else {
@@ -125,7 +130,9 @@ public class ManualSerializeAspect {
                 tempPassword = HexUtil.decodeHexStr(replace);
             }
             SysUserPojo account = subsonicUserCache.checkUser(user);
-            if (!StringUtils.equals(account.getPassword(), tempPassword)) {
+            if (StringUtils.equals(account.getPassword(), tempPassword)) {
+                SubsonicUserUtil.setUser(account);
+            } else {
                 throw new BaseException(ResultCode.PASSWORD_ERROR);
             }
         }

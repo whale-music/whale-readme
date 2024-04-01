@@ -106,13 +106,13 @@ public class BrowsingApi {
         song.setBitRate(tbMusicUrlPojo.getRate());
         song.setPath(tbMusicUrlPojo.getPath());
         
-        song.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getUpdateTime()));
+        song.setStarred(LocalDateUtil.formatUTC(musicPojo.getUpdateTime()));
         song.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
         song.setParent(StringUtil.defaultNullString(albumByAlbumId.getId()));
         song.setDiscNumber(StringUtil.defaultNullString(0));
         song.setPlayCount(0);
-        song.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
-        song.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
+        song.setPlayed(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
+        song.setCreated(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
         song.setType("music");
         song.setUserRating(0);
         song.setIsVideo(false);
@@ -245,11 +245,11 @@ public class BrowsingApi {
             c.setType("music");
             c.setUserRating((byte) 0);
             c.setIsVideo(false);
-            c.setPlayed(LocalDateUtil.formatUTCZ(s.getPublishTime()));
+            c.setPlayed(LocalDateUtil.formatUTC(s.getPublishTime()));
             c.setComment(s.getComment());
             c.setSortName(s.getAliasName());
             c.setMediaType("song");
-            c.setCreated(LocalDateUtil.formatUTCZ(s.getPublishTime()));
+            c.setCreated(LocalDateUtil.formatUTC(s.getPublishTime()));
             c.setDuration(DurationUtil.getDuration(s.getTimeLength()));
             c.setBpm((byte) 0);
             
@@ -374,8 +374,8 @@ public class BrowsingApi {
             e.setDuration(DurationUtil.getDuration(albumDurationCountMap.get(albumListByArtistId.getId())));
             // 播放数量
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(albumListByArtistId.getCreateTime()));
-            e.setCreated(LocalDateUtil.formatUTCZ(albumListByArtistId.getPublishTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(albumListByArtistId.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(albumListByArtistId.getPublishTime()));
             e.setArtistId(StringUtil.defaultNullString(artist.getId()));
             e.setUserRating(0);
             e.setSongCount(albumMusicCountMap.get(albumListByArtistId.getId()));
@@ -497,10 +497,10 @@ public class BrowsingApi {
         album.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
         album.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
         album.setPlayCount(0);
-        album.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getUpdateTime()));
-        album.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
+        album.setPlayed(LocalDateUtil.formatUTC(albumPojo.getUpdateTime()));
+        album.setCreated(LocalDateUtil.formatUTC(albumPojo.getCreateTime()));
         album.setYear(LocalDateUtil.getYear(albumPojo.getPublishTime()));
-        album.setStarred(LocalDateUtil.formatUTCZ(albumPojo.getUpdateTime()));
+        album.setStarred(LocalDateUtil.formatUTC(albumPojo.getUpdateTime()));
         
         
         ArrayList<SongItem> song = new ArrayList<>();
@@ -536,13 +536,13 @@ public class BrowsingApi {
             e.setPath(tbResourcePojo.getPath());
             e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             
-            e.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getUpdateTime()));
+            e.setStarred(LocalDateUtil.formatUTC(musicPojo.getUpdateTime()));
             e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
             e.setType("music");
             e.setIsVideo(false);
-            e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getPublishTime()));
+            e.setCreated(LocalDateUtil.formatUTC(albumPojo.getPublishTime()));
             song.add(e);
             duration += musicPojo.getTimeLength();
         }
@@ -675,9 +675,9 @@ public class BrowsingApi {
             
             e.setDuration(DurationUtil.getDuration(musicConvert.getTimeLength()));
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicConvert.getCreateTime()));
             e.setDiscNumber(0);
-            e.setCreated(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(musicConvert.getCreateTime()));
             e.setType("music");
             e.setIsVideo(false);
             
@@ -737,9 +737,9 @@ public class BrowsingApi {
             
             e.setDuration(DurationUtil.getDuration(musicConvert.getTimeLength()));
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicConvert.getCreateTime()));
             e.setDiscNumber(0);
-            e.setCreated(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(musicConvert.getCreateTime()));
             e.setType("music");
             e.setIsVideo(false);
             
@@ -778,7 +778,7 @@ public class BrowsingApi {
                 topSongs.setTrack(0);
                 topSongs.setCoverArt(String.valueOf(tbMusicPojo.getId()));
                 topSongs.setDuration(DurationUtil.getDuration(tbMusicPojo.getTimeLength()));
-                topSongs.setCreated(LocalDateUtil.formatUTCZ((tbMusicPojo.getCreateTime())));
+                topSongs.setCreated(LocalDateUtil.formatUTC((tbMusicPojo.getCreateTime())));
                 topSongs.setIsVideo(false);
                 
                 TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(tbMusicPojo.getId()));
@@ -791,7 +791,7 @@ public class BrowsingApi {
                 topSongs.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 topSongs.setSuffix(tbResourcePojo.getEncodeType());
                 topSongs.setPlayCount(0);
-                topSongs.setPlayed(LocalDateUtil.formatUTCZ(tbMusicPojo.getCreateTime()));
+                topSongs.setPlayed(LocalDateUtil.formatUTC(tbMusicPojo.getCreateTime()));
                 
                 AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(tbMusicPojo.getAlbumId());
                 if (Objects.nonNull(albumConvert)) {

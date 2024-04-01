@@ -125,7 +125,7 @@ public class SongListsApi {
             e.setId(StringUtil.defaultNullString(albumPojo.getId()));
             e.setBpm(0);
             e.setComment("");
-            e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(albumPojo.getCreateTime()));
             
             e.setDuration(DurationUtil.getDuration(albumDurationCount.get(albumPojo.getId())));
             List<TbTagPojo> tbTagPojos = labelAlbumGenre.get(albumPojo.getId());
@@ -145,8 +145,8 @@ public class SongListsApi {
             e.setMediaType("album");
             e.setMusicBrainzId("");
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
-            e.setStarred(LocalDateUtil.formatUTCZ(albumPojo.getPublishTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(albumPojo.getCreateTime()));
+            e.setStarred(LocalDateUtil.formatUTC(albumPojo.getPublishTime()));
             e.setSortName("");
             e.setUserRating(0);
             
@@ -462,9 +462,9 @@ public class SongListsApi {
             e.setMediaType("song");
             e.setMusicBrainzId("");
             e.setReplayGain(new RandomSongsRes.Song.ReplayGain(0, 0));
-            e.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
-            e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+            e.setStarred(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
             song.add(e);
         }
         RandomSongsRes.RandomSongs randomSongs = new RandomSongsRes.RandomSongs();
@@ -536,10 +536,10 @@ public class SongListsApi {
             }
             e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setPlayCount(0);
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
             e.setType("music");
             e.setIsVideo(false);
-            e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
+            e.setCreated(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
             song.add(e);
         }
         SongsByGenreRes.SongsByGenre songsByGenre = new SongsByGenreRes.SongsByGenre();
@@ -650,14 +650,14 @@ public class SongListsApi {
                     e.setParent(StringUtil.defaultNullString(artistConvert.getId()));
                 }
                 e.setCoverArt(StringUtil.defaultNullString(tbAlbumPojo.getId()));
-                e.setCreated(LocalDateUtil.formatUTCZ(tbAlbumPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTC(tbAlbumPojo.getCreateTime()));
                 e.setDuration(DurationUtil.getDuration(albumDurationCount.get(tbAlbumPojo.getId())));
                 e.setIsDir(true);
                 e.setIsVideo(false);
                 e.setPlayCount(0);
-                e.setPlayed(LocalDateUtil.formatUTCZ(tbAlbumPojo.getPublishTime()));
+                e.setPlayed(LocalDateUtil.formatUTC(tbAlbumPojo.getPublishTime()));
                 e.setSongCount(albumMusicCountByMapAlbumId.get(tbAlbumPojo.getId()));
-                e.setStarred(LocalDateUtil.formatUTCZ(tbAlbumPojo.getPublishTime()));
+                e.setStarred(LocalDateUtil.formatUTC(tbAlbumPojo.getPublishTime()));
                 e.setYear(LocalDateUtil.getYear(tbAlbumPojo.getPublishTime()));
                 
                 albums.add(e);
@@ -676,7 +676,7 @@ public class SongListsApi {
                 e.setId(String.valueOf(tbArtistPojo.getId()));
                 e.setName(tbArtistPojo.getArtistName());
                 e.setCoverArt(String.valueOf(tbArtistPojo.getId()));
-                e.setStarred(LocalDateUtil.formatUTCZ(tbArtistPojo.getCreateTime()));
+                e.setStarred(LocalDateUtil.formatUTC(tbArtistPojo.getCreateTime()));
                 e.setAlbumCount(tbArtistPojo.getCreateTime().getYear());
                 e.setUserRating(0);
                 e.setCoverArt(String.valueOf(tbArtistPojo.getId()));
@@ -746,11 +746,11 @@ public class SongListsApi {
                 }
                 e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 e.setPlayCount(0);
-                e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
                 e.setType("music");
                 e.setIsVideo(false);
-                e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
-                e.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
+                e.setStarred(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
                 
                 songs.add(e);
             }
@@ -801,14 +801,14 @@ public class SongListsApi {
                     TbTagPojo tbTagPojo = tbTagPojos.get(0);
                     e.setGenre(tbTagPojo.getTagName());
                 }
-                e.setCreated(LocalDateUtil.formatUTCZ(tbAlbumPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTC(tbAlbumPojo.getCreateTime()));
                 e.setDuration(DurationUtil.getDuration(albumDurationCount.get(tbAlbumPojo.getId())));
                 e.setIsDir(true);
                 e.setIsVideo(false);
                 e.setPlayCount(0);
-                e.setPlayed(LocalDateUtil.formatUTCZ(tbAlbumPojo.getCreateTime()));
+                e.setPlayed(LocalDateUtil.formatUTC(tbAlbumPojo.getCreateTime()));
                 e.setSongCount(albumMusicCountByMapAlbumId.get(tbAlbumPojo.getId()));
-                e.setStarred(LocalDateUtil.formatUTCZ(tbAlbumPojo.getPublishTime()));
+                e.setStarred(LocalDateUtil.formatUTC(tbAlbumPojo.getPublishTime()));
                 e.setYear(LocalDateUtil.getYear(tbAlbumPojo.getPublishTime()));
                 
                 albums.add(e);
@@ -826,7 +826,7 @@ public class SongListsApi {
                 Starred2Res.Artist e = new Starred2Res.Artist();
                 e.setId(String.valueOf(tbArtistPojo.getId()));
                 e.setName(tbArtistPojo.getArtistName());
-                e.setStarred(LocalDateUtil.formatUTCZ(tbArtistPojo.getCreateTime()));
+                e.setStarred(LocalDateUtil.formatUTC(tbArtistPojo.getCreateTime()));
                 e.setAlbumCount(LocalDateUtil.getYear(tbArtistPojo.getCreateTime()));
                 e.setUserRating(0);
                 e.setCoverArt(String.valueOf(tbArtistPojo.getId()));
@@ -903,13 +903,13 @@ public class SongListsApi {
                 e.setMediaType("song");
                 e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 e.setPlayCount(0);
-                e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
                 e.setDiscNumber(0);
                 e.setType("music");
                 e.setMusicBrainzId("");
                 e.setIsVideo(false);
-                e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
-                e.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
+                e.setStarred(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
                 songs.add(e);
             }
             starred2.setSong(songs);

@@ -71,9 +71,9 @@ public class PlaylistApi {
             PlaylistItem e = new PlaylistItem();
             e.setId(StringUtil.defaultNullString(collectPojo.getId()));
             e.setName(collectPojo.getPlayListName());
-            e.setChanged(LocalDateUtil.formatUTCZ((collectPojo.getUpdateTime())));
+            e.setChanged(LocalDateUtil.formatUTC((collectPojo.getUpdateTime())));
             e.setSongCount(qukuApi.getCollectMusicCount(collectPojo.getId()));
-            e.setCreated(LocalDateUtil.formatUTCZ(collectPojo.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(collectPojo.getCreateTime()));
             e.setCoverArt(StringUtil.defaultNullString(collectPojo.getId()));
             e.setOwner(user.getUsername());
             e.setDuration(DurationUtil.getDuration(collectDurationCount.get(collectPojo.getId())));
@@ -107,7 +107,7 @@ public class PlaylistApi {
             e.setBitRate(tbMusicUrlPojo.getRate() == null ? 0 : tbMusicUrlPojo.getRate());
             e.setIsDir(false);
             e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
-            e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
+            e.setPlayed(LocalDateUtil.formatUTC(musicPojo.getPublishTime()));
             
             TbAlbumPojo albumByAlbumId = Optional.ofNullable(qukuApi.getAlbumByAlbumId(musicPojo.getAlbumId())).orElse(new AlbumConvert());
             e.setAlbum(albumByAlbumId.getAlbumName());
@@ -127,7 +127,7 @@ public class PlaylistApi {
             e.setContentType(URLConnection.guessContentTypeFromName(tbMusicUrlPojo.getPath()));
             e.setUserRating(0);
             e.setPath(tbMusicUrlPojo.getPath());
-            e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTC(musicPojo.getCreateTime()));
             e.setPlayCount(0);
             
             List<ArtistConvert> artistByMusicId = qukuApi.getArtistByMusicIds(musicPojo.getId());
@@ -149,8 +149,8 @@ public class PlaylistApi {
         playlistRes.setJsonMemberPublic(true);
         SysUserPojo byId1 = accountService.getById(byId.getUserId());
         playlistRes.setOwner(Optional.ofNullable(byId1).orElse(new SysUserPojo()).getUsername());
-        playlistRes.setCreated(LocalDateUtil.formatUTCZ(byId.getCreateTime()));
-        playlistRes.setChanged(LocalDateUtil.formatUTCZ(byId.getUpdateTime()));
+        playlistRes.setCreated(LocalDateUtil.formatUTC(byId.getCreateTime()));
+        playlistRes.setChanged(LocalDateUtil.formatUTC(byId.getUpdateTime()));
         playlistRes.setCoverArt(StringUtil.defaultNullString(byId.getId()));
         
         playlistRes.setEntry(entry);
@@ -185,9 +185,9 @@ public class PlaylistApi {
         CreatePlaylistRes.Playlist playlist = new CreatePlaylistRes.Playlist();
         playlist.setPublicFlag(false);
         playlist.setId(StringUtil.defaultNullString(playList.getId()));
-        playlist.setCreated(LocalDateUtil.formatUTCZ(playList.getCreateTime()));
+        playlist.setCreated(LocalDateUtil.formatUTC(playList.getCreateTime()));
         playlist.setName(playList.getPlayListName());
-        playlist.setChanged(LocalDateUtil.formatUTCZ(playList.getCreateTime()));
+        playlist.setChanged(LocalDateUtil.formatUTC(playList.getCreateTime()));
         playlist.setSongCount(0);
         playlist.setCoverArt(StringUtil.defaultNullString(playList.getId()));
         playlist.setDuration(0);

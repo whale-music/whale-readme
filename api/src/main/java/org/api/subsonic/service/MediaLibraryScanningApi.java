@@ -22,7 +22,7 @@ public class MediaLibraryScanningApi {
     public ScanStatusRes getScanStatus(SubsonicCommonReq req) {
         ScanStatusRes res = new ScanStatusRes();
         long count = tbMusicService.count();
-        String format = LocalDateUtil.formatUTCZ(LocalDateTime.now());
+        String format = LocalDateUtil.formatUTC(LocalDateTime.now());
         res.setScanStatus(new ScanStatusRes.ScanStatus(format,false, count, 1));
         return res;
     }
@@ -30,7 +30,7 @@ public class MediaLibraryScanningApi {
     public StartScanRes startScan(SubsonicCommonReq req) {
         StartScanRes res = new StartScanRes();
         long count = tbMusicService.count();
-        String format = LocalDateUtil.formatUTCZ(LocalDateTime.now());
+        String format = LocalDateUtil.formatUTC(LocalDateTime.now());
         res.setScanStatus(new StartScanRes.ScanStatus(format, false, count, 1));
         return res;
     }

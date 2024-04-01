@@ -1,5 +1,7 @@
 package org.api.subsonic.utils;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ public class LocalDateUtil {
     private LocalDateUtil() {
     }
     
-    public static String formatUTCZ(LocalDateTime localDateTime) {
+    public static String formatUTC(LocalDateTime localDateTime) {
         if (Objects.isNull(localDateTime)) {
             return "";
         }
@@ -22,9 +24,9 @@ public class LocalDateUtil {
         return localDateTime.atOffset(ZoneOffset.UTC).format(formatter);
     }
     
-    // public static String formatUTCZ(LocalDateTime localDateTime) {
-    //     return LocalDateTimeUtil.format(localDateTime, DatePattern.UTC_PATTERN);
-    // }
+    public static String formatUTCZ(LocalDateTime localDateTime) {
+        return LocalDateTimeUtil.format(localDateTime, DatePattern.UTC_PATTERN);
+    }
     
     public static Integer getYear(LocalDateTime localDateTime) {
         if (Objects.isNull(localDateTime)) {
@@ -35,7 +37,9 @@ public class LocalDateUtil {
  
     public static void main(String[] args) {
         LocalDateTime now = LocalDateTime.now();
-        String s = formatUTCZ(now);
-        log.info("UTC Z: {}",s);
+        String s = formatUTC(now);
+        String s1 = formatUTCZ(now);
+        log.info("UTC  : {}",s);
+        log.info("UTC Z: {}",s1);
     }
 }

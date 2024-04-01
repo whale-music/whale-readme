@@ -109,7 +109,7 @@ public class TagManagerServiceImpl implements TagManagerService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Byte target, Long id, List<String> labels) {
+    public void addTag(Byte target, Long id, List<String> labels) {
         // 新增tag
         synchronized (lock) {
             Set<Long> tagIds = null;
@@ -128,7 +128,7 @@ public class TagManagerServiceImpl implements TagManagerService {
                 tagIds = list.parallelStream().map(TbTagPojo::getId).collect(Collectors.toSet());
             }
             // 关联到对应ID
-            this.addLabel(target, id, tagIds);
+            this.addTag(target, id, tagIds);
         }
     }
     
@@ -141,7 +141,7 @@ public class TagManagerServiceImpl implements TagManagerService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addLabel(Byte target, Long id, Set<Long> tagIds) {
+    public void addTag(Byte target, Long id, Set<Long> tagIds) {
         LambdaQueryWrapper<TbMiddleTagPojo> eq = Wrappers.<TbMiddleTagPojo>lambdaQuery()
                                                          .eq(TbMiddleTagPojo::getMiddleId, id)
                                                          .eq(TbMiddleTagPojo::getType, target);

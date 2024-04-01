@@ -162,7 +162,7 @@ public interface TagManagerService {
      * @param id     歌单或歌曲前ID
      * @param labels 标签名
      */
-    void addLabel(Byte target, Long id, List<String> labels);
+    void addTag(Byte target, Long id, List<String> labels);
     
     /**
      * 对歌单tag，音乐添加tag Name， 或者指定音乐流派
@@ -171,8 +171,8 @@ public interface TagManagerService {
      * @param id     歌单或歌曲前ID
      * @param label  标签名
      */
-    default void addLabel(Byte target, Long id, String label) {
-        addLabel(target, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
+    default void addTag(Byte target, Long id, String label) {
+        addTag(target, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
     }
     
     /**
@@ -182,7 +182,7 @@ public interface TagManagerService {
      * @param id       歌单或歌曲前ID
      * @param labelIds 标签ID
      */
-    void addLabel(Byte target, Long id, Set<Long> labelIds);
+    void addTag(Byte target, Long id, Set<Long> labelIds);
     
     
     /**
@@ -192,8 +192,56 @@ public interface TagManagerService {
      * @param id      歌单或歌曲前ID
      * @param labelId 标签ID
      */
-    default void addLabel(Byte target, Long id, Long labelId) {
-        addLabel(target, id, Set.of(labelId));
+    default void addTag(Byte target, Long id, Long labelId) {
+        addTag(target, id, Set.of(labelId));
+    }
+    
+    default void addCollectLabel(Long id, Long labelId) {
+        this.addTag(TargetTagConstant.TARGET_COLLECT_TAG, id, labelId);
+    }
+    
+    default void addCollectLabel(Long id, String label) {
+        this.addTag(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
+    }
+    
+    default void addCollectLabel(Long id, List<String> label) {
+        this.addTag(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
+    }
+    
+    default void addMusicLabelTag(Long id, String label) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
+    }
+    
+    default void addMusicLabelTag(Long id, List<String> labels) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
+    }
+    
+    default void addAlbumGenreLabel(Long id, List<String> labels) {
+        this.addTag(TargetTagConstant.TARGET_ALBUM_GENRE, id, labels);
+    }
+    
+    default void addAlbumGenreLabel(Long id, String label) {
+        this.addTag(TargetTagConstant.TARGET_ALBUM_GENRE, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
+    }
+    
+    default void addMusicLabelTag(Long id, Long labelId) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_TAG, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, Long labelId) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_GENRE, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, String label) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_GENRE, id, label);
+    }
+    
+    default void addMusicGenreLabel(Long id, List<String> labels) {
+        this.addTag(TargetTagConstant.TARGET_MUSIC_GENRE, id, labels);
+    }
+    
+    default void addMvGenreLabel(Long id, List<String> labels) {
+        this.addTag(TargetTagConstant.TARGET_MV_TAG, id, labels);
     }
     
     /**
@@ -308,55 +356,4 @@ public interface TagManagerService {
     default void removeCollectLabelByName(Long id, String labelName) {
         removeLabelByName(TargetTagConstant.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
     }
-    
-    
-    default void addCollectLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, labelId);
-    }
-    
-    default void addCollectLabel(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
-    }
-    
-    default void addCollectLabel(Long id, List<String> label) {
-        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
-    }
-    
-    default void addMusicLabelTag(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
-    }
-    
-    default void addMusicLabelTag(Long id, List<String> labels) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
-    }
-    
-    default void addAlbumGenreLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, labels);
-    }
-    
-    default void addAlbumGenreLabel(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
-    }
-    
-    default void addMusicLabelTag(Long id, Long labelId) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labelId);
-    }
-    
-    default void addMusicGenreLabel(Long id, Long labelId) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labelId);
-    }
-    
-    default void addMusicGenreLabel(Long id, String label) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, label);
-    }
-    
-    default void addMusicGenreLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labels);
-    }
-    
-    default void addMvGenreLabel(Long id, List<String> labels) {
-        this.addLabel(TargetTagConstant.TARGET_MV_TAG, id, labels);
-    }
-    
-    
 }

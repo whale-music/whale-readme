@@ -21,7 +21,6 @@ import org.api.subsonic.model.res.starred2.Starred2Res;
 import org.api.subsonic.utils.DurationUtil;
 import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
-import org.core.common.constant.HistoryConstant;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.constant.TargetTagConstant;
 import org.core.mybatis.iservice.*;
@@ -56,10 +55,6 @@ public class SongListsApi {
     
     private final TbArtistService tbArtistService;
     
-    private final TbCollectService tbCollectService;
-    
-    private final TbMvService tbMvService;
-    
     private final TbHistoryService tbHistoryService;
     
     private final AccountService accountService;
@@ -76,7 +71,7 @@ public class SongListsApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbCollectService tbCollectService, TbMvService tbMvService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService, RemoteStorePicService remoteStorePicService) {
+    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService, RemoteStorePicService remoteStorePicService) {
         this.tbCollectMusicService = tbCollectMusicService;
         this.qukuService = qukuService;
         this.tbMusicService = tbMusicService;
@@ -85,8 +80,6 @@ public class SongListsApi {
         this.albumService = albumService;
         this.tbTagService = tbTagService;
         this.tbArtistService = tbArtistService;
-        this.tbCollectService = tbCollectService;
-        this.tbMvService = tbMvService;
         this.tbHistoryService = tbHistoryService;
         this.accountService = accountService;
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
@@ -267,75 +260,6 @@ public class SongListsApi {
                 Collections.shuffle(page.getRecords());
         }
         return page.getRecords();
-    }
-    
-    public void scrobble(SubsonicCommonReq req, Long id, Long timeStamp, Boolean submission) {
-        String userName = req.getU();
-        SysUserPojo userByName = accountService.getUserOrSubAccount(userName);
-        if (updateHistory(tbMusicService.count(Wrappers.<TbMusicPojo>lambdaQuery().eq(TbMusicPojo::getId, id)),
-                userByName,
-                id,
-                HistoryConstant.MUSIC,
-                timeStamp)) {
-            return;
-        }
-        
-        // 专辑
-        if (updateHistory(albumService.count(Wrappers.<TbAlbumPojo>lambdaQuery().eq(TbAlbumPojo::getId, id)),
-                userByName,
-                id,
-                HistoryConstant.ALBUM,
-                timeStamp)) {
-            return;
-        }
-        
-        // 歌手
-        if (updateHistory(tbArtistService.count(Wrappers.<TbArtistPojo>lambdaQuery().eq(TbArtistPojo::getId, id)),
-                userByName,
-                id,
-                HistoryConstant.ARTIST,
-                timeStamp)) {
-            return;
-        }
-        
-        // 歌单
-        if (updateHistory(tbCollectService.count(Wrappers.<TbCollectPojo>lambdaQuery().eq(TbCollectPojo::getId, id)),
-                userByName,
-                id,
-                HistoryConstant.PLAYLIST,
-                timeStamp)) {
-            return;
-        }
-        
-        // MV
-        if (updateHistory(tbMvService.count(Wrappers.<TbMvPojo>lambdaQuery().eq(TbMvPojo::getId, id)), userByName, id, HistoryConstant.MV, timeStamp)) {
-            // TODO MV 后续处理
-            return;
-        }
-    }
-    
-    private boolean updateHistory(long count, SysUserPojo userByName, Long id, Byte type, Long playTime) {
-        // 音乐
-        if (count > 0) {
-            TbHistoryPojo historyPojo = tbHistoryService.getOne(Wrappers.<TbHistoryPojo>lambdaQuery()
-                                                                        .eq(TbHistoryPojo::getUserId, userByName.getId())
-                                                                        .eq(TbHistoryPojo::getMiddleId, id)
-                                                                        .eq(TbHistoryPojo::getType, type));
-            if (Objects.isNull(historyPojo)) {
-                TbHistoryPojo entity = new TbHistoryPojo();
-                entity.setCount(1);
-                entity.setMiddleId(id);
-                entity.setUserId(userByName.getId());
-                entity.setPlayedTime(playTime);
-                entity.setType(type);
-                tbHistoryService.save(entity);
-            } else {
-                historyPojo.setCount(historyPojo.getCount() + 1);
-                tbHistoryService.updateById(historyPojo);
-            }
-            return true;
-        }
-        return false;
     }
     
     /**

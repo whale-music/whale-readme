@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.api.subsonic.aspect.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
+import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.star.StarRes;
 import org.api.subsonic.model.res.unstar.UnStarRes;
@@ -82,5 +83,33 @@ public class MediaAnnotationController {
     ) {
         UnStarRes res = mediaAnnotationApi.unStar(req, id, albumId, artistId);
         return res.success(req);
+    }
+    
+    
+    @Operation(summary = "注册一个或多个媒体文件的本地回放。通常在播放缓存在客户端上的媒体时使用。此操作包括以下内容：",
+               description = "如果用户已在Subsonic服务器上配置了他/她的last.fm凭证（Settings > Personal），则会“滚动”last.fm上的媒体文件。" +
+                       "更新媒体文件的播放次数和上次播放时间戳。（自1.11.0版起）" +
+                       "使媒体文件显示在Web应用程序的“正在播放”页面中，并显示在 getNowPlaying （自1.11.0起）返回的歌曲列表中"
+    )
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
+                 content = {
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
+                 }
+    )
+    @WebLog(LogNameConstant.SUBSONIC)
+    @GetMapping({"/scrobble.view", "/scrobble"})
+    @ManualSerialize
+    public ResponseEntity<String> scrobble(SubsonicCommonReq req,
+                                           @Parameter(description = "要标记为已播放的媒体文件的ID。")
+                                           @RequestParam("id") Long id,
+                                           
+                                           @Parameter(description = "（自1.8.0起）歌曲被收听的时间（自1970年1月1日起，以毫秒为单位）", deprecated = true)
+                                           @RequestParam(value = "time", required = false) Long timeStamp,
+                                           
+                                           @Parameter(description = "无论这是“提交”还是“正在播放”通知", deprecated = true)
+                                           @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
+        mediaAnnotationApi.scrobble(req, id, timeStamp, submission);
+        return new SubsonicResult().success(req);
     }
 }

@@ -25,10 +25,10 @@ public class SearchRes extends SubsonicResult {
     @NoArgsConstructor
     public static class SearchResult {
         @JacksonXmlProperty(isAttribute = true)
-        private int offset;
+        private Integer offset;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int totalHits;
+        private Integer totalHits;
         
         @JacksonXmlElementWrapper(useWrapping = false)
         @JacksonXmlProperty(localName = "match")
@@ -66,16 +66,16 @@ public class SearchRes extends SubsonicResult {
         private String artistId;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int track;
+        private Integer track;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int year;
+        private Integer year;
         
         @JacksonXmlProperty(isAttribute = true)
         private String genre;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int coverArt;
+        private Integer coverArt;
         
         @JacksonXmlProperty(isAttribute = true)
         private long size;

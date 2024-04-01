@@ -44,7 +44,7 @@ public class ArtistInfoRes extends SubsonicResult {
     @NoArgsConstructor
     public static class SimilarArtist {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(isAttribute = true)
         private String name;

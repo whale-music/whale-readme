@@ -30,7 +30,7 @@ public class SimilarSongsRes extends SubsonicResult {
     @NoArgsConstructor
     public static class Song {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(isAttribute = true)
         private String parent;
@@ -48,10 +48,10 @@ public class SimilarSongsRes extends SubsonicResult {
         private String artist;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int track;
+        private Integer track;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int year;
+        private Integer year;
         
         @JacksonXmlProperty(isAttribute = true)
         private String coverArt;
@@ -66,22 +66,22 @@ public class SimilarSongsRes extends SubsonicResult {
         private String suffix;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int bitRate;
+        private Integer bitRate;
         
         @JacksonXmlProperty(isAttribute = true)
         private String path;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int playCount;
+        private Integer playCount;
         
         @JacksonXmlProperty(isAttribute = true)
         private String played;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int discNumber;
+        private Integer discNumber;
         
         @JacksonXmlProperty(isAttribute = true)
         private String created;

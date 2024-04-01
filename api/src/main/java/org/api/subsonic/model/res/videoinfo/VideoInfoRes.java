@@ -21,7 +21,7 @@ public class VideoInfoRes extends SubsonicResult {
     @NoArgsConstructor
     public static class VideoInfo {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(localName = "captions")
         private Captions captions;
@@ -38,7 +38,7 @@ public class VideoInfoRes extends SubsonicResult {
     @NoArgsConstructor
     public static class Captions {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(isAttribute = true)
         private String name;
@@ -49,7 +49,7 @@ public class VideoInfoRes extends SubsonicResult {
     @NoArgsConstructor
     public static class AudioTrack {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(isAttribute = true)
         private String name;
@@ -63,9 +63,9 @@ public class VideoInfoRes extends SubsonicResult {
     @NoArgsConstructor
     public static class Conversion {
         @JacksonXmlProperty(isAttribute = true)
-        private int id;
+        private Integer id;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int bitRate;
+        private Integer bitRate;
     }
 }

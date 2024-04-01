@@ -65,7 +65,7 @@ public class EntryItem {
 	
 	@JsonProperty("duration")
 	@JacksonXmlProperty(isAttribute = true)
-	private int duration;
+	private Integer duration;
 	
 	@JsonProperty("path")
 	@JacksonXmlProperty(isAttribute = true)

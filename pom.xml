@@ -206,6 +206,18 @@
             <artifactId>jcodec</artifactId>
             <version>0.2.5</version>
         </dependency>
+
+        <!-- AOPUtil 内中报错类， 需要手动引入. 后续升级时可能需要移除 -->
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reactivestreams</groupId>
+            <artifactId>reactive-streams</artifactId>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

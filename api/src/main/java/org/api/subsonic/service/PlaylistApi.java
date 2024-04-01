@@ -29,6 +29,7 @@ import org.core.utils.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -121,13 +122,10 @@ public class PlaylistApi {
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
             e.setType("music");
-            if (StringUtils.equalsIgnoreCase(tbMusicUrlPojo.getEncodeType(), "mp3")) {
-                e.setContentType("audio/mpeg");
-            } else {
-                e.setContentType("audio/" + tbMusicUrlPojo.getEncodeType());
-            }
-            
-            e.setParent(tbMusicUrlPojo.getPath());
+            e.setContentType(URLConnection.guessContentTypeFromName(tbMusicUrlPojo.getPath()));
+            e.setUserRating(0);
+            e.setPath(tbMusicUrlPojo.getPath());
+            e.setCreated(LocalDateTimeUtil.format(musicPojo.getCreateTime(), DatePattern.UTC_MS_PATTERN));
             e.setPlayCount(0);
             
             List<ArtistConvert> artistByMusicId = qukuApi.getArtistByMusicIds(musicPojo.getId());

@@ -1,6 +1,7 @@
 package org.api.subsonic.service;
 
 
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +44,14 @@ public class MediaRetrievalApi {
         this.tbMiddlePicService = tbMiddlePicService;
     }
     
+    // todo: 考虑添加缓存
     @Cacheable(value = "coverArt", key = "#id")
     public String getCoverArt(SubsonicCommonReq req, String id, Long size) {
         Optional.ofNullable(DebugConfig.getDebugOption()).ifPresent(o -> log.debug("cover id: {}", id));
+        // 如果封面ID 小于0则数据库中没有之间返回默认封面
+        if (NumberUtil.isNumber(id) && Long.parseLong(id) <= 0) {
+            return defaultInfo.getPic().getDefaultPic();
+        }
         // 与封面关联的id，比如歌单，音乐，专辑，歌手
         long middlePic;
         // 处理一些前端会添加 歌单封面前缀 pl-

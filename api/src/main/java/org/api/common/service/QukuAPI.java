@@ -7,10 +7,7 @@ import org.core.common.constant.PicTypeConstant;
 import org.core.mybatis.iservice.*;
 import org.core.mybatis.pojo.TbMiddlePicPojo;
 import org.core.mybatis.pojo.TbResourcePojo;
-import org.core.service.AccountService;
-import org.core.service.PlayListService;
-import org.core.service.RemoteStorageService;
-import org.core.service.RemoteStorePicService;
+import org.core.service.*;
 import org.core.service.impl.QukuServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +23,7 @@ public class QukuAPI extends QukuServiceImpl {
     private final RemoteStorageService remoteStorageService;
     
     
-    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tagService, AccountService accountService, PlayListService playListService, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, RemoteStorePicService remoteStorePicService, RemoteStorageService remoteStorageService) {
+    public QukuAPI(TbMusicService musicService, TbAlbumService albumService, TbArtistService artistService, TbResourceService musicUrlService, TbUserAlbumService userAlbumService, TbMusicArtistService musicArtistService, TbUserArtistService userSingerService, TbCollectMusicService collectMusicService, TbCollectService collectService, TbUserCollectService userCollectService, TbMiddleTagService middleTagService, TbLyricService lyricService, TbTagService tbTagService, AccountService accountService, PlayListService playListService, TbMvArtistService tbMvArtistService, TbOriginService tbOriginService, TbMiddlePicService tbMiddlePicService, RemoteStorePicService remoteStorePicService, RemoteStorageService remoteStorageService, TagManagerService tagManagerService) {
         super(musicService,
                 albumService,
                 artistService,
@@ -39,12 +36,13 @@ public class QukuAPI extends QukuServiceImpl {
                 userCollectService,
                 middleTagService,
                 lyricService,
-                tagService,
+                tbTagService,
                 accountService,
                 playListService,
                 tbMvArtistService,
                 tbOriginService,
-                remoteStorePicService
+                remoteStorePicService,
+                tagManagerService
         );
         this.tbMiddlePicService = tbMiddlePicService;
         this.remoteStorageService = remoteStorageService;

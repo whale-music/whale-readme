@@ -32,6 +32,7 @@ import org.core.mybatis.pojo.TbArtistPojo;
 import org.core.mybatis.pojo.TbMusicPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,13 +62,16 @@ public class AlbumApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public AlbumApi(TbAlbumService albumService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService) {
+    private final TagManagerService tagManagerService;
+    
+    public AlbumApi(TbAlbumService albumService, TbArtistService singerService, QukuAPI qukuService, HttpRequestConfig httpRequestConfig, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService, TagManagerService tagManagerService) {
         this.albumService = albumService;
         this.singerService = singerService;
         this.qukuService = qukuService;
         this.httpRequestConfig = httpRequestConfig;
         this.remoteStorePicService = remoteStorePicService;
         this.tbMusicService = tbMusicService;
+        this.tagManagerService = tagManagerService;
     }
     
     
@@ -175,7 +179,7 @@ public class AlbumApi {
             throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
         }
         Integer albumCount = qukuService.getAlbumMusicCountByAlbumId(albumId);
-        List<TbTagPojo> albumGenre = qukuService.getLabelAlbumGenre(albumId);
+        List<TbTagPojo> albumGenre = tagManagerService.getLabelAlbumGenre(albumId);
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(albumId);
         List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumId);
         
@@ -202,7 +206,7 @@ public class AlbumApi {
         // 保存或更新专辑流派
         if (CollUtil.isNotEmpty(req.getAlbumGenre())) {
             List<String> list = req.getAlbumGenre().parallelStream().map(StringUtils::trim).toList();
-            qukuService.addAlbumGenreLabel(req.getId(), list);
+            tagManagerService.addAlbumGenreLabel(req.getId(), list);
         }
         if (StringUtils.isNotBlank(req.getTempFile())) {
             File file = httpRequestConfig.getTempPathFile(req.getTempFile());

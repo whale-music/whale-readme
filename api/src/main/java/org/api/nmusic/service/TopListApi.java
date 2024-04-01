@@ -24,6 +24,7 @@ import org.core.mybatis.pojo.TbCollectPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.AliasUtil;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
@@ -45,12 +46,15 @@ public class TopListApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public TopListApi(QukuAPI qukuService, TbArtistService singerService, AccountService accountService, TbCollectService collectService, RemoteStorePicService remoteStorePicService) {
+    private final TagManagerService tagManagerService;
+    
+    public TopListApi(QukuAPI qukuService, TbArtistService singerService, AccountService accountService, TbCollectService collectService, RemoteStorePicService remoteStorePicService, TagManagerService tagManagerService) {
         this.qukuService = qukuService;
         this.singerService = singerService;
         this.accountService = accountService;
         this.collectService = collectService;
         this.remoteStorePicService = remoteStorePicService;
+        this.tagManagerService = tagManagerService;
     }
     
     public TopListArtistRes artist(String type) {
@@ -109,7 +113,7 @@ public class TopListApi {
         ArrayList<PlaylistsItem> playlists = new ArrayList<>();
         Map<Long, List<TbTagPojo>> label = new HashMap<>();
         if (StringUtils.isNotBlank(cat)) {
-            label = qukuService.getLabel(TargetTagConstant.TARGET_COLLECT_TAG,
+            label = tagManagerService.getLabel(TargetTagConstant.TARGET_COLLECT_TAG,
                     page.getRecords().parallelStream().map(TbCollectPojo::getId).toList());
         }
         for (TbCollectPojo tbCollectPojo : page.getRecords()) {

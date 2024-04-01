@@ -51,6 +51,7 @@ import org.core.oss.model.Resource;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.AudioUtil;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.LocalFileUtil;
@@ -142,6 +143,7 @@ public class MusicFlowApi {
     
     private final TbCollectMusicService collectMusicService;
     
+    private final TagManagerService tagManagerService;
     
     /**
      * 上传文件或音乐URL下载到临时目录
@@ -791,9 +793,9 @@ public class MusicFlowApi {
             musicService.update(wrapper);
         }
         // 流派
-        qukuService.addMusicGenreLabel(req.getId(), req.getMusicGenre().stream().map(StringUtils::trim).toList());
+        tagManagerService.addMusicGenreLabel(req.getId(), req.getMusicGenre().stream().map(StringUtils::trim).toList());
         // 音乐tag
-        qukuService.addMusicLabelTag(req.getId(), req.getMusicTag().stream().map(StringUtils::trim).toList());
+        tagManagerService.addMusicLabelTag(req.getId(), req.getMusicTag().stream().map(StringUtils::trim).toList());
         // 更新封面
         if (StringUtils.isNotBlank(req.getTempPicFile())) {
             File file = requestConfig.getTempPathFile(req.getTempPicFile());
@@ -859,7 +861,7 @@ public class MusicFlowApi {
         String tags = dto.getMusic().getTags();
         if (StringUtils.isNotBlank(tags)) {
             List<String> list = Arrays.asList(tags.split(","));
-            qukuService.addMusicLabelTag(musicPojo.getId(), list);
+            tagManagerService.addMusicLabelTag(musicPojo.getId(), list);
         }
     }
     
@@ -867,7 +869,7 @@ public class MusicFlowApi {
         String musicGenre = dto.getMusic().getMusicGenre();
         if (StringUtils.isNotBlank(musicGenre)) {
             List<String> list = Arrays.asList(musicGenre.split(","));
-            qukuService.addMusicGenreLabel(musicPojo.getId(), list);
+            tagManagerService.addMusicGenreLabel(musicPojo.getId(), list);
         }
     }
     
@@ -890,7 +892,7 @@ public class MusicFlowApi {
     }
     
     private void saveAlbumGenre(AudioInfoReq dto, TbAlbumPojo albumPojo) {
-        qukuService.addAlbumGenreLabel(albumPojo.getId(), dto.getAlbum().getGenre());
+        tagManagerService.addAlbumGenreLabel(albumPojo.getId(), dto.getAlbum().getGenre());
     }
     
     private void nameHandler(AudioInfoReq dto) {
@@ -949,8 +951,8 @@ public class MusicFlowApi {
     public MusicInfoRes getMusicInfo(Long id) {
         // 音乐
         TbMusicPojo byId = musicService.getById(id);
-        List<TbTagPojo> labelMusic = qukuService.getLabelMusicTag(byId.getId()).get(id);
-        List<TbTagPojo> musicGenre = qukuService.getLabelMusicGenre(byId.getId()).get(id);
+        List<TbTagPojo> labelMusic = tagManagerService.getLabelMusicTag(byId.getId()).get(id);
+        List<TbTagPojo> musicGenre = tagManagerService.getLabelMusicGenre(byId.getId()).get(id);
         // 歌曲艺术家
         List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
         

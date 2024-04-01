@@ -31,6 +31,7 @@ import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
@@ -71,7 +72,10 @@ public class SongListsApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService, RemoteStorePicService remoteStorePicService) {
+    private final TagManagerService tagManagerService;
+    
+    
+    public SongListsApi(TbCollectMusicService tbCollectMusicService, QukuAPI qukuService, TbMusicService tbMusicService, TbUserAlbumService tbUserAlbumService, TbUserArtistService tbUserArtistService, TbAlbumService albumService, TbTagService tbTagService, TbArtistService tbArtistService, TbHistoryService tbHistoryService, AccountService accountService, SubsonicResourceReturnStrategyUtil subsonicResourceReturnStrategyUtil, TbMiddleTagService tbMiddleTagService, RemoteStorePicService remoteStorePicService, TagManagerService tagManagerService) {
         this.tbCollectMusicService = tbCollectMusicService;
         this.qukuService = qukuService;
         this.tbMusicService = tbMusicService;
@@ -85,6 +89,7 @@ public class SongListsApi {
         this.subsonicResourceReturnStrategyUtil = subsonicResourceReturnStrategyUtil;
         this.tbMiddleTagService = tbMiddleTagService;
         this.remoteStorePicService = remoteStorePicService;
+        this.tagManagerService = tagManagerService;
     }
     
     
@@ -111,7 +116,7 @@ public class SongListsApi {
         Map<Long, List<ArtistConvert>> artistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
         Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByAlbumIdToMap(albumIds);
         Map<Long, Integer> albumDurationCount = qukuService.getAlbumDurationCount(albumIds);
-        Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumIds);
+        Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
         
         for (TbAlbumPojo albumPojo : albumList) {
             AlbumList2Res.AlbumList2.AlbumItem e = new AlbumList2Res.AlbumList2.AlbumItem();
@@ -323,7 +328,7 @@ public class SongListsApi {
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
                                                                                                     .map(TbMusicPojo::getId)
                                                                                                     .collect(Collectors.toSet()));
-        Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
         ArrayList<RandomSongsRes.Song> song = new ArrayList<>();
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             RandomSongsRes.Song e = new RandomSongsRes.Song();
@@ -493,7 +498,7 @@ public class SongListsApi {
         Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
         Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(albumIds);
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
-        Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             NowPlayingRes.Entry e = new NowPlayingRes.Entry();
             e.setId(StringUtil.defaultNullString(musicPojo.getId()));
@@ -621,7 +626,7 @@ public class SongListsApi {
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
             Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(musicAlbumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
-            Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
+            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
             List<StarredRes.Song> songs = new ArrayList<>();
             for (TbMusicPojo musicPojo : tbMusicPojos) {
                 StarredRes.Song e = new StarredRes.Song();
@@ -701,7 +706,7 @@ public class SongListsApi {
             List<TbAlbumPojo> tbAlbumPojos = albumService.listByIds(albumIds);
             
             Map<Long, List<ArtistConvert>> albumArtistMapByAlbumIds = qukuService.getArtistByAlbumIdsToMap(albumIds);
-            Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumIds);
+            Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
             Map<Long, Integer> albumMusicCountByMapAlbumId = qukuService.getAlbumMusicCountByAlbumIdToMap(albumIds);
             Map<Long, Integer> albumDurationCount = qukuService.getAlbumDurationCount(albumIds);
             List<Starred2Res.Album> albums = new ArrayList<>();
@@ -771,7 +776,7 @@ public class SongListsApi {
             Map<Long, List<ArtistConvert>> musicArtistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(musicIds);
             Map<Long, AlbumConvert> albumByMusicIdToMap = qukuService.getMusicAlbumByAlbumIdToMap(musicAlbumIds);
             Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicIds);
-            Map<Long, List<TbTagPojo>> labelMusicGenre = qukuService.getLabelMusicGenre(musicIds);
+            Map<Long, List<TbTagPojo>> labelMusicGenre = tagManagerService.getLabelMusicGenre(musicIds);
             List<Starred2Res.Song> songs = new ArrayList<>();
             for (TbMusicPojo musicPojo : tbMusicPojos) {
                 Starred2Res.Song e = new Starred2Res.Song();

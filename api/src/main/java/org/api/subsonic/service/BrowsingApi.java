@@ -41,6 +41,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.StringUtil;
 import org.springframework.stereotype.Service;
 
@@ -64,9 +65,9 @@ public class BrowsingApi {
     private final SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil;
     private final TbMusicArtistService tbMusicArtistService;
     private final RemoteStorePicService remoteStorePicService;
-  
+    private final TagManagerService tagManagerService;
     
-    public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService, RemoteStorePicService remoteStorePicService) {
+    public BrowsingApi(QukuAPI qukuService, TbAlbumService albumService, TbMusicService musicService, TbArtistService tbArtistService, TbMiddleTagService tbMiddleTagService, TbTagService tbTagService, TbResourceService tbResourceService, SubsonicResourceReturnStrategyUtil resourceReturnStrategyUtil, TbMusicArtistService tbMusicArtistService, RemoteStorePicService remoteStorePicService, TagManagerService tagManagerService) {
         this.qukuService = qukuService;
         this.albumService = albumService;
         this.musicService = musicService;
@@ -77,6 +78,7 @@ public class BrowsingApi {
         this.resourceReturnStrategyUtil = resourceReturnStrategyUtil;
         this.tbMusicArtistService = tbMusicArtistService;
         this.remoteStorePicService = remoteStorePicService;
+        this.tagManagerService = tagManagerService;
     }
     
     public SongRes getSong(Long id) {
@@ -225,7 +227,7 @@ public class BrowsingApi {
                 c.setArtist(first.getArtistName());
                 c.setArtistId(first.getId());
             }
-            List<TbTagPojo> labelAlbumGenre = qukuService.getLabelAlbumGenre(id);
+            List<TbTagPojo> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(id);
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 c.setGenre(CollUtil.join(labelAlbumGenre, ","));
             }
@@ -366,7 +368,7 @@ public class BrowsingApi {
             e.setAlbum(albumListByArtistId.getAlbumName());
             e.setArtist(artist.getArtistName());
             e.setYear(Optional.ofNullable(albumListByArtistId.getPublishTime()).orElse(LocalDateTime.now()).getYear());
-            List<TbTagPojo> labelAlbumGenre = qukuService.getLabelAlbumGenre(albumListByArtistId.getId());
+            List<TbTagPojo> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumListByArtistId.getId());
             if (CollUtil.isNotEmpty(labelAlbumGenre)) {
                 e.setGenre(Optional.ofNullable(labelAlbumGenre.get(0)).orElse(new TbTagPojo()).getTagName());
             }

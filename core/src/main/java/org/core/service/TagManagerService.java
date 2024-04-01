@@ -1,0 +1,362 @@
+package org.core.service;
+
+import org.core.common.constant.TargetTagConstant;
+import org.core.model.TagMiddleTypeModel;
+import org.core.mybatis.pojo.TbTagPojo;
+
+import java.util.*;
+
+public interface TagManagerService {
+    /**
+     * 根据ID获取tag
+     *
+     * @param type tag类型 0流派 1歌曲 2歌单
+     * @param ids  歌单，音乐，专辑
+     * @return tag列表
+     */
+    Map<Long, List<TbTagPojo>> getLabel(Byte type, Collection<Long> ids);
+    
+    /**
+     * 根据tag名获取 Tag
+     *
+     * @param type tag类型
+     * @param tags tag名
+     * @return tag列表
+     */
+    Map<Long, List<TbTagPojo>> getLabel(Byte type, Iterator<String> tags);
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
+    }
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Set<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, ids);
+    }
+    
+    /**
+     * 获取tag音乐
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicTag(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, Collections.singletonList(ids));
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
+    }
+    
+    /**
+     * 获取音乐流派
+     *
+     * @param ids 音乐ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMusicGenre(Set<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MUSIC_GENRE, ids);
+    }
+    
+    /**
+     * 获取tag专辑
+     *
+     * @param ids 专辑ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelAlbumGenre(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, ids);
+    }
+    
+    /**
+     * 获取tag专辑
+     *
+     * @param id 专辑ID
+     * @return tag 列表
+     */
+    default List<TbTagPojo> getLabelAlbumGenre(Long id) {
+        return getLabel(TargetTagConstant.TARGET_ALBUM_GENRE, Collections.singletonList(id)).get(id);
+    }
+    
+    /**
+     * 获取tag歌单
+     *
+     * @param ids 歌单ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Collection<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, ids);
+    }
+    
+    /**
+     * 获取tag歌单
+     *
+     * @param ids 歌单ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelCollectTag(Long ids) {
+        return getLabel(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(ids));
+    }
+    
+    /**
+     * 获取tag mv
+     *
+     * @param ids mv ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(List<Long> ids) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, ids);
+    }
+    
+    /**
+     * 获取tag mv
+     *
+     * @param id mv ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(Long id) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, Collections.singletonList(id));
+    }
+    
+    /**
+     * 获取tag MV
+     *
+     * @param tags MV ID
+     * @return tag 列表
+     */
+    default Map<Long, List<TbTagPojo>> getLabelMvTag(Iterator<String> tags) {
+        return getLabel(TargetTagConstant.TARGET_MV_TAG, tags);
+    }
+    
+    /**
+     * 批量添加tag
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param labels 标签名
+     */
+    void addLabel(Byte target, Long id, List<String> labels);
+    
+    /**
+     * 对歌单tag，音乐添加tag Name， 或者指定音乐流派
+     *
+     * @param target 指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id     歌单或歌曲前ID
+     * @param label  标签名
+     */
+    default void addLabel(Byte target, Long id, String label) {
+        addLabel(target, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
+    }
+    
+    /**
+     * 批量添加tag
+     *
+     * @param target   指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id       歌单或歌曲前ID
+     * @param labelIds 标签ID
+     */
+    void addLabel(Byte target, Long id, Set<Long> labelIds);
+    
+    
+    /**
+     * 对歌单tag，音乐添加tag ID， 或者指定音乐流派
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 标签ID
+     */
+    default void addLabel(Byte target, Long id, Long labelId) {
+        addLabel(target, id, Set.of(labelId));
+    }
+    
+    /**
+     * 根据类型ID, 删除tag
+     *
+     * @param ids  tag id
+     * @param type tag type
+     */
+    default void removeLabel(Collection<Long> ids, byte type) {
+        this.removeLabel(ids.parallelStream().map(aLong -> new TagMiddleTypeModel(aLong, type)).toList());
+    }
+    
+    /**
+     * 根据类型ID, 删除tag列表
+     *
+     * @param list tag 数据
+     */
+    void removeLabel(Collection<TagMiddleTypeModel> list);
+    
+    /**
+     * 移除专辑tag
+     *
+     * @param ids album id
+     */
+    default void removeLabelAlbum(List<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_ALBUM_GENRE);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param ids mv ids
+     */
+    default void removeLabelMv(List<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_MV_TAG);
+    }
+    
+    
+    /**
+     * 移除MV tag
+     *
+     * @param id mv id
+     */
+    default void removeLabelMv(Long id) {
+        removeLabel(Collections.singletonList(id), TargetTagConstant.TARGET_MV_TAG);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param id 歌单 id
+     */
+    default void removeLabelPlaylist(Long id) {
+        removeLabel(Collections.singletonList(id), TargetTagConstant.TARGET_COLLECT_TAG);
+    }
+    
+    /**
+     * 移除MV tag
+     *
+     * @param ids 歌单 id
+     */
+    default void removeLabelPlaylist(Collection<Long> ids) {
+        removeLabel(ids, TargetTagConstant.TARGET_COLLECT_TAG);
+    }
+    
+    /**
+     * 删除歌单或音乐中的tag, 根据ID
+     *
+     * @param target       指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id           歌单或歌曲前ID
+     * @param labelBatchId 需要删除的label ID
+     */
+    void removeLabelById(Byte target, Long id, Collection<Long> labelBatchId);
+    
+    /**
+     * 删除歌单或音乐中的tag, 根据tag name
+     *
+     * @param target         指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id             歌单或歌曲前ID
+     * @param labelBatchName 需要删除的label ID
+     */
+    void removeLabelByName(Byte target, Long id, Collection<String> labelBatchName);
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target  指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id      歌单或歌曲前ID
+     * @param labelId 需要删除的label ID
+     */
+    default void removeLabelById(Byte target, Long id, Long labelId) {
+        removeLabelById(target, id, Collections.singletonList(labelId));
+    }
+    
+    /**
+     * 删除歌单或音乐中的tag
+     *
+     * @param target    指定歌单tag，或者音乐tag，音乐流派 0流派 1歌曲 2歌单
+     * @param id        歌单或歌曲前ID
+     * @param labelName 需要删除的label ID
+     */
+    default void removeLabelByName(Byte target, Long id, String labelName) {
+        removeLabelByName(target, id, Collections.singletonList(labelName));
+    }
+    
+    /**
+     * 删除歌单的tag
+     *
+     * @param id        歌单或歌曲前ID
+     * @param labelName 需要删除的label ID
+     */
+    default void removeCollectLabelByName(Long id, String labelName) {
+        removeLabelByName(TargetTagConstant.TARGET_COLLECT_TAG, id, Collections.singletonList(labelName));
+    }
+    
+    
+    default void addCollectLabel(Long id, Long labelId) {
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, labelId);
+    }
+    
+    default void addCollectLabel(Long id, String label) {
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
+    }
+    
+    default void addCollectLabel(Long id, List<String> label) {
+        this.addLabel(TargetTagConstant.TARGET_COLLECT_TAG, id, label);
+    }
+    
+    default void addMusicLabelTag(Long id, String label) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, label);
+    }
+    
+    default void addMusicLabelTag(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labels);
+    }
+    
+    default void addAlbumGenreLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, labels);
+    }
+    
+    default void addAlbumGenreLabel(Long id, String label) {
+        this.addLabel(TargetTagConstant.TARGET_ALBUM_GENRE, id, Objects.isNull(label) ? Collections.emptyList() : Collections.singletonList(label));
+    }
+    
+    default void addMusicLabelTag(Long id, Long labelId) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_TAG, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, Long labelId) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labelId);
+    }
+    
+    default void addMusicGenreLabel(Long id, String label) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, label);
+    }
+    
+    default void addMusicGenreLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_MUSIC_GENRE, id, labels);
+    }
+    
+    default void addMvGenreLabel(Long id, List<String> labels) {
+        this.addLabel(TargetTagConstant.TARGET_MV_TAG, id, labels);
+    }
+    
+    
+}

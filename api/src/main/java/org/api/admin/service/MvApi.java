@@ -26,6 +26,7 @@ import org.core.mybatis.pojo.TbMvPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.RemoteStorageService;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.UserUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -56,8 +57,9 @@ public class MvApi {
     
     private final TbMvInfoService tbMvInfoService;
     
+    private final TagManagerService tagManagerService;
     
-    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService, RemoteStorePicService remoteStorePicService, TbMvInfoService tbMvInfoService) {
+    public MvApi(TbMvService tbMvService, QukuAPI qukuApi, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, RemoteStorageService remoteStorageService, RemoteStorePicService remoteStorePicService, TbMvInfoService tbMvInfoService, TagManagerService tagManagerService) {
         this.tbMvService = tbMvService;
         this.qukuApi = qukuApi;
         this.httpRequestConfig = httpRequestConfig;
@@ -65,6 +67,7 @@ public class MvApi {
         this.remoteStorageService = remoteStorageService;
         this.remoteStorePicService = remoteStorePicService;
         this.tbMvInfoService = tbMvInfoService;
+        this.tagManagerService = tagManagerService;
     }
     
     @Transactional(rollbackFor = Exception.class)
@@ -104,8 +107,8 @@ public class MvApi {
         // tag
         Long id = request.getId();
         // 移除重新添加
-        qukuApi.removeLabelMv(id);
-        qukuApi.addMvGenreLabel(request.getId(), request.getTags());
+        tagManagerService.removeLabelMv(id);
+        tagManagerService.addMvGenreLabel(request.getId(), request.getTags());
     }
     
     public Page<MvPageRes> getMvPage(String title, List<String> artist, List<String> tags, String order, String orderBy, Long index, Long size) {
@@ -123,7 +126,7 @@ public class MvApi {
         }
         // tag
         if (CollUtil.isNotEmpty(mvIds) && CollUtil.isNotEmpty(tags)) {
-            Map<Long, List<TbTagPojo>> labelMvTag = qukuApi.getLabelMvTag(mvIds, tags);
+            Map<Long, List<TbTagPojo>> labelMvTag = tagManagerService.getLabelMvTag(tags.iterator());
             mvIds.addAll(labelMvTag.keySet());
         }
         Page<TbMvInfoPojo> page = new Page<>(index, size);
@@ -140,7 +143,7 @@ public class MvApi {
         Page<MvPageRes> mvPageResPage = new Page<>();
         LinkedList<MvPageRes> records = new LinkedList<>();
         BeanUtils.copyProperties(page, mvPageResPage);
-        Map<Long, List<TbTagPojo>> labelMusicTag = qukuApi.getLabelMvTag(mvIds);
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(mvIds);
         Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuApi.getMvArtistByMvIdToMap(mvIds);
         for (TbMvInfoPojo mvPojo : page.getRecords()) {
@@ -171,7 +174,7 @@ public class MvApi {
         remoteStorePicService.removeMvPicMiddleIds(ids);
         
         // remove mv tag
-        qukuApi.removeLabelMv(ids);
+        tagManagerService.removeLabelMv(ids);
         
         // remove file
         remoteStorageService.removeMvStorageFiles(ids);
@@ -188,7 +191,7 @@ public class MvApi {
         MvInfoRes e = new MvInfoRes();
         BeanUtils.copyProperties(mvPojo, e);
         String mvPicUrl = remoteStorePicService.getMvPicUrl(mvPojo.getId());
-        Map<Long, List<TbTagPojo>> labelMusicTag = qukuApi.getLabelMvTag(e.getId());
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(e.getId());
         List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
         if (CollUtil.isNotEmpty(tbTagPojos)) {
             e.setTags(tbTagPojos.parallelStream().map(TbTagPojo::getTagName).toList());
@@ -215,8 +218,8 @@ public class MvApi {
         // tag
         Long id = request.getId();
         // 移除重新添加
-        qukuApi.removeLabelMv(id);
-        qukuApi.addMvGenreLabel(request.getId(), request.getTags());
+        tagManagerService.removeLabelMv(id);
+        tagManagerService.addMvGenreLabel(request.getId(), request.getTags());
         // artist
         tbMvArtistService.remove(Wrappers.<TbMvArtistPojo>lambdaQuery().in(TbMvArtistPojo::getMvId, request.getId()));
         if (CollUtil.isNotEmpty(request.getArtistIds())) {

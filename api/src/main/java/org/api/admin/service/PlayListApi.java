@@ -31,6 +31,7 @@ import org.core.mybatis.pojo.*;
 import org.core.service.AccountService;
 import org.core.service.PlayListService;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.ExceptionUtil;
 import org.core.utils.UserUtil;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +74,9 @@ public class PlayListApi {
     
     private final AccountService accountService;
     
-    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo, RemoteStorePicService remoteStorePicService, AccountService accountService) {
+    private final TagManagerService tagManagerService;
+    
+    public PlayListApi(TbMusicService musicService, QukuAPI qukuService, TbAlbumService albumService, TbCollectService collectService, TbCollectMusicService collectMusicService, PlayListService playListService, TbResourceService musicUrlService, DefaultInfo defaultInfo, RemoteStorePicService remoteStorePicService, AccountService accountService, TagManagerService tagManagerService) {
         this.musicService = musicService;
         this.qukuService = qukuService;
         this.albumService = albumService;
@@ -84,6 +87,7 @@ public class PlayListApi {
         this.defaultInfo = defaultInfo;
         this.remoteStorePicService = remoteStorePicService;
         this.accountService = accountService;
+        this.tagManagerService = tagManagerService;
     }
     
     private static void pageOrderBy(boolean order, String orderBy, LambdaQueryWrapper<TbMusicPojo> musicWrapper) {
@@ -435,7 +439,7 @@ public class PlayListApi {
     
     public CollectInfoRes getPlayListInfo(Long id) {
         TbCollectPojo byId = collectService.getById(id);
-        List<TbTagPojo> labelCollectTag = qukuService.getLabelCollectTag(id).get(id);
+        List<TbTagPojo> labelCollectTag = tagManagerService.getLabelCollectTag(id).get(id);
         CollectInfoRes collectInfoRes = new CollectInfoRes();
         BeanUtils.copyProperties(byId, collectInfoRes);
         collectInfoRes.setCollectTag(labelCollectTag.parallelStream().map(TbTagPojo::getTagName).toList());
@@ -540,7 +544,7 @@ public class PlayListApi {
         
         collectService.saveOrUpdate(entity);
         if (CollUtil.isNotEmpty(req.getCollectTag())) {
-            qukuService.addCollectLabel(req.getId(), req.getCollectTag().stream().map(StringUtils::trim).toList());
+            tagManagerService.addCollectLabel(req.getId(), req.getCollectTag().stream().map(StringUtils::trim).toList());
         }
         return collectService.getById(req.getId());
     }

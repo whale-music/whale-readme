@@ -34,6 +34,7 @@ import org.core.mybatis.pojo.TbOriginPojo;
 import org.core.mybatis.pojo.TbPicPojo;
 import org.core.mybatis.pojo.TbTagPojo;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.UserUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,7 +73,10 @@ public class ExchangeApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public ExchangeApi(TbMusicEntityRepository tbMusicEntityRepository, TbAlbumEntityRepository tbAlbumEntityRepository, TbArtistEntityRepository artistEntityRepository, TbResourceEntityRepository resourceEntityRepository, TbPicService picService, MusicFlowApi musicFlowApi, HttpRequestConfig requestConfig, QukuAPI qukuApi, RemoteStorePicService remoteStorePicService) {
+    private final TagManagerService tagManagerService;
+    
+    
+    public ExchangeApi(TbMusicEntityRepository tbMusicEntityRepository, TbAlbumEntityRepository tbAlbumEntityRepository, TbArtistEntityRepository artistEntityRepository, TbResourceEntityRepository resourceEntityRepository, TbPicService picService, MusicFlowApi musicFlowApi, HttpRequestConfig requestConfig, QukuAPI qukuApi, RemoteStorePicService remoteStorePicService, TagManagerService tagManagerService) {
         this.tbMusicEntityRepository = tbMusicEntityRepository;
         this.tbAlbumEntityRepository = tbAlbumEntityRepository;
         this.artistEntityRepository = artistEntityRepository;
@@ -82,6 +86,7 @@ public class ExchangeApi {
         this.requestConfig = requestConfig;
         this.qukuApi = qukuApi;
         this.remoteStorePicService = remoteStorePicService;
+        this.tagManagerService = tagManagerService;
     }
     
     public StreamingResponseBody exportExcel() {
@@ -90,10 +95,10 @@ public class ExchangeApi {
         
         Set<Long> musicIds = all.parallelStream().map(TbMusicEntity::getId).collect(Collectors.toSet());
         
-        Map<Long, List<TbTagPojo>> labelMusicGenreMap = qukuApi.getLabelMusicGenre(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicGenreMap = tagManagerService.getLabelMusicGenre(musicIds);
         Map<Long, String> musicPicUrl = remoteStorePicService.getMusicPicPath(musicIds);
         Map<Long, List<TbLyricPojo>> musicLyricMap = qukuApi.getMusicLyric(musicIds);
-        Map<Long, List<TbTagPojo>> labelMusicTagMap = qukuApi.getLabelMusicTag(musicIds);
+        Map<Long, List<TbTagPojo>> labelMusicTagMap = tagManagerService.getLabelMusicTag(musicIds);
         
         all.parallelStream().forEach(tbMusicEntity -> {
             try {
@@ -145,7 +150,7 @@ public class ExchangeApi {
         List<TbAlbumEntity> albumList = tbAlbumEntityRepository.findAll();
         List<Long> albumIds = albumList.parallelStream().map(TbAlbumEntity::getId).toList();
         Map<Long, String> albumPicUrl = remoteStorePicService.getAlbumPicPath(albumIds);
-        Map<Long, List<TbTagPojo>> labelAlbumGenre = qukuApi.getLabelAlbumGenre(albumIds);
+        Map<Long, List<TbTagPojo>> labelAlbumGenre = tagManagerService.getLabelAlbumGenre(albumIds);
         Collection<ExportExcelRes.AlbumInfo> albumInfos = new ConcurrentLinkedDeque<>();
         
         albumList.parallelStream().forEach(entity -> {

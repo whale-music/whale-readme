@@ -31,6 +31,7 @@ import org.core.mybatis.model.convert.ArtistConvert;
 import org.core.mybatis.model.convert.MusicConvert;
 import org.core.mybatis.pojo.*;
 import org.core.service.RemoteStorePicService;
+import org.core.service.TagManagerService;
 import org.core.utils.AliasUtil;
 import org.core.utils.ExceptionUtil;
 import org.springframework.beans.BeanUtils;
@@ -62,7 +63,9 @@ public class ArtistApi {
     
     private final RemoteStorePicService remoteStorePicService;
     
-    public ArtistApi(TbArtistService artistService, QukuAPI qukuService, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbMvService tbMvService, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService, TbAlbumService tbAlbumService) {
+    private final TagManagerService tagManagerService;
+    
+    public ArtistApi(TbArtistService artistService, QukuAPI qukuService, DefaultInfo defaultInfo, HttpRequestConfig httpRequestConfig, TbMvArtistService tbMvArtistService, TbMvService tbMvService, RemoteStorePicService remoteStorePicService, TbMusicService tbMusicService, TbAlbumService tbAlbumService, TagManagerService tagManagerService) {
         this.artistService = artistService;
         this.qukuService = qukuService;
         this.defaultInfo = defaultInfo;
@@ -72,6 +75,7 @@ public class ArtistApi {
         this.remoteStorePicService = remoteStorePicService;
         this.tbMusicService = tbMusicService;
         this.tbAlbumService = tbAlbumService;
+        this.tagManagerService = tagManagerService;
     }
     
     public Page<ArtistRes> getAllSingerList(AlbumListPageReq req) {
@@ -166,7 +170,7 @@ public class ArtistApi {
         List<TbMvPojo> tbMvPojos = tbMvService.listByIds(list.parallelStream().map(TbMvArtistPojo::getMvId).toList());
         
         List<Long> mvIds = tbMvPojos.parallelStream().map(TbMvPojo::getId).toList();
-        Map<Long, List<TbTagPojo>> labelMusicTag = qukuService.getLabelMvTag(mvIds);
+        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getLabelMvTag(mvIds);
         Map<Long, String> mvPicUrl = remoteStorePicService.getMvPicUrl(mvIds);
         Map<Long, List<ArtistConvert>> mvArtistByMvIdsToMap = qukuService.getMvArtistByMvIdToMap(mvIds);
         

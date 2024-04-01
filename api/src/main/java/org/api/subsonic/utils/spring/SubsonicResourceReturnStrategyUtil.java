@@ -32,12 +32,8 @@ public class SubsonicResourceReturnStrategyUtil {
             return resources.getFirst();
         }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
-            case FIRST -> {
-                return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
-            }
             case LAST -> {
-                return Optional.ofNullable(resources.get(resources.size() - 1)).orElse(new TbResourcePojo());
-                
+                return Optional.ofNullable(resources.getLast()).orElse(new TbResourcePojo());
             }
             case BITRATEMAX -> {
                 return resources.parallelStream().max(Comparator.comparingInt(TbResourcePojo::getRate)).orElse(new TbResourcePojo());
@@ -55,6 +51,9 @@ public class SubsonicResourceReturnStrategyUtil {
                 return resources.parallelStream().min(Comparator.comparingLong(TbResourcePojo::getSize)).orElse(new TbResourcePojo());
                 
             }
+            // case FIRST -> {
+            //     return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
+            // }
             default -> {
                 return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
             }

@@ -33,31 +33,26 @@ public class WebdavResourceReturnStrategyUtil {
             return resources.getFirst();
         }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
-            case FIRST -> {
-                return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
-            }
             case LAST -> {
-                return Optional.ofNullable(resources.get(resources.size() - 1)).orElse(new TbResourcePojo());
-                
+                return Optional.ofNullable(resources.getLast()).orElse(new TbResourcePojo());
             }
             case BITRATEMAX -> {
                 return resources.parallelStream().max(Comparator.comparingInt(TbResourcePojo::getRate)).orElse(new TbResourcePojo());
-                
             }
             case BITRATEMIN -> {
                 return resources.parallelStream().min(Comparator.comparingInt(TbResourcePojo::getRate)).orElse(new TbResourcePojo());
-                
             }
             case SIZEMAX -> {
                 return resources.parallelStream().max(Comparator.comparingLong(TbResourcePojo::getSize)).orElse(new TbResourcePojo());
-                
             }
             case SIZEMIN -> {
                 return resources.parallelStream().min(Comparator.comparingLong(TbResourcePojo::getSize)).orElse(new TbResourcePojo());
-                
             }
+            // case FIRST -> {
+            //     return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
+            // }
             default -> {
-                return Optional.ofNullable(resources.get(0)).orElse(new TbResourcePojo());
+                return Optional.ofNullable(resources.getFirst()).orElse(new TbResourcePojo());
             }
         }
     }
@@ -76,31 +71,26 @@ public class WebdavResourceReturnStrategyUtil {
             return resources.getFirst();
         }
         switch (resourceReturnStrategyConfig.getResource().getReturnPlan()) {
-            case FIRST -> {
-                return Optional.ofNullable(resources.get(0)).orElse(new TbResourceEntity());
-            }
             case LAST -> {
-                return Optional.ofNullable(resources.get(resources.size() - 1)).orElse(new TbResourceEntity());
-                
+                return Optional.ofNullable(resources.getLast()).orElse(new TbResourceEntity());
             }
             case BITRATEMAX -> {
                 return resources.parallelStream().max(Comparator.comparingInt(TbResourceEntity::getRate)).orElse(new TbResourceEntity());
-                
             }
             case BITRATEMIN -> {
                 return resources.parallelStream().min(Comparator.comparingInt(TbResourceEntity::getRate)).orElse(new TbResourceEntity());
-                
             }
             case SIZEMAX -> {
                 return resources.parallelStream().max(Comparator.comparingLong(TbResourceEntity::getSize)).orElse(new TbResourceEntity());
-                
             }
             case SIZEMIN -> {
                 return resources.parallelStream().min(Comparator.comparingLong(TbResourceEntity::getSize)).orElse(new TbResourceEntity());
-                
             }
+            // case FIRST -> {
+            //     return Optional.ofNullable(resources.get(0)).orElse(new TbResourceEntity());
+            // }
             default -> {
-                return Optional.ofNullable(resources.get(0)).orElse(new TbResourceEntity());
+                return Optional.ofNullable(resources.getFirst()).orElse(new TbResourceEntity());
             }
         }
     }

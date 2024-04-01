@@ -1159,62 +1159,58 @@ public class QukuServiceImpl implements QukuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void collectLike(Long userId, Long id, Boolean isAddAndDelLike) {
-        LambdaQueryWrapper<TbCollectPojo> query = Wrappers.lambdaQuery();
-        query.eq(TbCollectPojo::getUserId, userId);
-        query.eq(TbCollectPojo::getType, PlayListTypeConstant.LIKE);
-        TbCollectPojo collectServiceById = collectService.getOne(query);
-        if (collectServiceById == null) {
-            // 添加用户喜爱歌单
-            TbCollectPojo entity = new TbCollectPojo();
-            SysUserPojo userPojo = accountService.getById(userId);
-            entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
-            entity.setSort(collectService.count());
-            entity.setUserId(userId);
-            entity.setType(PlayListTypeConstant.LIKE);
-            collectService.save(entity);
-            collectServiceById = entity;
+    public void collectLike(Long userId, List<Long> id, Boolean isAddAndDelLike) {
+        if (CollectUtil.isEmpty(id)) {
+            return;
         }
-        TbMusicPojo byId = musicService.getById(id);
-        if (byId == null) {
-            log.debug("添加歌曲不存在: {}", id);
-            throw new BaseException(ResultCode.SONG_NOT_EXIST);
-        }
-        
-        // 效验歌单中是否有该歌曲
-        LambdaQueryWrapper<TbCollectMusicPojo> wrapper = Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                                 .eq(TbCollectMusicPojo::getCollectId, collectServiceById.getId())
-                                                                 .eq(TbCollectMusicPojo::getMusicId, id);
-        long count = collectMusicService.count(wrapper);
+        // 查询用户喜爱歌单
+        TbCollectPojo collectServiceById = getUserLikeCollect(userId);
+        List<Long> musicIds = musicService.listObjs(Wrappers.<TbMusicPojo>lambdaQuery().select(TbMusicPojo::getId).in(TbMusicPojo::getId, id));
         // 删除还是添加歌曲
         if (Boolean.TRUE.equals(isAddAndDelLike)) {
-            // 歌曲已存在
-            if (count >= 1) {
-                throw new BaseException(ResultCode.SONG_EXIST);
+            // 获取歌单中不存在歌曲, 并保存
+            List<TbCollectMusicPojo> collectMusics = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                                      .in(TbCollectMusicPojo::getCollectId, collectServiceById.getId())
+                                                                                      .notIn(TbCollectMusicPojo::getMusicId, musicIds));
+            if (CollectUtil.isNotEmpty(collectMusics)) {
+                synchronized (lock) {
+                    Long sort = getCollectCount(collectServiceById.getId());
+                    List<TbCollectMusicPojo> collects = new ArrayList<>();
+                    for (Long musicId : musicIds) {
+                        ++sort;
+                        collects.add(new TbCollectMusicPojo(collectServiceById.getId(), musicId, sort));
+                    }
+                    collectMusicService.saveBatch(collects);
+                    collects.forEach(s -> log.debug("歌单ID: {} 歌曲ID: {}  歌曲保存", s.getCollectId(), s.getMusicId()));
+                }
             }
-            TbCollectMusicPojo tbLikeMusicPojo = new TbCollectMusicPojo();
-            tbLikeMusicPojo.setCollectId(collectServiceById.getId());
-            tbLikeMusicPojo.setMusicId(id);
-            
-            synchronized (lock) {
-                Long sort = getCollectCount(collectServiceById.getId());
-                tbLikeMusicPojo.setSort(sort);
-                collectMusicService.save(tbLikeMusicPojo);
-            }
-            log.debug("歌单ID: {} 歌曲ID: {}  歌曲保存", tbLikeMusicPojo.getCollectId(), tbLikeMusicPojo.getMusicId());
-            
-            TbCollectPojo entity = new TbCollectPojo();
-            entity.setId(collectServiceById.getId());
-            collectService.updateById(entity);
         } else {
-            // 歌曲不存在
-            if (count == 0) {
-                throw new BaseException(ResultCode.SONG_NOT_EXIST);
-            }
-            collectMusicService.remove(wrapper);
+            collectMusicService.remove(Wrappers.<TbCollectMusicPojo>lambdaQuery().in(TbCollectMusicPojo::getMusicId, musicIds));
             log.debug("歌单ID: {} 歌曲ID: {}  歌曲已删除", collectServiceById.getId(), id);
         }
         
+    }
+    
+    @org.jetbrains.annotations.NotNull
+    private TbCollectPojo getUserLikeCollect(Long userId) {
+        synchronized (lock) {
+            LambdaQueryWrapper<TbCollectPojo> query = Wrappers.lambdaQuery();
+            query.eq(TbCollectPojo::getUserId, userId);
+            query.eq(TbCollectPojo::getType, PlayListTypeConstant.LIKE);
+            TbCollectPojo collectServiceById = collectService.getOne(query);
+            if (collectServiceById == null) {
+                // 添加用户喜爱歌单
+                TbCollectPojo entity = new TbCollectPojo();
+                SysUserPojo userPojo = accountService.getById(userId);
+                entity.setPlayListName(userPojo.getNickname() + " 喜欢的音乐");
+                entity.setSort(collectService.count());
+                entity.setUserId(userId);
+                entity.setType(PlayListTypeConstant.LIKE);
+                collectService.save(entity);
+                return entity;
+            }
+            return collectServiceById;
+        }
     }
     
     /**

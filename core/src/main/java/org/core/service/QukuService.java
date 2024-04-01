@@ -708,7 +708,11 @@ public interface QukuService {
      * @param id              音乐ID
      * @param isAddAndDelLike true添加 false删除
      */
-    void collectLike(Long userId, Long id, Boolean isAddAndDelLike);
+    void collectLike(Long userId, List<Long> id, Boolean isAddAndDelLike);
+    
+    default void collectLike(Long userId, Long id, Boolean isAddAndDelLike) {
+        collectLike(userId, Collections.singletonList(id), isAddAndDelLike);
+    }
     
     /**
      * 删除音乐

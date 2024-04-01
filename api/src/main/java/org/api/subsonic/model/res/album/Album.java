@@ -18,6 +18,10 @@ public class Album {
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<SongItem> song;
     
+    @JsonProperty("parent")
+    @JacksonXmlProperty(isAttribute = true)
+    private String parent;
+    
     @JsonProperty("artist")
     @JacksonXmlProperty(isAttribute = true)
     private String artist;

@@ -559,6 +559,7 @@ public class BrowsingApi {
         album.setYear(albumPojo.getPublishTime().getYear());
         album.setStarred(albumPojo.getUpdateTime().toString());
         
+        
         ArrayList<SongItem> song = new ArrayList<>();
         List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
         List<ArtistConvert> artistListByAlbumIds1 = qukuService.getArtistByAlbumIds(id);
@@ -566,6 +567,7 @@ public class BrowsingApi {
         Map<Long, List<TbResourcePojo>> musicMapUrl = qukuService.getMusicPathMap(musicListByAlbumId.stream()
                                                                                                     .map(TbMusicPojo::getId)
                                                                                                     .collect(Collectors.toSet()));
+        album.setParent(StringUtil.defaultString(tbArtistPojo.getId()));
         int duration = 0;
         for (TbMusicPojo musicPojo : musicListByAlbumId) {
             SongItem e = new SongItem();

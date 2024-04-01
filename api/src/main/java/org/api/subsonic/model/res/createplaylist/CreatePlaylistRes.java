@@ -28,13 +28,13 @@ public class CreatePlaylistRes extends SubsonicResult {
         private String name;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int songCount;
+        private Integer songCount;
         
         @JacksonXmlProperty(isAttribute = true)
-        private int duration;
+        private Integer duration;
         
         @JacksonXmlProperty(isAttribute = true, localName = "public")
-        private boolean publicFlag;
+        private Boolean publicFlag;
         
         @JacksonXmlProperty(isAttribute = true)
         private String owner;

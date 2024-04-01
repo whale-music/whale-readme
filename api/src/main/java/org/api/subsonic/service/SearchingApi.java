@@ -11,6 +11,7 @@ import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.search.SearchRes;
 import org.api.subsonic.model.res.search2.Search2Res;
 import org.api.subsonic.model.res.search3.Search3Res;
+import org.api.subsonic.utils.DurationUtil;
 import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.mybatis.iservice.TbAlbumService;
@@ -155,7 +156,7 @@ public class SearchingApi {
                     e.setArtist(artistConvert.getArtistName());
                 }
                 e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
-                e.setDuration(albumDurationCount.get(albumPojo.getId()));
+                e.setDuration(DurationUtil.getDuration(albumDurationCount.get(albumPojo.getId())));
                 e.setPlayCount(0);
                 e.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
                 e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
@@ -210,7 +211,7 @@ public class SearchingApi {
                 }
                 e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
                 
-                e.setDuration(musicPojo.getTimeLength());
+                e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicPojo.getId());
                 TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(tbResourcePojos);
                 if (Objects.nonNull(tbResourcePojo)) {
@@ -302,7 +303,7 @@ public class SearchingApi {
                     e.setArtist(artistConvert.getArtistName());
                 }
                 e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
-                e.setDuration(albumDurationCount.get(albumPojo.getId()));
+                e.setDuration(DurationUtil.getDuration(albumDurationCount.get(albumPojo.getId())));
                 e.setPlayCount(0);
                 e.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
                 e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
@@ -357,7 +358,7 @@ public class SearchingApi {
                 }
                 e.setCoverArt(StringUtil.defaultNullString(musicPojo.getId()));
                 
-                e.setDuration(musicPojo.getTimeLength());
+                e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 List<TbResourcePojo> tbResourcePojos = resourceMap.get(musicPojo.getId());
                 TbResourcePojo tbResourcePojo = subsonicResourceReturnStrategyUtil.handleResource(tbResourcePojos);
                 if (Objects.nonNull(tbResourcePojo)) {

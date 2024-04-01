@@ -18,6 +18,7 @@ import org.api.subsonic.model.res.randomsongs.RandomSongsRes;
 import org.api.subsonic.model.res.songsbygenre.SongsByGenreRes;
 import org.api.subsonic.model.res.starred.StarredRes;
 import org.api.subsonic.model.res.starred2.Starred2Res;
+import org.api.subsonic.utils.DurationUtil;
 import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.HistoryConstant;
@@ -126,7 +127,7 @@ public class SongListsApi {
             e.setComment("");
             e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
             
-            e.setDuration(albumDurationCount.get(albumPojo.getId()));
+            e.setDuration(DurationUtil.getDuration(albumDurationCount.get(albumPojo.getId())));
             List<TbTagPojo> tbTagPojos = labelAlbumGenre.get(albumPojo.getId());
             if (CollUtil.isNotEmpty(tbTagPojos)) {
                 List<String> list = tbTagPojos.parallelStream()
@@ -440,7 +441,7 @@ public class SongListsApi {
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 e.setTranscodedContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
-            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
+            e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setPlayCount(0);
             e.setType("music");
             e.setIsVideo(false);
@@ -523,7 +524,7 @@ public class SongListsApi {
                 e.setPath(tbResourcePojo.getPath());
                 e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             }
-            e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
+            e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setPlayCount(0);
             e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
             e.setType("music");
@@ -640,7 +641,7 @@ public class SongListsApi {
                 }
                 e.setCoverArt(StringUtil.defaultNullString(tbAlbumPojo.getId()));
                 e.setCreated(LocalDateUtil.formatUTCZ(tbAlbumPojo.getCreateTime()));
-                e.setDuration(albumDurationCount.get(tbAlbumPojo.getId()));
+                e.setDuration(DurationUtil.getDuration(albumDurationCount.get(tbAlbumPojo.getId())));
                 e.setIsDir(true);
                 e.setIsVideo(false);
                 e.setPlayCount(0);
@@ -733,7 +734,7 @@ public class SongListsApi {
                 }else{
                     continue;
                 }
-                e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
+                e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 e.setPlayCount(0);
                 e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
                 e.setType("music");
@@ -791,7 +792,7 @@ public class SongListsApi {
                     e.setGenre(tbTagPojo.getTagName());
                 }
                 e.setCreated(LocalDateUtil.formatUTCZ(tbAlbumPojo.getCreateTime()));
-                e.setDuration(albumDurationCount.get(tbAlbumPojo.getId()));
+                e.setDuration(DurationUtil.getDuration(albumDurationCount.get(tbAlbumPojo.getId())));
                 e.setIsDir(true);
                 e.setIsVideo(false);
                 e.setPlayCount(0);
@@ -890,7 +891,7 @@ public class SongListsApi {
                 }
                 e.setReplayGain(new Starred2Res.Song.ReplayGain(1, 1));
                 e.setMediaType("song");
-                e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
+                e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
                 e.setPlayCount(0);
                 e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
                 e.setDiscNumber(0);

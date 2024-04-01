@@ -11,4 +11,11 @@ public class DurationUtil {
         }
         return duration / 1000L;
     }
+    
+    public static Integer getDuration(Integer duration) {
+        if (Objects.isNull(duration) || duration == 0L) {
+            return 0;
+        }
+        return duration / 1000;
+    }
 }

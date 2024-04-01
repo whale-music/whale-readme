@@ -14,6 +14,7 @@ import org.api.subsonic.model.res.playlist.PlaylistRes;
 import org.api.subsonic.model.res.playlists.PlayLists;
 import org.api.subsonic.model.res.playlists.PlaylistItem;
 import org.api.subsonic.model.res.playlists.PlaylistsRes;
+import org.api.subsonic.utils.DurationUtil;
 import org.api.subsonic.utils.LocalDateUtil;
 import org.core.common.constant.PlayListTypeConstant;
 import org.core.common.exception.BaseException;
@@ -75,7 +76,7 @@ public class PlaylistApi {
             e.setCreated(LocalDateUtil.formatUTCZ(collectPojo.getCreateTime()));
             e.setCoverArt(StringUtil.defaultNullString(collectPojo.getId()));
             e.setOwner(user.getUsername());
-            e.setDuration(collectDurationCount.get(collectPojo.getId()));
+            e.setDuration(DurationUtil.getDuration(collectDurationCount.get(collectPojo.getId())));
             e.setJsonMemberPublic(true);
             playlist.add(e);
         }
@@ -119,7 +120,7 @@ public class PlaylistApi {
             e.setTrack(0);
             LocalDateTime publishTime = albumByAlbumId.getPublishTime();
             e.setYear(publishTime == null ? null : publishTime.getYear());
-            e.setDuration(musicPojo.getTimeLength() / 1000);
+            e.setDuration(DurationUtil.getDuration(musicPojo.getTimeLength()));
             e.setSize(Math.toIntExact(tbMusicUrlPojo.getSize() == null ? 0 : tbMusicUrlPojo.getSize()));
             e.setSuffix(tbMusicUrlPojo.getEncodeType());
             e.setType("music");
@@ -144,7 +145,7 @@ public class PlaylistApi {
         playlistRes.setId(StringUtil.defaultNullString(byId.getId()));
         playlistRes.setName(byId.getPlayListName());
         playlistRes.setSongCount(qukuApi.getCollectMusicCount(byId.getId()));
-        playlistRes.setDuration(duration / 1000);
+        playlistRes.setDuration(DurationUtil.getDuration(duration));
         playlistRes.setJsonMemberPublic(true);
         SysUserPojo byId1 = accountService.getById(byId.getUserId());
         playlistRes.setOwner(Optional.ofNullable(byId1).orElse(new SysUserPojo()).getUsername());

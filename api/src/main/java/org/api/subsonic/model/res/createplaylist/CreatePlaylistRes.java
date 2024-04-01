@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,10 +38,10 @@ public class CreatePlaylistRes extends SubsonicResult {
         private String owner;
         
         @JacksonXmlProperty(isAttribute = true)
-        private Date created;
+        private String created;
         
         @JacksonXmlProperty(isAttribute = true)
-        private Date changed;
+        private String changed;
         
         @JacksonXmlProperty(isAttribute = true)
         private String coverArt;

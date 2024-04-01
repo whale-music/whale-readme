@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -88,7 +87,7 @@ public class StarredRes extends SubsonicResult {
         private String coverArt;
         
         @JacksonXmlProperty(isAttribute = true, localName = "created")
-        private Date created;
+        private String created;
         
         @JacksonXmlProperty(isAttribute = true, localName = "starred")
         private String starred;
@@ -109,7 +108,7 @@ public class StarredRes extends SubsonicResult {
         private Integer playCount;
         
         @JacksonXmlProperty(isAttribute = true, localName = "played")
-        private Date played;
+        private String played;
         
         @JacksonXmlProperty(isAttribute = true, localName = "artistId")
         private String artistId;
@@ -150,10 +149,10 @@ public class StarredRes extends SubsonicResult {
         private String coverArt;
         
         @JacksonXmlProperty(isAttribute = true, localName = "created")
-        private Date created;
+        private String created;
         
         @JacksonXmlProperty(isAttribute = true, localName = "starred")
-        private Date starred;
+        private String starred;
         
         @JacksonXmlProperty(isAttribute = true, localName = "duration")
         private String duration;
@@ -198,7 +197,7 @@ public class StarredRes extends SubsonicResult {
         private Integer playCount;
         
         @JacksonXmlProperty(isAttribute = true, localName = "played")
-        private Date played;
+        private String played;
         
         @JacksonXmlProperty(isAttribute = true, localName = "userRating")
         private Integer userRating;

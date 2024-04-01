@@ -1,8 +1,6 @@
 package org.api.subsonic.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,6 +11,7 @@ import org.api.subsonic.config.SubsonicConfig;
 import org.api.subsonic.model.res.search.SearchRes;
 import org.api.subsonic.model.res.search2.Search2Res;
 import org.api.subsonic.model.res.search3.Search3Res;
+import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.mybatis.iservice.TbAlbumService;
 import org.core.mybatis.iservice.TbArtistService;
@@ -26,8 +25,10 @@ import org.core.utils.StringUtil;
 import org.springframework.stereotype.Service;
 
 import java.net.URLConnection;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service(SubsonicConfig.SUBSONIC + "SearchingApi")
 public class SearchingApi {
@@ -109,7 +110,7 @@ public class SearchingApi {
                 Search2Res.Artist e = new Search2Res.Artist();
                 e.setId(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setName(artistPojo.getArtistName());
-                e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
+                e.setStarred(LocalDateUtil.formatUTCZ(artistPojo.getCreateTime()));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
                 e.setCoverArt(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
@@ -156,8 +157,8 @@ public class SearchingApi {
                 e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setDuration(albumDurationCount.get(albumPojo.getId()));
                 e.setPlayCount(0);
-                e.setPlayed(new Date());
-                e.setCreated(Date.from(albumPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+                e.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
                 e.setSongCount(albumMusicCountByMapAlbumId.get(albumPojo.getId()));
                 e.setIsVideo(false);
                 
@@ -217,17 +218,13 @@ public class SearchingApi {
                     e.setPath(tbResourcePojo.getPath());
                     e.setSuffix(tbResourcePojo.getEncodeType());
                     e.setBitRate(tbResourcePojo.getRate());
-                    if (StringUtils.equalsIgnoreCase(tbResourcePojo.getEncodeType(), "mp3")) {
-                        e.setContentType("audio/mpeg");
-                    } else {
-                        e.setContentType("audio/" + tbResourcePojo.getEncodeType());
-                    }
+                    e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 }
                 e.setTrack(0);
                 e.setPlayCount(0);
                 e.setType("music");
-                e.setPlayed(new Date());
-                e.setCreated(Date.from(musicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+                e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
                 e.setIsVideo(false);
                 
                 musics.add(e);
@@ -260,7 +257,7 @@ public class SearchingApi {
                 Search3Res.Artist e = new Search3Res.Artist();
                 e.setId(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setName(artistPojo.getArtistName());
-                e.setStarred(LocalDateTimeUtil.format(artistPojo.getCreateTime(), DatePattern.UTC_PATTERN));
+                e.setStarred(LocalDateUtil.formatUTCZ(artistPojo.getCreateTime()));
                 e.setAlbumCount(artistAlbumCount.get(artistPojo.getId()));
                 e.setCoverArt(StringUtil.defaultNullString(artistPojo.getId()));
                 e.setArtistImageUrl(remoteStorePicService.getArtistPicUrl(artistPojo.getId()));
@@ -307,8 +304,8 @@ public class SearchingApi {
                 e.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
                 e.setDuration(albumDurationCount.get(albumPojo.getId()));
                 e.setPlayCount(0);
-                e.setPlayed(new Date());
-                e.setCreated(Date.from(albumPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+                e.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
                 e.setSongCount(albumMusicCountByMapAlbumId.get(albumPojo.getId()));
                 e.setIsVideo(false);
                 
@@ -373,8 +370,8 @@ public class SearchingApi {
                 e.setTrack(0);
                 e.setPlayCount(0);
                 e.setType("music");
-                e.setPlayed(new Date());
-                e.setCreated(Date.from(musicPojo.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()));
+                e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
+                e.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
                 e.setIsVideo(false);
                 
                 musics.add(e);

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.*;
 import org.api.subsonic.common.SubsonicResult;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -135,11 +134,11 @@ public class Starred2Res extends SubsonicResult {
         
         @JsonProperty("played")
         @JacksonXmlProperty(isAttribute = true, localName = "played")
-        private Date played;
+        private String played;
         
         @JsonProperty("created")
         @JacksonXmlProperty(isAttribute = true, localName = "created")
-        private Date created;
+        private String created;
         
         @JsonProperty("artistId")
         @JacksonXmlProperty(isAttribute = true, localName = "artistId")
@@ -229,7 +228,7 @@ public class Starred2Res extends SubsonicResult {
         
         @JsonProperty("starred")
         @JacksonXmlProperty(isAttribute = true, localName = "starred")
-        private Date starred;
+        private String starred;
         
         @JsonProperty("duration")
         @JacksonXmlProperty(isAttribute = true, localName = "duration")
@@ -253,7 +252,7 @@ public class Starred2Res extends SubsonicResult {
         
         @JsonProperty("played")
         @JacksonXmlProperty(isAttribute = true, localName = "played")
-        private Date played;
+        private String played;
         
         @JsonProperty("discNumber")
         @JacksonXmlProperty(isAttribute = true, localName = "discNumber")
@@ -261,7 +260,7 @@ public class Starred2Res extends SubsonicResult {
         
         @JsonProperty("created")
         @JacksonXmlProperty(isAttribute = true, localName = "created")
-        private Date created;
+        private String created;
         
         @JsonProperty("musicBrainzId")
         @JacksonXmlProperty(isAttribute = true, localName = "musicBrainzId")

@@ -2,8 +2,6 @@ package org.api.subsonic.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +28,7 @@ import org.api.subsonic.model.res.song.SongRes;
 import org.api.subsonic.model.res.topsongs.TopSongsRes;
 import org.api.subsonic.model.res.videoinfo.VideoInfoRes;
 import org.api.subsonic.model.res.videos.VideosRes;
+import org.api.subsonic.utils.LocalDateUtil;
 import org.api.subsonic.utils.spring.SubsonicResourceReturnStrategyUtil;
 import org.core.common.constant.PicTypeConstant;
 import org.core.common.exception.BaseException;
@@ -163,15 +162,15 @@ public class BrowsingApi {
         song.setBitRate(tbMusicUrlPojo.getRate());
         song.setPath(tbMusicUrlPojo.getPath());
         
-        song.setStarred(musicPojo.getUpdateTime().toString());
+        song.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getUpdateTime()));
         song.setDuration(musicPojo.getTimeLength() / 1000);
         song.setParent(StringUtil.defaultNullString(albumByAlbumId.getId()));
         song.setDiscNumber(StringUtil.defaultNullString(0));
         song.setPlayCount(0);
-        song.setPlayed(musicPojo.getUpdateTime().toString());
-        song.setCreated(LocalDateTimeUtil.format(musicPojo.getCreateTime(), DatePattern.UTC_MS_PATTERN));
+        song.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
+        song.setCreated(LocalDateUtil.formatUTCZ(musicPojo.getPublishTime()));
         song.setType("music");
-        song.setUserRating(1);
+        song.setUserRating(0);
         song.setIsVideo(false);
         
         SongRes songRes = new SongRes();
@@ -302,11 +301,11 @@ public class BrowsingApi {
             c.setType("music");
             c.setUserRating((byte) 0);
             c.setIsVideo(false);
-            c.setPlayed(LocalDateTimeUtil.format(s.getUpdateTime(), DatePattern.UTC_MS_PATTERN));
+            c.setPlayed(LocalDateUtil.formatUTCZ(s.getPublishTime()));
             c.setComment(s.getComment());
             c.setSortName(s.getAliasName());
             c.setMediaType("song");
-            c.setCreated(LocalDateTimeUtil.format(s.getCreateTime(), DatePattern.UTC_MS_PATTERN));
+            c.setCreated(LocalDateUtil.formatUTCZ(s.getPublishTime()));
             c.setDuration(s.getTimeLength());
             c.setBpm((byte) 0);
             
@@ -432,8 +431,8 @@ public class BrowsingApi {
             e.setDuration(StringUtil.defaultNullString(albumDurationCountMap.get(albumListByArtistId.getId())));
             // 播放数量
             e.setPlayCount(StringUtil.defaultNullString(0));
-            e.setPlayed(new Date().toString());
-            e.setCreated(LocalDateTimeUtil.format(albumListByArtistId.getPublishTime(), DatePattern.UTC_MS_PATTERN));
+            e.setPlayed(LocalDateUtil.formatUTCZ(albumListByArtistId.getCreateTime()));
+            e.setCreated(LocalDateUtil.formatUTCZ(albumListByArtistId.getPublishTime()));
             e.setArtistId(StringUtil.defaultNullString(artist.getId()));
             e.setUserRating(StringUtil.defaultNullString(0));
             e.setSongCount(StringUtil.defaultNullString(albumMusicCountMap.get(albumListByArtistId.getId())));
@@ -555,10 +554,10 @@ public class BrowsingApi {
         album.setCoverArt(StringUtil.defaultNullString(albumPojo.getId()));
         album.setSongCount(qukuService.getAlbumMusicCountByAlbumId(albumPojo.getId()));
         album.setPlayCount(0);
-        album.setPlayed(albumPojo.getUpdateTime().toString());
-        album.setCreated(albumPojo.getCreateTime().toString());
-        album.setYear(albumPojo.getPublishTime().getYear());
-        album.setStarred(albumPojo.getUpdateTime().toString());
+        album.setPlayed(LocalDateUtil.formatUTCZ(albumPojo.getUpdateTime()));
+        album.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getCreateTime()));
+        album.setYear(LocalDateUtil.getYear(albumPojo.getPublishTime()));
+        album.setStarred(LocalDateUtil.formatUTCZ(albumPojo.getUpdateTime()));
         
         
         ArrayList<SongItem> song = new ArrayList<>();
@@ -594,13 +593,13 @@ public class BrowsingApi {
             e.setPath(tbResourcePojo.getPath());
             e.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
             
-            e.setStarred(musicPojo.getUpdateTime().toString());
+            e.setStarred(LocalDateUtil.formatUTCZ(musicPojo.getUpdateTime()));
             e.setDuration(Optional.ofNullable(musicPojo.getTimeLength()).orElse(0) / 1000);
             e.setPlayCount(0);
-            e.setPlayed(musicPojo.getCreateTime().toString());
+            e.setPlayed(LocalDateUtil.formatUTCZ(musicPojo.getCreateTime()));
             e.setType("music");
             e.setIsVideo(false);
-            e.setCreated(albumPojo.getPublishTime().toString());
+            e.setCreated(LocalDateUtil.formatUTCZ(albumPojo.getPublishTime()));
             song.add(e);
             duration += musicPojo.getTimeLength();
         }
@@ -733,9 +732,9 @@ public class BrowsingApi {
             
             e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setPlayCount(0);
-            e.setPlayed(new Date());
+            e.setPlayed(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
             e.setDiscNumber(0);
-            e.setCreated(LocalDateTimeUtil.format(musicConvert.getCreateTime(), DatePattern.UTC_PATTERN));
+            e.setCreated(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
             e.setType("music");
             e.setVideo(false);
             
@@ -795,12 +794,11 @@ public class BrowsingApi {
             
             e.setDuration(musicConvert.getTimeLength() / 1000);
             e.setPlayCount(0);
-            e.setPlayed(new Date());
+            e.setPlayed(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
             e.setDiscNumber(0);
-            e.setCreated(LocalDateTimeUtil.format(musicConvert.getCreateTime(), DatePattern.UTC_PATTERN));
+            e.setCreated(LocalDateUtil.formatUTCZ(musicConvert.getCreateTime()));
             e.setType("music");
             e.setIsVideo(false);
-            
             
             songs.add(e);
         }
@@ -837,7 +835,7 @@ public class BrowsingApi {
                 topSongs.setTrack(0);
                 topSongs.setCoverArt(String.valueOf(tbMusicPojo.getId()));
                 topSongs.setDuration(tbMusicPojo.getTimeLength());
-                topSongs.setCreated(LocalDateTimeUtil.format(tbMusicPojo.getCreateTime(), DatePattern.UTC_PATTERN));
+                topSongs.setCreated(LocalDateUtil.formatUTCZ((tbMusicPojo.getCreateTime())));
                 topSongs.setIsVideo(false);
                 
                 TbResourcePojo tbResourcePojo = resourceReturnStrategyUtil.handleResource(resourceMap.get(tbMusicPojo.getId()));
@@ -850,7 +848,7 @@ public class BrowsingApi {
                 topSongs.setContentType(URLConnection.guessContentTypeFromName(tbResourcePojo.getPath()));
                 topSongs.setSuffix(tbResourcePojo.getEncodeType());
                 topSongs.setPlayCount(0);
-                topSongs.setPlayed(new Date());
+                topSongs.setPlayed(LocalDateUtil.formatUTCZ(tbMusicPojo.getCreateTime()));
                 
                 AlbumConvert albumConvert = musicAlbumByMusicIdToMap.get(tbMusicPojo.getAlbumId());
                 if (Objects.nonNull(albumConvert)) {

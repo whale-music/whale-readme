@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.api.subsonic.common.SubsonicResult;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -80,7 +79,7 @@ public class SimilarSongs2Res extends SubsonicResult {
         private Integer playCount;
         
         @JacksonXmlProperty(isAttribute = true)
-        private Date played;
+        private String played;
         
         @JacksonXmlProperty(isAttribute = true)
         private Integer discNumber;

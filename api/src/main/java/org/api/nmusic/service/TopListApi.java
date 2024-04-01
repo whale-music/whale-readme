@@ -113,7 +113,7 @@ public class TopListApi {
         ArrayList<PlaylistsItem> playlists = new ArrayList<>();
         Map<Long, List<TbTagPojo>> label = new HashMap<>();
         if (StringUtils.isNotBlank(cat)) {
-            label = tagManagerService.getLabel(TargetTagConstant.TARGET_COLLECT_TAG,
+            label = tagManagerService.getTag(TargetTagConstant.TARGET_COLLECT_TAG,
                     page.getRecords().parallelStream().map(TbCollectPojo::getId).toList());
         }
         for (TbCollectPojo tbCollectPojo : page.getRecords()) {

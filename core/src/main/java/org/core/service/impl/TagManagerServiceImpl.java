@@ -37,7 +37,7 @@ public class TagManagerServiceImpl implements TagManagerService {
      * @return tag列表
      */
     @Override
-    public Map<Long, List<TbTagPojo>> getLabel(Byte type, Collection<Long> ids) {
+    public Map<Long, List<TbTagPojo>> getTag(Byte type, Collection<Long> ids) {
         if (CollectUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
@@ -73,7 +73,7 @@ public class TagManagerServiceImpl implements TagManagerService {
      * @return tag列表
      */
     @Override
-    public Map<Long, List<TbTagPojo>> getLabel(Byte type, Iterator<String> tags) {
+    public Map<Long, List<TbTagPojo>> getTag(Byte type, Iterator<String> tags) {
         if (CollectUtil.isEmpty(tags)) {
             return Collections.emptyMap();
         }

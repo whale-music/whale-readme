@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.config.SubsonicConfig;
+import org.api.subsonic.model.res.setrating.SetratingRes;
 import org.api.subsonic.model.res.star.StarRes;
 import org.api.subsonic.model.res.unstar.UnStarRes;
 import org.api.subsonic.utils.SubsonicUserUtil;
@@ -142,5 +143,9 @@ public class MediaAnnotationApi {
             return true;
         }
         return false;
+    }
+    
+    public SetratingRes setrating(SubsonicCommonReq req, Long id, Integer rating) {
+        return new SetratingRes();
     }
 }

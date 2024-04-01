@@ -10,6 +10,7 @@ import org.api.subsonic.aspect.ManualSerialize;
 import org.api.subsonic.common.SubsonicCommonReq;
 import org.api.subsonic.common.SubsonicResult;
 import org.api.subsonic.config.SubsonicConfig;
+import org.api.subsonic.model.res.setrating.SetratingRes;
 import org.api.subsonic.model.res.star.StarRes;
 import org.api.subsonic.model.res.unstar.UnStarRes;
 import org.api.subsonic.service.MediaAnnotationApi;
@@ -111,5 +112,26 @@ public class MediaAnnotationController {
                                            @RequestParam(value = "submission", defaultValue = "true", required = false) Boolean submission) {
         mediaAnnotationApi.scrobble(req, id, timeStamp, submission);
         return new SubsonicResult().success(req);
+    }
+    
+    @Operation(summary = "设置评级", description = "该接口可以访问，但是不会进行任何操作", deprecated = true)
+    @ApiResponse(responseCode = HttpStatusStrConstant.OK,
+                 content = {
+                         @Content(mediaType = MediaType.APPLICATION_JSON_VALUE),
+                         @Content(mediaType = MediaType.APPLICATION_XML_VALUE)
+                 }
+    )
+    @WebLog(LogNameConstant.SUBSONIC)
+    @GetMapping({"/setrating.view", "/setrating"})
+    @ManualSerialize
+    public ResponseEntity<String> setrating(SubsonicCommonReq req,
+                                            @Parameter(description = "唯一标识要评分的文件（歌曲）或文件夹（专辑/艺术家）的字符串")
+                                            @RequestParam(value = "id", required = false) final Long id,
+                                            
+                                            @Parameter(description = "要取消加注星标的相册的 ID。如果客户端根据 ID3 标签而不是文件结构访问媒体集合，请使用此选项而不是 id 。允许多个参数")
+                                            @RequestParam(value = "rating", required = false) final Integer rating
+    ) {
+        SetratingRes res = mediaAnnotationApi.setrating(req, id, rating);
+        return res.success(req);
     }
 }

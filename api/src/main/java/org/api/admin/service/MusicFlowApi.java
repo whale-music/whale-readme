@@ -1378,11 +1378,13 @@ public class MusicFlowApi {
                                                                         (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
         
         List<Long> likeMusic = new ArrayList<>();
-        List<CollectConvert> userPlayList = qukuService.getUserPlayList(UserUtil.getUser().getId(), Collections.singletonList(PlayListTypeConstant.LIKE));
-        if (CollUtil.isNotEmpty(userPlayList) && userPlayList.size() == 1) {
-            List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
-                                                                             .eq(TbCollectMusicPojo::getCollectId, userPlayList.get(0).getId()));
-            likeMusic.addAll(list.parallelStream().map(TbCollectMusicPojo::getMusicId).toList());
+        if (Objects.nonNull(req.getUserId())) {
+            List<CollectConvert> userPlayList = qukuService.getUserPlayList(req.getUserId(), Collections.singletonList(PlayListTypeConstant.LIKE));
+            if (CollUtil.isNotEmpty(userPlayList) && userPlayList.size() == 1) {
+                List<TbCollectMusicPojo> list = collectMusicService.list(Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                                 .eq(TbCollectMusicPojo::getCollectId, userPlayList.get(0).getId()));
+                likeMusic.addAll(list.parallelStream().map(TbCollectMusicPojo::getMusicId).toList());
+            }
         }
         
         Set<Long> userIds = musicConverts.parallelStream().map(TbMusicPojo::getUserId).collect(Collectors.toSet());

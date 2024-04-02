@@ -54,6 +54,6 @@ public class LoginApi {
         String token = tokenUtil.adminSignToken(date, userInfo.getUsername(), userInfo);
         String newRefresh = tokenUtil.adminRefreshSignToken(refreshDate, userInfo.getUsername(), userInfo);
         
-        return new RefreshTokenRes(token, newRefresh, date.getTime());
+        return new RefreshTokenRes(userInfo.getId(), userInfo.getUsername(), userInfo.getRoleNamesSet(), token, newRefresh, date.getTime());
     }
 }

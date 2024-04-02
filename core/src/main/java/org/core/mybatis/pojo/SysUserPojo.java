@@ -6,11 +6,12 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
+import org.core.common.constant.RoleConstant;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 系统用户表(SysUser)表实体类
@@ -93,6 +94,18 @@ public class SysUserPojo extends Model<SysUserPojo> implements Serializable {
             return null;
         }
         return DateUtil.date(createTime).getTime();
+    }
+    
+    public List<String> getRoleNamesList() {
+        return new ArrayList<>(this.getRoleNamesSet());
+    }
+    
+    public Set<String> getRoleNamesSet() {
+        if (StringUtils.isBlank(this.roleName)) {
+            return Collections.emptySet();
+        }
+        String[] split = StringUtils.split(this.roleName, RoleConstant.ROLE_SEPARATOR);
+        return new HashSet<>(Arrays.asList(split));
     }
 }
 

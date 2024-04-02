@@ -40,7 +40,7 @@ import java.util.Set;
 @CrossOrigin
 @RequiredArgsConstructor
 public class MusicController {
-    private final MusicFlowApi uploadMusic;
+    private final MusicFlowApi musicFlowApi;
     
     private final HttpRequestConfig httpRequestConfig;
     
@@ -54,7 +54,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/upload/music/file")
     public R uploadMusicFile(@RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam(value = "url", required = false) String url) throws CannotReadException, TagException, ReadOnlyFileException, IOException {
-        return R.success(uploadMusic.uploadMusicFile(uploadFile, url));
+        return R.success(musicFlowApi.uploadMusicFile(uploadFile, url));
     }
     
     /**
@@ -66,7 +66,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/get/temp/{music}")
     public ResponseEntity<FileSystemResource> getMusicTempFile(@PathVariable("music") String musicTempFile) {
-        return uploadMusic.getMusicTempFile(musicTempFile);
+        return musicFlowApi.getMusicTempFile(musicTempFile);
     }
     
     /**
@@ -78,7 +78,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/upload/info")
     public R uploadMusicInfo(@Validated @RequestBody AudioInfoReq dto) {
-        MusicDetails musicDetails = uploadMusic.saveMusicInfo(dto);
+        MusicDetails musicDetails = musicFlowApi.saveMusicInfo(dto);
         return R.success(musicDetails);
     }
     
@@ -92,7 +92,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/url/{musicId}")
     public R getMusicUrl(@PathVariable("musicId") Set<String> musicId, @RequestParam(value = "refresh", required = false, defaultValue = "false") Boolean refresh) {
-        return R.success(uploadMusic.getMusicUrl(musicId, refresh));
+        return R.success(musicFlowApi.getMusicUrl(musicId, refresh));
     }
     
     /**
@@ -104,7 +104,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/lyric/{musicId}")
     public R getMusicLyric(@PathVariable("musicId") Long musicId) {
-        return R.success(uploadMusic.getMusicLyric(musicId));
+        return R.success(musicFlowApi.getMusicLyric(musicId));
     }
     
     
@@ -118,7 +118,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @DeleteMapping("/")
     public R deleteMusic(@RequestBody RemoveMusicReq musicId, @RequestParam(value = "compel", required = false, defaultValue = "false") Boolean compel) {
-        uploadMusic.deleteMusic(musicId.getIds(), compel);
+        musicFlowApi.deleteMusic(musicId.getIds(), compel);
         return R.success();
     }
     
@@ -133,7 +133,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/lyric/{musicId}")
     public R saveOrUpdateLyric(@PathVariable("musicId") Long musicId, @RequestParam("type") String type, @RequestBody Map<String, String> lyric) {
-        uploadMusic.saveOrUpdateLyric(musicId, type, MapUtil.get(lyric, "lyric", String.class));
+        musicFlowApi.saveOrUpdateLyric(musicId, type, MapUtil.get(lyric, "lyric", String.class));
         return R.success();
     }
     
@@ -146,7 +146,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/musicInfo/{id}")
     public R getMusicInfo(@PathVariable("id") Long id) {
-        return R.success(uploadMusic.getMusicInfo(id));
+        return R.success(musicFlowApi.getMusicInfo(id));
     }
     
     /**
@@ -158,7 +158,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/")
     public R updateMusic(@RequestBody SaveOrUpdateMusicReq req) {
-        uploadMusic.saveOrUpdateMusic(req);
+        musicFlowApi.saveOrUpdateMusic(req);
         return R.success();
     }
     
@@ -176,7 +176,7 @@ public class MusicController {
     public R uploadAutoMusicFile(@RequestParam("userId") Long userId, @RequestParam(value = "file", required = false) MultipartFile uploadFile, @RequestParam("id") Long musicId) throws IOException {
         File uploadFile1 = FileUtil.writeBytes(uploadFile.getBytes(),
                 httpRequestConfig.getTempPathFile(Objects.requireNonNull(uploadFile.getOriginalFilename())));
-        uploadMusic.uploadAutoMusicFile(userId, uploadFile1, musicId);
+        musicFlowApi.uploadAutoMusicFile(userId, uploadFile1, musicId);
         return R.success();
     }
     
@@ -189,7 +189,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/manual/upload")
     public R uploadManualMusic(@RequestBody UploadMusicReq musicSource) {
-        uploadMusic.uploadManualMusic(musicSource);
+        musicFlowApi.uploadManualMusic(musicSource);
         return R.success();
     }
     
@@ -202,7 +202,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/update/source")
     public R updateSource(@RequestBody TbResourcePojo source) {
-        uploadMusic.updateSource(source);
+        musicFlowApi.updateSource(source);
         return R.success();
     }
     
@@ -215,28 +215,28 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @DeleteMapping("/delete/source/{id}")
     public R deleteSource(@PathVariable("id") Long id) {
-        uploadMusic.deleteSource(id);
+        musicFlowApi.deleteSource(id);
         return R.success();
     }
     
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/select")
     public R selectResources(@RequestParam(value = "md5", required = false) String md5) {
-        List<Map<String, Object>> maps = uploadMusic.selectResources(md5);
+        List<Map<String, Object>> maps = musicFlowApi.selectResources(md5);
         return R.success(maps);
     }
     
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/sync/metadata")
     public R syncMetaMusicFile(@RequestBody SyncMusicMetaDataReq req) {
-        uploadMusic.syncMetaMusicFile(req);
+        musicFlowApi.syncMetaMusicFile(req);
         return R.success();
     }
     
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/page")
     public R getMusicPage(@RequestBody MusicTabPageReq req) {
-        PageResCommon<MusicTabsPageRes> page = uploadMusic.getMusicPage(req);
+        PageResCommon<MusicTabsPageRes> page = musicFlowApi.getMusicPage(req);
         return R.success(page);
     }
     
@@ -249,7 +249,7 @@ public class MusicController {
     @WebLog(LogNameConstant.ADMIN)
     @PostMapping("/play/info")
     public R getMusicPlayInfo(@RequestBody MusicPlayInfoReq req) {
-        List<MusicPlayInfoRes> res = uploadMusic.getMusicPlayInfo(req.getIds(), req.getIsPlayed());
+        List<MusicPlayInfoRes> res = musicFlowApi.getMusicPlayInfo(req.getIds(), req.getIsPlayed());
         return R.success(res);
     }
 }

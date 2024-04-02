@@ -191,8 +191,7 @@ public class MvApi {
         MvInfoRes e = new MvInfoRes();
         BeanUtils.copyProperties(mvPojo, e);
         String mvPicUrl = remoteStorePicService.getMvPicUrl(mvPojo.getId());
-        Map<Long, List<TbTagPojo>> labelMusicTag = tagManagerService.getMvTag(e.getId());
-        List<TbTagPojo> tbTagPojos = labelMusicTag.get(mvPojo.getId());
+        List<TbTagPojo> tbTagPojos = tagManagerService.getMvTag(e.getId());
         if (CollUtil.isNotEmpty(tbTagPojos)) {
             e.setTags(tbTagPojos.parallelStream().map(TbTagPojo::getTagName).toList());
         }

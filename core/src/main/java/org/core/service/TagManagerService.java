@@ -49,21 +49,21 @@ public interface TagManagerService {
     /**
      * 获取tag音乐
      *
-     * @param ids 音乐ID
+     * @param id 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getMusicTag(Long ids) {
-        return getTag(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(ids));
+    default List<TbTagPojo> getMusicTag(Long id) {
+        return Optional.ofNullable(getTag(TargetTagConstant.TARGET_MUSIC_TAG, Collections.singletonList(id)).get(id)).orElse(new ArrayList<>());
     }
     
     /**
      * 获取音乐流派
      *
-     * @param ids 音乐ID
+     * @param id 音乐ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getMusicGenre(Long ids) {
-        return getTag(TargetTagConstant.TARGET_MUSIC_GENRE, Collections.singletonList(ids));
+    default List<TbTagPojo> getMusicGenre(Long id) {
+        return Optional.ofNullable(getTag(TargetTagConstant.TARGET_MUSIC_GENRE, Collections.singletonList(id)).get(id)).orElse(new ArrayList<>());
     }
     
     /**
@@ -119,11 +119,11 @@ public interface TagManagerService {
     /**
      * 获取tag歌单
      *
-     * @param ids 歌单ID
+     * @param id 歌单ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getCollectTag(Long ids) {
-        return getTag(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(ids));
+    default List<TbTagPojo> getCollectTag(Long id) {
+        return Optional.ofNullable(getTag(TargetTagConstant.TARGET_COLLECT_TAG, Collections.singletonList(id)).get(id)).orElse(new ArrayList<>());
     }
     
     /**
@@ -142,8 +142,8 @@ public interface TagManagerService {
      * @param id mv ID
      * @return tag 列表
      */
-    default Map<Long, List<TbTagPojo>> getMvTag(Long id) {
-        return getTag(TargetTagConstant.TARGET_MV_TAG, Collections.singletonList(id));
+    default List<TbTagPojo> getMvTag(Long id) {
+        return Optional.ofNullable(getTag(TargetTagConstant.TARGET_MV_TAG, Collections.singletonList(id)).get(id)).orElse(new ArrayList<>());
     }
     
     /**

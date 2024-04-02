@@ -951,8 +951,8 @@ public class MusicFlowApi {
     public MusicInfoRes getMusicInfo(Long id) {
         // 音乐
         TbMusicPojo byId = musicService.getById(id);
-        List<TbTagPojo> labelMusic = tagManagerService.getMusicTag(byId.getId()).get(id);
-        List<TbTagPojo> musicGenre = tagManagerService.getMusicGenre(byId.getId()).get(id);
+        List<TbTagPojo> labelMusic = tagManagerService.getMusicTag(byId.getId());
+        List<TbTagPojo> musicGenre = tagManagerService.getMusicGenre(byId.getId());
         // 歌曲艺术家
         List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
         

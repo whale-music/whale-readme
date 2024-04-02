@@ -23,4 +23,7 @@ public class ArtistPageReq extends PageReqCommon {
     
     @Schema(name = "专辑")
     private String albumName;
+    
+    @Schema(name = "用户ID")
+    private Long userId;
 }

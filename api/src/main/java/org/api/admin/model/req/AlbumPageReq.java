@@ -32,6 +32,9 @@ public class AlbumPageReq extends PageReqCommon {
     @Schema(name = "数据排序", example = "true: ASC, false: DESC")
     private Boolean order = false;
     
+    @Schema(name = "用户ID")
+    private Long userId;
+    
     @Schema(name = "开始时间")
     private LocalDateTime beforeTime;
     

@@ -237,6 +237,7 @@ public class ArtistApi {
         }
         
         LambdaQueryWrapper<TbArtistPojo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Objects.nonNull(req.getUserId()), TbArtistPojo::getUserId, req.getUserId());
         queryWrapper.in(CollUtil.isNotEmpty(artistIds), TbArtistPojo::getId, artistIds);
         artistService.page(page, queryWrapper);
         

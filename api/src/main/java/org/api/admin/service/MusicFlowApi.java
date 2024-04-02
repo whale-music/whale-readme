@@ -23,10 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageReqCommon;
 import org.api.admin.model.common.PageResCommon;
-import org.api.admin.model.req.MusicTabPageReq;
-import org.api.admin.model.req.SaveOrUpdateMusicReq;
-import org.api.admin.model.req.SyncMusicMetaDataReq;
-import org.api.admin.model.req.UploadMusicReq;
+import org.api.admin.model.req.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
 import org.api.admin.model.res.*;
 import org.api.admin.utils.MyPageUtil;
@@ -775,23 +772,19 @@ public class MusicFlowApi {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateMusic(SaveOrUpdateMusicReq req) {
-        if (StringUtils.isBlank(req.getMusicName())) {
+        if (Objects.isNull(req.getId()) || StringUtils.isBlank(req.getMusicName())) {
             throw new BaseException(ResultCode.PARAM_IS_BLANK);
         }
         req.setUserId(Optional.ofNullable(req.getUserId()).orElse(UserUtil.getUser().getId()));
         // 音乐
-        if (Objects.isNull(req.getId())) {
-            musicService.save(req);
-        } else {
-            LambdaUpdateWrapper<TbMusicPojo> wrapper = Wrappers.lambdaUpdate();
-            wrapper.eq(TbMusicPojo::getId, req.getId())
-                   .set(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())
-                   .set(TbMusicPojo::getTimeLength, req.getTimeLength())
-                   .set(TbMusicPojo::getPublishTime, req.getPublishTime())
-                   .set(TbMusicPojo::getAliasName, req.getAliasName())
-                   .set(TbMusicPojo::getAlbumId, req.getAlbumId());
-            musicService.update(wrapper);
-        }
+        LambdaUpdateWrapper<TbMusicPojo> wrapper = Wrappers.lambdaUpdate();
+        wrapper.eq(TbMusicPojo::getId, req.getId())
+               .set(StringUtils.isNotBlank(req.getMusicName()), TbMusicPojo::getMusicName, req.getMusicName())
+               .set(TbMusicPojo::getTimeLength, req.getTimeLength())
+               .set(TbMusicPojo::getPublishTime, req.getPublishTime())
+               .set(TbMusicPojo::getAliasName, req.getAliasName())
+               .set(TbMusicPojo::getAlbumId, req.getAlbumId());
+        musicService.update(wrapper);
         // 流派
         tagManagerService.addMusicGenreLabel(req.getId(), req.getMusicGenre().stream().map(StringUtils::trim).toList());
         // 音乐tag
@@ -1555,5 +1548,51 @@ public class MusicFlowApi {
             res.add(infoRes);
         }
         return res;
+    }
+    
+    public void saveMusic(SaveMusicReq req) {
+        if (Objects.nonNull(req.getId())) {
+            throw new BaseException(ResultCode.SONG_UPLOADED);
+        }
+        
+        TbMusicPojo entity = new TbMusicPojo();
+        entity.setMusicName(req.getMusicName());
+        entity.setAliasName(req.getAliasName());
+        entity.setAlbumId(req.getAlbumId());
+        entity.setUserId(req.getUserId());
+        entity.setTimeLength(req.getTimeLength());
+        entity.setComment(req.getComment());
+        entity.setLanguage(req.getLanguage());
+        entity.setPublishTime(req.getPublishTime());
+        
+        musicService.save(entity);
+        
+        Long id = entity.getId();
+        // 流派
+        tagManagerService.addMusicGenreLabel(id, req.getMusicGenre().stream().map(StringUtils::trim).toList());
+        // 音乐tag
+        tagManagerService.addMusicLabelTag(id, req.getMusicTag().stream().map(StringUtils::trim).toList());
+        // 更新封面
+        if (StringUtils.isNotBlank(req.getTempPicFile())) {
+            File file = requestConfig.getTempPathFile(req.getTempPicFile());
+            ExceptionUtil.isNull(FileUtil.isEmpty(file), ResultCode.FILENAME_NO_EXIST);
+            remoteStorePicService.saveOrUpdateMusicPicFile(id, file);
+        }
+        List<Long> artistIds = req.getArtistIds();
+        if (CollUtil.isNotEmpty(artistIds)) {
+            List<TbMusicArtistPojo> musicArtistList = artistIds.parallelStream().map(aLong -> new TbMusicArtistPojo(id, aLong)).toList();
+            // 重新保存关联歌手
+            musicArtistService.saveBatch(musicArtistList);
+        }
+        
+        
+        // 保存音源
+        TbResourcePojo resource = req.getResource();
+        if (Objects.nonNull(resource) && Objects.nonNull(resource.getMd5())) {
+            long count = resourceEntityRepository.countByMd5EqualsIgnoreCase(req.getResource().getMd5());
+            ExceptionUtil.isNull(count >= 1, ResultCode.RESOURCE_DATA_EXISTED);
+            
+            resourceService.save(resource);
+        }
     }
 }

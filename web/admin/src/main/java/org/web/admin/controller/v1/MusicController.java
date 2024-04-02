@@ -163,6 +163,19 @@ public class MusicController {
     }
     
     /**
+     * 更新音乐信息
+     *
+     * @param req 音乐信息
+     * @return 成功信息
+     */
+    @WebLog(LogNameConstant.ADMIN)
+    @PostMapping("/save")
+    public R saveMusic(@RequestBody SaveMusicReq req) {
+        musicFlowApi.saveMusic(req);
+        return R.success();
+    }
+    
+    /**
      * 自动上传音乐文件
      *
      * @param userId     用户ID

@@ -477,10 +477,10 @@ public class QukuServiceImpl implements QukuService {
         }
         LambdaQueryWrapper<TbMusicArtistPojo> eq = Wrappers.<TbMusicArtistPojo>lambdaQuery().in(TbMusicArtistPojo::getMusicId, musicId);
         List<TbMusicArtistPojo> list = musicArtistService.list(eq);
-        Collection<Long> collect = list.parallelStream().map(TbMusicArtistPojo::getArtistId).collect(Collectors.toSet());
-        if (CollUtil.isEmpty(collect)) {
+        if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
+        Collection<Long> collect = list.parallelStream().map(TbMusicArtistPojo::getArtistId).collect(Collectors.toSet());
         List<TbArtistPojo> tbArtistPojos = artistService.listByIds(collect);
         return getArtistConvertList(tbArtistPojos, remoteStorePicService.getCollectPicUrl(collect));
     }

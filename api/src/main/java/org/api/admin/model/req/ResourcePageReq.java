@@ -12,7 +12,7 @@ import java.util.List;
 public class ResourcePageReq {
     private String select;
     private String order;
-    private String orderBy;
+    private String orderBy = "";
     private List<String> filter;
     private Boolean filterType;
     private Boolean refresh = false;

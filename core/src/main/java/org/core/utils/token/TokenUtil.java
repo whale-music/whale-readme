@@ -39,61 +39,78 @@ public class TokenUtil {
      * @return 返回token
      */
     public String webdavSignToken(String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.WEBDAV, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.WEBDAV,
+                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                userId,
+                user,
+                USER_INFO);
     }
     
     public String subsonicSignToken(String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.SUBSONIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.SUBSONIC,
+                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                userId,
+                user,
+                USER_INFO);
     }
     
     public String nMusicSignToken(String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NMUSIC, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.NMUSIC,
+                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                userId,
+                user,
+                USER_INFO);
     }
     
     public String adminSignToken(String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.ADMIN, new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()), userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.ADMIN,
+                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                userId,
+                user,
+                USER_INFO);
     }
     
     // ----------------------------------------------------------------
     
     public String webdavSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.WEBDAV, expires, userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.WEBDAV, expires, userId, user, USER_INFO);
     }
     
     public String subsonicSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.SUBSONIC, expires, userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.SUBSONIC, expires, userId, user, USER_INFO);
     }
     
     public String nMusicSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NMUSIC, expires, userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.NMUSIC, expires, userId, user, USER_INFO);
     }
     
     public String adminSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.ADMIN, expires, userId, user, USER_INFO);
+        return signAndSaveUserCache(UserCacheTypeConstant.ADMIN, expires, userId, user, USER_INFO);
     }
     
     // ---------------------------------------------------------------- refresh
     public String webdavRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.WEBDAV_REFRESH, expires, userId, user, REFRESH);
+        return signAndSaveUserCache(UserCacheTypeConstant.WEBDAV_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String subsonicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.SUBSONIC_REFRESH, expires, userId, user, REFRESH);
+        return signAndSaveUserCache(UserCacheTypeConstant.SUBSONIC_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String nMusicRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.NMUSIC_REFRESH, expires, userId, user, REFRESH);
+        return signAndSaveUserCache(UserCacheTypeConstant.NMUSIC_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String adminRefreshSignToken(Date expires, String userId, SysUserPojo user) {
-        return sign(UserCacheTypeConstant.ADMIN_REFRESH, expires, userId, user, REFRESH);
+        return signAndSaveUserCache(UserCacheTypeConstant.ADMIN_REFRESH, expires, userId, user, REFRESH);
     }
     
     public String refreshSignToken(String type, Date expires, String userId, SysUserPojo user) {
-        return sign(type, expires, userId, user, REFRESH);
+        return signAndSaveUserCache(type, expires, userId, user, REFRESH);
     }
     
-    private String sign(String type, Date expires, String userId, SysUserPojo user, String info) {
+    
+    private String signAndSaveUserCache(String type, Date expires, String userId, SysUserPojo user, String info) {
         String uuid = type + IdUtil.fastUUID();
         String sign = JWT.create()
                          // 将userId保存到token里面

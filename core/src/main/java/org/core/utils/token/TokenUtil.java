@@ -10,6 +10,7 @@ import org.core.common.exception.BaseException;
 import org.core.config.JwtConfig;
 import org.core.model.UserLoginCacheModel;
 import org.core.mybatis.pojo.SysUserPojo;
+import org.core.utils.StringUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -109,6 +110,43 @@ public class TokenUtil {
         return signAndSaveUserCache(type, expires, userId, user, REFRESH);
     }
     
+    // ----------------------------------------------------------------
+    
+    public UserLoginCacheModel adminSignAndRefreshToken(SysUserPojo user) {
+        return signAndRefreshToken(UserCacheTypeConstant.ADMIN, UserCacheTypeConstant.ADMIN_REFRESH, user);
+    }
+    
+    public UserLoginCacheModel signAndRefreshToken(String type, String refreshType, SysUserPojo user) {
+        // token
+        String uuid = type + IdUtil.fastUUID();
+        Date expires = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        String sign = JWT.create()
+                         // 将userId保存到token里面
+                         .withAudience(StringUtil.defaultNullString(user.getId()))
+                         // 存放自定义数据
+                         .withClaim(USER_INFO, uuid)
+                         // 根据设定的时间过期
+                         .withExpiresAt(expires)
+                         // token的密钥
+                         .sign(algorithm);
+        // refresh
+        String refreshUuid = refreshType + IdUtil.fastUUID();
+        Date refreshExpires = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
+        String refreshSign = JWT.create()
+                                // 将userId保存到token里面
+                                .withAudience(StringUtil.defaultNullString(user.getId()))
+                                // 存放自定义数据
+                                .withClaim(REFRESH, refreshUuid)
+                                // 根据设定的时间过期
+                                .withExpiresAt(refreshExpires)
+                                // token的密钥
+                                .sign(algorithm);
+        
+        UserLoginCacheModel userToken = new UserLoginCacheModel(user, uuid, sign, refreshUuid, refreshSign, expires, LocalDateTime.now());
+        userCacheServiceUtil.setUserCache(uuid, userToken);
+        userCacheServiceUtil.setUserCache(refreshUuid, userToken);
+        return userToken;
+    }
     
     private String signAndSaveUserCache(String type, Date expires, String userId, SysUserPojo user, String info) {
         String uuid = type + IdUtil.fastUUID();

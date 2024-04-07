@@ -13,6 +13,7 @@ import org.core.common.annotation.AnonymousAccess;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
 import org.core.common.weblog.constant.LogNameConstant;
+import org.core.mybatis.model.convert.UserConvert;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -31,6 +32,13 @@ public class LoginController {
     @PostMapping("/login")
     public R login(@RequestBody UserReq dto) {
         UserRes userPojo = loginApi.login(dto.getUsername(), dto.getPassword());
+        return R.success(userPojo);
+    }
+    
+    @WebLog(LogNameConstant.ADMIN)
+    @GetMapping("/info")
+    public R getUserInfo() {
+        UserConvert userPojo = loginApi.getUserInfo();
         return R.success(userPojo);
     }
     

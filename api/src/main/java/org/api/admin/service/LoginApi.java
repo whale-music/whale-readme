@@ -9,9 +9,12 @@ import org.api.admin.model.res.UserRes;
 import org.core.common.exception.BaseException;
 import org.core.common.result.ResultCode;
 import org.core.config.JwtConfig;
+import org.core.mybatis.model.convert.UserConvert;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.service.AccountService;
+import org.core.service.RemoteStorePicService;
 import org.core.utils.RoleUtil;
+import org.core.utils.UserUtil;
 import org.core.utils.token.TokenUtil;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class LoginApi {
     private final AccountService accountService;
     
     private final TokenUtil tokenUtil;
+    
+    private final RemoteStorePicService remoteStorePicService;
     
     public UserRes login(String phone, String password) {
         SysUserPojo userPojo = accountService.login(phone, password);
@@ -55,5 +60,16 @@ public class LoginApi {
         String newRefresh = tokenUtil.adminRefreshSignToken(refreshDate, userInfo.getUsername(), userInfo);
         
         return new RefreshTokenRes(userInfo.getId(), userInfo.getUsername(), userInfo.getRoleNamesSet(), token, newRefresh, date.getTime());
+    }
+    
+    public UserConvert getUserInfo() {
+        SysUserPojo byId = accountService.getById(UserUtil.getUser().getId());
+        if (Objects.isNull(byId)) {
+            return new UserConvert();
+        }
+        UserConvert res = new UserConvert(byId);
+        res.setBackgroundPicUrl(remoteStorePicService.getUserBackgroundPicUrl(byId.getId()));
+        res.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(byId.getId()));
+        return res;
     }
 }

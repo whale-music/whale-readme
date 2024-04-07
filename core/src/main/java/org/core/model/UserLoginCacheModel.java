@@ -15,7 +15,13 @@ import java.time.LocalDateTime;
 public class UserLoginCacheModel extends SysUserPojo {
     private LocalDateTime generatedDate;
     
-    public UserLoginCacheModel(SysUserPojo pojo, LocalDateTime generatedDate) {
+    private String token;
+    private String tokenKey;
+    
+    private String refreshToken;
+    private String refreshTokenKey;
+    
+    public UserLoginCacheModel(SysUserPojo pojo, String token, String tokenKey, LocalDateTime generatedDate) {
         super(pojo.getId(),
                 pojo.getUsername(),
                 pojo.getNickname(),
@@ -30,6 +36,8 @@ public class UserLoginCacheModel extends SysUserPojo {
                 pojo.getSubAccountPassword(),
                 pojo.getCreateTime(),
                 pojo.getUpdateTime());
+        this.token = token;
+        this.tokenKey = tokenKey;
         this.generatedDate = generatedDate;
     }
     

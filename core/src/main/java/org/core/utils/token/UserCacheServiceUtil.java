@@ -2,7 +2,6 @@ package org.core.utils.token;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import org.core.model.UserLoginCacheModel;
-import org.core.mybatis.pojo.SysUserPojo;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +17,7 @@ public class UserCacheServiceUtil {
         return cache;
     }
     
-    public SysUserPojo getUserCache(String key) {
+    public UserLoginCacheModel getUserCache(String key) {
         return getCache().getIfPresent(key);
     }
     

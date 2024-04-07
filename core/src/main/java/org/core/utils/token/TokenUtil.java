@@ -95,16 +95,17 @@ public class TokenUtil {
     
     private String sign(String type, Date expires, String userId, SysUserPojo user, String info) {
         String uuid = type + IdUtil.fastUUID();
-        userCacheServiceUtil.setUserCache(uuid, new UserLoginCacheModel(user, LocalDateTime.now()));
-        return JWT.create()
-                  // 将userId保存到token里面
-                  .withAudience(userId)
-                  // 存放自定义数据
-                  .withClaim(info, uuid)
-                  // 根据设定的时间过期
-                  .withExpiresAt(expires)
-                  // token的密钥
-                  .sign(algorithm);
+        String sign = JWT.create()
+                         // 将userId保存到token里面
+                         .withAudience(userId)
+                         // 存放自定义数据
+                         .withClaim(info, uuid)
+                         // 根据设定的时间过期
+                         .withExpiresAt(expires)
+                         // token的密钥
+                         .sign(algorithm);
+        userCacheServiceUtil.setUserCache(uuid, new UserLoginCacheModel(user, sign, uuid, LocalDateTime.now()));
+        return sign;
     }
     
     /**
@@ -127,7 +128,7 @@ public class TokenUtil {
      * @param token token
      * @return 返回自定义数据
      */
-    public SysUserPojo getUserInfo(String token) {
+    public UserLoginCacheModel getUserInfo(String token) {
         return userCacheServiceUtil.getUserCache(getInfo(token, USER_INFO));
     }
     

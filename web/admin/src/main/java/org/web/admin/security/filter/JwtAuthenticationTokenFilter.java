@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.core.model.UserLoginCacheModel;
 import org.core.mybatis.pojo.SysUserPojo;
 import org.core.utils.RoleUtil;
 import org.core.utils.UserUtil;
@@ -72,8 +73,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             tokenUtil.isJwtExpired(token);
             tokenUtil.checkSign(token);
             // 获取用户信息
-            SysUserPojo userPojo = tokenUtil.getUserInfo(token);
-            // 没有用户则之间跳过
+            UserLoginCacheModel userPojo = tokenUtil.getUserInfo(token);
+            
+            // 没有用户则直接跳过
             if (Objects.isNull(userPojo)) {
                 filterChain.doFilter(request, response);
                 return;

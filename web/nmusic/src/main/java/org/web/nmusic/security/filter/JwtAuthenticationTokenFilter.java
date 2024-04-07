@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.core.common.constant.CookieConstant;
-import org.core.mybatis.pojo.SysUserPojo;
+import org.core.model.UserLoginCacheModel;
 import org.core.utils.RoleUtil;
 import org.core.utils.UserUtil;
 import org.core.utils.token.TokenUtil;
@@ -133,7 +133,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     
     private void setSecurityUser(@NotNull HttpServletRequest request, String token) {
         // 校验token, 并获取信息
-        SysUserPojo userPojo = tokenUtil.getUserInfo(token);
+        UserLoginCacheModel userPojo = tokenUtil.getUserInfo(token);
         if (Objects.nonNull(userPojo)) {
             UserUtil.setUser(userPojo);
             UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(userPojo,

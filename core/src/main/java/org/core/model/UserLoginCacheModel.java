@@ -22,9 +22,9 @@ public class UserLoginCacheModel extends SysUserPojo {
     private String tokenKey;
     
     private String refreshToken;
-    private String refreshTokenKey;
+    // private String refreshTokenKey;
     
-    public UserLoginCacheModel(SysUserPojo pojo, String tokenKey, String token, String refreshTokenKey, String refreshToken, Date expires, LocalDateTime generatedDate) {
+    public UserLoginCacheModel(SysUserPojo pojo, String tokenKey, String token, String refreshToken, Date expires, LocalDateTime generatedDate) {
         super(pojo.getId(),
                 pojo.getUsername(),
                 pojo.getNickname(),
@@ -42,7 +42,7 @@ public class UserLoginCacheModel extends SysUserPojo {
         this.token = token;
         this.tokenKey = tokenKey;
         this.refreshToken = refreshToken;
-        this.refreshTokenKey = refreshTokenKey;
+        // this.refreshTokenKey = refreshTokenKey;
         this.expires = expires;
         this.generatedDate = generatedDate;
     }

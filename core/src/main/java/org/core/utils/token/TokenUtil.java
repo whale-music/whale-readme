@@ -130,21 +130,21 @@ public class TokenUtil {
                          // token的密钥
                          .sign(algorithm);
         // refresh
-        String refreshUuid = refreshType + IdUtil.fastUUID();
+        // String refreshUuid = refreshType + IdUtil.fastUUID();
         Date refreshExpires = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
         String refreshSign = JWT.create()
                                 // 将userId保存到token里面
                                 .withAudience(StringUtil.defaultNullString(user.getId()))
                                 // 存放自定义数据
-                                .withClaim(REFRESH, refreshUuid)
+                                .withClaim(REFRESH, uuid)
                                 // 根据设定的时间过期
                                 .withExpiresAt(refreshExpires)
                                 // token的密钥
                                 .sign(algorithm);
         
-        UserLoginCacheModel userToken = new UserLoginCacheModel(user, uuid, sign, refreshUuid, refreshSign, expires, LocalDateTime.now());
+        UserLoginCacheModel userToken = new UserLoginCacheModel(user, uuid, sign, refreshSign, expires, LocalDateTime.now());
         userCacheServiceUtil.setUserCache(uuid, userToken);
-        userCacheServiceUtil.setUserCache(refreshUuid, userToken);
+        // userCacheServiceUtil.setUserCache(refreshUuid, userToken);
         return userToken;
     }
     

@@ -76,7 +76,6 @@ public class LoginController {
         try {
             UserLoginCacheModel user = UserUtil.getUser();
             userCacheServiceUtil.clearUserCache(user.getTokenKey());
-            userCacheServiceUtil.clearUserCache(user.getRefreshTokenKey());
         } catch (Exception e) {
             log.error("remove user token fail: {}", e.getMessage());
         }

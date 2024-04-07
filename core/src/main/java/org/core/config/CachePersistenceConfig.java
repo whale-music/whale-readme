@@ -72,7 +72,13 @@ public class CachePersistenceConfig implements DisposableBean {
         }
         byte[] fileBytes = FileUtil.readBytes(file);
         if (PrimitiveArrayUtil.isNotEmpty(fileBytes)) {
-            return SerializeUtil.deserialize(fileBytes);
+            try {
+                return SerializeUtil.deserialize(fileBytes);
+            } catch (Exception e) {
+                log.error("Failed to deserialize: {}", e.getMessage());
+                FileUtil.del(file);
+                return Collections.emptyMap();
+            }
         }
         return Collections.emptyMap();
     }

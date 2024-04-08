@@ -79,6 +79,8 @@ public class LoginApi {
         if (Objects.isNull(byId)) {
             return new UserConvert();
         }
+        byId.setPassword("");
+        byId.setSubAccountPassword("");
         UserConvert res = new UserConvert(byId);
         res.setBackgroundPicUrl(remoteStorePicService.getUserBackgroundPicUrl(byId.getId()));
         res.setAvatarUrl(remoteStorePicService.getUserAvatarPicUrl(byId.getId()));

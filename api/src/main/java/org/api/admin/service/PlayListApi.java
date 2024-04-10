@@ -7,13 +7,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageCommon;
+import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
+import org.api.admin.model.req.PlaylistMusicPageReq;
 import org.api.admin.model.req.UpdatePlayListReq;
-import org.api.admin.model.res.CollectInfoRes;
-import org.api.admin.model.res.MusicPageRes;
-import org.api.admin.model.res.PlayListMusicRes;
-import org.api.admin.model.res.PlayListRes;
+import org.api.admin.model.res.*;
 import org.api.admin.model.res.router.Children;
 import org.api.admin.model.res.router.Meta;
 import org.api.admin.model.res.router.RouterVo;
@@ -551,5 +550,86 @@ public class PlayListApi {
     
     public void like(Long userId, Long id, boolean add) {
         qukuService.collectLike(userId, id, add);
+    }
+    
+    public List<PlayListAllRes> getUserPlaylistAll(Long uid) {
+        Collection<CollectConvert> list = qukuService.getUserPlayList(uid, Collections.emptyList());
+        ArrayList<PlayListAllRes> res = new ArrayList<>();
+        for (CollectConvert collectConvert : list) {
+            PlayListAllRes e = new PlayListAllRes();
+            BeanUtils.copyProperties(collectConvert, e);
+            res.add(e);
+        }
+        return res;
+    }
+    
+    public PageResCommon<PlaylistMusicPageRes> getPlaylistMusicPage(PlaylistMusicPageReq req) {
+        if (Objects.isNull(req.getId())) {
+            throw new BaseException(ResultCode.PARAM_IS_BLANK);
+        }
+        ArrayList<Long> musicIds = new ArrayList<>();
+        if (StringUtils.isNotBlank(req.getMusicName())) {
+            LambdaQueryWrapper<TbMusicPojo> wrapper = Wrappers.<TbMusicPojo>lambdaQuery()
+                                                              .select(TbMusicPojo::getId)
+                                                              .like(StringUtils.isNotBlank(req.getMusicName()),
+                                                                      TbMusicPojo::getMusicName,
+                                                                      req.getMusicName())
+                                                              .or()
+                                                              .like(StringUtils.isNotBlank(req.getMusicName()),
+                                                                      TbMusicPojo::getAliasName,
+                                                                      req.getMusicName());
+            musicIds.addAll(musicService.listObjs(wrapper));
+        }
+        LambdaQueryWrapper<TbCollectMusicPojo> playlistWrapper = Wrappers.<TbCollectMusicPojo>lambdaQuery()
+                                                                         .eq(TbCollectMusicPojo::getCollectId, req.getId())
+                                                                         .in(CollUtil.isNotEmpty(musicIds), TbCollectMusicPojo::getMusicId, musicIds);
+        Page<TbCollectMusicPojo> page = Page.of(req.getPageIndex(), req.getPageNum());
+        collectMusicService.page(page, playlistWrapper);
+        if (page.getRecords().isEmpty()) {
+            return new PageResCommon<>(req.getPageIndex(), req.getPageNum());
+        }
+        List<Long> playlistMusicIds = page.getRecords().parallelStream().map(TbCollectMusicPojo::getMusicId).toList();
+        Map<Long, List<ArtistConvert>> artistByMusicIdToMap = qukuService.getArtistByMusicIdToMap(playlistMusicIds);
+        List<TbMusicPojo> tbMusicPojos = musicService.listByIds(playlistMusicIds);
+        Map<Long, TbMusicPojo> collect = tbMusicPojos.parallelStream().collect(Collectors.toMap(TbMusicPojo::getId, s -> s));
+        
+        Map<Long, TbResourcePojo> urlPojoMap = new HashMap<>();
+        // 获取音乐地址
+        try {
+            List<TbResourcePojo> musicUrlByMusicId = qukuService.getMusicUrlByMusicId(musicIds, false);
+            urlPojoMap = musicUrlByMusicId.parallelStream()
+                                          .collect(Collectors.toMap(TbResourcePojo::getMusicId,
+                                                  Function.identity(),
+                                                  (musicUrlPojo, musicUrlPojo2) -> musicUrlPojo2));
+        } catch (BaseException ex) {
+            if (!StringUtils.equals(ex.getCode(), ResultCode.SONG_NOT_EXIST.getCode())) {
+                throw new BaseException(ResultCode.SONG_NOT_EXIST);
+            }
+        }
+        
+        PageResCommon<PlaylistMusicPageRes> res = new PageResCommon<>();
+        res.setSize(page.getSize());
+        res.setCurrent(page.getCurrent());
+        res.setTotal(page.getTotal());
+        ArrayList<PlaylistMusicPageRes> content = new ArrayList<>();
+        for (TbCollectMusicPojo record : page.getRecords()) {
+            TbMusicPojo musicPojo = collect.get(record.getMusicId());
+            PlaylistMusicPageRes e = new PlaylistMusicPageRes();
+            e.setId(musicPojo.getId());
+            e.setMusicName(musicPojo.getMusicName());
+            e.setMusicNameAlias(musicPojo.getAliasName());
+            e.setPicUrl(remoteStorePicService.getMusicPicUrl(musicPojo.getId()));
+            List<ArtistConvert> artistConverts = artistByMusicIdToMap.get(musicPojo.getId());
+            if (CollUtil.isNotEmpty(artistConverts)) {
+                e.setArtistIds(artistConverts.parallelStream().filter(Objects::nonNull).map(TbArtistPojo::getId).toList());
+                e.setArtistNames(artistConverts.parallelStream().filter(Objects::nonNull).map(TbArtistPojo::getArtistName).toList());
+            }
+            e.setAlbumId(musicPojo.getAlbumId());
+            e.setIsExist(StringUtils.isNotBlank(Optional.ofNullable(urlPojoMap.get(musicPojo.getId())).orElse(new TbResourcePojo()).getPath()));
+            content.add(e);
+        }
+        res.setContent(content);
+        
+        return res;
     }
 }

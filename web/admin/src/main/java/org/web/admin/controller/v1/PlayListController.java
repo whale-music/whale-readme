@@ -5,10 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api.admin.config.AdminConfig;
+import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.req.MusicPageReq;
 import org.api.admin.model.req.PlayListReq;
+import org.api.admin.model.req.PlaylistMusicPageReq;
 import org.api.admin.model.req.UpdatePlayListReq;
+import org.api.admin.model.res.PlayListAllRes;
 import org.api.admin.model.res.PlayListRes;
+import org.api.admin.model.res.PlaylistMusicPageRes;
 import org.api.admin.model.res.router.RouterVo;
 import org.api.admin.service.PlayListApi;
 import org.core.common.result.R;
@@ -43,6 +47,19 @@ public class PlayListController {
     @PostMapping("/music/page")
     public R getMusicPage(@RequestBody MusicPageReq req) {
         return R.success(playList.getMusicPage(req));
+    }
+    
+    /**
+     * 移动端获取歌单音乐
+     *
+     * @param req 请求参数
+     * @return 返回歌单音乐数据
+     */
+    @WebLog(LogNameConstant.ADMIN)
+    @PostMapping("/tracks/music/page")
+    public R getPlaylistMusicPage(@RequestBody PlaylistMusicPageReq req) {
+        PageResCommon<PlaylistMusicPageRes> res = playList.getPlaylistMusicPage(req);
+        return R.success(res);
     }
     
     @WebLog(LogNameConstant.ADMIN)
@@ -133,6 +150,19 @@ public class PlayListController {
         uid = uid == null ? UserUtil.getUser().getId() : uid;
         List<RouterVo> playListRouters = playList.getAsyncPlayListRoutes(uid);
         return R.success(playListRouters);
+    }
+    
+    /**
+     * 获取用户全部歌单
+     *
+     * @param uid 用户ID
+     * @return 用户歌单
+     */
+    @WebLog(LogNameConstant.ADMIN)
+    @GetMapping("/user/all")
+    public R getUserPlaylistAll(@RequestParam("id") Long uid) {
+        List<PlayListAllRes> playListPage = playList.getUserPlaylistAll(uid);
+        return R.success(playListPage);
     }
     
     @WebLog(LogNameConstant.ADMIN)

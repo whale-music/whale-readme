@@ -67,10 +67,9 @@ public interface QukuService {
     
     /**
      * 随即获取曲库中的多条数据
+     * @param count 数量
      */
-    default List<MusicConvert> randomMusicList(int count) {
-        return randomMusicList(count, null, null, null);
-    }
+    List<MusicConvert> randomMusicList(int count);
     
     /**
      * 随即获取曲库中的多条数据
@@ -281,6 +280,8 @@ public interface QukuService {
      * @param count 获取数量
      */
     List<ArtistConvert> randomSinger(int count);
+    
+    List<AlbumConvert> randomAlbum(int count);
     
     /**
      * 添加或删除音乐到歌单

@@ -281,6 +281,28 @@ public class QukuServiceImpl implements QukuService {
         return convert;
     }
     
+    /**
+     * 随即获取曲库中的多条数据
+     *
+     * @param count 数量
+     */
+    @Override
+    public List<MusicConvert> randomMusicList(int count) {
+        long sum = musicService.count();
+        List<TbMusicPojo> res = new ArrayList<>();
+        if (count >= sum) {
+            res.addAll(musicService.list());
+        } else {
+            for (int i = 0; i < count; i++) {
+                long randomNum = RandomUtil.randomLong(sum);
+                Page<TbMusicPojo> page = musicService.page(new Page<>(randomNum, 1),
+                        Wrappers.<TbMusicPojo>lambdaQuery()
+                                .notIn(CollUtil.isNotEmpty(res), TbMusicPojo::getId, res.stream().map(TbMusicPojo::getId).toList()));
+                res.addAll(page.getRecords());
+            }
+        }
+        return getMusicConvertList(res, remoteStorePicService.getArtistPicUrl(res.parallelStream().map(TbMusicPojo::getId).toList()));
+    }
     
     /**
      * 随即获取曲库中的多条数据
@@ -708,13 +730,41 @@ public class QukuServiceImpl implements QukuService {
     @Override
     public List<ArtistConvert> randomSinger(int count) {
         long sum = artistService.count();
-        ArrayList<TbArtistPojo> res = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            long randomNum = RandomUtil.randomLong(sum);
-            Page<TbArtistPojo> page = artistService.page(new Page<>(randomNum, 1));
-            res.addAll(page.getRecords());
+        // 数据库中大于需要消费数量则直接返回
+        List<TbArtistPojo> res = new ArrayList<>();
+        if (count >= sum) {
+            res.addAll(artistService.list());
+        } else {
+            for (int i = 0; i < count; i++) {
+                long randomNum = RandomUtil.randomLong(sum);
+                Page<TbArtistPojo> page = artistService.page(new Page<>(randomNum, 1), Wrappers.<TbArtistPojo>lambdaQuery()
+                                                                                               .notIn(CollUtil.isNotEmpty(res),
+                                                                                                       TbArtistPojo::getId,
+                                                                                                       res.stream().map(TbArtistPojo::getId).toList()));
+                res.addAll(page.getRecords());
+            }
         }
         return getArtistConvertList(res, remoteStorePicService.getArtistPicUrl(res.parallelStream().map(TbArtistPojo::getId).toList()));
+    }
+    
+    @Override
+    public List<AlbumConvert> randomAlbum(int count) {
+        long sum = albumService.count();
+        List<TbAlbumPojo> res = new ArrayList<>();
+        if (count >= sum) {
+            res.addAll(albumService.list());
+        } else {
+            for (int i = 0; i < count; i++) {
+                long randomNum = RandomUtil.randomLong(sum);
+                Page<TbAlbumPojo> page = albumService.page(new Page<>(randomNum, 1),
+                        Wrappers.<TbAlbumPojo>lambdaQuery()
+                                .notIn(CollUtil.isNotEmpty(res),
+                                        TbAlbumPojo::getId,
+                                        res.stream().map(TbAlbumPojo::getId).toList()));
+                res.addAll(page.getRecords());
+            }
+        }
+        return getAlbumConvertList(res, remoteStorePicService.getArtistPicUrl(res.parallelStream().map(TbAlbumPojo::getId).toList()));
     }
     
     /**

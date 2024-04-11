@@ -28,21 +28,21 @@ public class RecommendController {
     
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/new/musics")
-    public R getNewMusic(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public R getNewMusic(@RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         List<NewMusicRes> res = recommendApi.getNewMusic(count);
         return R.success(res);
     }
     
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/new/artists")
-    public R getNewArtist(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public R getNewArtist(@RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         List<NewArtistRes> res = recommendApi.getNewArtist(count);
         return R.success(res);
     }
     
     @WebLog(LogNameConstant.ADMIN)
     @GetMapping("/new/albums")
-    public R getNewAlbums(@RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public R getNewAlbums(@RequestParam(value = "count", required = false, defaultValue = "5") Integer count) {
         List<NewAlbumRes> res = recommendApi.getNewAlbums(count);
         return R.success(res);
     }

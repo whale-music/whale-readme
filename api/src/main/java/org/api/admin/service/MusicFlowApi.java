@@ -946,13 +946,13 @@ public class MusicFlowApi {
         TbMusicPojo byId = musicService.getById(id);
         List<TbTagPojo> labelMusic = tagManagerService.getMusicTag(byId.getId());
         List<TbTagPojo> musicGenre = tagManagerService.getMusicGenre(byId.getId());
-        // 歌曲艺术家
-        List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
-        
         MusicInfoRes musicInfoRes = new MusicInfoRes();
         musicInfoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
         musicInfoRes.setMusicTag(labelMusic.parallelStream().map(TbTagPojo::getTagName).toList());
         musicInfoRes.setMusicGenre(musicGenre.parallelStream().map(TbTagPojo::getTagName).toList());
+        
+        // 歌曲艺术家
+        List<ArtistConvert> musicArtistByMusicId = qukuService.getArtistByMusicIds(id);
         if (CollUtil.isNotEmpty(musicArtistByMusicId)) {
             musicInfoRes.setArtists(musicArtistByMusicId.parallelStream()
                                                         .map(artistConvert -> new MusicInfoRes.Artist(artistConvert.getId(),
@@ -964,19 +964,11 @@ public class MusicFlowApi {
         Long albumId = byId.getAlbumId();
         if (Objects.nonNull(albumId)) {
             TbAlbumPojo albumPojo = albumService.getById(albumId);
-            // 专辑艺术家
-            List<ArtistConvert> artistListByAlbumIds = qukuService.getArtistByAlbumIds(albumId);
             // 专辑
             MusicInfoRes.Album album = new MusicInfoRes.Album();
             musicInfoRes.setAlbum(album);
             album.setAlbumId(albumPojo.getId());
             album.setAlbumName(albumPojo.getAlbumName());
-            if (CollUtil.isNotEmpty(artistListByAlbumIds)) {
-                album.setArtist(artistListByAlbumIds.stream()
-                                                    .map(artistConvert -> new MusicInfoRes.Artist(artistConvert.getId(),
-                                                            artistConvert.getArtistName(),
-                                                            artistConvert.getAliasName())).toList());
-            }
             musicInfoRes.setPublishTime(albumPojo.getPublishTime());
         }
         // 音源

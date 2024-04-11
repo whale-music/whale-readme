@@ -66,9 +66,6 @@ public class MusicInfoRes implements Serializable {
         
         @Schema(name = "专辑")
         private String albumName;
-        
-        @Schema(name = "歌手名ID")
-        private List<Artist> artist;
     }
     
     @Data

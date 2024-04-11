@@ -1587,4 +1587,28 @@ public class MusicFlowApi {
             resourceService.save(resource);
         }
     }
+    
+    public MobileMusicDetailRes getMobileMusicDetail(Long id) {
+        // 音乐
+        TbMusicPojo byId = musicService.getById(id);
+        if (Objects.isNull(byId)) {
+            throw new BaseException(ResultCode.SONG_NOT_EXIST);
+        }
+        MobileMusicDetailRes musicInfoRes = new MobileMusicDetailRes();
+        musicInfoRes.setMusicName(byId.getMusicName());
+        musicInfoRes.setAliasName(byId.getAliasName());
+        musicInfoRes.setPicUrl(remoteStorePicService.getMusicPicUrl(byId.getId()));
+        
+        // 音源
+        List<TbResourcePojo> resources = resourceService.getResources(byId.getId());
+        if (CollUtil.isNotEmpty(resources)) {
+            List<MobileMusicDetailRes.MusicSources> sources = resources.parallelStream()
+                                                                       .map(MobileMusicDetailRes.MusicSources::new)
+                                                                       .peek(s -> s.setUrl(remoteStorageService.getMusicResourceUrl(s.getPath())))
+                                                                       .toList();
+            musicInfoRes.setSources(sources);
+        }
+        
+        return musicInfoRes;
+    }
 }

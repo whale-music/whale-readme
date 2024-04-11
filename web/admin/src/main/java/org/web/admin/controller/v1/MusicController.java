@@ -8,6 +8,7 @@ import org.api.admin.config.AdminConfig;
 import org.api.admin.model.common.PageResCommon;
 import org.api.admin.model.req.*;
 import org.api.admin.model.req.upload.AudioInfoReq;
+import org.api.admin.model.res.MobileMusicDetailRes;
 import org.api.admin.model.res.MusicPlayInfoRes;
 import org.api.admin.model.res.MusicTabsPageRes;
 import org.api.admin.service.MusicFlowApi;
@@ -147,6 +148,13 @@ public class MusicController {
     @GetMapping("/musicInfo/{id}")
     public R getMusicInfo(@PathVariable("id") Long id) {
         return R.success(musicFlowApi.getMusicInfo(id));
+    }
+    
+    @WebLog(LogNameConstant.ADMIN)
+    @GetMapping("/mobile/detail/{id}")
+    public R getMobileMusicDetail(@PathVariable("id") Long id) {
+        MobileMusicDetailRes res = musicFlowApi.getMobileMusicDetail(id);
+        return R.success(res);
     }
     
     /**

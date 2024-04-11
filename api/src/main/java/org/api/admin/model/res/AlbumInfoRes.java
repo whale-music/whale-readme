@@ -22,25 +22,25 @@ public class AlbumInfoRes extends AlbumConvert {
     private List<String> albumGenre;
     
     @Schema(name = "音乐数据")
-    private List<AlbumMusic> musicList;
+    private List<Music> musicList;
     
     @Schema(name = "专辑歌曲数量")
     private Long albumSize;
     
     @Schema(name = "歌手信息")
-    private List<AlbumArtist> artistList;
+    private List<Artist> artistList;
     
     public void setMusicList(Collection<MusicConvert> musicList) {
-        this.musicList = musicList.parallelStream().map(AlbumMusic::new).toList();
+        this.musicList = musicList.parallelStream().map(Music::new).toList();
     }
     
     public void setArtistList(Collection<ArtistConvert> artistList) {
-        this.artistList = artistList.parallelStream().map(AlbumArtist::new).toList();
+        this.artistList = artistList.parallelStream().map(Artist::new).toList();
     }
     
     @Data
-    public static class AlbumMusic implements Serializable {
-        public AlbumMusic(MusicConvert m) {
+    public static class Music implements Serializable {
+        public Music(MusicConvert m) {
             this.id = m.getId();
             this.musicName = m.getMusicName();
             this.aliasName = m.getAliasName();
@@ -54,8 +54,8 @@ public class AlbumInfoRes extends AlbumConvert {
     }
     
     @Data
-    public static class AlbumArtist implements Serializable {
-        public AlbumArtist(ArtistConvert a) {
+    public static class Artist implements Serializable {
+        public Artist(ArtistConvert a) {
             this.id = a.getId();
             this.artistName = a.getArtistName();
             this.aliasName = a.getAliasName();

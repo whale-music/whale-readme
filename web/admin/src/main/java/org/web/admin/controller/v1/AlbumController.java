@@ -11,6 +11,7 @@ import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumListPageRes;
 import org.api.admin.model.res.AlbumPageRes;
+import org.api.admin.model.res.MobileAlbumDetailRes;
 import org.api.admin.service.AlbumApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
@@ -49,6 +50,13 @@ public class AlbumController {
     @GetMapping("/{id}")
     public R getAlbumInfo(@PathVariable("id") Long id) {
         AlbumInfoRes res = albumApi.getAlbumInfo(id);
+        return R.success(res);
+    }
+    
+    @WebLog(LogNameConstant.ADMIN)
+    @GetMapping("/mobile/{id}")
+    public R getMobileAlbumDetail(@PathVariable("id") Long id) {
+        MobileAlbumDetailRes res = albumApi.getMobileAlbumDetail(id);
         return R.success(res);
     }
     

@@ -14,6 +14,7 @@ import org.api.admin.model.req.SaveOrUpdateAlbumReq;
 import org.api.admin.model.res.AlbumInfoRes;
 import org.api.admin.model.res.AlbumListPageRes;
 import org.api.admin.model.res.AlbumPageRes;
+import org.api.admin.model.res.MobileAlbumDetailRes;
 import org.api.admin.utils.MyPageUtil;
 import org.api.admin.utils.OrderByUtil;
 import org.api.admin.utils.WrapperUtil;
@@ -310,5 +311,25 @@ public class AlbumApi {
         res.setContent(content);
         
         return res;
+    }
+    
+    public MobileAlbumDetailRes getMobileAlbumDetail(Long id) {
+        TbAlbumPojo byId = albumService.getById(id);
+        if (Objects.isNull(byId)) {
+            throw new BaseException(ResultCode.ALBUM_NO_EXIST_ERROR);
+        }
+        MobileAlbumDetailRes albumRes = new MobileAlbumDetailRes();
+        albumRes.setId(byId.getId());
+        albumRes.setAlbumName(byId.getAlbumName());
+        albumRes.setSubType(byId.getSubType());
+        albumRes.setDescription(byId.getDescription());
+        albumRes.setCompany(byId.getCompany());
+        albumRes.setPublishTime(byId.getPublishTime());
+        albumRes.setUserId(byId.getUserId());
+        albumRes.setPicUrl(remoteStorePicService.getAlbumPicUrl(byId.getId()));
+        
+        List<MusicConvert> musicListByAlbumId = qukuService.getMusicListByAlbumId(id);
+        albumRes.setMusicList(musicListByAlbumId);
+        return albumRes;
     }
 }

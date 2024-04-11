@@ -13,10 +13,7 @@ import org.api.admin.model.common.SimpleArtist;
 import org.api.admin.model.req.AlbumListPageReq;
 import org.api.admin.model.req.ArtistPageReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
-import org.api.admin.model.res.ArtistInfoRes;
-import org.api.admin.model.res.ArtistMvListRes;
-import org.api.admin.model.res.ArtistPageRes;
-import org.api.admin.model.res.ArtistRes;
+import org.api.admin.model.res.*;
 import org.api.admin.utils.MyPageUtil;
 import org.api.admin.utils.OrderByUtil;
 import org.api.admin.utils.WrapperUtil;
@@ -266,5 +263,28 @@ public class ArtistApi {
         res.setContent(content);
         
         return res;
+    }
+    
+    public MobileArtistDetailRes getMobileArtistDetail(Long id) {
+        MobileArtistDetailRes artistInfoRes = new MobileArtistDetailRes();
+        TbArtistPojo pojo = artistService.getById(id);
+        if (Objects.isNull(pojo)) {
+            throw new BaseException(ResultCode.ARTIST_NO_EXIST_ERROR);
+        }
+        artistInfoRes.setId(pojo.getId());
+        artistInfoRes.setArtistName(pojo.getArtistName());
+        artistInfoRes.setBirth(pojo.getBirth());
+        artistInfoRes.setIntroduction(pojo.getIntroduction());
+        artistInfoRes.setLocation(pojo.getLocation());
+        artistInfoRes.setSex(pojo.getSex());
+        artistInfoRes.setAliasName(pojo.getAliasName());
+        artistInfoRes.setUserId(pojo.getUserId());
+        
+        BeanUtils.copyProperties(pojo, artistInfoRes);
+        String picUrl = remoteStorePicService.getArtistPicUrl(pojo.getId());
+        artistInfoRes.setPicUrl(StringUtils.isBlank(picUrl) ? defaultInfo.getPic().getDefaultPic() : picUrl);
+        List<MusicConvert> musicListByArtistId = qukuService.getMusicListByArtistId(id);
+        artistInfoRes.setMusicList(musicListByArtistId);
+        return artistInfoRes;
     }
 }

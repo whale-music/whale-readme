@@ -8,10 +8,7 @@ import org.api.admin.model.req.AlbumListPageReq;
 import org.api.admin.model.req.ArtistPageReq;
 import org.api.admin.model.req.RemoveArtistReq;
 import org.api.admin.model.req.SaveOrUpdateArtistReq;
-import org.api.admin.model.res.ArtistInfoRes;
-import org.api.admin.model.res.ArtistMvListRes;
-import org.api.admin.model.res.ArtistPageRes;
-import org.api.admin.model.res.ArtistRes;
+import org.api.admin.model.res.*;
 import org.api.admin.service.ArtistApi;
 import org.core.common.result.R;
 import org.core.common.weblog.annotation.WebLog;
@@ -59,6 +56,14 @@ public class ArtistController {
     @GetMapping("/{id}")
     public R getArtistById(@PathVariable("id") Long id) {
         ArtistInfoRes artist = artistApi.getArtistById(id);
+        return R.success(artist);
+    }
+    
+    
+    @WebLog(LogNameConstant.ADMIN)
+    @GetMapping("/mobile/{id}")
+    public R getMobileArtistDetail(@PathVariable("id") Long id) {
+        MobileArtistDetailRes artist = artistApi.getMobileArtistDetail(id);
         return R.success(artist);
     }
     

@@ -241,3 +241,18 @@ webdav:
 
 upload:
   music-name-template: "{music}-{album}-[{artist}]-{rate}"
+
+# 添加跨域配置, 域名使用配置隔开
+cross:
+  admin:
+    enable: false
+    domains: http://localhost:8848/,http://localhost:8081/
+  subsonic:
+    enable: false
+    domains: http://localhost:8080
+  webdav:
+    enable: false
+    domains: http://localhost:8081
+  nmusic:
+    enable: false
+    domains: http://localhost:8081

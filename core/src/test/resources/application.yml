@@ -120,8 +120,8 @@ mybatis-plus:
 #    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
 # 查询大于有效页时，返回有效页最后一页
-pagehelper:
-  reasonable: true
+#pagehelper:
+#  reasonable: true
 
 # 对象存储
 save-config:

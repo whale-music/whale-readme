@@ -46,8 +46,9 @@
     </dependencies>
 
     <build>
-        <plugins>
+        <finalName>${project.parent.artifactId}-music</finalName>
 
+        <plugins>
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
@@ -65,7 +66,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 </project>

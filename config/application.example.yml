@@ -17,10 +17,10 @@ logging:
     io.milton.common: off
   pattern:
     # 控制输出的格式
-    #格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} %clr(%5p) %clr(%C.%M[%line]){cyan} [%thread] %msg%n"
+    #格式化输出：%d:表示日期    %thread:表示线程名  ${PID} 进程ID  %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss:SSS}){blue} ${PID} %clr([%thread]){magenta} %clr(%5p){green} %clr(%C.%M[%line]){cyan} %msg%n"
     # 文件输出的格式
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} ${PID} [%thread] %-5level %logger - %msg%n"
   file:
     # 日志文件名
     #    path: logs
@@ -38,6 +38,10 @@ logging:
 
 #spring
 spring:
+  # 启用虚拟线程
+  threads:
+    virtual:
+      enabled: true
   application:
     name: whale
     # config:
@@ -50,7 +54,6 @@ spring:
       enabled: always
   datasource:
     #引用项目中的数据库文件
-    # mysql or h2
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:./data/db/db_data
     username: root
@@ -216,6 +219,10 @@ application:
     subsonic-application: false
     webdav-application: false
 
+# 保存缓存路径
+cache:
+  path: ./data/cache/record
+
 # subsonic 资源多个资源返回策略:
 # first:第一个 last: 最后一个
 # bitRateMax:最大比特率 bitRateMin:最小比特率
@@ -234,3 +241,18 @@ webdav:
 
 upload:
   music-name-template: "{music}-{album}-[{artist}]-{rate}"
+
+# 添加跨域配置, 域名使用配置隔开
+cross:
+  admin:
+    enable: false
+    domains: http://localhost:8848/,http://localhost:8081/
+  subsonic:
+    enable: false
+    domains: http://localhost:8080
+  webdav:
+    enable: false
+    domains: http://localhost:8081
+  nmusic:
+    enable: false
+    domains: http://localhost:8081

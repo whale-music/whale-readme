@@ -7,6 +7,8 @@
 
 
 > Personal music management service
+>
+> Warn: The project is in beta version and cannot be used for production.
 
 ---
 

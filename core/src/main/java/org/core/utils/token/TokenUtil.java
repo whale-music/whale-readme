@@ -22,12 +22,16 @@ public class TokenUtil {
     
     private static final String REFRESH = "refresh";
     
-    private static final Algorithm algorithm = Algorithm.HMAC256(JwtConfig.getSeedKey());
+    private final JwtConfig jwtConfig;
+    
+    private final Algorithm algorithm;
     
     private final UserCacheServiceUtil userCacheServiceUtil;
     
-    public TokenUtil(UserCacheServiceUtil userCacheServiceUtil) {
+    public TokenUtil(UserCacheServiceUtil userCacheServiceUtil, JwtConfig jwtConfig) {
         this.userCacheServiceUtil = userCacheServiceUtil;
+        this.algorithm = Algorithm.HMAC256(jwtConfig.getSeedKey());
+        this.jwtConfig = jwtConfig;
     }
     
     //----------------------------------------------------------------sign token
@@ -41,7 +45,7 @@ public class TokenUtil {
      */
     public String webdavSignToken(String userId, SysUserPojo user) {
         return signAndSaveUserCache(UserCacheTypeConstant.WEBDAV,
-                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                new Date(System.currentTimeMillis() + jwtConfig.getExpireTime()),
                 userId,
                 user,
                 USER_INFO);
@@ -49,7 +53,7 @@ public class TokenUtil {
     
     public String subsonicSignToken(String userId, SysUserPojo user) {
         return signAndSaveUserCache(UserCacheTypeConstant.SUBSONIC,
-                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                new Date(System.currentTimeMillis() + jwtConfig.getExpireTime()),
                 userId,
                 user,
                 USER_INFO);
@@ -57,7 +61,7 @@ public class TokenUtil {
     
     public String nMusicSignToken(String userId, SysUserPojo user) {
         return signAndSaveUserCache(UserCacheTypeConstant.NMUSIC,
-                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                new Date(System.currentTimeMillis() + jwtConfig.getExpireTime()),
                 userId,
                 user,
                 USER_INFO);
@@ -65,7 +69,7 @@ public class TokenUtil {
     
     public String adminSignToken(String userId, SysUserPojo user) {
         return signAndSaveUserCache(UserCacheTypeConstant.ADMIN,
-                new Date(System.currentTimeMillis() + JwtConfig.getExpireTime()),
+                new Date(System.currentTimeMillis() + jwtConfig.getExpireTime()),
                 userId,
                 user,
                 USER_INFO);
@@ -119,7 +123,7 @@ public class TokenUtil {
     public UserLoginCacheModel signAndRefreshToken(String type, String refreshType, SysUserPojo user) {
         // token
         String uuid = type + IdUtil.fastUUID();
-        Date expires = new Date(System.currentTimeMillis() + JwtConfig.getExpireTime());
+        Date expires = new Date(System.currentTimeMillis() + jwtConfig.getExpireTime());
         String sign = JWT.create()
                          // 将userId保存到token里面
                          .withAudience(StringUtil.defaultNullString(user.getId()))
@@ -131,7 +135,7 @@ public class TokenUtil {
                          .sign(algorithm);
         // refresh
         // String refreshUuid = refreshType + IdUtil.fastUUID();
-        Date refreshExpires = new Date(System.currentTimeMillis() + JwtConfig.getRefreshExpireTime());
+        Date refreshExpires = new Date(System.currentTimeMillis() + jwtConfig.getRefreshExpireTime());
         String refreshSign = JWT.create()
                                 // 将userId保存到token里面
                                 .withAudience(StringUtil.defaultNullString(user.getId()))
@@ -203,7 +207,7 @@ public class TokenUtil {
      * 判断 jwt 是否过期
      */
     public void isJwtExpired(String token) {
-        JWT.require(algorithm).acceptExpiresAt(JwtConfig.getExpireTime()).build().verify(token);
+        JWT.require(algorithm).acceptExpiresAt(jwtConfig.getExpireTime()).build().verify(token);
     }
     
     /**

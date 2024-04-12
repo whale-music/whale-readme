@@ -154,7 +154,7 @@ jwt-config:
   # token 1天
   expire-time: 86_400_000
   # 刷新token 30天
-  refresh-key: 2_592_000_000
+  refresh-expire-time: 2_592_000_000
 
 file-type:
   suffix:

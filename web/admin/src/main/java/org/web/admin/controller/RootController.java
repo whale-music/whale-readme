@@ -30,7 +30,7 @@ public class RootController {
     public PlatformConfigRes platformConfig() {
         PlatformConfigRes platformConfigRes = new PlatformConfigRes();
         // 设置版本号
-        platformConfigRes.setVersion("0.0.1");
+        platformConfigRes.setVersion("v0.0.1-beta");
         // 设置标题
         platformConfigRes.setTitle("Whale");
         // 设置是否固定头部

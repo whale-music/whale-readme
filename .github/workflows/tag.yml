@@ -1,4 +1,4 @@
-name: "Auto build project and push release"
+name: "tag push auto build project "
 # 触发工作流的条件
 on:
   push:

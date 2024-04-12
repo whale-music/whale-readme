@@ -23,36 +23,18 @@ Check out our docs at .
 Download
 
 ```bash
-wget https://github.com/
-```
-
-mirror
-
-```bash
-wget https://github.com/
+wget https://github.com/whale-music/whale/releases/latest/download/whale-music.jar
 ```
 
 ### run
 
 ```bash
-java -jar whale.jar
-```
-
-## Docker
-
-pull
-
-```bash
-docker pull xxx
-```
-
-run
-
-```bash
-docker run xxx
+java -jar whale-music.jar
 ```
 
 # Build
+
+> Not including the web
 
 clone
 

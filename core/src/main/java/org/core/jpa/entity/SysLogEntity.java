@@ -59,7 +59,7 @@ public class SysLogEntity {
     private String methodResultParamType;
     
     @Size(max = 512)
-    @Column(name = "methodName", length = 512)
+    @Column(name = "method_name", length = 512)
     private String methodName;
     
     @Size(max = 24)

@@ -62,7 +62,7 @@ public class SysLogPojo extends Model<SysLogPojo> implements Serializable {
     private String methodResultParamType;
     
     @Schema(description = "全类方法名")
-    @TableField("methodName")
+    @TableField("method_name")
     private String methodName;
     
     @Schema(description = "请求方法")

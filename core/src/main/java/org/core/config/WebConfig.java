@@ -30,12 +30,19 @@ public class WebConfig implements WebMvcConfigurer {
     public static final String PUBLIC_ASSETS_URL = "/assets/**";
     public static final String PUBLIC_LOGIN_KEY_URL = "/login-key/**";
     
+    public static final String API_DOCS = "/v3/api-docs/**";
+    public static final String KNIFE4J_API_DOCS = "/docs/**";
+    public static final String SWAGGER_UI = "/swagger-ui/**";
+    
     private static final List<String> PUBLIC_LIST = new ArrayList<>();
     
     static {
         PUBLIC_LIST.add(PUBLIC_STATIC_URL);
         PUBLIC_LIST.add(PUBLIC_ASSETS_URL);
         PUBLIC_LIST.add(PUBLIC_LOGIN_KEY_URL);
+        PUBLIC_LIST.add(API_DOCS);
+        PUBLIC_LIST.add(KNIFE4J_API_DOCS);
+        PUBLIC_LIST.add(SWAGGER_UI);
     }
     
     private final SaveConfig saveConfig;

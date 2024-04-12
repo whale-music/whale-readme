@@ -98,7 +98,7 @@ knife4j:
   enable: true
   setting:
     language: zh_cn
-    home-custom-path:
+  #    home-custom-path:
   cors: true
 
 # mybatis-plus相关配置

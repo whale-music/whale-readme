@@ -26,6 +26,7 @@ import java.util.Objects;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     
+    public static final String WEB_VERSION = "/web/**";
     public static final String PUBLIC_STATIC_URL = "/common/static/**";
     public static final String PUBLIC_ASSETS_URL = "/assets/**";
     public static final String PUBLIC_LOGIN_KEY_URL = "/login-key/**";
@@ -37,6 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
     private static final List<String> PUBLIC_LIST = new ArrayList<>();
     
     static {
+        PUBLIC_LIST.add(WEB_VERSION);
         PUBLIC_LIST.add(PUBLIC_STATIC_URL);
         PUBLIC_LIST.add(PUBLIC_ASSETS_URL);
         PUBLIC_LIST.add(PUBLIC_LOGIN_KEY_URL);
